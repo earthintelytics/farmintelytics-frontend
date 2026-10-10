@@ -44,7 +44,7 @@ const HeroSection = () => {
 
         {/* Description */}
         <p className="max-w-2xl text-base sm:text-lg text-slate-200 leading-relaxed font-normal mb-10 drop-shadow">
-          Real-time satellite intelligence for farms, estates, and agricultural lands. Track crop health and growth, get smart irrigation and moisture advice, verify EUDR deforestation compliance, and evaluate soil suitability, all in one clear, easy-to-use platform.
+          Real-time satellite intelligence for farms, estates, and agricultural lands. Track crop health and growth, get smart irrigation and moisture advice, verify EUDR deforestation compliance, and evaluate land suitability, all in one clear, easy-to-use platform.
         </p>
 
         {/* Central Primary Sign In Button */}
