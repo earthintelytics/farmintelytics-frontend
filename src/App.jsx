@@ -95,16 +95,30 @@ const hasValidTeamSession = hasValidTeamToken;
 // "Back to hub" on an organisation's page always means that organisation's
 // own hub, never the FarmIntelytics team hub or the admin console. Team-only
 // tools (/tools/<id>) go back to the team hub.
-const backHub = (tenant) => (tenant ? paths.orgHub(tenant) : '/');
+const backHub = (tenant) => (tenant ? paths.orgHub(tenant) : '/hub');
 
-// "/" is the team hub. A client who lands here goes to its own hub.
-const HubPage = () => {
+// "/" is the main landing & sign-in page for organisations and clients.
+// If an organisation is already signed in on this browser, go to their hub.
+const RootPage = () => {
+  const tenant = sessionTenant();
+  if (tenant) return <Navigate to={paths.orgHub(tenant)} replace />;
+  return <LoginPage />;
+};
+
+// "/admin-login" & "/admin/login" is the Super Admin & Team sign-in page.
+const AdminLoginPage = () => {
+  const navigate = useNavigate();
+  const [teamSignedIn] = useState(hasValidTeamSession);
+  if (teamSignedIn) return <Navigate to="/admin/organizations" replace />;
+  return <AdminLogin context="admin" onSuccess={() => navigate('/admin/organizations')} />;
+};
+
+// "/hub" is the internal platform hub for the FarmIntelytics team.
+const TeamHubPage = () => {
   const navigate = useNavigate();
   const [teamSignedIn, setTeamSignedIn] = useState(hasValidTeamSession);
 
   const handleSelectModule = (id) => {
-    // Organisation cards open that organisation's own hub (signing in with
-    // one of its accounts if needed).
     if (id.startsWith('org:')) {
       const org = id.slice(4);
       navigate(sessionTenant() === org ? paths.orgHub(org) : paths.orgLogin(org));
@@ -116,12 +130,11 @@ const HubPage = () => {
   const handleTeamSignOut = () => {
     clearTeamSession();
     setTeamSignedIn(false);
+    navigate('/admin-login');
   };
 
   if (teamSignedIn) return <PortalHub onSelectModule={handleSelectModule} onSignOut={handleTeamSignOut} onOpenAdmin={() => navigate('/admin/organizations')} />;
-  const tenant = sessionTenant();
-  if (tenant) return <Navigate to={paths.orgHub(tenant)} replace />;
-  return <AdminLogin context="hub" onSuccess={() => setTeamSignedIn(true)} />;
+  return <Navigate to="/admin-login" replace />;
 };
 
 // /org/<tenant> and /org/<tenant>/settings. The URL names the organisation;
@@ -213,7 +226,7 @@ const PortalPage = () => {
   useEffect(() => { if (moduleId) sessionStorage.setItem('fi_module', moduleId); }, [moduleId]);
 
   const handleSignOut = () => {
-    if (isToolRoute) { clearTeamSession(); navigate('/'); return; }
+    if (isToolRoute) { clearTeamSession(); navigate('/admin-login'); return; }
     clearTenantSession();
     navigate(`${paths.orgLogin(tenant)}?next=${encodeURIComponent(moduleId || '')}`);
   };
@@ -230,7 +243,7 @@ const PortalPage = () => {
   if (moduleFromUrl !== moduleId || (preMod?.teamOnly && !isToolRoute) || (preMod && !preMod.teamOnly && isToolRoute)) {
     return <Navigate to={paths.service(moduleId, tenant || sessionTenant())} replace />;
   }
-  if (isToolRoute && !team) return <Navigate to="/" replace />;
+  if (isToolRoute && !team) return <Navigate to="/admin-login" replace />;
   if (!isToolRoute && sessionTenant() !== tenant) {
     return <Navigate to={`${paths.orgLogin(tenant)}?next=${encodeURIComponent(moduleId)}`} replace />;
   }
@@ -238,7 +251,7 @@ const PortalPage = () => {
   const backButton = (label, onClick) => (
     <button onClick={onClick} className="mt-8 px-6 py-3 bg-white text-[var(--text-main)] border border-[var(--border-light)] rounded-xl font-semibold text-sm hover:bg-[var(--bg-main)] transition-colors">{label}</button>
   );
-  const exitAction = backButton(isToolRoute ? 'Back to hub' : 'Back to your services', () => navigate(isToolRoute ? '/' : paths.orgHub(tenant)));
+  const exitAction = backButton(isToolRoute ? 'Back to hub' : 'Back to your services', () => navigate(isToolRoute ? '/hub' : paths.orgHub(tenant)));
 
   const mod = resolveModule(moduleId);
   if (!mod) {
@@ -307,8 +320,11 @@ const AppRoutes = () => {
   return (
     <React.Suspense fallback={<RouteLoading />}>
       <Routes>
-        <Route path="/"                         element={<HubPage />} />
+        <Route path="/"                         element={<RootPage />} />
         <Route path="/login"                    element={<LoginPage />} />
+        <Route path="/admin-login"              element={<AdminLoginPage />} />
+        <Route path="/admin/login"              element={<AdminLoginPage />} />
+        <Route path="/hub"                      element={<TeamHubPage />} />
         <Route path="/f/:token"                 element={<PublicFormPage />} />
         <Route path="/tools/:moduleId"          element={<PortalPage />} />
         <Route path="/org/:tenant"              element={<OrgPage view="services" />} />
@@ -319,14 +335,12 @@ const AppRoutes = () => {
         <Route path="/org/:tenant/login"        element={<LoginPage />} />
         <Route path="/org/:tenant/:moduleId"    element={<PortalPage />} />
         {/* Old addresses */}
-        <Route path="/hub"                      element={<Navigate to="/" replace />} />
         <Route path="/tenant/hub"               element={<LegacyTenantHub />} />
         <Route path="/portal/:moduleId"         element={<LegacyPortal />} />
         <Route path="/portal"                   element={<Navigate to="/" replace />} />
-        <Route path="/admin/login"            element={<AdminLogin />} />
-        <Route path="/admin/*"               element={<AdminPortal />} />
-        {/* Catch-all: back to hub */}
-        <Route path="*"                       element={<Navigate to="/" replace />} />
+        <Route path="/admin/*"                  element={<AdminPortal />} />
+        {/* Catch-all: back to root */}
+        <Route path="*"                         element={<Navigate to="/" replace />} />
       </Routes>
     </React.Suspense>
   );

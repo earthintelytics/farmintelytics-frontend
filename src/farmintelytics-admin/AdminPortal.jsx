@@ -78,7 +78,7 @@ const AdminPortal = () => {
   const handleSignOut = () => {
     localStorage.removeItem('fi_admin_token');
     localStorage.removeItem('fi_admin_email');
-    navigate('/admin/login');
+    navigate('/admin-login');
   };
 
   const activeId = NAV_ITEMS.find(n => location.pathname.startsWith(n.path))?.id || 'organizations';

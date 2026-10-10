@@ -241,7 +241,10 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
           }}
         />
 
-        <footer className="text-xs text-gray-400">© {new Date().getFullYear()} FarmIntelytics</footer>
+        <footer className="flex items-center justify-between text-xs text-gray-400">
+          <span>© {new Date().getFullYear()} FarmIntelytics</span>
+          <a href="/admin-login" className="hover:text-gray-600 transition-colors">Team / Admin Sign-in →</a>
+        </footer>
       </main>
     </div>
   );

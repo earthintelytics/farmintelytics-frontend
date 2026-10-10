@@ -87,7 +87,7 @@ export function teamRole() {
 /** The team sign-in was refused or is outdated: clear it and go to the team sign-in. */
 export function redirectToTeamSignIn() {
   TEAM_KEYS.forEach((k) => localStorage.removeItem(k));
-  if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin/login')) {
-    window.location.href = '/admin/login';
+  if (typeof window !== 'undefined' && !window.location.pathname.startsWith('/admin-login') && !window.location.pathname.startsWith('/admin/login')) {
+    window.location.href = '/admin-login';
   }
 }

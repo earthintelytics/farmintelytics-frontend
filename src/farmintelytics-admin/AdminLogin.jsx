@@ -112,6 +112,12 @@ const AdminLogin = ({ onSuccess = null, context = 'admin' }) => {
               ))}
             </div>
           )}
+
+          <div className="mt-6 pt-5 border-t border-gray-100 text-center">
+            <a href="/" className="text-xs font-semibold text-[var(--brand-primary)] hover:underline">
+              ← Go to Organisation / Client Sign-in
+            </a>
+          </div>
         </div>
 
         <p className="text-center text-xs text-gray-400 mt-6">© {new Date().getFullYear()} FarmIntelytics</p>

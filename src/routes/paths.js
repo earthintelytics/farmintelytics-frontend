@@ -18,7 +18,8 @@ import { resolveModule, canonicalModuleId } from '../modules/registry';
 const enc = encodeURIComponent;
 
 export const paths = {
-  teamHub: '/',
+  teamHub: '/hub',
+  adminLogin: '/admin-login',
   orgHub: (tenant) => `/org/${enc(tenant)}`,
   orgSettings: (tenant) => `/org/${enc(tenant)}/settings`,
   orgField: (tenant) => `/org/${enc(tenant)}/field`,
