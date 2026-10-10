@@ -7,17 +7,16 @@ const HeroSection = () => {
 
   return (
     <section id="hero" className="relative overflow-hidden bg-[#070b14] min-h-[720px] lg:min-h-[820px] flex items-center justify-center border-b border-slate-800">
-      {/* Option 5 Panoramic Satellite Background Image */}
+      {/* Pristine Background Image - 100% Free of Words & Labels */}
       <div
-        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-85 z-0"
-        style={{ backgroundImage: "url('/hero-satellite-panoramic.jpg')" }}
+        className="absolute inset-0 w-full h-full bg-cover bg-center opacity-90 z-0"
+        style={{ backgroundImage: "url('/hero-clean-panoramic-v4.jpg?v=4')" }}
       />
 
       {/* Cinematic Gradient Overlays for High Contrast & Text Legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#070b14] via-[#070b14]/50 to-[#070b14]/70 z-0 pointer-events-none" />
-      <div className="absolute inset-0 bg-radial-vignette from-transparent via-[#070b14]/30 to-[#070b14]/80 z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#070b14] via-[#070b14]/40 to-[#070b14]/60 z-0 pointer-events-none" />
 
-      {/* Live Animated Radar Waves & Telemetry Canvas */}
+      {/* Live Animated Radar Telemetry Canvas */}
       <GlobeCanvas />
 
       {/* Hero Content */}
@@ -25,7 +24,7 @@ const HeroSection = () => {
         {/* FarmIntelytics Logo */}
         <div className="mb-6">
           <img
-            src="/farmintelytics-logo.png"
+            src="/farmintelytics-logo.png?v=4"
             alt="FarmIntelytics"
             className="w-20 h-20 object-contain drop-shadow-[0_4px_24px_rgba(52,211,153,0.4)]"
             width="80"
