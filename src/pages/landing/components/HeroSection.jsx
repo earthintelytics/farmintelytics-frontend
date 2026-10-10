@@ -21,15 +21,17 @@ const HeroSection = () => {
 
       {/* Hero Content */}
       <div className="relative z-20 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center flex flex-col items-center">
-        {/* FarmIntelytics Logo */}
+        {/* FarmIntelytics Logo with Crisp White Background */}
         <div className="mb-6">
-          <img
-            src="/farmintelytics-logo.png?v=4"
-            alt="FarmIntelytics"
-            className="w-20 h-20 object-contain drop-shadow-[0_4px_24px_rgba(52,211,153,0.4)]"
-            width="80"
-            height="80"
-          />
+          <div className="inline-block p-2.5 sm:p-3 bg-white rounded-2xl shadow-[0_10px_35px_rgba(0,0,0,0.6)] border border-white/30 transform hover:scale-105 transition-transform duration-300">
+            <img
+              src="/farmintelytics-logo.png?v=6"
+              alt="FarmIntelytics"
+              className="w-20 h-20 sm:w-24 sm:h-24 object-contain rounded-xl"
+              width="96"
+              height="96"
+            />
+          </div>
         </div>
 
         {/* Title and Branding */}
