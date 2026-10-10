@@ -22,19 +22,19 @@ const LandingNav = () => {
           </div>
 
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <button onClick={() => navigate('/privacy')} className="hover:text-slate-900 transition-colors">
+            <button onClick={() => navigate('/privacy')} className="hover:text-emerald-700 transition-colors">
               Privacy
             </button>
-            <button onClick={() => navigate('/trust')} className="hover:text-slate-900 transition-colors">
+            <button onClick={() => navigate('/trust')} className="hover:text-emerald-700 transition-colors">
               Trust Center
             </button>
-            <button onClick={() => navigate('/legal')} className="hover:text-slate-900 transition-colors">
+            <button onClick={() => navigate('/legal')} className="hover:text-emerald-700 transition-colors">
               Legal
             </button>
-            <button onClick={() => navigate('/docs')} className="hover:text-slate-900 transition-colors">
+            <button onClick={() => navigate('/docs')} className="hover:text-emerald-700 transition-colors">
               Docs
             </button>
-            <button onClick={() => navigate('/contact')} className="hover:text-slate-900 transition-colors">
+            <button onClick={() => navigate('/contact')} className="hover:text-emerald-700 transition-colors">
               Contact
             </button>
           </nav>
@@ -44,7 +44,7 @@ const LandingNav = () => {
           <button
             id="top-nav-sign-in"
             onClick={() => navigate('/login')}
-            className="px-6 py-2 rounded-lg text-sm font-semibold text-slate-900 bg-slate-100 hover:bg-slate-200 border border-slate-300 transition-all active:scale-[0.98]"
+            className="text-sm font-semibold text-slate-800 hover:text-emerald-700 transition-colors px-3 py-1.5 cursor-pointer bg-transparent border-0 active:scale-95"
           >
             Sign In
           </button>

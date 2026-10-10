@@ -9,17 +9,16 @@ const HeroSection = () => {
     <section id="hero" className="relative overflow-hidden bg-[#0c101d] min-h-[680px] lg:min-h-[750px] flex items-center justify-center border-b border-slate-800">
       <GlobeCanvas />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center flex flex-col items-center">
-        {/* Platform Center Icon Badge */}
-        <div className="mb-6 relative">
-          <div className="absolute -inset-2 bg-gradient-to-r from-blue-600 to-emerald-500 rounded-3xl blur-md opacity-40 animate-pulse-slow" />
-          <div className="relative w-20 h-20 rounded-2xl bg-[#131b2e] border border-blue-400/30 shadow-2xl flex items-center justify-center p-3">
-            <img
-              src="/farmintelytics-logo.png"
-              alt="FarmIntelytics"
-              className="w-full h-full object-contain filter drop-shadow-[0_0_12px_rgba(52,211,153,0.5)]"
-            />
-          </div>
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center flex flex-col items-center">
+        {/* FarmIntelytics Logo - No Box / No Frame Background */}
+        <div className="mb-6">
+          <img
+            src="/farmintelytics-logo.png"
+            alt="FarmIntelytics"
+            className="w-20 h-20 object-contain drop-shadow-[0_4px_16px_rgba(52,211,153,0.3)]"
+            width="80"
+            height="80"
+          />
         </div>
 
         {/* Title and Branding */}
