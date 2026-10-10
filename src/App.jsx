@@ -59,6 +59,13 @@ const SuitabilityPortal = lazyWithReload(() => import('./modules/suitability/Sui
 const SmallholderHub = lazyWithReload(() => import('./modules/smallholder/SmallholderHub'));
 const PublicFormPage = lazyWithReload(() => import('./modules/forms/PublicFormPage'));
 
+// === Public Information & Compliance Pages ===
+const PrivacyPage = lazyWithReload(() => import('./pages/public/PrivacyPage'));
+const TrustCenterPage = lazyWithReload(() => import('./pages/public/TrustCenterPage'));
+const LegalPage = lazyWithReload(() => import('./pages/public/LegalPage'));
+const DocumentationPage = lazyWithReload(() => import('./pages/public/DocumentationPage'));
+const ContactPage = lazyWithReload(() => import('./pages/public/ContactPage'));
+
 // === Crop monitoring (one portal for every crop) ===
 const CropPortal = lazyWithReload(() => import('./modules/monitoring/CropPortal'));
 
@@ -96,13 +103,15 @@ const hasValidTeamSession = hasValidTeamToken;
 // own hub, never the FarmIntelytics team hub or the admin console. Team-only
 // tools (/tools/<id>) go back to the team hub.
 const backHub = (tenant) => (tenant ? paths.orgHub(tenant) : '/hub');
+import LandingPage from './pages/LandingPage';
 
-// "/" is the main landing & sign-in page for organisations and clients.
+// ─── Root Landing Page ───────────────────────────────────────────────────────
+// "/" renders the FarmIntelytics Online landing page (ArcGIS Online style).
 // If an organisation is already signed in on this browser, go to their hub.
 const RootPage = () => {
   const tenant = sessionTenant();
   if (tenant) return <Navigate to={paths.orgHub(tenant)} replace />;
-  return <LoginPage />;
+  return <LandingPage />;
 };
 
 // "/admin-engine" & "/admin/login" is the Super Admin & Team sign-in page.
@@ -322,6 +331,11 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/"                         element={<RootPage />} />
         <Route path="/login"                    element={<LoginPage />} />
+        <Route path="/privacy"                  element={<PrivacyPage />} />
+        <Route path="/trust"                    element={<TrustCenterPage />} />
+        <Route path="/legal"                    element={<LegalPage />} />
+        <Route path="/docs"                     element={<DocumentationPage />} />
+        <Route path="/contact"                  element={<ContactPage />} />
         <Route path="/admin-engine"             element={<AdminLoginPage />} />
         <Route path="/admin-login"              element={<Navigate to="/admin-engine" replace />} />
         <Route path="/admin/login"              element={<Navigate to="/admin-engine" replace />} />
