@@ -19,7 +19,7 @@ const enc = encodeURIComponent;
 
 export const paths = {
   teamHub: '/hub',
-  adminLogin: '/admin-login',
+  adminLogin: '/admin-engine',
   orgHub: (tenant) => `/org/${enc(tenant)}`,
   orgSettings: (tenant) => `/org/${enc(tenant)}/settings`,
   orgField: (tenant) => `/org/${enc(tenant)}/field`,

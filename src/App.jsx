@@ -105,7 +105,7 @@ const RootPage = () => {
   return <LoginPage />;
 };
 
-// "/admin-login" & "/admin/login" is the Super Admin & Team sign-in page.
+// "/admin-engine" & "/admin/login" is the Super Admin & Team sign-in page.
 const AdminLoginPage = () => {
   const navigate = useNavigate();
   const [teamSignedIn] = useState(hasValidTeamSession);
@@ -130,11 +130,11 @@ const TeamHubPage = () => {
   const handleTeamSignOut = () => {
     clearTeamSession();
     setTeamSignedIn(false);
-    navigate('/admin-login');
+    navigate('/admin-engine');
   };
 
   if (teamSignedIn) return <PortalHub onSelectModule={handleSelectModule} onSignOut={handleTeamSignOut} onOpenAdmin={() => navigate('/admin/organizations')} />;
-  return <Navigate to="/admin-login" replace />;
+  return <Navigate to="/admin-engine" replace />;
 };
 
 // /org/<tenant> and /org/<tenant>/settings. The URL names the organisation;
@@ -226,7 +226,7 @@ const PortalPage = () => {
   useEffect(() => { if (moduleId) sessionStorage.setItem('fi_module', moduleId); }, [moduleId]);
 
   const handleSignOut = () => {
-    if (isToolRoute) { clearTeamSession(); navigate('/admin-login'); return; }
+    if (isToolRoute) { clearTeamSession(); navigate('/admin-engine'); return; }
     clearTenantSession();
     navigate(`${paths.orgLogin(tenant)}?next=${encodeURIComponent(moduleId || '')}`);
   };
@@ -243,7 +243,7 @@ const PortalPage = () => {
   if (moduleFromUrl !== moduleId || (preMod?.teamOnly && !isToolRoute) || (preMod && !preMod.teamOnly && isToolRoute)) {
     return <Navigate to={paths.service(moduleId, tenant || sessionTenant())} replace />;
   }
-  if (isToolRoute && !team) return <Navigate to="/admin-login" replace />;
+  if (isToolRoute && !team) return <Navigate to="/admin-engine" replace />;
   if (!isToolRoute && sessionTenant() !== tenant) {
     return <Navigate to={`${paths.orgLogin(tenant)}?next=${encodeURIComponent(moduleId)}`} replace />;
   }
@@ -322,8 +322,9 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/"                         element={<RootPage />} />
         <Route path="/login"                    element={<LoginPage />} />
-        <Route path="/admin-login"              element={<AdminLoginPage />} />
-        <Route path="/admin/login"              element={<AdminLoginPage />} />
+        <Route path="/admin-engine"             element={<AdminLoginPage />} />
+        <Route path="/admin-login"              element={<Navigate to="/admin-engine" replace />} />
+        <Route path="/admin/login"              element={<Navigate to="/admin-engine" replace />} />
         <Route path="/hub"                      element={<TeamHubPage />} />
         <Route path="/f/:token"                 element={<PublicFormPage />} />
         <Route path="/tools/:moduleId"          element={<PortalPage />} />
