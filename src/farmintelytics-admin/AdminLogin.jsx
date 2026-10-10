@@ -62,13 +62,19 @@ const AdminLogin = ({ onSuccess = null, context = 'admin' }) => {
             <div className="mt-6 p-3.5 rounded-[10px] border border-red-200 bg-red-50 text-sm text-red-800">{error}</div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-4 space-y-5">
+          <form onSubmit={handleSubmit} className="mt-4 space-y-5" method="POST" action="#" name="admin-login-form">
             <div>
-              <label className="block text-sm font-medium mb-1.5">Email</label>
+              <label htmlFor="admin-email" className="block text-sm font-medium mb-1.5">Email</label>
               <div className="relative">
                 <Mail size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  type="email" required value={email}
+                  id="admin-email"
+                  name="username"
+                  type="email"
+                  required
+                  autoComplete="username email"
+                  placeholder="admin@farmintelytics.com"
+                  value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="w-full rounded-[10px] border border-gray-200 bg-white py-3 pl-11 pr-4 text-sm outline-none transition-colors focus:border-[var(--brand-primary)] focus:ring-1 focus:ring-[var(--brand-primary)]"
                 />
@@ -76,13 +82,18 @@ const AdminLogin = ({ onSuccess = null, context = 'admin' }) => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1.5">Password</label>
+              <label htmlFor="admin-password" className="block text-sm font-medium mb-1.5">Password</label>
               <div className="relative">
                 <Lock size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
-                  type={showCode ? 'text' : 'password'} required
+                  id="admin-password"
+                  name="password"
+                  type={showCode ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
                   placeholder="••••••••••••"
-                  value={code} onChange={e => setCode(e.target.value)}
+                  value={code}
+                  onChange={e => setCode(e.target.value)}
                   className="w-full rounded-[10px] border border-gray-200 bg-white py-3 pl-11 pr-11 text-sm outline-none transition-colors placeholder:text-gray-400 focus:border-[var(--brand-primary)] focus:ring-1 focus:ring-[var(--brand-primary)]"
                 />
                 <button type="button" onClick={() => setShowCode(!showCode)}
@@ -93,7 +104,7 @@ const AdminLogin = ({ onSuccess = null, context = 'admin' }) => {
               </div>
             </div>
 
-            <button type="submit" disabled={loading}
+            <button type="submit" name="submit" disabled={loading}
               className="w-full flex items-center justify-center gap-2 rounded-[10px] bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] py-3 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               {loading
                 ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

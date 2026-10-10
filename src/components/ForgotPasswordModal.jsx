@@ -106,14 +106,17 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', onSuccess }) 
         )}
 
         {step === 'email' ? (
-          <form onSubmit={handleRequestCode} className="space-y-4">
+          <form onSubmit={handleRequestCode} className="space-y-4" method="POST" action="#" name="forgot-password-form">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Account email</label>
+              <label htmlFor="forgot-email" className="block text-xs font-semibold text-gray-700 mb-1">Account email</label>
               <div className="relative">
                 <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
+                  id="forgot-email"
+                  name="email"
                   type="email"
                   required
+                  autoComplete="email"
                   placeholder="you@organisation.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -130,25 +133,31 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', onSuccess }) 
             </button>
           </form>
         ) : (
-          <form onSubmit={handleReset} className="space-y-3.5">
+          <form onSubmit={handleReset} className="space-y-3.5" method="POST" action="#" name="reset-password-form">
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Verification code</label>
+              <label htmlFor="reset-code" className="block text-xs font-semibold text-gray-700 mb-1">Verification code</label>
               <input
+                id="reset-code"
+                name="one-time-code"
                 type="text"
                 required
+                autoComplete="one-time-code"
                 placeholder="6-character code"
                 value={resetCode}
                 onChange={(e) => setResetCode(e.target.value.toUpperCase())}
-                className="w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm font-mono  outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
+                className="w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm font-mono outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
               />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">New password</label>
+              <label htmlFor="reset-new-password" className="block text-xs font-semibold text-gray-700 mb-1">New password</label>
               <div className="relative">
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
+                  id="reset-new-password"
+                  name="new-password"
                   type="password"
                   required
+                  autoComplete="new-password"
                   minLength={8}
                   placeholder="At least 8 characters"
                   value={newPassword}
@@ -158,12 +167,15 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', onSuccess }) 
               </div>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-gray-700 mb-1">Confirm new password</label>
+              <label htmlFor="reset-confirm-password" className="block text-xs font-semibold text-gray-700 mb-1">Confirm new password</label>
               <div className="relative">
                 <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input
+                  id="reset-confirm-password"
+                  name="confirm-password"
                   type="password"
                   required
+                  autoComplete="new-password"
                   minLength={8}
                   placeholder="Re-enter new password"
                   value={confirmPassword}

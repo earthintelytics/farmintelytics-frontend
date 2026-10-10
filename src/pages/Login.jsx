@@ -155,14 +155,17 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <form onSubmit={handleSubmit} className="mt-8 space-y-5" method="POST" action="#" name="login-form">
               <div>
-                <label className="block text-sm font-medium mb-1.5">Email</label>
+                <label htmlFor="login-email" className="block text-sm font-medium mb-1.5">Email</label>
                 <div className="relative">
                   <Mail size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="login-email"
+                    name="username"
                     type="email"
                     required
+                    autoComplete="username email"
                     placeholder="you@organisation.com"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
@@ -173,7 +176,7 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
 
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium">Password</label>
+                  <label htmlFor="login-password" className="block text-sm font-medium">Password</label>
                   <button
                     type="button"
                     onClick={() => setForgotModalOpen(true)}
@@ -185,8 +188,11 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
                 <div className="relative">
                   <Lock size={17} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input
+                    id="login-password"
+                    name="password"
                     type={showPassword ? 'text' : 'password'}
                     required
+                    autoComplete="current-password"
                     placeholder="••••••••"
                     value={accessCode}
                     onChange={e => setAccessCode(e.target.value)}
@@ -205,6 +211,7 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
 
               <button
                 type="submit"
+                name="submit"
                 disabled={loading}
                 className="w-full flex items-center justify-center gap-2 rounded-[10px] bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] py-3 text-sm font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
