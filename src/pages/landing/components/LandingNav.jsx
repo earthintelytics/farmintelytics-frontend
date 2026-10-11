@@ -9,13 +9,11 @@ const LandingNav = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="p-1 bg-white rounded-lg shadow-sm border border-slate-200/80 flex items-center justify-center">
+            <div className="p-0.5 bg-white rounded-none shadow-sm border border-slate-200/80 flex items-center justify-center">
               <img
-                src="/farmintelytics-logo.png?v=6"
+                src="/farmintelytics-logo.png?v=7"
                 alt="FarmIntelytics"
-                className="h-8 w-8 object-contain rounded"
-                width="32"
-                height="32"
+                className="h-8 w-auto object-contain rounded-none block"
               />
             </div>
             <span className="font-display text-lg font-bold tracking-tight text-slate-900">

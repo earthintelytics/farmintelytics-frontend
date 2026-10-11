@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PublicHeader from './PublicHeader';
 import PublicFooter from './PublicFooter';
-import { Mail, Phone, MapPin, Send, CheckCircle2, ShieldCheck } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
 
 const ContactPage = () => {
   const [submitted, setSubmitted] = useState(false);
@@ -18,10 +18,7 @@ const ContactPage = () => {
 
       <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <span className="text-xs font-bold tracking-widest text-emerald-700 uppercase bg-emerald-100 px-3.5 py-1 rounded-full border border-emerald-200">
-            Enterprise Support & Sales
-          </span>
-          <h1 className="text-3xl sm:text-4xl font-bold font-display text-slate-900 mt-4">
+          <h1 className="text-3xl sm:text-4xl font-bold font-display text-slate-900">
             Connect with Agricultural Geospatial Specialists
           </h1>
           <p className="text-sm sm:text-base text-slate-600 mt-2">
@@ -32,14 +29,14 @@ const ContactPage = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Contact Details Column */}
           <div className="space-y-6">
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-5">
+            <div className="bg-white border border-slate-200 p-6 shadow-sm space-y-5">
               <h3 className="text-lg font-bold font-display text-slate-900">Global Headquarters</h3>
 
               <div className="flex items-start gap-3.5 text-sm text-slate-700">
                 <MapPin className="text-emerald-600 shrink-0 mt-1" size={18} />
                 <div>
                   <p className="font-semibold text-slate-900">Earthintelytics Geospatial Hub</p>
-                  <p className="text-xs text-slate-500 mt-0.5">Plot 14, Commercial District, Abuja & Lagos, Nigeria</p>
+                  <p className="text-xs text-slate-500 mt-0.5">Abuja & Lagos, Nigeria</p>
                 </div>
               </div>
 
@@ -58,15 +55,6 @@ const ContactPage = () => {
                   <p className="text-xs text-slate-500">+234 (0) 800-FARM-INTEL</p>
                 </div>
               </div>
-            </div>
-
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-              <h4 className="text-sm font-bold text-slate-900 flex items-center gap-2 mb-2">
-                <ShieldCheck size={16} className="text-emerald-600" /> Enterprise SLA Guarantee
-              </h4>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Critical monitoring infrastructure is backed by 99.9% uptime SLA with real-time Sentinel-1 SAR and Sentinel-2 optical pipeline redundancy.
-              </p>
             </div>
           </div>
 

@@ -19,13 +19,11 @@ const PublicHeader = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="p-1 bg-white rounded-lg shadow-sm border border-slate-200/80 flex items-center justify-center">
+            <div className="p-0.5 bg-white rounded-none shadow-sm border border-slate-200/80 flex items-center justify-center">
               <img
-                src="/farmintelytics-logo.png?v=6"
+                src="/farmintelytics-logo.png?v=7"
                 alt="FarmIntelytics"
-                className="h-7 w-7 object-contain rounded"
-                width="28"
-                height="28"
+                className="h-7 w-auto object-contain rounded-none block"
               />
             </div>
             <span className="font-display text-base font-bold text-slate-900">
