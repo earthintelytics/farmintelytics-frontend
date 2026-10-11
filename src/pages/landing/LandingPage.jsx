@@ -5,7 +5,7 @@ import LandingFooter from './components/LandingFooter';
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+    <div className="h-screen max-h-screen overflow-hidden bg-[#070b14] text-slate-100 flex flex-col justify-between font-sans selection:bg-emerald-500 selection:text-white">
       {/* ── Top Header Navigation Bar ────────────────────────────────────────── */}
       <LandingNav />
 

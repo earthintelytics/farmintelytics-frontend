@@ -12,8 +12,8 @@ const LandingNav = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 text-slate-800 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 text-slate-800 shadow-sm shrink-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2.5 sm:gap-3 cursor-pointer" onClick={() => handleNav('/')}>
@@ -40,8 +40,8 @@ const LandingNav = () => {
             <button onClick={() => handleNav('/legal')} className="hover:text-emerald-700 transition-colors">
               Legal
             </button>
-            <button onClick={() => handleNav('/docs')} className="hover:text-emerald-700 transition-colors">
-              Docs
+            <button onClick={() => handleNav('/docs?topic=api')} className="hover:text-emerald-700 transition-colors">
+              API Docs
             </button>
             <button onClick={() => handleNav('/contact')} className="hover:text-emerald-700 transition-colors">
               Contact
@@ -93,10 +93,10 @@ const LandingNav = () => {
               Legal & Terms
             </button>
             <button
-              onClick={() => handleNav('/docs')}
+              onClick={() => handleNav('/docs?topic=api')}
               className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
             >
-              Documentation & Guides
+              API Docs
             </button>
             <button
               onClick={() => handleNav('/contact')}

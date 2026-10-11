@@ -10,7 +10,7 @@ const PublicHeader = () => {
     { path: '/privacy', label: 'Privacy' },
     { path: '/trust', label: 'Trust Center' },
     { path: '/legal', label: 'Legal' },
-    { path: '/docs', label: 'Docs' },
+    { path: '/docs?topic=api', label: 'API Docs' },
     { path: '/contact', label: 'Contact' },
   ];
 
