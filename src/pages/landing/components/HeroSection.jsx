@@ -6,7 +6,7 @@ const HeroSection = () => {
   const navigate = useNavigate();
 
   return (
-    <section id="hero" className="relative overflow-hidden bg-[#070b14] min-h-[720px] lg:min-h-[820px] flex items-center justify-center border-b border-slate-800">
+    <section id="hero" className="relative overflow-hidden bg-[#070b14] min-h-[calc(100vh-140px)] flex-1 flex items-center justify-center border-b border-slate-800">
       {/* Pristine Background Image - 100% Free of Words & Labels */}
       <div
         className="absolute inset-0 w-full h-full bg-cover bg-center opacity-90 z-0"
