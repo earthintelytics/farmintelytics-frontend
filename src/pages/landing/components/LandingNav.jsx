@@ -1,55 +1,120 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Menu, X } from 'lucide-react';
 
 const LandingNav = () => {
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const handleNav = (path) => {
+    setMobileMenuOpen(false);
+    navigate(path);
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 text-slate-800 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        {/* Brand Logo & Name */}
         <div className="flex items-center gap-8">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => navigate('/')}>
+          <div className="flex items-center gap-2.5 sm:gap-3 cursor-pointer" onClick={() => handleNav('/')}>
             <div className="p-0.5 bg-white rounded-none shadow-sm border border-slate-200/80 flex items-center justify-center">
               <img
                 src="/farmintelytics-logo.png?v=7"
                 alt="FarmIntelytics"
-                className="h-8 w-auto object-contain rounded-none block"
+                className="h-7 sm:h-8 w-auto object-contain rounded-none block"
               />
             </div>
-            <span className="font-display text-lg font-bold tracking-tight text-slate-900">
+            <span className="font-display text-base sm:text-lg font-bold tracking-tight text-slate-900">
               FarmIntelytics
             </span>
           </div>
 
+          {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <button onClick={() => navigate('/privacy')} className="hover:text-emerald-700 transition-colors">
+            <button onClick={() => handleNav('/privacy')} className="hover:text-emerald-700 transition-colors">
               Privacy
             </button>
-            <button onClick={() => navigate('/trust')} className="hover:text-emerald-700 transition-colors">
+            <button onClick={() => handleNav('/trust')} className="hover:text-emerald-700 transition-colors">
               Trust Center
             </button>
-            <button onClick={() => navigate('/legal')} className="hover:text-emerald-700 transition-colors">
+            <button onClick={() => handleNav('/legal')} className="hover:text-emerald-700 transition-colors">
               Legal
             </button>
-            <button onClick={() => navigate('/docs')} className="hover:text-emerald-700 transition-colors">
+            <button onClick={() => handleNav('/docs')} className="hover:text-emerald-700 transition-colors">
               Docs
             </button>
-            <button onClick={() => navigate('/contact')} className="hover:text-emerald-700 transition-colors">
+            <button onClick={() => handleNav('/contact')} className="hover:text-emerald-700 transition-colors">
               Contact
             </button>
           </nav>
         </div>
 
-        <div>
+        {/* Right Section: Desktop Sign In & Mobile Hamburger Toggle */}
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             id="top-nav-sign-in"
-            onClick={() => navigate('/login')}
+            onClick={() => handleNav('/login')}
             className="text-sm font-semibold text-slate-800 hover:text-emerald-700 transition-colors px-3 py-1.5 cursor-pointer bg-transparent border-0 active:scale-95"
           >
             Sign In
           </button>
+
+          {/* Mobile Hamburger Button */}
+          <button
+            aria-label="Toggle navigation menu"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded focus:outline-none transition-colors"
+          >
+            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Dropdown Navigation Drawer */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-4 shadow-lg animate-fadeIn">
+          <nav className="flex flex-col space-y-1 text-sm font-medium text-slate-700">
+            <button
+              onClick={() => handleNav('/privacy')}
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+            >
+              Privacy Policy
+            </button>
+            <button
+              onClick={() => handleNav('/trust')}
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+            >
+              Trust Center
+            </button>
+            <button
+              onClick={() => handleNav('/legal')}
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+            >
+              Legal & Terms
+            </button>
+            <button
+              onClick={() => handleNav('/docs')}
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+            >
+              Documentation & Guides
+            </button>
+            <button
+              onClick={() => handleNav('/contact')}
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+            >
+              Contact Support
+            </button>
+            <div className="pt-2 border-t border-slate-100">
+              <button
+                onClick={() => handleNav('/login')}
+                className="w-full text-center py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded shadow-sm transition-colors"
+              >
+                Sign In to Platform
+              </button>
+            </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 };
