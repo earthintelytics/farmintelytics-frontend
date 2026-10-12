@@ -3,14 +3,15 @@
 // from greenness: bare ground red, healthy crop green), the way the platform reads them.
 // The fade stops for visitors who ask for reduced motion (index.css).
 const Z = 16;
-const XS = [34306, 34307, 34308, 34309];
+const XS = [34304, 34305, 34306, 34307, 34308, 34309];
 const YS = [30616, 30617, 30618];
 const tile = (x, y) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${Z}/${y}/${x}`;
 
 const Tiles = ({ className = '', style }) => (
-  <div className={`absolute inset-0 grid grid-cols-4 grid-rows-3 ${className}`} style={style}>
+  // Tiles at their own size (256 px), anchored right, so the imagery stays sharp on wide screens.
+  <div className={`absolute right-0 top-1/2 -translate-y-1/2 grid grid-cols-[repeat(6,256px)] grid-rows-[repeat(3,256px)] ${className}`} style={style}>
     {YS.map((y) => XS.map((x) => (
-      <img key={`${x}-${y}`} src={tile(x, y)} alt="" decoding="async" draggable="false" className="w-full h-full object-cover select-none" />
+      <img key={`${x}-${y}`} src={tile(x, y)} alt="" decoding="async" draggable="false" className="w-64 h-64 select-none" />
     )))}
   </div>
 );
@@ -20,7 +21,7 @@ const HeroBackdrop = () => (
     <svg width="0" height="0" className="absolute">
       <filter id="fi-health" colorInterpolationFilters="sRGB">
         {/* Greenness: more green than red reads as crop, more red as bare ground */}
-        <feColorMatrix type="matrix" values="-1.6 2.2 -0.4 0 0.32  -1.6 2.2 -0.4 0 0.32  -1.6 2.2 -0.4 0 0.32  0 0 0 1 0" />
+        <feColorMatrix type="matrix" values="-2.4 3.2 -0.8 0 0.42  -2.4 3.2 -0.8 0 0.42  -2.4 3.2 -0.8 0 0.42  0 0 0 1 0" />
         <feComponentTransfer>
           <feFuncR type="table" tableValues="0.80 0.93 0.97 0.62 0.20 0.09" />
           <feFuncG type="table" tableValues="0.20 0.47 0.78 0.80 0.62 0.45" />
@@ -30,7 +31,7 @@ const HeroBackdrop = () => (
     </svg>
     <Tiles />
     <Tiles className="fi-hero-health" style={{ filter: 'url(#fi-health)' }} />
-    <div className="absolute right-6 top-6 hidden lg:block rounded-full bg-white/95 border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800">
+    <div className="absolute right-6 top-6 hidden lg:block w-36 text-center whitespace-nowrap rounded-full bg-white/95 border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800">
       <span className="fi-hero-label-a">Natural view</span>
       <span className="fi-hero-label-b absolute inset-0 flex items-center justify-center">Crop health view</span>
     </div>
