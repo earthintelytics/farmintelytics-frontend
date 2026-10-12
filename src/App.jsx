@@ -152,10 +152,21 @@ const OrgPage = ({ view }) => {
   const { tenant } = useParams();
   const navigate = useNavigate();
   const [profile, setProfile] = useState(readOrgProfile);
+  const location = useLocation();
   if (sessionTenant() !== tenant) return <Navigate to={paths.orgLogin(tenant)} replace />;
   const signOut = () => { clearTenantSession(); navigate(paths.orgLogin(tenant)); };
+  // Settings opened from a service page: a way straight back to where the person was.
+  const from = view === 'settings' ? location.state?.from : null;
   return (
     <OrgShell profile={profile} onSignOut={signOut}>
+      {from && (
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
+          <button type="button" onClick={() => navigate(from)}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+            <span aria-hidden="true">←</span>Back
+          </button>
+        </div>
+      )}
       {view === 'settings' ? <OrgSettingsPage profile={profile} onProfile={setProfile} /> : view === 'field' ? <FieldPage /> : <OrgServicesPage profile={profile} />}
     </OrgShell>
   );

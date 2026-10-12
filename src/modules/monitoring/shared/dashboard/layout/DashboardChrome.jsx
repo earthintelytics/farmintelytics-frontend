@@ -146,6 +146,7 @@ export function renderDashboardHeader(ctx) {
                   {tenant && (
                     <Link
                       to={paths.orgSettings(tenant)}
+                      state={{ from: `${window.location.pathname}${window.location.search}` }}
                       className="w-full flex items-center gap-2.5 px-3.5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50 rounded-xl"
                     >
                       <Settings2 size={15} className="text-gray-500" />
