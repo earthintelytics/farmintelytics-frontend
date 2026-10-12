@@ -213,8 +213,8 @@ const Scheduler = () => {
   const rows = useMemo(() => jobs.map(job => {
     const org = orgs.find(o => job.name.startsWith(o.schema_name) || job.config_path.includes(o.schema_name));
     const site = configs.find(c => `configs/${c.filename}` === job.config_path);
-    const siteId = (site?.batch_name || job.config_path.replace('configs/', '').replace(/\.ya?ml$/, ''));
-    const last = logs.find(l => l.job_name === job.name || (l.batch_name && l.batch_name === site?.batch_name) || (l._minio_path || '').includes(siteId));
+    // Newest monitoring run of this organisation (the run list is newest first).
+    const last = logs.find(l => l.kind === 'monitoring_run' && org && l.company_id === org.schema_name);
     return { job, org, site, parsed: parseCron(job.cron), next: job.enabled ? nextRun(job.cron) : null, last };
   }), [jobs, orgs, configs, logs]);
 

@@ -5,15 +5,15 @@
 import { RefreshCw, ChevronDown, ChevronUp, Play, Pause, ChevronLeft, ChevronRight, CalendarDays, Satellite } from 'lucide-react';
 import { MONTH_NAMES } from '../constants/chartConfig';
 
-// Plain names for the satellites behind each picture.
-const SENSOR_NAME = { 'sentinel-2': 'Clear-sky picture', landsat: 'Landsat picture', 'sentinel-1': 'Radar picture' };
-const SENSOR_HINT = { 'sentinel-2': 'Sharp colour picture, blocked by cloud', landsat: 'Older, coarser picture', 'sentinel-1': 'Sees through cloud' };
-const sensorName = (s) => SENSOR_NAME[s] || s;
+// The client never chooses a satellite: for a day with several pictures the best one is shown
+// (sharpest optical first, then Landsat, then radar, which sees through cloud but less detail).
+const BEST_ORDER = ['sentinel-2', 'landsat', 'sentinel-1'];
+const bestSensor = (sensors = []) => BEST_ORDER.find((s) => sensors.includes(s)) || sensors[0];
 const longDate = (d) => new Date(d).toLocaleDateString(undefined, { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric' });
 const shortDate = (d) => new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 
 export function renderMapBottomPanel(ctx, indexValue, centerContent = null, hideCalendarAndSlider = false) {
-  const { latestCalDate, jumpToLatestMonth, canPrevCal, canNextCal, SENSOR_DOT_COLOR, TIMELINE_DATA, activeDateSlot, bottomPanelHeight, calDaysInMonth, calFirstDay, calTrailing, calendarDates, calendarMonth, calendarYear, compareTimelineIndex, currentTimeline, currentTimelineA, currentTimelineB, effectiveSensor, isBottomPanelMinimized, isCompareMode, isPlaying, nextCalMonth, prevCalMonth, satellitePicker, selectDateWithSensor, selectedIndex, selectedTimelineIndex, setCompareTimelineIndex, setIsBottomPanelMinimized, setRefreshSlider, setSatellitePicker, setSelectedTimelineIndex, showCalendarTool, showTimeSliderTool, sliderPending, startBottomPanelResize, timelineLoading, togglePlay } = ctx;
+  const { latestCalDate, jumpToLatestMonth, canPrevCal, canNextCal, TIMELINE_DATA, activeDateSlot, bottomPanelHeight, calDaysInMonth, calFirstDay, calTrailing, calendarDates, calendarMonth, calendarYear, compareTimelineIndex, currentTimeline, currentTimelineA, currentTimelineB, isBottomPanelMinimized, isCompareMode, isPlaying, nextCalMonth, prevCalMonth, selectDateWithSensor, selectedIndex, selectedTimelineIndex, setCompareTimelineIndex, setIsBottomPanelMinimized, setRefreshSlider, setSelectedTimelineIndex, showCalendarTool, showTimeSliderTool, sliderPending, startBottomPanelResize, timelineLoading, togglePlay } = ctx;
 
   if (!showTimeSliderTool && !showCalendarTool) return null;
 
@@ -22,7 +22,6 @@ export function renderMapBottomPanel(ctx, indexValue, centerContent = null, hide
   const monthPrefix = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}`;
   const picturesThisMonth = (calendarDates || []).filter((d) => d.date.startsWith(monthPrefix)).length;
   const latestPrefix = latestCalDate ? latestCalDate.slice(0, 7) : null;
-  const sensorsSeen = [...new Set((calendarDates || []).flatMap((d) => d.sensors))];
   const hasPictures = (calendarDates || []).length > 0 || TIMELINE_DATA.length > 0;
 
   return (
@@ -144,12 +143,10 @@ export function renderMapBottomPanel(ctx, indexValue, centerContent = null, hide
                 else if (isFuture) cls = 'text-gray-300';
                 if (isToday && !isSelA && !isSelB) cls += ' ring-1 ring-inset ring-gray-300';
 
-                const showCallout = satellitePicker?.date === dateStr;
-                const openUpward = Math.floor((calFirstDay + day - 1) / 7) >= 3;
                 return (
                   <div key={dateStr} className="relative">
                     <button disabled={!dayClickable}
-                      title={dayCoverage ? dayCoverage.sensors.map(sensorName).join(', ') : isFuture ? 'Not yet' : 'No picture this day'}
+                      title={hasPicture ? 'Picture available' : isFuture ? 'Not yet' : 'No picture this day'}
                       aria-label={`${longDate(dateStr)}${hasPicture ? ', picture available' : ''}`}
                       onClick={() => {
                         if (isCompareMode) {
@@ -158,45 +155,23 @@ export function renderMapBottomPanel(ctx, indexValue, centerContent = null, hide
                           return;
                         }
                         if (!dayCoverage) { if (isHL) setSelectedTimelineIndex(matchIdx); return; }
-                        if (dayCoverage.sensors.length > 1) setSatellitePicker(showCallout ? null : { date: dateStr, sensors: dayCoverage.sensors });
-                        else selectDateWithSensor(dateStr, dayCoverage.sensors[0]);
+                        selectDateWithSensor(dateStr, bestSensor(dayCoverage.sensors));
                       }}
                       className={`h-9 w-full rounded-lg text-xs flex flex-col items-center justify-center gap-0.5 transition-colors disabled:cursor-default ${cls}`}>
                       <span className="tabular-nums">{day}</span>
-                      {dayCoverage && (
-                        <span className="flex items-center gap-0.5 leading-none">
-                          {dayCoverage.sensors.map((s) => (
-                            <span key={s} className="w-1 h-1 rounded-full" style={{ backgroundColor: (isSelA || isSelB) ? '#FFFFFF' : SENSOR_DOT_COLOR[s] }} />
-                          ))}
-                        </span>
-                      )}
+                      {hasPicture && <span className={`w-1 h-1 rounded-full ${(isSelA || isSelB) ? 'bg-white' : 'bg-[var(--brand-primary)]'}`} />}
                     </button>
-                    {showCallout && (
-                      <div className={`absolute z-50 left-1/2 -translate-x-1/2 bg-white border border-gray-200 rounded-xl shadow-sm p-2.5 flex flex-col gap-1.5 w-max ${openUpward ? 'bottom-full mb-1' : 'top-full mt-1'}`} onClick={(e) => e.stopPropagation()}>
-                        <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">Which picture?</span>
-                        {satellitePicker.sensors.map((s) => (
-                          <button key={s} onClick={() => { selectDateWithSensor(dateStr, s); setSatellitePicker(null); }}
-                            className="flex items-center gap-2 text-xs font-medium px-2.5 py-1.5 rounded-lg text-gray-700 border border-gray-200 hover:bg-gray-50 whitespace-nowrap text-left">
-                            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: SENSOR_DOT_COLOR[s] }} />
-                            {sensorName(s)}
-                          </button>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 );
               })}
               {Array.from({ length: Math.max(0, calTrailing) % 7 }).map((_, i) => <span key={`trail-${i}`} />)}
             </div>
 
-            {/* What the dots mean */}
-            <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-x-4 gap-y-1.5">
-              {(sensorsSeen.length ? sensorsSeen : ['sentinel-2', 'sentinel-1']).map((s) => (
-                <span key={s} className="inline-flex items-center gap-1.5 text-[11px] text-gray-600" title={SENSOR_HINT[s]}>
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: SENSOR_DOT_COLOR[s] }} />{sensorName(s)}
-                </span>
-              ))}
-              <span className="inline-flex items-center gap-1.5 text-[11px] text-gray-600"><span className="w-3 h-3 rounded ring-1 ring-inset ring-gray-300" />Today</span>
+            {/* What the marks mean */}
+            <div className="mt-4 pt-3 border-t border-gray-100 flex flex-wrap gap-x-4 gap-y-1.5 text-[11px] text-gray-600">
+              <span className="inline-flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-green-50 border border-green-200" />Picture available</span>
+              <span className="inline-flex items-center gap-1.5"><span className="w-3 h-3 rounded bg-[var(--brand-primary)]" />Shown on the map</span>
+              <span className="inline-flex items-center gap-1.5"><span className="w-3 h-3 rounded ring-1 ring-inset ring-gray-300" />Today</span>
             </div>
           </div>
         )}
@@ -233,11 +208,9 @@ export function renderMapBottomPanel(ctx, indexValue, centerContent = null, hide
                   ) : currentTimeline ? (
                     <div className="rounded-xl border border-gray-200 px-4 py-3">
                       <p className="font-display text-base font-semibold text-gray-900">{currentTimeline.date ? longDate(currentTimeline.date) : currentTimeline.label}</p>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        <span className="inline-flex items-center gap-1.5 text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200 text-gray-700">
-                          <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: SENSOR_DOT_COLOR[effectiveSensor] }} />{sensorName(effectiveSensor)}
-                        </span>
+                      <div className="flex flex-wrap items-center gap-1.5 mt-2">
                         <span className="text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200 text-gray-700">{measure}</span>
+                        <span className="text-xs text-gray-500">The best picture for this day is chosen for you.</span>
                       </div>
                     </div>
                   ) : (
@@ -257,14 +230,11 @@ export function renderMapBottomPanel(ctx, indexValue, centerContent = null, hide
                             onClick={() => {
                               const [y, m] = d.date.split('-').map(Number);
                               if (y !== calendarYear || m - 1 !== calendarMonth) { ctx.setCalendarYear?.(y); ctx.setCalendarMonth?.(m - 1); }
-                              if (d.sensors.length > 1) setSatellitePicker({ date: d.date, sensors: d.sensors });
-                              else selectDateWithSensor(d.date, d.sensors[0]);
+                              selectDateWithSensor(d.date, bestSensor(d.sensors));
                             }}
                             className={`flex items-center justify-between gap-2 px-3 py-2 rounded-xl border text-left transition-colors ${isActive ? 'border-green-300 bg-green-50' : 'border-gray-200 hover:bg-gray-50'}`}>
                             <span className={`text-sm font-medium ${isActive ? 'text-green-800' : 'text-gray-800'}`}>{shortDate(d.date)}</span>
-                            <span className="flex items-center gap-1 shrink-0">
-                              {d.sensors.map((s) => <span key={s} title={sensorName(s)} className="w-2 h-2 rounded-full" style={{ backgroundColor: SENSOR_DOT_COLOR[s] }} />)}
-                            </span>
+
                           </button>
                         );
                       })}

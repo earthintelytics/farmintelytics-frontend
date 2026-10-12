@@ -298,9 +298,10 @@ export async function fetchLogs({ status, sensor, search, page = 1, pageSize = 5
   return adminFetch(`/logs?${p}`);
 }
 
-export async function fetchPipelineLogs(companyId, limit = 20) {
+export async function fetchPipelineLogs(companyId, limit = 20, status) {
   const p = new URLSearchParams({ limit });
   if (companyId) p.set('company_id', companyId);
+  if (status) p.set('status', status);
   return adminFetch(`/logs/pipeline?${p}`);
 }
 

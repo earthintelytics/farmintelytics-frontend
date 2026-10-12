@@ -41,12 +41,16 @@ const Logs = () => {
       setJobs(data.items || []); setTotalJobs(data.total || 0);
     } catch (e) { setError(e.message || 'Could not load jobs'); }
   };
+  const [failedTotal, setFailedTotal] = useState(0);
   const loadRuns = async (limit = runLimit) => {
-    try { const data = await fetchPipelineLogs(undefined, limit); setRuns(data.logs || []); } catch (e) { setError(e.message || 'Could not load run records'); }
+    try {
+      const data = await fetchPipelineLogs(undefined, limit, runStatus || undefined);
+      setRuns(data.logs || []); setFailedTotal(data.failed_total ?? 0);
+    } catch (e) { setError(e.message || 'Could not load run records'); }
   };
   const loadAll = async () => { setLoading(true); setError(''); await Promise.all([loadJobs(), loadRuns()]); setLoading(false); };
 
-  useEffect(() => { loadAll(); }, [jobStatus, jobSearch, page]); // eslint-disable-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+  useEffect(() => { loadAll(); }, [jobStatus, jobSearch, page, runStatus]); // eslint-disable-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => {
     const t = setInterval(() => { loadJobs(); loadRuns(); }, REFRESH_MS);
     return () => clearInterval(t);
@@ -54,10 +58,8 @@ const Logs = () => {
 
   const shownRuns = useMemo(() => {
     const q = runSearch.toLowerCase();
-    return runs.filter((l) => (!runStatus || logStatus(l) === runStatus)
-      && (!q || [l._minio_path, l.job_name, l.error, l.message].some((v) => (v || '').toLowerCase().includes(q))));
-  }, [runs, runStatus, runSearch]);
-  const failedRuns = runs.filter((l) => logStatus(l) === 'failed').length;
+    return runs.filter((l) => !q || [l.job_name, l.company_id, l.service, l.error, l.message, l.id].some((v) => (v || '').toLowerCase().includes(q)));
+  }, [runs, runSearch]);
   const failedJobs = jobs.filter((j) => (j.status || '').toLowerCase() === 'failed' || j.error).length;
   const lastRun = runs[0];
 
@@ -66,53 +68,56 @@ const Logs = () => {
       wide
       eyebrow="Operations"
       title="Logs"
-      text="What each pipeline run did and any errors, plus the imagery jobs recorded per block. Refreshes every 30 seconds."
+      text="Every pipeline run (Run now, schedules, checks, suitability), newest first, with what went wrong when one failed. Refreshes every 30 seconds."
       actions={<Button variant="secondary" onClick={loadAll}><RefreshCw size={15} className={loading ? 'animate-spin' : ''} />Refresh</Button>}
     >
       <ErrorBanner message={error} onDismiss={() => setError('')} onRetry={loadAll} />
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <Stat label="Last run" value={lastRun ? statusOf(logStatus(lastRun))[0] : '—'} sub={lastRun ? fmtTime(lastRun.timestamp) : 'No run recorded yet'} />
-        <Stat label="Runs that failed" value={failedRuns} sub={`of ${runs.length} loaded`} />
+        <Stat label="Runs that failed" value={failedTotal} sub="all time" />
         <Stat label="Imagery jobs" value={totalJobs.toLocaleString()} />
         <Stat label="Jobs that failed" value={failedJobs} sub="on this page" />
       </div>
 
       <Tabs value={tab} onChange={setTab} tabs={[
         { id: 'runs', label: 'Pipeline runs', count: runs.length },
-        { id: 'jobs', label: 'Imagery jobs', count: totalJobs },
+        { id: 'jobs', label: 'Older imagery jobs', count: totalJobs },
       ]} />
 
       {tab === 'runs' ? (
         <>
           <div className="flex flex-wrap items-center gap-3">
-            {[['', 'All'], ['completed', 'Done'], ['failed', 'Failed']].map(([v, l]) => <Chip key={v} on={runStatus === v} onClick={() => setRunStatus(v)}>{l}</Chip>)}
+            {[['', 'All'], ['pending', 'Waiting'], ['processing', 'Running'], ['completed', 'Done'], ['failed', 'Failed']].map(([v, l]) => <Chip key={v} on={runStatus === v} onClick={() => setRunStatus(v)}>{l}</Chip>)}
             <label className="relative ml-auto w-full sm:w-80">
               <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input className={`${inputCls} pl-10`} value={runSearch} onChange={(e) => setRunSearch(e.target.value)} placeholder="Job, file or error" />
+              <input className={`${inputCls} pl-10`} value={runSearch} onChange={(e) => setRunSearch(e.target.value)} placeholder="Organisation, service or error" />
             </label>
           </div>
           {loading ? <Loading>Reading run records…</Loading> : runs.length === 0 ? (
-            <Empty>No run records yet. Each pipeline run writes one when it finishes.</Empty>
+            <Empty>{runStatus ? 'No runs with this status.' : 'No runs yet. They appear here as soon as one is started.'}</Empty>
           ) : shownRuns.length === 0 ? <Empty>No runs match.</Empty> : (
             <div className="space-y-2.5">
               {shownRuns.map((log, i) => {
                 const st = logStatus(log);
                 const [label, tone] = statusOf(st);
-                const highlighted = highlightKey && log._minio_path === highlightKey;
+                const highlighted = highlightKey && (log.id === highlightKey || log._minio_path === highlightKey);
                 return (
-                  <button key={log._minio_path || i} type="button" onClick={() => setOpenRun(log)}
+                  <button key={log.id || log._minio_path || i} type="button" onClick={() => setOpenRun(log)}
                     className={`w-full text-left bg-white rounded-2xl border px-5 py-4 space-y-2 hover:border-gray-300 ${highlighted ? 'border-sky-500' : st === 'failed' ? 'border-red-200' : 'border-gray-200'}`}>
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="font-semibold text-gray-900">{log.job_name || (log._minio_path || '').split('/').pop()}</span>
+                      {st === 'processing' && log.progress != null && <span className="text-xs text-gray-500">{log.progress}%</span>}
                       <Pill tone={tone}>{label}</Pill>
                       <span className="ml-auto flex items-center gap-1 text-xs text-gray-500">{fmtTime(log.timestamp)}<ChevronRight size={15} /></span>
                     </div>
                     <div className="flex flex-wrap gap-4 text-xs text-gray-500">
-                      {log.duration != null && <span>Took {Number(log.duration).toFixed(1)} s</span>}
-                      {log.plots_processed != null && <span>{log.plots_processed} blocks</span>}
-                      {log.message && <span className="text-gray-700 truncate max-w-md">{log.message}</span>}
-                      <span className="font-mono truncate max-w-md">{log._minio_path}</span>
+                      {log.period && <span>Pictures {log.period}</span>}
+                      {log.estates?.length > 0 && <span>{log.estates.length} {log.estates.length === 1 ? 'estate' : 'estates'}</span>}
+                      {log.duration != null && <span>Took {log.duration < 90 ? `${Number(log.duration).toFixed(0)} s` : `${Math.round(log.duration / 60)} min`}</span>}
+                      {log.message && st !== 'completed' && <span className="text-gray-700 truncate max-w-md">Step: {log.message}</span>}
+                      {log.outputs_count > 0 && <span>{log.outputs_count} files written</span>}
+                      {log.created_by && <span>Started by {log.created_by}</span>}
                     </div>
                     {log.error && <ErrorBox error={log.error} compact />}
                   </button>

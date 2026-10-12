@@ -55,6 +55,7 @@ import PortalHub from './pages/PortalHub';
 // === Sustainability, Field Advisory & Finance ===
 // One portal for all of them: the organisation monitoring layout with the
 const ServicePortal = lazyWithReload(() => import('./modules/services/ServicePortal'));
+const AdvisorApp = lazyWithReload(() => import('./modules/advisor/AdvisorApp'));
 const SuitabilityPortal = lazyWithReload(() => import('./modules/suitability/SuitabilityPortal'));
 const SmallholderHub = lazyWithReload(() => import('./modules/smallholder/SmallholderHub'));
 const PublicFormPage = lazyWithReload(() => import('./modules/forms/PublicFormPage'));
@@ -295,6 +296,8 @@ const PortalPage = () => {
     content = <SuitabilityPortal {...props} />;
   } else if (mod.kind === 'smallholder') {
     content = <SmallholderHub {...props} />;
+  } else if (mod.kind === 'advisor') {
+    content = <AdvisorApp {...props} />;
   } else {
     content = <ServicePortal moduleId={moduleId} {...props} />;
   }

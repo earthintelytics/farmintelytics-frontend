@@ -9,6 +9,7 @@
  *         service       a service in CropDashboardLayout (modules/services/serviceCatalog.js)
  *         smallholder   the Smallholder hub (its cards open services)
  *         suitability   the suitability tool (FarmIntelytics team only)
+ *         advisor       the farm advisor (modules/advisor/AdvisorApp.jsx)
  *   teamOnly            only a team session may open it; clients receive its reports
  */
 import { SERVICE_CATALOG } from './services/serviceCatalog';
@@ -43,6 +44,8 @@ export function resolveModule(rawId) {
   if (CROPS[id]) return { id, kind: 'crop', name: CROPS[id], teamOnly: false };
   if (id === 'suitability-tool') return { id, kind: 'suitability', name: 'Crop suitability', teamOnly: true };
   if (id === 'smallholder-hub') return { id, kind: 'smallholder', name: 'Smallholder', teamOnly: false };
+  // The farm advisor is its own phone-first app (chat, advisories, reports), not a map dashboard.
+  if (id === 'advisor') return { id, kind: 'advisor', name: 'Farm advisor', teamOnly: false };
   if (SERVICE_CATALOG[id]) return { id, kind: 'service', name: SERVICE_CATALOG[id].title, teamOnly: false };
   return null;
 }
