@@ -14,7 +14,12 @@ const SESSION_KEYS = ['fi_module', 'fi_target_tenant', 'fi_from_hub', 'fi_hub', 
 /** Keys namespaced by tenant (offline caches): `${base}:${tenant}`. */
 export const tenantKey = (base) => `${base}:${localStorage.getItem('fi_tenant') || 'none'}`;
 
+// Per-organisation copies kept on the device (the advisor chat); cleared on sign-out so a shared
+// phone does not show the last person's chat.
+const clearDeviceCopies = () => Object.keys(localStorage).filter((k) => k.startsWith('fi_advisor_chat')).forEach((k) => localStorage.removeItem(k));
+
 export function clearTenantSession() {
+  clearDeviceCopies();
   TENANT_KEYS.forEach((k) => localStorage.removeItem(k));
   SESSION_KEYS.forEach((k) => sessionStorage.removeItem(k));
 }
@@ -27,6 +32,7 @@ export function clearTeamSession() {
 /** Before a new sign-in: no account data from a previous user survives (the
  *  module being opened, in sessionStorage, is kept). */
 export function clearTenantAccount() {
+  clearDeviceCopies();
   TENANT_KEYS.forEach((k) => localStorage.removeItem(k));
 }
 
