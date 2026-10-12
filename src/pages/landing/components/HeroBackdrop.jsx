@@ -3,13 +3,13 @@
 // from greenness: bare ground red, healthy crop green), the way the platform reads them.
 // The fade stops for visitors who ask for reduced motion (index.css).
 const Z = 16;
-const XS = [34304, 34305, 34306, 34307, 34308, 34309];
+const XS = [34302, 34303, 34304, 34305, 34306, 34307, 34308, 34309];
 const YS = [30616, 30617, 30618];
 const tile = (x, y) => `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${Z}/${y}/${x}`;
 
 const Tiles = ({ className = '', style }) => (
   // Tiles at their own size (256 px), anchored right, so the imagery stays sharp on wide screens.
-  <div className={`absolute right-0 top-1/2 -translate-y-1/2 grid grid-cols-[repeat(6,256px)] grid-rows-[repeat(3,256px)] ${className}`} style={style}>
+  <div className={`absolute right-0 top-1/2 -translate-y-1/2 grid grid-cols-[repeat(8,256px)] grid-rows-[repeat(3,256px)] ${className}`} style={style}>
     {YS.map((y) => XS.map((x) => (
       <img key={`${x}-${y}`} src={tile(x, y)} alt="" decoding="async" draggable="false" className="w-64 h-64 select-none" />
     )))}
@@ -41,13 +41,13 @@ const HeroBackdrop = () => (
     <Tiles />
     <Tiles className="fi-hero-health" style={{ filter: 'url(#fi-health)' }} />
     <Tiles className="fi-hero-water" style={{ filter: 'url(#fi-water)' }} />
-    <div className="absolute right-6 top-6 hidden lg:block w-36 text-center whitespace-nowrap rounded-full bg-white/95 border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800">
-      <span className="fi-hero-label-a">Natural view</span>
-      <span className="fi-hero-label-b absolute inset-0 flex items-center justify-center">Crop health view</span>
-      <span className="fi-hero-label-c absolute inset-0 flex items-center justify-center">Water need view</span>
+    <div className="absolute right-6 top-6 hidden lg:block w-32 text-center whitespace-nowrap rounded-full bg-white/95 border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800">
+      <span className="fi-hero-label-a">Natural colour</span>
+      <span className="fi-hero-label-b absolute inset-0 flex items-center justify-center">Crop health</span>
+      <span className="fi-hero-label-c absolute inset-0 flex items-center justify-center">Moisture</span>
     </div>
     {/* White behind the text: across on wide screens, downwards on phones */}
-    <div className="absolute inset-0 bg-[linear-gradient(180deg,#fff_0%,#fff_55%,rgba(255,255,255,0.6)_80%,rgba(255,255,255,0.1)_100%)] lg:bg-[linear-gradient(90deg,#fff_0%,#fff_34%,rgba(255,255,255,0.8)_48%,rgba(255,255,255,0)_66%)]" />
+    <div className="absolute inset-0 bg-[linear-gradient(180deg,#fff_0%,#fff_55%,rgba(255,255,255,0.6)_80%,rgba(255,255,255,0.1)_100%)] lg:bg-[linear-gradient(90deg,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.88)_40%,rgba(255,255,255,0.55)_54%,rgba(255,255,255,0)_70%)]" />
     <p className="absolute bottom-2 right-3 text-[11px] text-white/90">Imagery © Esri, Maxar, Earthstar Geographics</p>
   </div>
 );

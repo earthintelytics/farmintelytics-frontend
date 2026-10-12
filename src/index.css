@@ -141,7 +141,7 @@ button:active {
   body.fi-print-report .no-print { display: none !important; }
 }
 
-/* Landing hero: the fields cycle natural -> crop health -> water need. Each view holds 5 s and
+/* Landing hero: the fields cycle natural colour -> crop health -> moisture. Each view holds 5 s and
    changes in 1 s (18 s cycle; 1 s = 5.56%). */
 @keyframes fi-hero-health { 0%, 27.8% { opacity: 0; } 33.3%, 61.1% { opacity: 0.92; } 66.7%, 100% { opacity: 0; } }
 @keyframes fi-hero-water { 0%, 61.1% { opacity: 0; } 66.7%, 94.4% { opacity: 0.92; } 100% { opacity: 0; } }
