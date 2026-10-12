@@ -26,3 +26,17 @@ export function Section({ title, children }) {
     </section>
   );
 }
+
+/** Capsule buttons that switch between the sub-pages of a public page. */
+export function CapsuleTabs({ tabs, active, onChange, label }) {
+  return (
+    <div role="tablist" aria-label={label} className="inline-flex p-1 rounded-full bg-gray-100 border border-gray-200">
+      {tabs.map(({ id, label: text }) => (
+        <button key={id} type="button" role="tab" aria-selected={active === id} onClick={() => onChange(id)}
+          className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${active === id ? 'bg-white text-gray-900 border border-gray-200' : 'text-gray-600 hover:text-gray-900 border border-transparent'}`}>
+          {text}
+        </button>
+      ))}
+    </div>
+  );
+}

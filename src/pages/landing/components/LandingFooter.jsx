@@ -21,14 +21,11 @@ const LandingFooter = () => {
 
         {/* Footer Navigation Links */}
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 font-medium text-slate-600 text-[11px] sm:text-xs">
-          <button onClick={() => navigate('/privacy')} className="hover:text-[var(--brand-primary)] transition-colors">
-            Privacy
-          </button>
           <button onClick={() => navigate('/trust')} className="hover:text-[var(--brand-primary)] transition-colors">
             Trust centre
           </button>
-          <button onClick={() => navigate('/legal')} className="hover:text-[var(--brand-primary)] transition-colors">
-            Legal and terms
+          <button onClick={() => navigate('/policies')} className="hover:text-[var(--brand-primary)] transition-colors">
+            Policies
           </button>
           <button onClick={() => navigate('/docs')} className="hover:text-[var(--brand-primary)] transition-colors">
             Guide

@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { Compass, Sprout, Droplets, MapPinned, ShieldCheck, FileText, CloudSun, Plug } from 'lucide-react';
-import PublicLayout from './PublicLayout';
+import PublicLayout, { CapsuleTabs } from './PublicLayout';
 import { TUTORIALS } from './guideTutorials';
 
 /**
@@ -72,10 +72,9 @@ const TOPICS = [
 
 const ALL = [...TOPICS, ...TUTORIALS];
 
-function NavGroup({ title, items, active, onPick }) {
+function NavGroup({ items, active, onPick }) {
   return (
     <div className="flex lg:flex-col gap-1 shrink-0">
-      <p className="hidden lg:block px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-500 first:pt-0">{title}</p>
       {items.map(({ id, label, icon: Icon }) => (
         <button key={id} type="button" onClick={() => onPick(id)}
           className={`shrink-0 flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-left ${active === id ? 'bg-green-50 text-green-900 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}>
@@ -88,17 +87,22 @@ function NavGroup({ title, items, active, onPick }) {
 
 export default function DocumentationPage() {
   const [params, setParams] = useSearchParams();
-  const active = ALL.find((t) => t.id === params.get('topic')) || TOPICS[0];
+  const found = ALL.find((t) => t.id === params.get('topic'));
+  const section = found ? (TUTORIALS.includes(found) ? 'tutorials' : 'learn') : (params.get('section') === 'tutorials' ? 'tutorials' : 'learn');
+  const list = section === 'tutorials' ? TUTORIALS : TOPICS;
+  const active = found || list[0];
   const pick = (id) => { setParams({ topic: id }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const switchSection = (id) => setParams({ topic: (id === 'tutorials' ? TUTORIALS : TOPICS)[0].id });
   const idx = TUTORIALS.findIndex((t) => t.id === active.id);
   const next = idx >= 0 ? TUTORIALS[idx + 1] : null;
   return (
     <PublicLayout eyebrow="Guide" title="How FarmIntelytics works" wide
       intro="What each part of the platform does, where its numbers come from, and step-by-step tutorials for everyday tasks.">
-      <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
+      <CapsuleTabs label="Guide sections" active={section} onChange={switchSection}
+        tabs={[{ id: 'learn', label: 'Learn' }, { id: 'tutorials', label: 'Tutorials' }]} />
+      <div className="mt-8 grid gap-8 lg:grid-cols-[260px_1fr]">
         <nav aria-label="Guide topics" className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible -mx-4 px-4 lg:mx-0 lg:px-0 pb-2 lg:pb-0">
-          <NavGroup title="Learn" items={TOPICS} active={active.id} onPick={pick} />
-          <NavGroup title="Tutorials" items={TUTORIALS} active={active.id} onPick={pick} />
+          <NavGroup items={list} active={active.id} onPick={pick} />
         </nav>
         <article className="min-w-0">
           {active.steps ? (

@@ -61,9 +61,8 @@ const SmallholderHub = lazyWithReload(() => import('./modules/smallholder/Smallh
 const PublicFormPage = lazyWithReload(() => import('./modules/forms/PublicFormPage'));
 
 // === Public Information & Compliance Pages ===
-const PrivacyPage = lazyWithReload(() => import('./pages/public/PrivacyPage'));
 const TrustCenterPage = lazyWithReload(() => import('./pages/public/TrustCenterPage'));
-const LegalPage = lazyWithReload(() => import('./pages/public/LegalPage'));
+const PoliciesPage = lazyWithReload(() => import('./pages/public/PoliciesPage'));
 const DocumentationPage = lazyWithReload(() => import('./pages/public/DocumentationPage'));
 const ContactPage = lazyWithReload(() => import('./pages/public/ContactPage'));
 
@@ -334,9 +333,10 @@ const AppRoutes = () => {
       <Routes>
         <Route path="/"                         element={<RootPage />} />
         <Route path="/login"                    element={<LoginPage />} />
-        <Route path="/privacy"                  element={<PrivacyPage />} />
+        <Route path="/policies"                 element={<PoliciesPage />} />
+        <Route path="/privacy"                  element={<Navigate to="/policies?tab=privacy" replace />} />
         <Route path="/trust"                    element={<TrustCenterPage />} />
-        <Route path="/legal"                    element={<LegalPage />} />
+        <Route path="/legal"                    element={<Navigate to="/policies?tab=terms" replace />} />
         <Route path="/docs"                     element={<DocumentationPage />} />
         <Route path="/contact"                  element={<ContactPage />} />
         <Route path="/admin-engine"             element={<AdminLoginPage />} />

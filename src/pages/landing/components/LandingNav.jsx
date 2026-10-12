@@ -31,14 +31,11 @@ const LandingNav = () => {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <button onClick={() => handleNav('/privacy')} className="hover:text-[var(--brand-primary)] transition-colors">
-              Privacy
-            </button>
             <button onClick={() => handleNav('/trust')} className="hover:text-[var(--brand-primary)] transition-colors">
               Trust centre
             </button>
-            <button onClick={() => handleNav('/legal')} className="hover:text-[var(--brand-primary)] transition-colors">
-              Legal
+            <button onClick={() => handleNav('/policies')} className="hover:text-[var(--brand-primary)] transition-colors">
+              Policies
             </button>
             <button onClick={() => handleNav('/docs')} className="hover:text-[var(--brand-primary)] transition-colors">
               Guide
@@ -75,22 +72,16 @@ const LandingNav = () => {
         <div className="md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-4 ">
           <nav className="flex flex-col space-y-1 text-sm font-medium text-slate-700">
             <button
-              onClick={() => handleNav('/privacy')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
-            >
-              Privacy
-            </button>
-            <button
               onClick={() => handleNav('/trust')}
               className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
               Trust centre
             </button>
             <button
-              onClick={() => handleNav('/legal')}
+              onClick={() => handleNav('/policies')}
               className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
-              Legal and terms
+              Policies
             </button>
             <button
               onClick={() => handleNav('/docs')}
