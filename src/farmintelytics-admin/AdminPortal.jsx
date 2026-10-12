@@ -135,7 +135,7 @@ const AdminPortal = () => {
               {role && <p className="text-xs font-medium text-green-800 mt-0.5">{TEAM_ROLES[role].label}</p>}
             </div>
           )}
-          <button onClick={() => navigate('/')} title="Platform hub"
+          <button onClick={() => navigate('/platformhub')} title="Platform hub"
             className={`w-full flex items-center gap-3 rounded-[10px] text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors ${sidebarOpen ? 'px-3 py-2' : 'justify-center py-2.5'}`}>
             <LayoutDashboard size={17} className="shrink-0" />{sidebarOpen && 'Platform hub'}
           </button>

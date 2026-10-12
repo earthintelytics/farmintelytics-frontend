@@ -103,7 +103,7 @@ const hasValidTeamSession = hasValidTeamToken;
 // "Back to hub" on an organisation's page always means that organisation's
 // own hub, never the FarmIntelytics team hub or the admin console. Team-only
 // tools (/tools/<id>) go back to the team hub.
-const backHub = (tenant) => (tenant ? paths.orgHub(tenant) : '/hub');
+const backHub = (tenant) => (tenant ? paths.orgHub(tenant) : paths.teamHub);
 import LandingPage from './pages/LandingPage';
 
 // ─── Root Landing Page ───────────────────────────────────────────────────────
@@ -123,7 +123,7 @@ const AdminLoginPage = () => {
   return <AdminLogin context="admin" onSuccess={() => navigate('/admin/organizations')} />;
 };
 
-// "/hub" is the internal platform hub for the FarmIntelytics team.
+// "/platformhub" is the internal platform hub for the FarmIntelytics team ("/hub" redirects there).
 const TeamHubPage = () => {
   const navigate = useNavigate();
   const [teamSignedIn, setTeamSignedIn] = useState(hasValidTeamSession);
@@ -261,7 +261,7 @@ const PortalPage = () => {
   const backButton = (label, onClick) => (
     <button onClick={onClick} className="mt-8 px-6 py-3 bg-white text-[var(--text-main)] border border-[var(--border-light)] rounded-xl font-semibold text-sm hover:bg-[var(--bg-main)] transition-colors">{label}</button>
   );
-  const exitAction = backButton(isToolRoute ? 'Back to hub' : 'Back to your services', () => navigate(isToolRoute ? '/hub' : paths.orgHub(tenant)));
+  const exitAction = backButton(isToolRoute ? 'Back to hub' : 'Back to your services', () => navigate(isToolRoute ? paths.teamHub : paths.orgHub(tenant)));
 
   const mod = resolveModule(moduleId);
   if (!mod) {
@@ -342,7 +342,8 @@ const AppRoutes = () => {
         <Route path="/admin-engine"             element={<AdminLoginPage />} />
         <Route path="/admin-login"              element={<Navigate to="/admin-engine" replace />} />
         <Route path="/admin/login"              element={<Navigate to="/admin-engine" replace />} />
-        <Route path="/hub"                      element={<TeamHubPage />} />
+        <Route path="/platformhub"              element={<TeamHubPage />} />
+        <Route path="/hub"                      element={<Navigate to="/platformhub" replace />} />
         <Route path="/f/:token"                 element={<PublicFormPage />} />
         <Route path="/tools/:moduleId"          element={<PortalPage />} />
         <Route path="/org/:tenant"              element={<OrgPage view="services" />} />
