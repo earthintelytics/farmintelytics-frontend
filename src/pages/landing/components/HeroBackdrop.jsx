@@ -28,12 +28,23 @@ const HeroBackdrop = () => (
           <feFuncB type="table" tableValues="0.16 0.16 0.22 0.30 0.28 0.22" />
         </feComponentTransfer>
       </filter>
+      <filter id="fi-water" colorInterpolationFilters="sRGB">
+        {/* Wetness: dark, green ground reads as wet; bright bare soil as dry */}
+        <feColorMatrix type="matrix" values="-1.9 1.4 -0.9 0 0.95  -1.9 1.4 -0.9 0 0.95  -1.9 1.4 -0.9 0 0.95  0 0 0 1 0" />
+        <feComponentTransfer>
+          <feFuncR type="table" tableValues="0.80 0.93 0.96 0.62 0.24 0.12" />
+          <feFuncG type="table" tableValues="0.38 0.64 0.90 0.80 0.52 0.33" />
+          <feFuncB type="table" tableValues="0.14 0.28 0.70 0.90 0.82 0.66" />
+        </feComponentTransfer>
+      </filter>
     </svg>
     <Tiles />
     <Tiles className="fi-hero-health" style={{ filter: 'url(#fi-health)' }} />
+    <Tiles className="fi-hero-water" style={{ filter: 'url(#fi-water)' }} />
     <div className="absolute right-6 top-6 hidden lg:block w-36 text-center whitespace-nowrap rounded-full bg-white/95 border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800">
       <span className="fi-hero-label-a">Natural view</span>
       <span className="fi-hero-label-b absolute inset-0 flex items-center justify-center">Crop health view</span>
+      <span className="fi-hero-label-c absolute inset-0 flex items-center justify-center">Water need view</span>
     </div>
     {/* White behind the text: across on wide screens, downwards on phones */}
     <div className="absolute inset-0 bg-[linear-gradient(180deg,#fff_0%,#fff_55%,rgba(255,255,255,0.6)_80%,rgba(255,255,255,0.1)_100%)] lg:bg-[linear-gradient(90deg,#fff_0%,#fff_34%,rgba(255,255,255,0.8)_48%,rgba(255,255,255,0)_66%)]" />
