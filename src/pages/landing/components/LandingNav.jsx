@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
@@ -12,7 +12,7 @@ const LandingNav = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 text-slate-800 shadow-sm shrink-0">
+    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 text-slate-800 shrink-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between">
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-8">
@@ -31,19 +31,19 @@ const LandingNav = () => {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <button onClick={() => handleNav('/privacy')} className="hover:text-emerald-700 transition-colors">
+            <button onClick={() => handleNav('/privacy')} className="hover:text-[var(--brand-primary)] transition-colors">
               Privacy
             </button>
-            <button onClick={() => handleNav('/trust')} className="hover:text-emerald-700 transition-colors">
-              Trust Center
+            <button onClick={() => handleNav('/trust')} className="hover:text-[var(--brand-primary)] transition-colors">
+              Trust centre
             </button>
-            <button onClick={() => handleNav('/legal')} className="hover:text-emerald-700 transition-colors">
+            <button onClick={() => handleNav('/legal')} className="hover:text-[var(--brand-primary)] transition-colors">
               Legal
             </button>
-            <button onClick={() => handleNav('/docs?topic=api')} className="hover:text-emerald-700 transition-colors">
-              API Docs
+            <button onClick={() => handleNav('/docs?topic=api')} className="hover:text-[var(--brand-primary)] transition-colors">
+              API docs
             </button>
-            <button onClick={() => handleNav('/contact')} className="hover:text-emerald-700 transition-colors">
+            <button onClick={() => handleNav('/contact')} className="hover:text-[var(--brand-primary)] transition-colors">
               Contact
             </button>
           </nav>
@@ -54,9 +54,9 @@ const LandingNav = () => {
           <button
             id="top-nav-sign-in"
             onClick={() => handleNav('/login')}
-            className="text-sm font-semibold text-slate-800 hover:text-emerald-700 transition-colors px-3 py-1.5 cursor-pointer bg-transparent border-0 active:scale-95"
+            className="text-sm font-semibold text-slate-800 hover:text-[var(--brand-primary)] transition-colors px-3 py-1.5 cursor-pointer bg-transparent border-0 active:scale-95"
           >
-            Sign In
+            Sign in
           </button>
 
           {/* Mobile Hamburger Button */}
@@ -72,44 +72,44 @@ const LandingNav = () => {
 
       {/* Mobile Dropdown Navigation Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-4 shadow-lg animate-fadeIn">
+        <div className="md:hidden bg-white border-b border-gray-200 px-4 pt-2 pb-4 ">
           <nav className="flex flex-col space-y-1 text-sm font-medium text-slate-700">
             <button
               onClick={() => handleNav('/privacy')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
-              Privacy Policy
+              Privacy
             </button>
             <button
               onClick={() => handleNav('/trust')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
-              Trust Center
+              Trust centre
             </button>
             <button
               onClick={() => handleNav('/legal')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
-              Legal & Terms
+              Legal and terms
             </button>
             <button
               onClick={() => handleNav('/docs?topic=api')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
-              API Docs
+              API docs
             </button>
             <button
               onClick={() => handleNav('/contact')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-emerald-700 rounded transition-colors"
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
-              Contact Support
+              Contact
             </button>
             <div className="pt-2 border-t border-slate-100">
               <button
                 onClick={() => handleNav('/login')}
-                className="w-full text-center py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded shadow-sm transition-colors"
+                className="w-full text-center py-2.5 px-4 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white font-bold rounded shadow-sm transition-colors"
               >
-                Sign In to Platform
+                Sign in
               </button>
             </div>
           </nav>

@@ -22,8 +22,9 @@ export function parseError(raw) {
       if (v) text = typeof v === 'string' ? v : JSON.stringify(v);
     } catch { /* keep the text */ }
   }
-  const lines = text.split(/\r?\n/).map((l) => l.trimEnd()).filter(Boolean);
-  const title = [...lines].reverse().find((l) => /Error:|Exception:|HTTP |Failed:/.test(l)) || lines[lines.length - 1] || text;
+  // Library footers ("For further information visit https://errors.pydantic.dev/...") are not the error.
+  const lines = text.split(/\r?\n/).map((l) => l.trimEnd()).filter((l) => l && !/^\s*For further information visit/i.test(l));
+  const title = [...lines].reverse().find((l) => /Error:|Exception:|HTTP |Failed:|Input should|validation error/i.test(l)) || lines[lines.length - 1] || text;
   return { title: title.replace(/^Traceback.*$/i, '').trim() || text, full: text };
 }
 

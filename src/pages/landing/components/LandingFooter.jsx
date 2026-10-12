@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const LandingFooter = () => {
@@ -17,25 +16,25 @@ const LandingFooter = () => {
             />
           </div>
           <span className="font-semibold text-slate-900 text-[11px] sm:text-xs">FarmIntelytics</span>
-          <span className="text-slate-400 text-[10px] sm:text-[11px]">© {new Date().getFullYear()} FarmIntelytics / Earthintelytics</span>
+          <span className="text-slate-400 text-[11px]">© {new Date().getFullYear()} FarmIntelytics / Earthintelytics</span>
         </div>
 
         {/* Footer Navigation Links */}
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 font-medium text-slate-600 text-[11px] sm:text-xs">
-          <button onClick={() => navigate('/privacy')} className="hover:text-emerald-700 transition-colors">
+          <button onClick={() => navigate('/privacy')} className="hover:text-[var(--brand-primary)] transition-colors">
             Privacy
           </button>
-          <button onClick={() => navigate('/trust')} className="hover:text-emerald-700 transition-colors">
-            Trust Center
+          <button onClick={() => navigate('/trust')} className="hover:text-[var(--brand-primary)] transition-colors">
+            Trust centre
           </button>
-          <button onClick={() => navigate('/legal')} className="hover:text-emerald-700 transition-colors">
-            Legal & Terms
+          <button onClick={() => navigate('/legal')} className="hover:text-[var(--brand-primary)] transition-colors">
+            Legal and terms
           </button>
-          <button onClick={() => navigate('/docs?topic=api')} className="hover:text-emerald-700 transition-colors">
-            API Docs
+          <button onClick={() => navigate('/docs?topic=api')} className="hover:text-[var(--brand-primary)] transition-colors">
+            API docs
           </button>
-          <button onClick={() => navigate('/contact')} className="hover:text-emerald-700 transition-colors">
-            Contact Support
+          <button onClick={() => navigate('/contact')} className="hover:text-[var(--brand-primary)] transition-colors">
+            Contact
           </button>
         </div>
       </div>
