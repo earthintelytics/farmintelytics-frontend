@@ -10,24 +10,24 @@ const TOPICS = [
   {
     id: 'how-it-works', label: 'How it works', icon: Compass,
     body: [
-      ['From your boundary to answers', 'Your estates or fields are set up once from their boundary files. For each service you use, FarmIntelytics looks for new satellite pictures of that area, measures each block, and turns the result into maps, numbers, alerts and advice.'],
-      ['When results update', 'Runs happen on a schedule set for your organisation, or when the FarmIntelytics team starts one. Each page says when its results were last updated and the date of the picture behind them.'],
+      ['From your boundary to answers', 'Your estates or fields are set up once from their boundary files. For each service you use, FarmIntelytics looks for new satellite imagery of that area, measures each block, and turns the result into maps, numbers, alerts and advice.'],
+      ['When results update', 'Runs happen on a schedule set for your organisation, or when the FarmIntelytics team starts one. Each page says when its results were last updated and the date of the image behind them.'],
       ['What you see', 'Maps of each measure with a legend in plain words, the blocks that need attention, trends over the season, alerts with what to do, a farm advisor you can ask questions, and reports to share.'],
     ],
   },
   {
     id: 'crop-health', label: 'Crop health and growth', icon: Sprout,
     body: [
-      ['Greenness and vigour', 'Satellite pictures measure how green and dense the canopy is (indices such as NDVI and EVI). Each crop has its own scale, set from research for that crop, from "act now" to "healthy".'],
-      ['Blocks that need a visit', 'Blocks well below the rest of the estate, or that dropped sharply since the last pictures, are raised as alerts with a suggested action.'],
-      ['Trends', 'The season chart shows the farm average on each clear picture date, so you can see whether the crop is improving or falling behind.'],
+      ['Greenness and vigour', 'Satellite imagery measures how green and dense the canopy is (indices such as NDVI and EVI). Each crop has its own scale, set from research for that crop, from "act now" to "healthy".'],
+      ['Blocks that need a visit', 'Blocks well below the rest of the estate, or that dropped sharply since the last images, are raised as alerts with a suggested action.'],
+      ['Trends', 'The season chart shows the farm average on each clear image date, so you can see whether the crop is improving or falling behind.'],
     ],
   },
   {
     id: 'irrigation', label: 'Water and flooding', icon: Droplets,
     body: [
       ['Water in the crop', 'Moisture indices (such as NDMI) show where plants are short of water or waterlogged. Rainfall and temperature records add the weather behind it.'],
-      ['Flooding and paddies', 'Radar pictures show standing water even under cloud, which matters for rice and for flood-prone fields.'],
+      ['Flooding and paddies', 'Radar images show standing water even under cloud, which matters for rice and for flood-prone fields.'],
     ],
   },
   {
@@ -55,9 +55,9 @@ const TOPICS = [
   {
     id: 'data', label: 'Data, cloud and limits', icon: CloudSun,
     body: [
-      ['Where the pictures come from', 'Sentinel-2 (every 5 days, 10-20 m), Landsat 8 and 9 (30 m) and Sentinel-1 radar (about every 6 days, sees through cloud), all open public missions.'],
-      ['Cloud in the rainy season', 'From about March to October, clouds can hide a farm from optical satellites for weeks. FarmIntelytics keeps the most recent clear view of each part of the farm and shows its date, and uses radar for water and growth when optical pictures are blocked.'],
-      ['Honest numbers', 'No value is ever made up. When there is no clear picture yet, the page says so instead of showing a number.'],
+      ['Where the images come from', 'Sentinel-2 (every 5 days, 10-20 m), Landsat 8 and 9 (30 m) and Sentinel-1 radar (about every 6 days, sees through cloud), all open public missions.'],
+      ['Cloud in the rainy season', 'From about March to October, clouds can hide a farm from optical satellites for weeks. FarmIntelytics keeps the most recent clear view of each part of the farm and shows its date, and uses radar for water and growth when optical images are blocked.'],
+      ['Honest numbers', 'No value is ever made up. When there is no clear image yet, the page says so instead of showing a number.'],
     ],
   },
   {

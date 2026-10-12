@@ -1,8 +1,20 @@
 import { useMemo, useState } from 'react';
 import { MapContainer, TileLayer, Polygon, ZoomControl } from 'react-leaflet';
-import { PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { PanelRightOpen, ChevronsRight, Layers, X, Sprout, Leaf, Droplets, Waves, Radar, Palette, FlaskConical, Thermometer, CloudRain, Activity } from 'lucide-react';
 import { FitBoundsToPlots, ResizeMap, ZoomToPlot } from '../map/MapHelpers';
 import { hexOf, legendFor, useLayerLegends } from '../legends/layerLegends';
+
+// Plain names and icons for the measure rail; the index name stays in the hover text only.
+const PLAIN = {
+  ndvi: ['Greenness', Leaf], evi: ['Growth', Sprout], ndmi: ['Moisture', Droplets], lswi: ['Water', Waves],
+  ndwi: ['Water', Waves], reci: ['Leaf colour', Palette], ndre: ['Nitrogen', FlaskConical], cvi: ['Leaf colour', Palette],
+  gndvi: ['Greenness', Leaf], rvi: ['Radar', Radar], lai: ['Leaf cover', Leaf], msavi2: ['Ground cover', Sprout],
+  lst: ['Heat', Thermometer], rainfall: ['Rain', CloudRain],
+};
+const plainOf = (x) => {
+  const [label, Icon] = PLAIN[String(x.key).toLowerCase()] || [x.label, Activity];
+  return { label, Icon };
+};
 
 const fmt = (v, d = 2) => (v == null ? '—' : Number(v).toFixed(d));
 
@@ -18,6 +30,7 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
   const [key, setKey] = useState(measures[0]?.key || null);
   const [found, setFound] = useState(null);
   const [panelOpen, setPanelOpen] = useState(true);
+  const [railOpen, setRailOpen] = useState(true);
   const m = measures.find((x) => x.key === key) || measures[0];
 
   const rows = useMemo(() => (m ? plotsData.map((p) => ({ p, v: m.valueOf(p) })) : []), [plotsData, m]);
@@ -62,34 +75,43 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
   return (
     <div className="flex h-full min-h-0">
       <div className="flex-1 relative min-w-0">
-        {/* Measure choice and the summary toggle, one card down the right edge of the map */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[1000] w-48 bg-white/95 backdrop-blur border border-gray-200 rounded-2xl overflow-hidden">
-          <p className="px-4 pt-3.5 pb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500">Show on map</p>
-          <div className="px-2 pb-2 space-y-1">
+        {/* Measure choice: a slim rail down the right edge of the map, plain words with an icon.
+            Its foot button folds the rail away; folded, one small button opens it again. */}
+        {railOpen ? (
+          <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[1000] w-[76px] bg-white border border-gray-200 rounded-2xl py-2 flex flex-col items-stretch">
             {measures.map((x) => {
               const on = x.key === m.key;
-              const ramp = (x.classes || []).map((c) => c.hex).filter(Boolean);
+              const { label, Icon } = plainOf(x);
               return (
                 <button key={x.key} type="button" onClick={() => setKey(x.key)} aria-pressed={on}
-                  className={`relative w-full text-left rounded-xl pl-4 pr-3 py-3 transition-colors ${on ? 'bg-green-50' : 'hover:bg-gray-50'}`}>
-                  {on && <span className="absolute left-0 top-3 bottom-3 w-1 rounded-full bg-[var(--brand-primary)]" />}
-                  <span className={`block text-sm font-semibold ${on ? 'text-green-900' : 'text-gray-900'}`}>{x.label}</span>
-                  {x.title && x.title !== x.label && <span className="block text-xs text-gray-500 mt-0.5 leading-snug line-clamp-2">{x.title}</span>}
-                  {ramp.length > 1 && (
-                    <span className="mt-2 flex h-1.5 rounded-full overflow-hidden">
-                      {ramp.map((h, i) => <span key={i} className="flex-1" style={{ background: h }} />)}
-                    </span>
-                  )}
+                  title={`${label}${x.title ? `: ${x.title}` : ''} (${x.label})`}
+                  className={`mx-1.5 my-0.5 flex flex-col items-center gap-1.5 rounded-xl px-1 py-3 transition-colors ${on ? 'bg-green-50 text-green-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}>
+                  <Icon size={20} strokeWidth={on ? 2.2 : 1.8} className={on ? 'text-[var(--brand-primary)]' : ''} />
+                  <span className={`text-[11px] leading-tight text-center ${on ? 'font-semibold' : 'font-medium'}`}>{label}</span>
                 </button>
               );
             })}
+            <div className="mx-3 my-1.5 border-t border-gray-100" />
+            <button type="button" onClick={() => setRailOpen(false)} aria-label="Hide the measures" title="Hide the measures"
+              className="mx-1.5 flex flex-col items-center gap-1 rounded-xl px-1 py-2.5 text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+              <ChevronsRight size={18} strokeWidth={1.8} />
+              <span className="text-[11px] font-medium leading-tight">Hide</span>
+            </button>
           </div>
-          <button type="button" onClick={() => setPanelOpen((o) => !o)}
-            className="w-full flex items-center justify-between gap-2 px-4 py-3 border-t border-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-50">
-            {panelOpen ? 'Hide summary' : 'Show summary'}
-            {panelOpen ? <PanelRightClose size={16} /> : <PanelRightOpen size={16} />}
+        ) : (
+          <button type="button" onClick={() => setRailOpen(true)} aria-label="Show the measures"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-[1000] w-[76px] flex flex-col items-center gap-1.5 rounded-2xl bg-white border border-gray-200 px-1 py-3 text-gray-700 hover:bg-gray-50">
+            {(() => { const { Icon } = plainOf(m); return <Icon size={20} strokeWidth={2.2} className="text-[var(--brand-primary)]" />; })()}
+            <span className="text-[11px] font-semibold leading-tight text-center">{plainOf(m).label}</span>
+            <span className="text-[11px] text-gray-500 inline-flex items-center gap-0.5"><Layers size={11} />Measures</span>
           </button>
-        </div>
+        )}
+        {!panelOpen && (
+          <button type="button" onClick={() => setPanelOpen(true)}
+            className="absolute right-4 top-4 z-[1000] inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            <PanelRightOpen size={16} />Summary
+          </button>
+        )}
         <MapContainer center={defaultMapCenter} zoom={13} maxZoom={22} zoomControl={false} style={{ height: '100%', width: '100%' }}>
           <TileLayer key={basemapUrl} url={basemapUrl} attribution={basemapAttribution} maxZoom={22} maxNativeZoom={basemapMaxNativeZoom} />
           {rows.map(({ p, v }) => {
@@ -108,7 +130,7 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
         {/* Colour key, only once there are values to colour */}
         {stats && (
           <div className="absolute bottom-6 left-4 z-[1000] bg-white border border-gray-200 rounded-xl px-3 py-2.5 space-y-1.5 max-w-[240px]">
-            <p className="text-xs font-semibold text-gray-900">{m.label}{m.unit ? ` (${m.unit})` : ''}</p>
+            <p className="text-xs font-semibold text-gray-900">{plainOf(m).label}{m.unit ? ` (${m.unit})` : ''}</p>
             {(m.classes || []).map((c) => (
               <div key={c.label} className="flex items-center gap-2 text-xs text-gray-700">
                 <span className="w-3 h-3 rounded-sm border border-black/20 shrink-0" style={{ background: c.hex }} />{c.label}
@@ -125,9 +147,13 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
         <div>
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-display text-xl font-semibold text-gray-900">Block summary</h2>
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200 text-gray-600">{plotsData.length} {unitLabel}</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200 text-gray-600">{plotsData.length} {unitLabel}</span>
+              <button type="button" onClick={() => setPanelOpen(false)} aria-label="Hide the summary" title="Hide the summary"
+                className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900"><X size={16} /></button>
+            </div>
           </div>
-          <p className="text-sm text-gray-500 mt-1">{m.label}{m.unit ? ` (${m.unit})` : ''}: one value per {one}, from the latest result.</p>
+          <p className="text-sm text-gray-500 mt-1">{plainOf(m).label}{m.unit ? ` (${m.unit})` : ''}: one value per {one}, from the latest result.</p>
         </div>
 
         {!stats ? (

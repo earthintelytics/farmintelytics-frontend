@@ -19,7 +19,7 @@ export default function TrustCenterPage() {
         <p>Your boundaries, results and member records are used to run the service for you. We do not sell them or share them with commodity traders or advertisers.</p>
       </Section>
       <Section title="Where the numbers come from">
-        <p>Satellite results come from open public missions (Copernicus Sentinel and Landsat) processed by us. Every result says which pictures it came from and when, and reports list the data used and its limits.</p>
+        <p>Satellite results come from open public missions (Copernicus Sentinel and Landsat) processed by us. Every result says which images it came from and when, and reports list the data used and its limits.</p>
       </Section>
       <Section title="Questions or a problem">
         <p>Signed-in users can send a problem report from any page. You can also write to us from the <a href="/contact" className="text-[var(--brand-primary)] underline">contact page</a>.</p>

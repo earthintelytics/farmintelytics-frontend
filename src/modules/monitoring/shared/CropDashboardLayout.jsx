@@ -353,7 +353,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
         const data = await api.fetchCompositeSlider({ farm: tenant || 'farm_1', composite: activeComposite });
         if (active) setCompositeSliderData(data);
       } catch (err) {
-        noteLoadIssue('satellite pictures', err);
+        noteLoadIssue('satellite imagery', err);
         if (active) setCompositeSliderData(null);
       }
     }
@@ -1848,7 +1848,7 @@ Context: ${context}.`;
     else setCalendarMonth(m => m + 1);
   };
 
-  // Newest picture we hold, so the calendar can jump straight to it.
+  // Newest image we hold, so the calendar can jump straight to it.
   const latestCalDate = useMemo(() => {
     const dates = [...(calendarDates || []).map(d => d.date), ...(TIMELINE_DATA || []).map(t => t.date)].filter(Boolean).sort();
     return dates.length ? dates[dates.length - 1] : null;

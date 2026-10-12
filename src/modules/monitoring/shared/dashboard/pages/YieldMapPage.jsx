@@ -24,7 +24,7 @@ export default function YieldMapPage({ cropType, basemapAttribution, basemapMaxN
             {tileRefreshing && currentTileUrl && (
               <div className="absolute top-2 left-1/2 -translate-x-1/2 z-[9999] flex items-center gap-1.5 bg-black/60 text-white text-[11px] font-semibold px-3 py-1.5 rounded-full pointer-events-none">
                 <svg className="animate-spin h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/></svg>
-                Loading the satellite picture…
+                Loading the satellite image…
               </div>
             )}
             <MapContainer preferCanvas={true} center={defaultMapCenter} zoom={13} maxZoom={22}

@@ -140,3 +140,10 @@ button:active {
   body.fi-print-report #fi-report { position: absolute; left: 0; top: 0; width: 100%; padding: 24px; }
   body.fi-print-report .no-print { display: none !important; }
 }
+
+/* Landing hero: slow pan over the imagery and a scan line crossing it. */
+@keyframes fi-hero-pan { from { transform: translate3d(0, 0, 0) scale(1.04); } to { transform: translate3d(-4%, -3%, 0) scale(1.1); } }
+@keyframes fi-hero-scan { from { left: 35%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } to { left: 100%; opacity: 0; } }
+.fi-hero-pan { animation: fi-hero-pan 40s ease-in-out infinite alternate; will-change: transform; }
+.fi-hero-scan { animation: fi-hero-scan 9s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .fi-hero-pan, .fi-hero-scan { animation: none; } .fi-hero-scan { display: none; } }

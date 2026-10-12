@@ -9,7 +9,7 @@ import SuitabilityEditor from './thresholds/SuitabilityEditor';
 
 /**
  * Interpretation settings, owned by the FarmIntelytics team: map classes
- * (the words, colours and advice clients see) for the satellite pictures and
+ * (the words, colours and advice clients see) for the satellite imagery and
  * for the results blocks are coloured by (rain, heat, harvest, restoration),
  * and the crop suitability factors. Set for every organisation, or for one.
  */
@@ -78,7 +78,7 @@ const CropThresholds = () => {
       {tab === 'map' ? (
         loading ? <Loading /> : items.length + layers.length === 0 ? <Empty>No map classes for this crop.</Empty> : (
           <>
-            {group('Satellite pictures', 'The colours of the satellite picture on the map pages.', items)}
+            {group('Satellite imagery', 'The colours of the satellite image on the map pages.', items)}
             {group('Results on the map', 'The colours blocks and zones get from “Colour by” on the map pages. A crop’s own classes come before “Every crop and service”.', layers)}
             {item && <LegendEditor key={`${crop}-${companyId}-${item.index_key}`} item={item} cropType={crop} companyId={companyId} onSaved={load} onError={setError} />}
           </>

@@ -112,7 +112,7 @@ const Logs = () => {
                       <span className="ml-auto flex items-center gap-1 text-xs text-gray-500">{fmtTime(log.timestamp)}<ChevronRight size={15} /></span>
                     </div>
                     <div className="flex flex-wrap gap-4 text-xs text-gray-500">
-                      {log.period && <span>Pictures {log.period}</span>}
+                      {log.period && <span>Images {log.period}</span>}
                       {log.estates?.length > 0 && <span>{log.estates.length} {log.estates.length === 1 ? 'estate' : 'estates'}</span>}
                       {log.duration != null && <span>Took {log.duration < 90 ? `${Number(log.duration).toFixed(0)} s` : `${Math.round(log.duration / 60)} min`}</span>}
                       {log.message && st !== 'completed' && <span className="text-gray-700 truncate max-w-md">Step: {log.message}</span>}

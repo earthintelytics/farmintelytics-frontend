@@ -19,7 +19,7 @@ export default function PrivacyPage() {
         <p>When you use the farm advisor, your question and a summary of your farm's own results are sent to the AI provider your organisation's service uses (for example Google, OpenAI or Anthropic) to write the answer. Nothing from other organisations is included.</p>
       </Section>
       <Section title="Satellite and public data">
-        <p>Satellite pictures and maps come from public sources (Copernicus, Landsat, CHIRPS, SoilGrids and others). We send them only the area to look at, never your personal data.</p>
+        <p>Satellite imagery and maps come from public sources (Copernicus, Landsat, CHIRPS, SoilGrids and others). We send them only the area to look at, never your personal data.</p>
       </Section>
       <Section title="How long we keep it">
         <p>For as long as your organisation uses the service, or as your agreement with us says. When an organisation leaves, we delete its data or return it on request. Member records can be exported or deleted by the co-operative at any time.</p>

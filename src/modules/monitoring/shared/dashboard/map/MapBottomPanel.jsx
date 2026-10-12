@@ -1,7 +1,7 @@
 /**
- * The strip under every map: which picture is on the map, step through pictures, play them, and a
+ * The strip under every map: which image is on the map, step through images, play them, and a
  * small month calendar in a pop-up. Kept short on purpose so the map keeps the screen.
- * The client never chooses a satellite: the best picture of a day is shown.
+ * The client never chooses a satellite: the best image of a day is shown.
  */
 import MapBottomStrip from './MapBottomStrip';
 

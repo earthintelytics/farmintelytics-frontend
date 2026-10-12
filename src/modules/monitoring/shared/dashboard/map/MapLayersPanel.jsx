@@ -31,7 +31,7 @@ const Row = ({ label, text, on, onChange, children }) => (
 
 /**
  * The map layers of every map page, the same everywhere: the satellite
- * picture (its legend comes from the admin's map classes), outlines, and,
+ * image (its legend comes from the admin's map classes), outlines, and,
  * where the page has its own results, one "Colour by" choice whose legend
  * and map colours come from the same classes. Only layers with real data are
  * offered; a page passes no colour options when it has none.
@@ -47,7 +47,7 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
     </div>
     <div className="p-4 space-y-3">
       {satellite && satellite.available && (
-        <Row label="Satellite picture" text={satellite.text} on={satellite.on} onChange={satellite.onChange}>
+        <Row label="Satellite image" text={satellite.text} on={satellite.on} onChange={satellite.onChange}>
           <Opacity value={satellite.opacity} onChange={satellite.setOpacity} />
           {satellite.legend || (
             <div className="pt-1 space-y-1">
@@ -58,7 +58,7 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
         </Row>
       )}
       {satellite && !satellite.available && (
-        <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-xl p-3">No satellite picture for this date yet. It appears after the first monitoring run.</p>
+        <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-xl p-3">No satellite image for this date yet. It appears after the first monitoring run.</p>
       )}
       {outlines && (
         <Row label={`Outlines of the ${unit}`} text="Click one to see its details" on={outlines.on} onChange={outlines.onChange}>
@@ -88,7 +88,7 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
       )}
       {children}
       <p className="text-xs text-gray-500 leading-relaxed">
-        The calendar and time slider change the date of the satellite picture.
+        The calendar and time slider change the date of the satellite image.
       </p>
     </div>
   </aside>

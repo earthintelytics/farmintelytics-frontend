@@ -16,10 +16,10 @@ export default function LegalPage() {
     <PublicLayout eyebrow="Legal" title="Terms and data credits"
       intro="The main points of using FarmIntelytics, and the open data it is built on. Your organisation's agreement with us sets out the full terms.">
       <Section title="Your data stays yours">
-        <p>Organisations keep ownership of their boundaries, uploaded records, drone pictures and settings. The FarmIntelytics software and its analysis methods belong to FarmIntelytics / Earthintelytics.</p>
+        <p>Organisations keep ownership of their boundaries, uploaded records, drone images and settings. The FarmIntelytics software and its analysis methods belong to FarmIntelytics / Earthintelytics.</p>
       </Section>
       <Section title="Results are decision support">
-        <p>Satellite results, alerts, suitability classes and yield estimates help you decide where to look and what to plan. They depend on clear pictures (cloud can delay them for weeks in the rainy season) and are not a substitute for checking in the field before large decisions.</p>
+        <p>Satellite results, alerts, suitability classes and yield estimates help you decide where to look and what to plan. They depend on clear images (cloud can delay them for weeks in the rainy season) and are not a substitute for checking in the field before large decisions.</p>
         <p>Deforestation checks report what the data shows; they are not a legal certificate of compliance.</p>
       </Section>
       <Section title="Fair use">
