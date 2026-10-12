@@ -1,72 +1,35 @@
-import React from 'react';
-import PublicHeader from './PublicHeader';
-import PublicFooter from './PublicFooter';
-import { ShieldCheck, Lock, EyeOff, Server, CheckCircle2 } from 'lucide-react';
+import PublicLayout, { Section } from './PublicLayout';
 
-const PrivacyPage = () => {
+/** Privacy notice in plain words. Keep it true to what the platform does; review with counsel before launch. */
+export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
-      <PublicHeader />
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 flex-1 w-full">
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center">
-              <ShieldCheck size={22} />
-            </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold font-display text-slate-900">Privacy Policy</h1>
-              <p className="text-xs text-slate-500">Last updated: October 2026</p>
-            </div>
-          </div>
-
-          <p className="text-sm text-slate-600 leading-relaxed mt-4">
-            At FarmIntelytics, we prioritize the strict confidentiality and sovereign ownership of your agricultural geospatial data, field boundaries, crop health analytics, and smallholder registries.
-          </p>
-
-          <div className="mt-8 space-y-6">
-            <section className="border-t border-slate-100 pt-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <Lock size={18} className="text-emerald-600" /> 1. Strict Tenant Boundary Isolation
-              </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                All plantation boundaries, GeoJSON spatial files, satellite time-series arrays (Zarr), and agronomic indices are stored under cryptographically isolated tenant keys. Cross-tenant queries are strictly rejected at the API gateway layer.
-              </p>
-            </section>
-
-            <section className="border-t border-slate-100 pt-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <EyeOff size={18} className="text-emerald-600" /> 2. Zero Telemetry Resale or Secondary Monetization
-              </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                FarmIntelytics does not sell, aggregate, or license your proprietary plantation data, yield forecasts, or smallholder member identities to third-party commercial commodity brokers.
-              </p>
-            </section>
-
-            <section className="border-t border-slate-100 pt-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <Server size={18} className="text-emerald-600" /> 3. Data Retention and Encryption
-              </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Data at rest is secured via AES-256 encryption across all MinIO object stores and PostgreSQL tables. All traffic in transit is enforced using TLS 1.3 encryption.
-              </p>
-            </section>
-
-            <section className="border-t border-slate-100 pt-6">
-              <h2 className="text-lg font-bold text-slate-900 mb-2 flex items-center gap-2">
-                <CheckCircle2 size={18} className="text-emerald-600" /> 4. EUDR Due Diligence Statements
-              </h2>
-              <p className="text-sm text-slate-600 leading-relaxed">
-                Audit logs generated for EU Deforestation Regulation compliance are preserved for the statutory 5-year requirement and remain under the exclusive custody of the subscribing organisation.
-              </p>
-            </section>
-          </div>
-        </div>
-      </main>
-
-      <PublicFooter />
-    </div>
+    <PublicLayout eyebrow="Privacy" title="Privacy notice"
+      intro="What FarmIntelytics collects, why, who can see it and what you can ask us to do with it. Last updated 12 October 2026.">
+      <Section title="What we collect">
+        <p><strong>Accounts:</strong> name, email address and role for each person your organisation adds.</p>
+        <p><strong>Farm data:</strong> estate and field boundaries, crops, planting dates and any farm records you upload, such as yields or field visits.</p>
+        <p><strong>Smallholder records:</strong> when a co-operative uses member registration, the member details its form asks for (for example name, phone, parcel boundary and photos), collected with the member's consent.</p>
+        <p><strong>Use of the service:</strong> questions asked to the farm advisor and basic records of sign-ins and changes, to run the service and fix problems.</p>
+      </Section>
+      <Section title="Why we use it">
+        <p>To run the services your organisation chose: satellite monitoring, alerts, advice, reports, deforestation checks and suitability analyses. We do not use your data for advertising and we do not sell it.</p>
+      </Section>
+      <Section title="Who can see it">
+        <p>People in your organisation, within their role. The FarmIntelytics team, to set up and support your account. Nobody in another organisation.</p>
+        <p>When you use the farm advisor, your question and a summary of your farm's own results are sent to the AI provider your organisation's service uses (for example Google, OpenAI or Anthropic) to write the answer. Nothing from other organisations is included.</p>
+      </Section>
+      <Section title="Satellite and public data">
+        <p>Satellite pictures and maps come from public sources (Copernicus, Landsat, CHIRPS, SoilGrids and others). We send them only the area to look at, never your personal data.</p>
+      </Section>
+      <Section title="How long we keep it">
+        <p>For as long as your organisation uses the service, or as your agreement with us says. When an organisation leaves, we delete its data or return it on request. Member records can be exported or deleted by the co-operative at any time.</p>
+      </Section>
+      <Section title="Your rights">
+        <p>Under the Nigeria Data Protection Act 2023 you can ask to see, correct, export or delete your personal data, and object to how it is used. Smallholder members can ask their co-operative or us directly.</p>
+      </Section>
+      <Section title="Contact">
+        <p>Write to us from the <a href="/contact" className="text-[var(--brand-primary)] underline">contact page</a> about anything on this page.</p>
+      </Section>
+    </PublicLayout>
   );
-};
-
-export default PrivacyPage;
+}

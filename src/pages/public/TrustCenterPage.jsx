@@ -1,76 +1,29 @@
-import React from 'react';
-import PublicHeader from './PublicHeader';
-import PublicFooter from './PublicFooter';
-import { Shield, Key, FileCheck, CheckCircle2, Activity, Database } from 'lucide-react';
+import PublicLayout, { Section } from './PublicLayout';
 
-const TrustCenterPage = () => {
+/** What we actually do to keep each organisation's data safe. Only true statements belong here. */
+export default function TrustCenterPage() {
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
-      <PublicHeader />
-
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-12 flex-1 w-full">
-        <div className="bg-white rounded-2xl border border-slate-200 p-8 sm:p-12 shadow-sm">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center">
-              <Shield size={22} />
-            </div>
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold font-display text-slate-900">Trust & Security Center</h1>
-              <p className="text-xs text-slate-500">Infrastructure Integrity & Regulatory Assurances</p>
-            </div>
-          </div>
-
-          <p className="text-sm text-slate-600 leading-relaxed mt-4">
-            FarmIntelytics delivers enterprise-grade agricultural telemetry and earth observation capabilities engineered to meet stringent corporate compliance and sovereign data governance standards.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center mb-3">
-                <Key size={18} />
-              </div>
-              <h3 className="text-base font-bold text-slate-900">Role-Based Access Control (RBAC)</h3>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Granular permission gates (Admin, Analyst, Field Officer, Viewer) with distinct Superadmin vs Tenant JWT tokens.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center mb-3">
-                <FileCheck size={18} />
-              </div>
-              <h3 className="text-base font-bold text-slate-900">Immutable Audit Logs</h3>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Every pipeline evaluation, boundary modification, and PDF report export is recorded with timestamped provenance.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="w-8 h-8 rounded-lg bg-purple-100 text-purple-800 flex items-center justify-center mb-3">
-                <Database size={18} />
-              </div>
-              <h3 className="text-base font-bold text-slate-900">High-Availability Geospatial Storage</h3>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                PostGIS spatial indexing paired with MinIO S3-compatible object storage and distributed Redis queue processing.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200">
-              <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center mb-3">
-                <Activity size={18} />
-              </div>
-              <h3 className="text-base font-bold text-slate-900">99.9% Uptime & SLA Guarantee</h3>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Monitored container health checks and automated background pipeline recovery for mission-critical farm management.
-              </p>
-            </div>
-          </div>
-        </div>
-      </main>
-
-      <PublicFooter />
-    </div>
+    <PublicLayout eyebrow="Trust centre" title="How we look after your data"
+      intro="FarmIntelytics holds farm boundaries, satellite results, field visits and member records for each organisation. This page says plainly how that data is kept apart and who can see it.">
+      <Section title="Each organisation sees only its own data">
+        <p>Every account belongs to one organisation, and every request is checked against it. Maps, results, alerts, reports, forms and member records are filtered to that organisation, and automated tests check that one organisation can never read another's.</p>
+      </Section>
+      <Section title="People see what their role allows">
+        <p>An organisation's accounts are admins, analysts or viewers. Viewers can look but not change anything. Organisations only see the services they are licensed for.</p>
+        <p>The FarmIntelytics team signs in separately, with owner, operations or support roles; support can look but not change.</p>
+      </Section>
+      <Section title="The farm advisor only knows your farm">
+        <p>When you ask the farm advisor a question, it is given your organisation's own results, alerts and records, and nothing from any other organisation. It is instructed to say when something is not in your data rather than guess.</p>
+      </Section>
+      <Section title="We do not sell your data">
+        <p>Your boundaries, results and member records are used to run the service for you. We do not sell them or share them with commodity traders or advertisers.</p>
+      </Section>
+      <Section title="Where the numbers come from">
+        <p>Satellite results come from open public missions (Copernicus Sentinel and Landsat) processed by us. Every result says which pictures it came from and when, and reports list the data used and its limits.</p>
+      </Section>
+      <Section title="Questions or a problem">
+        <p>Signed-in users can send a problem report from any page. You can also write to us from the <a href="/contact" className="text-[var(--brand-primary)] underline">contact page</a>.</p>
+      </Section>
+    </PublicLayout>
   );
-};
-
-export default TrustCenterPage;
+}

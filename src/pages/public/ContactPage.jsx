@@ -1,167 +1,66 @@
-import React, { useState } from 'react';
-import PublicHeader from './PublicHeader';
-import PublicFooter from './PublicFooter';
-import { Mail, Phone, MapPin, Send, CheckCircle2 } from 'lucide-react';
+import { useState } from 'react';
+import { Mail, MapPin, Send } from 'lucide-react';
+import PublicLayout from './PublicLayout';
 
-const ContactPage = () => {
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({ name: '', email: '', organization: '', subject: 'Enterprise Deployment', message: '' });
+const EMAIL = 'support@earthintelytics.com';
+const SUBJECTS = ['A demo for my organisation', 'Pricing and licences', 'Help with my account', 'Data and privacy', 'Something else'];
+const inputCls = 'w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-[15px] outline-none focus:border-[var(--brand-primary)]';
 
-  const handleSubmit = (e) => {
+/**
+ * Contact: the form opens the visitor's own email app with the message filled in, so nothing is
+ * lost on a server that does not send mail yet, and the visitor keeps a copy.
+ */
+export default function ContactPage() {
+  const [form, setForm] = useState({ name: '', organisation: '', subject: SUBJECTS[0], message: '' });
+  const [error, setError] = useState('');
+  const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+  const send = (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    if (!form.name.trim() || !form.message.trim()) { setError('Please add your name and a message.'); return; }
+    setError('');
+    const body = `${form.message.trim()}\n\n${form.name.trim()}${form.organisation.trim() ? `, ${form.organisation.trim()}` : ''}`;
+    window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(`FarmIntelytics: ${form.subject}`)}&body=${encodeURIComponent(body)}`;
   };
-
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans">
-      <PublicHeader />
-
-      <main className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <h1 className="text-3xl sm:text-4xl font-bold font-display text-slate-900">
-            Connect with Agricultural Geospatial Specialists
-          </h1>
-          <p className="text-sm sm:text-base text-slate-600 mt-2">
-            Reach out for dedicated enterprise instances, custom biophysical crop calibrations, sovereign cloud deployments, or EUDR integration assistance.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Contact Details Column */}
-          <div className="space-y-6">
-            <div className="bg-white border border-slate-200 p-6 shadow-sm space-y-5">
-              <h3 className="text-lg font-bold font-display text-slate-900">Global Headquarters</h3>
-
-              <div className="flex items-start gap-3.5 text-sm text-slate-700">
-                <MapPin className="text-emerald-600 shrink-0 mt-1" size={18} />
-                <div>
-                  <p className="font-semibold text-slate-900">Earthintelytics Geospatial Hub</p>
-                  <p className="text-xs text-slate-500 mt-0.5">Abuja & Lagos, Nigeria</p>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3.5 text-sm text-slate-700">
-                <Mail className="text-emerald-600 shrink-0" size={18} />
-                <div>
-                  <p className="font-semibold text-slate-900">Email Inquiries</p>
-                  <a href="mailto:support@earthintelytics.com" className="text-xs text-emerald-600 hover:underline">support@earthintelytics.com</a>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-3.5 text-sm text-slate-700">
-                <Phone className="text-emerald-600 shrink-0" size={18} />
-                <div>
-                  <p className="font-semibold text-slate-900">Direct Line</p>
-                  <p className="text-xs text-slate-500">+234 (0) 800-FARM-INTEL</p>
-                </div>
-              </div>
+    <PublicLayout eyebrow="Contact" title="Talk to us" wide
+      intro="For a demo, pricing, help with your account or anything about your data.">
+      <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
+        <div className="space-y-6">
+          <div className="flex gap-3">
+            <span className="w-10 h-10 rounded-xl bg-green-50 text-[var(--brand-primary)] flex items-center justify-center shrink-0"><Mail size={18} /></span>
+            <div>
+              <p className="font-semibold">Email</p>
+              <a href={`mailto:${EMAIL}`} className="text-[var(--brand-primary)] underline">{EMAIL}</a>
             </div>
           </div>
-
-          {/* Form Column */}
-          <div className="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
-            {submitted ? (
-              <div className="text-center py-12 space-y-4">
-                <div className="w-16 h-16 bg-emerald-100 border border-emerald-200 rounded-full flex items-center justify-center text-emerald-700 mx-auto">
-                  <CheckCircle2 size={32} />
-                </div>
-                <h3 className="text-2xl font-bold font-display text-slate-900">Inquiry Received</h3>
-                <p className="text-sm text-slate-600 max-w-md mx-auto">
-                  Thank you for contacting FarmIntelytics. A technical solution engineer will follow up with your organization within 4 business hours.
-                </p>
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="mt-4 px-6 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-xs font-semibold text-slate-800 transition-colors"
-                >
-                  Send another inquiry
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <h3 className="text-xl font-bold font-display text-slate-900 mb-2">Send an Inquiry</h3>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Your Name</label>
-                    <input
-                      type="text"
-                      required
-                      value={form.name}
-                      onChange={(e) => setForm({ ...form, name: e.target.value })}
-                      placeholder="e.g. Dr. Adebayo Ogunlesi"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Official Email</label>
-                    <input
-                      type="email"
-                      required
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                      placeholder="adebayo@plantation.com"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Organization / Enterprise</label>
-                    <input
-                      type="text"
-                      required
-                      value={form.organization}
-                      onChange={(e) => setForm({ ...form, organization: e.target.value })}
-                      placeholder="e.g. Okomu Oil Palm PLC"
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">Subject</label>
-                    <select
-                      value={form.subject}
-                      onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white transition-colors"
-                    >
-                      <option value="Enterprise Deployment">Enterprise Multi-Tenant Deployment</option>
-                      <option value="EUDR Compliance Audit">EUDR Audit & Due Diligence Tooling</option>
-                      <option value="Custom Biophysical Model">Custom Crop & Biophysical Calibration</option>
-                      <option value="API & Data Integration">API & Geospatial Data Integration</option>
-                      <option value="Technical Support">Platform Technical Support</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Message / Requirements</label>
-                  <textarea
-                    rows={4}
-                    required
-                    value={form.message}
-                    onChange={(e) => setForm({ ...form, message: e.target.value })}
-                    placeholder="Provide details about your project, estate hectarage, crop types, or specific compliance deadlines..."
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-50 border border-slate-300 text-sm text-slate-900 focus:outline-none focus:border-emerald-600 focus:bg-white resize-none transition-colors"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full py-3 rounded-xl text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-all shadow-md flex items-center justify-center gap-2 mt-4"
-                >
-                  <Send size={16} /> Send Enterprise Inquiry
-                </button>
-              </form>
-            )}
+          <div className="flex gap-3">
+            <span className="w-10 h-10 rounded-xl bg-green-50 text-[var(--brand-primary)] flex items-center justify-center shrink-0"><MapPin size={18} /></span>
+            <div>
+              <p className="font-semibold">Where we are</p>
+              <p className="text-gray-600">Abuja and Lagos, Nigeria</p>
+            </div>
           </div>
+          <p className="text-sm text-gray-500">Already a client? Signed-in users can send a problem report from any page in the platform.</p>
         </div>
-      </main>
 
-      <PublicFooter />
-    </div>
+        <form onSubmit={send} className="space-y-4 rounded-2xl border border-gray-200 p-6">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="block space-y-1.5"><span className="text-sm font-medium">Your name</span><input className={inputCls} value={form.name} onChange={set('name')} autoComplete="name" /></label>
+            <label className="block space-y-1.5"><span className="text-sm font-medium">Organisation <span className="text-gray-400 font-normal">(optional)</span></span><input className={inputCls} value={form.organisation} onChange={set('organisation')} autoComplete="organization" /></label>
+          </div>
+          <label className="block space-y-1.5"><span className="text-sm font-medium">About</span>
+            <select className={inputCls} value={form.subject} onChange={set('subject')}>{SUBJECTS.map((s) => <option key={s}>{s}</option>)}</select>
+          </label>
+          <label className="block space-y-1.5"><span className="text-sm font-medium">Message</span>
+            <textarea rows={5} className={`${inputCls} resize-y`} value={form.message} onChange={set('message')} placeholder="Tell us about your farm or what you need" />
+          </label>
+          {error && <p className="text-sm text-red-700">{error}</p>}
+          <button type="submit" className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)]">
+            <Send size={15} />Write the email
+          </button>
+          <p className="text-xs text-gray-500">This opens your email app with the message ready to send to {EMAIL}.</p>
+        </form>
+      </div>
+    </PublicLayout>
   );
-};
-
-export default ContactPage;
+}
