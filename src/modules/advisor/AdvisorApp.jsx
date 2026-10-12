@@ -59,7 +59,7 @@ export default function AdvisorApp({ onBack, onSignOut }) {
       <main className="flex-1 min-h-0">
         {tab === 'ask' && <AskTab prefill={prefill} onPrefillUsed={() => setPrefill('')} />}
         {tab === 'advisories' && <AdvisoriesTab onAsk={(q) => { setPrefill(q); setTab('ask'); }} />}
-        {tab === 'reports' && <ReportsTab />}
+        {tab === 'reports' && <ReportsTab onAsk={(q) => { setPrefill(q); setTab('ask'); }} />}
       </main>
 
       {/* Phone: tabs at the bottom, within thumb reach */}
@@ -230,49 +230,174 @@ async function downloadPdf(id, title) {
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-function ReportsTab() {
+const FALLBACK_TYPES = [
+  { id: 'monthly', label: 'Monthly farm report' }, { id: 'blocks', label: 'Block report' },
+  { id: 'compare', label: 'Comparison' }, { id: 'season', label: 'Season summary' }, { id: 'service', label: 'Service and ESG summary' },
+];
+const iso = (d) => d.toISOString().slice(0, 10);
+function periodFor(kind, from, to) {
+  const now = new Date();
+  const y = now.getFullYear(); const m = now.getMonth();
+  if (kind === 'this_month') return { from: iso(new Date(y, m, 1)), to: iso(now) };
+  if (kind === 'last_month') return { from: iso(new Date(y, m - 1, 1)), to: iso(new Date(y, m, 0)) };
+  if (kind === 'last_3') return { from: iso(new Date(y, m - 2, 1)), to: iso(now) };
+  if (kind === 'year') return { from: `${y}-01-01`, to: iso(now) };
+  return { from, to };
+}
+function shiftPeriod(p, how) {
+  const a = new Date(p.from); const b = new Date(p.to);
+  if (how === 'last_year') { a.setFullYear(a.getFullYear() - 1); b.setFullYear(b.getFullYear() - 1); return { from: iso(a), to: iso(b) }; }
+  const days = Math.round((b - a) / 86400000) + 1;
+  const end = new Date(a); end.setDate(end.getDate() - 1);
+  const begin = new Date(end); begin.setDate(begin.getDate() - days + 1);
+  return { from: iso(begin), to: iso(end) };
+}
+const selectCls = 'w-full px-3 py-2.5 rounded-xl border border-gray-300 bg-white text-[15px] outline-none focus:border-[var(--brand-primary)]';
+const summaryText = (r) => {
+  const sm = r?.summary;
+  if (!sm) return '';
+  if (typeof sm === 'string') return sm;
+  return sm.headline || sm.text || sm.summary || Object.values(sm).find((v) => typeof v === 'string') || '';
+};
+
+function ReportsTab({ onAsk }) {
   const [list, setList] = useState(null);
+  const [options, setOptions] = useState(null);
+  const [form, setForm] = useState({ type: 'monthly', area: 'organisation', estate: '', period: 'this_month', from: '', to: '', compare: 'previous', focus: 'general' });
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState('');
+  const [made, setMade] = useState(null);
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target ? e.target.value : e }));
   const load = useCallback(() => {
     serviceCall('/reports').then((d) => setList(Array.isArray(d) ? d : d?.items || d?.reports || [])).catch(() => setList([]));
   }, []);
-  useEffect(() => { load(); }, [load]); // eslint-disable-line react-hooks/set-state-in-effect
+  useEffect(() => { load(); }, [load]);
+  useEffect(() => { serviceCall('/reports/options').then(setOptions).catch(() => setOptions({})); }, []);
+  const types = options?.types?.length ? options.types : FALLBACK_TYPES;
+  const estates = options?.estates || [];
+  const today = iso(new Date());
+  const dateError = form.period === 'custom' && (!form.from || !form.to ? 'Choose both dates.' : form.from > form.to ? 'The start must be before the end.' : form.to > today ? 'The end cannot be in the future.' : '');
+
   const create = async () => {
-    setBusy(true); setMsg('');
+    if (dateError) { setMsg(dateError); return; }
+    if (form.area === 'estate' && !form.estate) { setMsg('Choose an estate.'); return; }
+    setBusy(true); setMsg(''); setMade(null);
+    const period = periodFor(form.period, form.from, form.to);
     try {
-      await serviceCall('/reports', { method: 'POST', body: { type: 'monthly', scope: { level: 'organisation' } } });
-      setMsg('Report ready.'); load();
+      const r = await serviceCall('/reports', { method: 'POST', body: {
+        type: form.type,
+        scope: { level: form.area, farm_id: form.area === 'estate' ? form.estate : null, field_ids: [] },
+        period,
+        compare: form.type === 'compare' ? shiftPeriod(period, form.compare) : null,
+        focus_area: form.focus !== 'general' ? form.focus : null,
+      } });
+      setMade(r); load();
     } catch (e) { setMsg(e?.message || 'Could not make the report.'); } finally { setBusy(false); }
   };
+  const ask = (r) => {
+    const title = r?.title || 'my farm report';
+    const when = r?.period?.from ? ` (${r.period.from} to ${r.period.to})` : '';
+    onAsk(`Explain my report "${title}"${when}: the main points and what I should do first.`);
+  };
+
   return (
     <div className="h-full overflow-y-auto">
-      <div className="max-w-3xl mx-auto px-4 py-6 space-y-4">
+      <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
         <div>
           <h2 className="font-display text-xl font-semibold">Reports</h2>
-          <p className="text-sm text-gray-500 mt-1">A short farm report from your latest data, ready to share as a PDF.</p>
+          <p className="text-sm text-gray-500 mt-1">A farm report from your latest data, ready to share as a PDF. Ask the advisor about any report.</p>
         </div>
-        <button type="button" onClick={create} disabled={busy}
-          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] disabled:opacity-60">
-          <FileText size={16} />{busy ? 'Making the report…' : "Make this month's report"}
-        </button>
-        {msg && <p className="text-sm text-gray-600">{msg}</p>}
-        {list === null ? <p className="text-sm text-gray-500">Loading…</p> : list.length === 0 ? (
-          <p className="text-sm text-gray-500">No reports yet.</p>
-        ) : (
-          <ul className="divide-y divide-gray-100 border border-gray-200 rounded-xl">
-            {list.map((r) => (
-              <li key={r.report_id || r.id} className="flex items-center gap-3 px-4 py-3">
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium truncate">{r.title || 'Farm report'}</p>
-                  <p className="text-xs text-gray-500">{r.created_at ? new Date(r.created_at).toLocaleDateString() : r.period?.from ? `${r.period.from} – ${r.period.to}` : ''}</p>
-                </div>
-                <button type="button" onClick={() => downloadPdf(r.report_id || r.id, r.title).catch((e) => setMsg(e.message))}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium hover:bg-gray-50"><Download size={15} />PDF</button>
-              </li>
-            ))}
-          </ul>
+
+        <section className="rounded-2xl border border-gray-200 p-4 space-y-4">
+          <div className="space-y-2">
+            <span className="text-sm font-medium">Kind of report</span>
+            <div className="flex flex-wrap gap-2">
+              {types.map((t) => (
+                <button key={t.id} type="button" onClick={() => setForm((f) => ({ ...f, type: t.id }))}
+                  className={`px-3 py-1.5 rounded-full text-sm border ${form.type === t.id ? 'border-green-700 bg-green-50 text-green-900' : 'border-gray-200 text-gray-700'}`}>{t.label}</button>
+              ))}
+            </div>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <label className="block space-y-1.5"><span className="text-sm font-medium">Area</span>
+              <select className={selectCls} value={form.area} onChange={set('area')}>
+                <option value="organisation">Whole organisation</option>
+                {estates.length > 0 && <option value="estate">One estate</option>}
+              </select>
+            </label>
+            {form.area === 'estate' && (
+              <label className="block space-y-1.5"><span className="text-sm font-medium">Estate</span>
+                <select className={selectCls} value={form.estate} onChange={set('estate')}>
+                  <option value="">Choose…</option>{estates.map((e) => <option key={e} value={e}>{e}</option>)}
+                </select>
+              </label>
+            )}
+            <label className="block space-y-1.5"><span className="text-sm font-medium">Period</span>
+              <select className={selectCls} value={form.period} onChange={set('period')}>
+                <option value="this_month">This month so far</option><option value="last_month">Last month</option>
+                <option value="last_3">Last 3 months</option><option value="year">This year so far</option><option value="custom">Choose dates</option>
+              </select>
+            </label>
+            {form.type === 'compare' && (
+              <label className="block space-y-1.5"><span className="text-sm font-medium">Compare with</span>
+                <select className={selectCls} value={form.compare} onChange={set('compare')}>
+                  <option value="previous">The period before</option><option value="last_year">The same time last year</option>
+                </select>
+              </label>
+            )}
+            <label className="block space-y-1.5"><span className="text-sm font-medium">Focus</span>
+              <select className={selectCls} value={form.focus} onChange={set('focus')}>
+                <option value="general">Everything</option><option value="crop_health">Crop health</option>
+                <option value="water">Water</option><option value="alerts">Alerts and actions</option>
+              </select>
+            </label>
+          </div>
+          {form.period === 'custom' && (
+            <div className="grid grid-cols-2 gap-3">
+              <label className="block space-y-1.5"><span className="text-sm font-medium">From</span><input type="date" max={form.to || today} className={selectCls} value={form.from} onChange={set('from')} /></label>
+              <label className="block space-y-1.5"><span className="text-sm font-medium">To</span><input type="date" min={form.from} max={today} className={selectCls} value={form.to} onChange={set('to')} /></label>
+            </div>
+          )}
+          {msg && <p className="text-sm text-red-700">{msg}</p>}
+          <button type="button" onClick={create} disabled={busy}
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] disabled:opacity-60">
+            <FileText size={16} />{busy ? 'Making the report…' : 'Make the report'}
+          </button>
+        </section>
+
+        {made && (
+          <section className="rounded-2xl border border-green-200 bg-green-50 p-4 space-y-2">
+            <p className="text-sm font-semibold text-green-900">{made.title || 'Report ready'}</p>
+            {summaryText(made) && <p className="text-sm text-green-900/80">{summaryText(made)}</p>}
+            <div className="flex flex-wrap gap-2 pt-1">
+              <button type="button" onClick={() => downloadPdf(made.report_id, made.title).catch((e) => setMsg(e.message))}
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-green-200 text-sm font-medium"><Download size={15} />PDF</button>
+              <button type="button" onClick={() => ask(made)} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-green-200 text-sm font-medium"><MessageSquare size={15} />Ask the advisor about this report</button>
+            </div>
+          </section>
         )}
+
+        <div>
+          <h3 className="text-sm font-semibold text-gray-900 mb-2">Earlier reports</h3>
+          {list === null ? <p className="text-sm text-gray-500">Loading…</p> : list.length === 0 ? (
+            <p className="text-sm text-gray-500">No reports yet.</p>
+          ) : (
+            <ul className="divide-y divide-gray-100 border border-gray-200 rounded-xl">
+              {list.map((r) => (
+                <li key={r.report_id || r.id} className="flex flex-wrap items-center gap-2 px-4 py-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium truncate">{r.title || 'Farm report'}</p>
+                    <p className="text-xs text-gray-500">{r.period?.from ? `${r.period.from} to ${r.period.to}` : r.created_at ? new Date(r.created_at).toLocaleDateString() : ''}</p>
+                  </div>
+                  <button type="button" onClick={() => ask(r)} aria-label="Ask the advisor about this report" title="Ask the advisor about this report"
+                    className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50"><MessageSquare size={15} /></button>
+                  <button type="button" onClick={() => downloadPdf(r.report_id || r.id, r.title).catch((e) => setMsg(e.message))}
+                    className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-sm font-medium hover:bg-gray-50"><Download size={15} />PDF</button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
     </div>
   );

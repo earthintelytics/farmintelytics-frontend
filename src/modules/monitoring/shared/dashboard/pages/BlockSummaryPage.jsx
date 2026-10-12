@@ -62,19 +62,33 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
   return (
     <div className="flex h-full min-h-0">
       <div className="flex-1 relative min-w-0">
-        {/* Measure choice and the summary toggle, down the right edge of the map */}
-        <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[1000] flex flex-col items-stretch gap-2">
-          <button type="button" onClick={() => setPanelOpen((o) => !o)}
-            title={panelOpen ? 'Hide the summary' : 'Show the summary'} aria-label={panelOpen ? 'Hide the summary' : 'Show the summary'}
-            className="inline-flex items-center justify-center h-9 rounded-xl bg-white border border-gray-200 text-gray-700 hover:bg-gray-50">
-            {panelOpen ? <PanelRightClose size={17} /> : <PanelRightOpen size={17} />}
-          </button>
-          <div className="flex flex-col gap-1 bg-white border border-gray-200 rounded-xl p-1.5">
-            {measures.map((x) => (
-              <button key={x.key} type="button" onClick={() => setKey(x.key)} title={x.title || x.label}
-                className={`px-3 py-1.5 rounded-lg text-sm font-semibold text-center ${x.key === m.key ? 'bg-[var(--brand-primary)] text-white' : 'text-gray-700 hover:bg-gray-100'}`}>{x.label}</button>
-            ))}
+        {/* Measure choice and the summary toggle, one card down the right edge of the map */}
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 z-[1000] w-48 bg-white/95 backdrop-blur border border-gray-200 rounded-2xl overflow-hidden">
+          <p className="px-4 pt-3.5 pb-2 text-[11px] font-semibold uppercase tracking-wider text-gray-500">Show on map</p>
+          <div className="px-2 pb-2 space-y-1">
+            {measures.map((x) => {
+              const on = x.key === m.key;
+              const ramp = (x.classes || []).map((c) => c.hex).filter(Boolean);
+              return (
+                <button key={x.key} type="button" onClick={() => setKey(x.key)} aria-pressed={on}
+                  className={`relative w-full text-left rounded-xl pl-4 pr-3 py-3 transition-colors ${on ? 'bg-green-50' : 'hover:bg-gray-50'}`}>
+                  {on && <span className="absolute left-0 top-3 bottom-3 w-1 rounded-full bg-[var(--brand-primary)]" />}
+                  <span className={`block text-sm font-semibold ${on ? 'text-green-900' : 'text-gray-900'}`}>{x.label}</span>
+                  {x.title && x.title !== x.label && <span className="block text-xs text-gray-500 mt-0.5 leading-snug line-clamp-2">{x.title}</span>}
+                  {ramp.length > 1 && (
+                    <span className="mt-2 flex h-1.5 rounded-full overflow-hidden">
+                      {ramp.map((h, i) => <span key={i} className="flex-1" style={{ background: h }} />)}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
+          <button type="button" onClick={() => setPanelOpen((o) => !o)}
+            className="w-full flex items-center justify-between gap-2 px-4 py-3 border-t border-gray-100 text-sm font-medium text-gray-700 hover:bg-gray-50">
+            {panelOpen ? 'Hide summary' : 'Show summary'}
+            {panelOpen ? <PanelRightClose size={16} /> : <PanelRightOpen size={16} />}
+          </button>
         </div>
         <MapContainer center={defaultMapCenter} zoom={13} maxZoom={22} zoomControl={false} style={{ height: '100%', width: '100%' }}>
           <TileLayer key={basemapUrl} url={basemapUrl} attribution={basemapAttribution} maxZoom={22} maxNativeZoom={basemapMaxNativeZoom} />
