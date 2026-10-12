@@ -29,6 +29,7 @@ const Logs = () => {
   const [page, setPage] = useState(1);
   const [runs, setRuns] = useState([]);
   const [runStatus, setRunStatus] = useState('');
+  const [runKind, setRunKind] = useState('');
   const [runSearch, setRunSearch] = useState('');
   const [runLimit, setRunLimit] = useState(RUN_PAGE);
   const [openRun, setOpenRun] = useState(null);
@@ -44,17 +45,17 @@ const Logs = () => {
   const [failedTotal, setFailedTotal] = useState(0);
   const loadRuns = async (limit = runLimit) => {
     try {
-      const data = await fetchPipelineLogs(undefined, limit, runStatus || undefined);
+      const data = await fetchPipelineLogs(undefined, limit, runStatus || undefined, runKind || undefined);
       setRuns(data.logs || []); setFailedTotal(data.failed_total ?? 0);
     } catch (e) { setError(e.message || 'Could not load run records'); }
   };
   const loadAll = async () => { setLoading(true); setError(''); await Promise.all([loadJobs(), loadRuns()]); setLoading(false); };
 
-  useEffect(() => { loadAll(); }, [jobStatus, jobSearch, page, runStatus]); // eslint-disable-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
+  useEffect(() => { loadAll(); }, [jobStatus, jobSearch, page, runStatus, runKind]); // eslint-disable-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
   useEffect(() => {
     const t = setInterval(() => { loadJobs(); loadRuns(); }, REFRESH_MS);
     return () => clearInterval(t);
-  }, [jobStatus, jobSearch, page, runLimit]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [jobStatus, jobSearch, page, runLimit, runStatus, runKind]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const shownRuns = useMemo(() => {
     const q = runSearch.toLowerCase();
@@ -87,7 +88,12 @@ const Logs = () => {
 
       {tab === 'runs' ? (
         <>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs font-medium text-gray-500 mr-1">What ran</span>
+            {[['', 'All'], ['monitoring_run', 'Monitoring'], ['suitability_run', 'Suitability'], ['report_build', 'Reports'], ['eudr_check', 'EUDR checks'], ['parcel_check', 'Parcel checks'], ['dataset_ingest', 'Farm data']].map(([v, l]) => <Chip key={v || 'all'} on={runKind === v} onClick={() => setRunKind(v)}>{l}</Chip>)}
+          </div>
           <div className="flex flex-wrap items-center gap-3">
+            <span className="text-xs font-medium text-gray-500">Status</span>
             {[['', 'All'], ['pending', 'Waiting'], ['processing', 'Running'], ['completed', 'Done'], ['failed', 'Failed']].map(([v, l]) => <Chip key={v} on={runStatus === v} onClick={() => setRunStatus(v)}>{l}</Chip>)}
             <label className="relative ml-auto w-full sm:w-80">
               <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />

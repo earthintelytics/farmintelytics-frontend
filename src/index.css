@@ -141,9 +141,11 @@ button:active {
   body.fi-print-report .no-print { display: none !important; }
 }
 
-/* Landing hero: slow pan over the imagery and a scan line crossing it. */
-@keyframes fi-hero-pan { from { transform: translate3d(0, 0, 0) scale(1.04); } to { transform: translate3d(-4%, -3%, 0) scale(1.1); } }
-@keyframes fi-hero-scan { from { left: 35%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } to { left: 100%; opacity: 0; } }
-.fi-hero-pan { animation: fi-hero-pan 40s ease-in-out infinite alternate; will-change: transform; }
-.fi-hero-scan { animation: fi-hero-scan 9s linear infinite; }
-@media (prefers-reduced-motion: reduce) { .fi-hero-pan, .fi-hero-scan { animation: none; } .fi-hero-scan { display: none; } }
+/* Landing hero: the fields fade between the natural view and the crop-health view. */
+@keyframes fi-hero-health { 0%, 30% { opacity: 0; } 45%, 80% { opacity: 0.92; } 95%, 100% { opacity: 0; } }
+@keyframes fi-hero-label-a { 0%, 36% { opacity: 1; } 42%, 86% { opacity: 0; } 92%, 100% { opacity: 1; } }
+@keyframes fi-hero-label-b { 0%, 36% { opacity: 0; } 42%, 86% { opacity: 1; } 92%, 100% { opacity: 0; } }
+.fi-hero-health { animation: fi-hero-health 14s ease-in-out infinite; }
+.fi-hero-label-a { animation: fi-hero-label-a 14s ease-in-out infinite; }
+.fi-hero-label-b { animation: fi-hero-label-b 14s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .fi-hero-health, .fi-hero-label-a, .fi-hero-label-b { animation: none; } .fi-hero-health, .fi-hero-label-b { opacity: 0; } }
