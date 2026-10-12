@@ -131,7 +131,7 @@ export default function ParcelMapPage({ alerts, cropType, basemapAttribution, ba
               onClose={() => setIntelShowLayers(false)}
               cropType={cropType}
               unit="blocks"
-              satellite={{ on: showRasterLayer, onChange: setShowRasterLayer, opacity: mapOpacity, setOpacity: setMapOpacity, available: !!currentTileUrl, scale: 'health', text: 'Plant health on the chosen date: green is healthy, red is stressed or bare.' }}
+              satellite={{ index: selectedIndex, on: showRasterLayer, onChange: setShowRasterLayer, opacity: mapOpacity, setOpacity: setMapOpacity, available: !!currentTileUrl, scale: 'health', text: 'Plant health on the chosen date: green is healthy, red is stressed or bare.' }}
               outlines={{ on: intelShowBoundaries, onChange: setIntelShowBoundaries, opacity: intelBoundariesOpacity, setOpacity: setIntelBoundariesOpacity }}
              />
           )}

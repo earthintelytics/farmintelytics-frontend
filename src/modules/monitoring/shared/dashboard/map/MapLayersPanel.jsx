@@ -1,4 +1,5 @@
-import { Layers, X } from 'lucide-react';
+import { Layers, X, Info } from 'lucide-react';
+import { indexName } from '../constants/indexNames';
 import LayerLegend from '../legends/LayerLegend';
 
 const Toggle = ({ on, onChange, label }) => (
@@ -16,11 +17,19 @@ const Opacity = ({ value, onChange }) => (
   </label>
 );
 
-const Row = ({ label, text, on, onChange, children }) => (
+// (i) with a hint on hover or keyboard focus, e.g. the scientific index behind a plain name.
+const Hint = ({ text }) => (
+  <span className="relative inline-flex group align-middle">
+    <button type="button" aria-label={text} className="text-gray-400 hover:text-gray-700 focus:text-gray-700 outline-none"><Info size={14} /></button>
+    <span role="tooltip" className="pointer-events-none absolute left-1/2 -translate-x-1/2 bottom-full mb-2 w-56 rounded-lg bg-gray-900 px-2.5 py-2 text-xs font-normal leading-snug text-white opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity z-50">{text}</span>
+  </span>
+);
+
+const Row = ({ label, hint, text, on, onChange, children }) => (
   <div className="border border-gray-200 rounded-xl p-3.5 space-y-2.5">
     <div className="flex items-start justify-between gap-3">
       <div>
-        <p className="text-sm font-semibold text-gray-900">{label}</p>
+        <p className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">{label}{hint && <Hint text={hint} />}</p>
         {text && <p className="text-xs text-gray-500 mt-0.5">{text}</p>}
       </div>
       <Toggle on={on} onChange={onChange} label={label} />
@@ -47,7 +56,7 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
     </div>
     <div className="p-4 space-y-3">
       {satellite && satellite.available && (
-        <Row label="Satellite image" text={satellite.text} on={satellite.on} onChange={satellite.onChange}>
+        <Row label={indexName(satellite.index).name} hint={indexName(satellite.index).science} text={satellite.text} on={satellite.on} onChange={satellite.onChange}>
           <Opacity value={satellite.opacity} onChange={satellite.setOpacity} />
           {satellite.legend || (
             <div className="pt-1 space-y-1">
@@ -58,7 +67,7 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
         </Row>
       )}
       {satellite && !satellite.available && (
-        <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-xl p-3">No satellite image for this date yet. It appears after the first monitoring run.</p>
+        <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-xl p-3">No image for this date yet. It appears after the first monitoring run.</p>
       )}
       {outlines && (
         <Row label={`Outlines of the ${unit}`} text="Click one to see its details" on={outlines.on} onChange={outlines.onChange}>
@@ -88,7 +97,7 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
       )}
       {children}
       <p className="text-xs text-gray-500 leading-relaxed">
-        The calendar and time slider change the date of the satellite image.
+        The calendar and time slider change the date shown on the map.
       </p>
     </div>
   </aside>

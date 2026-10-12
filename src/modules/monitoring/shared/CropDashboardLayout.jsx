@@ -1247,10 +1247,8 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     // switching sections used to leave whatever raster the previous section
     // had on (e.g. Moisture Content's SMI/SAR) still showing on the next
     // one, with that section's own legend panel not indicating anything as
-    // active. A freshly opened section should show only the plot boundary
-    // until the user explicitly turns a raster on — so showRasterLayer
-    // always resets to false on entry; selectedIndex still gets a sensible
-    // per-section default so that if they do turn it on, it's not blank.
+    // A freshly opened section shows its index layer straight away when an image exists for the
+    // date (the map draws it only then); selectedIndex gets the section's default.
     if (item === 'analytics') {
       setActiveTab('monitor');
     } else if (item === 'moisture-content') {
@@ -1260,7 +1258,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     } else if (item === 'land-restoration') {
       setSelectedIndex('ndwi');
     }
-    setShowRasterLayer(false);
+    setShowRasterLayer(true);
     // Which legend groups/cards were expanded is per-section UI state —
     // left as component-wide state, it carried over between pages (e.g.
     // Crop Health's "Vegetation Health" group left expanded would show as
@@ -1613,7 +1611,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
 
 
 
-  const renderMapBottomPanel = (...args) => renderMapBottomPanelImpl({ latestCalDate, jumpToLatestMonth, setCalendarYear, setCalendarMonth,canPrevCal, canNextCal, SENSOR_DOT_COLOR, TIMELINE_DATA, activeDateSlot, bottomPanelHeight, calDaysInMonth, calFirstDay, calTrailing, calendarDates, calendarMonth, calendarYear, compareTimelineIndex, currentTimeline, currentTimelineA, currentTimelineB, effectiveSensor, isBottomPanelMinimized, isCompareMode, isPlaying, nextCalMonth, prevCalMonth, satellitePicker, selectDateWithSensor, selectedIndex, selectedTimelineIndex, setCompareTimelineIndex, setIsBottomPanelMinimized, setRefreshSlider, setSatellitePicker, setSelectedTimelineIndex, showCalendarTool, showTimeSliderTool, sliderPending, startBottomPanelResize, timelineLoading, togglePlay }, ...args);
+  const renderMapBottomPanel = (...args) => renderMapBottomPanelImpl({ setActiveDateSlot, latestCalDate, jumpToLatestMonth, setCalendarYear, setCalendarMonth,canPrevCal, canNextCal, SENSOR_DOT_COLOR, TIMELINE_DATA, activeDateSlot, bottomPanelHeight, calDaysInMonth, calFirstDay, calTrailing, calendarDates, calendarMonth, calendarYear, compareTimelineIndex, currentTimeline, currentTimelineA, currentTimelineB, effectiveSensor, isBottomPanelMinimized, isCompareMode, isPlaying, nextCalMonth, prevCalMonth, satellitePicker, selectDateWithSensor, selectedIndex, selectedTimelineIndex, setCompareTimelineIndex, setIsBottomPanelMinimized, setRefreshSlider, setSatellitePicker, setSelectedTimelineIndex, showCalendarTool, showTimeSliderTool, sliderPending, startBottomPanelResize, timelineLoading, togglePlay }, ...args);
 
   // Dynamic Dashboard Calculations — real data only, no mock fallback
 

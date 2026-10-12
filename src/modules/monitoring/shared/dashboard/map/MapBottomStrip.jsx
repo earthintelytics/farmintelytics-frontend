@@ -4,7 +4,8 @@
  * The client never chooses a satellite: the best image of a day is shown.
  */
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Play, Pause, CalendarDays, RefreshCw } from 'lucide-react';
+import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Play, Pause, CalendarDays, RefreshCw, X } from 'lucide-react';
+import { indexName } from '../constants/indexNames';
 import { MONTH_NAMES } from '../constants/chartConfig';
 
 const BEST_ORDER = ['sentinel-2', 'landsat', 'sentinel-1'];
@@ -24,7 +25,7 @@ export default function MapBottomStrip({ ctx, centerContent, hideTimeline }) {
   const setActive = (i) => (isCompareMode && activeDateSlot === 'B' ? setCompareTimelineIndex(i) : setSelectedTimelineIndex(i));
   const count = TIMELINE_DATA.length;
   const current = count ? TIMELINE_DATA[Math.min(activeIdx, count - 1)] : null;
-  const measure = (selectedIndex || 'ndvi').toUpperCase();
+  const measure = indexName(selectedIndex || 'ndvi').name;
 
   // Keep the chosen image in view in the strip.
   useEffect(() => {
@@ -99,36 +100,53 @@ export default function MapBottomStrip({ ctx, centerContent, hideTimeline }) {
   );
 }
 
-/** Small month calendar in a pop-up: green days have a image; picking one shows its best image. */
+/** Small month calendar in a pop-up: green days have an image; picking one shows its best image.
+ *  It stays open while dates are picked; the cross (or Esc) closes it. */
 function MonthPopover({ ctx, onClose }) {
   const {
     calendarMonth, calendarYear, calDaysInMonth, calFirstDay, canPrevCal, canNextCal, prevCalMonth, nextCalMonth,
     latestCalDate, jumpToLatestMonth, calendarDates, TIMELINE_DATA, selectDateWithSensor, setSelectedTimelineIndex, selectedTimelineIndex,
+    isCompareMode, activeDateSlot, setActiveDateSlot, compareTimelineIndex, setCompareTimelineIndex,
   } = ctx;
+  const slotB = isCompareMode && activeDateSlot === 'B';
   const ref = useRef(null);
   useEffect(() => {
-    const away = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
     const esc = (e) => { if (e.key === 'Escape') onClose(); };
-    document.addEventListener('mousedown', away); document.addEventListener('keydown', esc);
-    return () => { document.removeEventListener('mousedown', away); document.removeEventListener('keydown', esc); };
+    document.addEventListener('keydown', esc);
+    return () => document.removeEventListener('keydown', esc);
   }, [onClose]);
   const prefix = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}`;
   const today = new Date().toISOString().slice(0, 10);
   const selectedDate = TIMELINE_DATA[selectedTimelineIndex]?.date;
+  const dateB = isCompareMode ? TIMELINE_DATA[compareTimelineIndex]?.date : null;
   const pick = (dateStr) => {
     const cov = (calendarDates || []).find((d) => d.date === dateStr);
     const idx = TIMELINE_DATA.findIndex((t) => t.date === dateStr);
+    // Split comparison: the pick goes to the side being set (date B is the second map).
+    if (slotB) { if (idx !== -1) setCompareTimelineIndex(idx); return; }
     if (cov) selectDateWithSensor(dateStr, bestSensor(cov.sensors));
     else if (idx !== -1) setSelectedTimelineIndex(idx);
-    onClose();
   };
   return (
     <div ref={ref} className="absolute bottom-full right-0 mb-2 z-[1200] w-72 bg-white border border-gray-200 rounded-xl shadow-lg p-3">
       <div className="flex items-center justify-between mb-2">
         <button type="button" onClick={prevCalMonth} disabled={!canPrevCal} aria-label="Previous month" className="w-7 h-7 inline-flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronLeft size={16} /></button>
         <span className="text-sm font-semibold">{MONTH_NAMES[calendarMonth]} {calendarYear}</span>
-        <button type="button" onClick={nextCalMonth} disabled={!canNextCal} aria-label="Next month" className="w-7 h-7 inline-flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight size={16} /></button>
+        <span className="inline-flex items-center gap-0.5">
+          <button type="button" onClick={nextCalMonth} disabled={!canNextCal} aria-label="Next month" className="w-7 h-7 inline-flex items-center justify-center rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-30"><ChevronRight size={16} /></button>
+          <button type="button" onClick={onClose} aria-label="Close the calendar" title="Close" className="w-7 h-7 inline-flex items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900"><X size={16} /></button>
+        </span>
       </div>
+      {isCompareMode && setActiveDateSlot && (
+        <div className="mb-2 grid grid-cols-2 gap-1 p-1 rounded-lg bg-gray-100">
+          {[['A', 'Date A'], ['B', 'Date B']].map(([k, l]) => (
+            <button key={k} type="button" onClick={() => setActiveDateSlot(k)} aria-pressed={activeDateSlot === k}
+              className={`h-7 rounded-md text-xs font-semibold inline-flex items-center justify-center gap-1.5 ${activeDateSlot === k ? 'bg-white text-gray-900 border border-gray-200' : 'text-gray-600'}`}>
+              <span className={`w-2 h-2 rounded-full ${k === 'A' ? 'bg-[var(--brand-primary)]' : 'bg-[var(--status-info)]'}`} />{l}
+            </button>
+          ))}
+        </div>
+      )}
       <div className="grid grid-cols-7 gap-0.5 text-center">
         {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => <span key={i} className="text-[11px] text-gray-400 h-6 leading-6">{d}</span>)}
         {Array.from({ length: calFirstDay }).map((_, i) => <span key={`p${i}`} />)}
@@ -137,9 +155,10 @@ function MonthPopover({ ctx, onClose }) {
           const dateStr = `${prefix}-${String(day).padStart(2, '0')}`;
           const has = (calendarDates || []).some((d) => d.date === dateStr) || TIMELINE_DATA.some((t) => t.date === dateStr);
           const sel = dateStr === selectedDate;
+          const selB = !!dateB && dateStr === dateB && !sel;
           return (
             <button key={dateStr} type="button" disabled={!has} onClick={() => pick(dateStr)} aria-label={`${dateStr}${has ? ', image available' : ''}`}
-              className={`h-8 rounded-md text-xs tabular-nums ${sel ? 'bg-[var(--brand-primary)] text-white font-semibold' : has ? 'bg-green-50 text-green-800 font-semibold hover:bg-green-100' : dateStr > today ? 'text-gray-300' : 'text-gray-400'} ${dateStr === today && !sel ? 'ring-1 ring-inset ring-gray-300' : ''}`}>
+              className={`h-8 rounded-md text-xs tabular-nums ${sel ? 'bg-[var(--brand-primary)] text-white font-semibold' : selB ? 'bg-[var(--status-info)] text-white font-semibold' : has ? 'bg-green-50 text-green-800 font-semibold hover:bg-green-100' : dateStr > today ? 'text-gray-300' : 'text-gray-400'} ${dateStr === today && !sel ? 'ring-1 ring-inset ring-gray-300' : ''}`}>
               {day}
             </button>
           );
