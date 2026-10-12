@@ -1,6 +1,7 @@
 import { useSearchParams } from 'react-router-dom';
 import { Compass, Sprout, Droplets, MapPinned, ShieldCheck, FileText, CloudSun, Plug } from 'lucide-react';
 import PublicLayout from './PublicLayout';
+import { TUTORIALS } from './guideTutorials';
 
 /**
  * How FarmIntelytics works, in plain words. Every statement here must match what the platform
@@ -69,31 +70,77 @@ const TOPICS = [
   },
 ];
 
+const ALL = [...TOPICS, ...TUTORIALS];
+
+function NavGroup({ title, items, active, onPick }) {
+  return (
+    <div className="flex lg:flex-col gap-1 shrink-0">
+      <p className="hidden lg:block px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-500 first:pt-0">{title}</p>
+      {items.map(({ id, label, icon: Icon }) => (
+        <button key={id} type="button" onClick={() => onPick(id)}
+          className={`shrink-0 flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-left ${active === id ? 'bg-green-50 text-green-900 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}>
+          <Icon size={16} />{label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function DocumentationPage() {
   const [params, setParams] = useSearchParams();
-  const active = TOPICS.find((t) => t.id === params.get('topic')) || TOPICS[0];
+  const active = ALL.find((t) => t.id === params.get('topic')) || TOPICS[0];
+  const pick = (id) => { setParams({ topic: id }); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  const idx = TUTORIALS.findIndex((t) => t.id === active.id);
+  const next = idx >= 0 ? TUTORIALS[idx + 1] : null;
   return (
     <PublicLayout eyebrow="Guide" title="How FarmIntelytics works" wide
-      intro="What each part of the platform does, where its numbers come from and what to expect from satellite data in Nigeria.">
+      intro="What each part of the platform does, where its numbers come from, and step-by-step tutorials for everyday tasks.">
       <div className="grid gap-8 lg:grid-cols-[260px_1fr]">
         <nav aria-label="Guide topics" className="flex lg:flex-col gap-1 overflow-x-auto lg:overflow-visible -mx-4 px-4 lg:mx-0 lg:px-0 pb-2 lg:pb-0">
-          {TOPICS.map(({ id, label, icon: Icon }) => (
-            <button key={id} type="button" onClick={() => setParams({ topic: id })}
-              className={`shrink-0 flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-left ${active.id === id ? 'bg-green-50 text-green-900 font-medium' : 'text-gray-600 hover:bg-gray-50'}`}>
-              <Icon size={16} />{label}
-            </button>
-          ))}
+          <NavGroup title="Learn" items={TOPICS} active={active.id} onPick={pick} />
+          <NavGroup title="Tutorials" items={TUTORIALS} active={active.id} onPick={pick} />
         </nav>
         <article className="min-w-0">
-          <h2 className="font-display text-2xl font-semibold">{active.label}</h2>
-          <div className="mt-6 space-y-6">
-            {active.body.map(([title, text]) => (
-              <section key={title}>
-                <h3 className="font-semibold text-gray-900">{title}</h3>
-                <p className="mt-1.5 text-[15px] text-gray-700 leading-relaxed">{text}</p>
-              </section>
-            ))}
-          </div>
+          {active.steps ? (
+            <>
+              <p className="text-sm font-medium text-[var(--brand-primary)]">Tutorial · {active.time}</p>
+              <h2 className="font-display text-2xl font-semibold mt-1">{active.label}</h2>
+              <p className="mt-2 text-[15px] text-gray-600 leading-relaxed">{active.intro}</p>
+              <ol className="mt-8 space-y-0">
+                {active.steps.map(([title, text], i) => (
+                  <li key={title} className="relative pl-12 pb-7 last:pb-0">
+                    {i < active.steps.length - 1 && <span className="absolute left-[15px] top-9 bottom-0 w-px bg-gray-200" aria-hidden="true" />}
+                    <span className="absolute left-0 top-0 w-8 h-8 rounded-full bg-green-50 border border-green-200 text-green-900 text-sm font-semibold flex items-center justify-center">{i + 1}</span>
+                    <h3 className="font-semibold text-gray-900 pt-1">{title}</h3>
+                    <p className="mt-1.5 text-[15px] text-gray-700 leading-relaxed">{text}</p>
+                  </li>
+                ))}
+              </ol>
+              {active.tip && (
+                <div className="mt-8 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                  <p className="text-sm text-gray-700"><span className="font-semibold text-gray-900">Tip: </span>{active.tip}</p>
+                </div>
+              )}
+              {next && (
+                <button type="button" onClick={() => pick(next.id)}
+                  className="mt-8 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-300 text-sm font-semibold text-gray-800 hover:bg-gray-50">
+                  Next tutorial: {next.label} →
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <h2 className="font-display text-2xl font-semibold">{active.label}</h2>
+              <div className="mt-6 space-y-6">
+                {active.body.map(([title, text]) => (
+                  <section key={title}>
+                    <h3 className="font-semibold text-gray-900">{title}</h3>
+                    <p className="mt-1.5 text-[15px] text-gray-700 leading-relaxed">{text}</p>
+                  </section>
+                ))}
+              </div>
+            </>
+          )}
         </article>
       </div>
     </PublicLayout>
