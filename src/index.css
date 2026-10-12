@@ -141,17 +141,18 @@ button:active {
   body.fi-print-report .no-print { display: none !important; }
 }
 
-/* Landing hero: the fields cycle natural -> crop health -> water need (21 s). */
-@keyframes fi-hero-health { 0%, 22% { opacity: 0; } 30%, 52% { opacity: 0.92; } 60%, 100% { opacity: 0; } }
-@keyframes fi-hero-water { 0%, 55% { opacity: 0; } 63%, 85% { opacity: 0.92; } 93%, 100% { opacity: 0; } }
-@keyframes fi-hero-label-a { 0%, 24% { opacity: 1; } 27%, 88% { opacity: 0; } 91%, 100% { opacity: 1; } }
-@keyframes fi-hero-label-b { 0%, 24% { opacity: 0; } 27%, 55% { opacity: 1; } 58%, 100% { opacity: 0; } }
-@keyframes fi-hero-label-c { 0%, 57% { opacity: 0; } 60%, 88% { opacity: 1; } 91%, 100% { opacity: 0; } }
-.fi-hero-health { animation: fi-hero-health 21s ease-in-out infinite; }
-.fi-hero-water { animation: fi-hero-water 21s ease-in-out infinite; }
-.fi-hero-label-a { animation: fi-hero-label-a 21s ease-in-out infinite; }
-.fi-hero-label-b { animation: fi-hero-label-b 21s ease-in-out infinite; }
-.fi-hero-label-c { animation: fi-hero-label-c 21s ease-in-out infinite; }
+/* Landing hero: the fields cycle natural -> crop health -> water need. Each view holds 5 s and
+   changes in 1 s (18 s cycle; 1 s = 5.56%). */
+@keyframes fi-hero-health { 0%, 27.8% { opacity: 0; } 33.3%, 61.1% { opacity: 0.92; } 66.7%, 100% { opacity: 0; } }
+@keyframes fi-hero-water { 0%, 61.1% { opacity: 0; } 66.7%, 94.4% { opacity: 0.92; } 100% { opacity: 0; } }
+@keyframes fi-hero-label-a { 0%, 29% { opacity: 1; } 31%, 96% { opacity: 0; } 98%, 100% { opacity: 1; } }
+@keyframes fi-hero-label-b { 0%, 29% { opacity: 0; } 31%, 63% { opacity: 1; } 65%, 100% { opacity: 0; } }
+@keyframes fi-hero-label-c { 0%, 63% { opacity: 0; } 65%, 96% { opacity: 1; } 98%, 100% { opacity: 0; } }
+.fi-hero-health { animation: fi-hero-health 18s linear infinite; }
+.fi-hero-water { animation: fi-hero-water 18s linear infinite; }
+.fi-hero-label-a { animation: fi-hero-label-a 18s linear infinite; }
+.fi-hero-label-b { animation: fi-hero-label-b 18s linear infinite; }
+.fi-hero-label-c { animation: fi-hero-label-c 18s linear infinite; }
 @media (prefers-reduced-motion: reduce) {
   .fi-hero-health, .fi-hero-water, .fi-hero-label-a, .fi-hero-label-b, .fi-hero-label-c { animation: none; }
   .fi-hero-health, .fi-hero-water, .fi-hero-label-b, .fi-hero-label-c { opacity: 0; }
