@@ -15,6 +15,7 @@ import {
   SlidersHorizontal,
   Sparkles,
   ShieldCheck,
+  Shield,
   LifeBuoy
 } from 'lucide-react';
 
@@ -29,6 +30,7 @@ import AiSettings from './pages/AiSettings';
 import PipelineRuns from './pages/PipelineRuns';
 import TeamAccounts from './pages/TeamAccounts';
 import ProblemReports from './pages/ProblemReports';
+import ProtectedAreas from './pages/ProtectedAreas';
 import { hasValidTeamToken, redirectToTeamSignIn, teamRole, TEAM_ROLES } from '../services/session';
 import { ConfirmProvider } from './components/ConfirmProvider';
 
@@ -50,8 +52,9 @@ const NAV_GROUPS = [
     { id: 'reports',       label: 'Problem reports',      icon: LifeBuoy,  path: '/admin/reports' },
   ]},
   { label: 'Configuration', items: [
-    { id: 'thresholds',    label: 'Map classes',          icon: SlidersHorizontal, path: '/admin/thresholds' },
-    { id: 'ai',            label: 'AI settings',          icon: Sparkles,  path: '/admin/ai', owner: true },
+    { id: 'thresholds',      label: 'Map classes',          icon: SlidersHorizontal, path: '/admin/thresholds' },
+    { id: 'protected-areas', label: 'Protected areas',      icon: Shield,            path: '/admin/protected-areas' },
+    { id: 'ai',              label: 'AI settings',          icon: Sparkles,          path: '/admin/ai', owner: true },
   ]},
 ];
 const NAV_ITEMS = NAV_GROUPS.flatMap(g => g.items);
@@ -177,10 +180,11 @@ const AdminPortal = () => {
             <Route path="credentials"   element={<Credentials />} />
             <Route path="scheduler"     element={<Scheduler />} />
             <Route path="runs"          element={<PipelineRuns />} />
-            <Route path="thresholds"    element={<CropThresholds />} />
-            <Route path="ai"            element={ownerOnly(<AiSettings />)} />
-            <Route path="logs"          element={<Logs />} />
-            <Route path="reports"       element={<ProblemReports />} />
+            <Route path="thresholds"      element={<CropThresholds />} />
+            <Route path="protected-areas" element={<ProtectedAreas />} />
+            <Route path="ai"              element={ownerOnly(<AiSettings />)} />
+            <Route path="logs"            element={<Logs />} />
+            <Route path="reports"         element={<ProblemReports />} />
           </Routes>
         </main>
       </div>
