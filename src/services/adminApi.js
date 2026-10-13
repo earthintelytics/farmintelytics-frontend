@@ -439,3 +439,33 @@ export async function fetchAdminJobs({ companyId = '', status = '', kind = '', l
 export async function retryAdminJob(id) {
   return adminFetch(`/jobs/${encodeURIComponent(id)}/retry`, { method: 'POST' });
 }
+
+// ── Integrations (T23 / T27) ────────────────────────────────────────────────
+/** GET /admin/integrations */
+export async function fetchIntegrations() {
+  return adminFetch('/integrations');
+}
+
+/** PUT /admin/integrations/{integration} { fields: { ... } } */
+export async function updateIntegrationSettings(integration, fields) {
+  return adminFetch(`/integrations/${encodeURIComponent(integration)}`, {
+    method: 'PUT',
+    body: JSON.stringify({ fields }),
+  });
+}
+
+/** POST /admin/integrations/smtp/test { recipient_email?: string } */
+export async function testSmtpConnection(recipientEmail = '') {
+  return adminFetch('/integrations/smtp/test', {
+    method: 'POST',
+    body: JSON.stringify(recipientEmail ? { recipient_email: recipientEmail } : {}),
+  });
+}
+
+/** POST /admin/integrations/cdse/test */
+export async function testCdseConnection() {
+  return adminFetch('/integrations/cdse/test', {
+    method: 'POST',
+  });
+}
+
