@@ -341,10 +341,11 @@ export async function fetchCompositeSlider({ farm, composite, start, end, sensor
  * full imagery coverage, not just whichever sensor+index is selected.
  * Returns { dates: [{ date, sensors: [...] }], farm }.
  */
-export async function fetchTimeseriesCalendar({ farm, start, end } = {}) {
+export async function fetchTimeseriesCalendar({ farm, start, end, index } = {}) {
   const params = new URLSearchParams({ farm: farm || 'farm_1' });
   if (start) params.set('start', start);
   if (end) params.set('end', end);
+  if (index) params.set('index', index);
   return apiFetch(`/timeseries/calendar?${params}`);
 }
 
