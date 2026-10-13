@@ -40,11 +40,18 @@ const DEFAULT_ALERT_THRESHOLDS = { alert_ndvi_drop_pct: 0.25, alert_smi_critical
 const STEPS = ['Organisation', 'Crops and services', 'Estates', 'Blocks and filters', 'Login', 'Schedule', 'Finish'];
 const NEAR_KM = 20; // estates further apart than this are processed separately
 
+const defaultStartDate = () => {
+  const d = new Date();
+  d.setFullYear(d.getFullYear() - 1);
+  return d.toISOString().slice(0, 10);
+};
+
 const blankEstate = () => ({
   key: Math.random().toString(36).slice(2), farm_name: '', farm_id: '', crop: '', is_irrigated: false,
   boundaryFile: null, geojson: null, centre: null,
   sensors: ['sentinel-2', 'sentinel-1'], indices: ['NDVI', 'EVI', 'NDMI', 'RECI', 'NDWI'],
-  processing_level: 'plot_level', cloud_cover_threshold: 10, start_date: '', end_date: '',
+  processing_level: 'plot_level', cloud_cover_threshold: 10, start_date: defaultStartDate(), end_date: '',
+  strayShapes: null,
 });
 
 function geojsonCentre(geojson) {
@@ -214,15 +221,31 @@ const Onboarding = () => {
   // Front-end validation (the backend checks again)
   const slugErr = slugError(company.schema_name.trim());
   const nameCounts = estates.reduce((m, e) => { const k = e.farm_name.trim().toLowerCase(); if (k) m[k] = (m[k] || 0) + 1; return m; }, {});
-  const estateErr = (e) => (nameCounts[e.farm_name.trim().toLowerCase()] > 1 ? 'Two estates have this name; give each a different name.'
-    : e.farm_id.trim() && slugError(e.farm_id.trim()) ? `Estate ID: ${slugError(e.farm_id.trim())}` : null);
+  const estateErr = (e) => {
+    if (nameCounts[e.farm_name.trim().toLowerCase()] > 1) {
+      return 'Two estates have this name; give each a different name.';
+    }
+    if (e.farm_id.trim() && slugError(e.farm_id.trim())) {
+      return `Estate ID: ${slugError(e.farm_id.trim())}`;
+    }
+    if (!e.start_date) {
+      return 'Monitoring start date is required.';
+    }
+    if (e.start_date < '2015-06-23') {
+      return 'Monitoring start date cannot be earlier than Sentinel-2 availability (23 June 2015).';
+    }
+    if (e.start_date > new Date().toISOString().slice(0, 10)) {
+      return 'Monitoring start date cannot be in the future.';
+    }
+    return null;
+  };
   const emailErr = cred.email ? emailError(cred.email) : null;
   const codeErr = accessCodeError(cred.access_code);
 
   const canNext = [
     company.company_name.trim() && !slugErr,
     crops.length > 0 || services.length > 0,
-    estates.length > 0 && estates.every(e => e.farm_name.trim() && e.boundaryFile && e.geojson && !e.boundaryError && !estateErr(e) && (e.crop || crops.length <= 1)),
+    estates.length > 0 && estates.every(e => e.farm_name.trim() && e.start_date && e.boundaryFile && e.geojson && !e.boundaryError && !estateErr(e) && (e.crop || crops.length <= 1)),
     true,
     cred.email.trim() && !emailErr && !codeErr,
     true,
@@ -251,10 +274,13 @@ const Onboarding = () => {
         company_name: company.company_name, company_id: org.schema_name, farm_name: e.farm_name, farm_id: farmId,
         parent_farm_id: grouped ? parentId : '', parent_farm_name: grouped ? parentName : '',
         sensors: e.sensors, indices: e.indices, processing_level: e.processing_level, cloud_cover_threshold: e.cloud_cover_threshold,
-        start_date: e.start_date || null, end_date: e.end_date || null,
+        start_date: e.start_date, end_date: e.end_date || null,
         crop: e.crop || (crops.length === 1 ? crops[0] : ''), is_irrigated: e.is_irrigated, // stored once the backend has the fields (G7)
       });
       const boundary = await uploadBoundary(farm.farm_id, e.boundaryFile);
+      if (boundary?.stray_shapes?.length) {
+        setEstate(e.key, { strayShapes: boundary.stray_shapes });
+      }
       created.push(farm); boundaries.push(boundary);
       setDone(d => ({ ...d, org, farms: [...created], boundaries: [...boundaries] })); // keep progress if a later estate fails
     }
@@ -459,8 +485,19 @@ const Onboarding = () => {
                     <div className="flex items-center gap-2 text-sm font-semibold text-gray-900"><MapPin size={16} className="text-green-700" /> Estate {i + 1}{created && <span className="text-xs font-semibold text-green-700">· created</span>}</div>
                     {estates.length > 1 && !created && <button type="button" onClick={() => setEstates(l => l.filter(x => x.key !== e.key))} className="p-2 text-gray-400 hover:text-red-600" aria-label="Remove estate"><Trash2 size={15} /></button>}
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <Field label="Estate name"><input className={inputCls} placeholder="e.g. Main estate" value={e.farm_name} onChange={ev => setEstate(e.key, { farm_name: ev.target.value })} /></Field>
+                    <Field label="Monitoring start date" hint="Earliest 23 June 2015">
+                      <input
+                        type="date"
+                        required
+                        min="2015-06-23"
+                        max={new Date().toISOString().slice(0, 10)}
+                        className={inputCls}
+                        value={e.start_date}
+                        onChange={ev => setEstate(e.key, { start_date: ev.target.value })}
+                      />
+                    </Field>
                     {crops.length > 0 && (
                       <Field label="Crop grown here">
                         <select className={inputCls} value={e.crop || (crops.length === 1 ? crops[0] : '')} onChange={ev => setEstate(e.key, { crop: ev.target.value })}>
@@ -489,6 +526,11 @@ const Onboarding = () => {
                   </div>
                   {e.boundaryError && <div className="text-sm text-red-700">{e.boundaryError}</div>}
                   {e.boundaryInfo && !e.boundaryError && <div className="text-xs text-gray-600">Boundary read: {e.boundaryInfo}</div>}
+                  {e.strayShapes?.length > 0 && (
+                    <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                      Left out: {e.strayShapes.map(s => `${s.plot_id}, ${Math.round(s.distance_km)} km from the estate`).join(' · ')}
+                    </div>
+                  )}
                   {estateErr(e) && <div className="text-sm text-red-700">{estateErr(e)}</div>}
                   <Toggle on={e.is_irrigated} label="Irrigated" sub="Adds irrigation pages and water-demand layers where the crop uses them." onChange={v => setEstate(e.key, { is_irrigated: v })} />
                   <Advanced title="Satellite processing (for agronomists)">

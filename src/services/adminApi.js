@@ -231,6 +231,15 @@ export async function getBoundaryProperties(farmId) {
   return adminFetch(`/boundaries/${farmId}/properties`);
 }
 
+/**
+ * GET /boundaries/{farm_id}
+ * Fetches boundary metadata, center coordinates, bounding box and GeoJSON features.
+ */
+export async function getBoundaryInfo(farmId) {
+  return adminFetch(`/boundaries/${encodeURIComponent(farmId)}`);
+}
+
+
 // ─── Credentials ──────────────────────────────────────────────────────────────
 
 export async function fetchCredentials(companyId) {

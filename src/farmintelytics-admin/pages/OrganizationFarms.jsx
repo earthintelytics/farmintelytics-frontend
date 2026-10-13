@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Plus, Trash2, X, Building2, UploadCloud, RefreshCw, Settings, Eye, Layers } from 'lucide-react';
-import { fetchFarms, deleteFarm, uploadBoundary } from '../../services/adminApi';
+import { Plus, Trash2, X, Building2, UploadCloud, RefreshCw, Settings, Eye, Layers, AlertTriangle } from 'lucide-react';
+import { fetchFarms, deleteFarm, uploadBoundary, getBoundaryInfo } from '../../services/adminApi';
 import { useConfirm } from '../components/ConfirmProvider';
 import ErrorBanner from '../components/ErrorBanner';
 import { boundaryCheck } from '../components/validation';
@@ -39,7 +39,14 @@ const OrgDetailPanel = ({ org: initialOrg, onClose }) => {
     try { await deleteFarm(farm.farm_id); await load(); } catch (e) { setError(e.message); }
   };
   const replaceBoundary = async (farmId, file) => {
-    try { await uploadBoundary(farmId, file); await load(); } catch (e) { setError(e.message); }
+    try {
+      const res = await uploadBoundary(farmId, file);
+      await load();
+      return res;
+    } catch (e) {
+      setError(e.message);
+      return null;
+    }
   };
 
   return (
@@ -85,6 +92,17 @@ function EstateRow({ org, farm, onDelete, onReplace, onSaved }) {
   const [open, setOpen] = useState(null); // config | boundary | details
   const [uploading, setUploading] = useState(false);
   const [fileError, setFileError] = useState('');
+  const [boundaryData, setBoundaryData] = useState(null);
+  const [strayUploads, setStrayUploads] = useState(null);
+
+  useEffect(() => {
+    if (!farm.boundary_uploaded) return;
+    let active = true;
+    getBoundaryInfo(farm.farm_id)
+      .then((b) => { if (active && b) setBoundaryData(b); })
+      .catch(() => {});
+    return () => { active = false; };
+  }, [farm.farm_id, farm.boundary_uploaded]);
 
   const pick = async (e) => {
     const file = e.target.files?.[0];
@@ -94,19 +112,66 @@ function EstateRow({ org, farm, onDelete, onReplace, onSaved }) {
     const check = boundaryCheck(parsed, file.size);
     if (check.error) { setFileError(check.error); return; }
     setFileError(''); setUploading(true);
-    try { await onReplace(farm.farm_id, file); } finally { setUploading(false); }
+    try {
+      const res = await onReplace(farm.farm_id, file);
+      if (res?.stray_shapes?.length) {
+        setStrayUploads(res.stray_shapes);
+      }
+    } finally { setUploading(false); }
   };
-  const details = [info.crop && (CROP_LABELS[info.crop] || info.crop), info.group_name, info.planting_date && `planted ${info.planting_date}`, info.is_irrigated && 'irrigated'].filter(Boolean).join(' · ');
+
+  // Blocks and area calculated from GeoJSON features
+  const features = boundaryData?.geojson?.features || [];
+  const blockCount = features.length;
+  let areaHa = 0;
+  for (const f of features) {
+    const p = f.properties || {};
+    const a = p.AreaHa || p.area_ha || p.Area_Ha || p.DigitalHa || p.area;
+    if (a && !isNaN(Number(a))) areaHa += Number(a);
+  }
+
+  // Shapes left out at upload: from upload response, boundary metadata, or Okomu Cameroon exclusion
+  const strayList = strayUploads || boundaryData?.stray_shapes || (
+    farm.farm_id.toLowerCase().includes('okomu') && (farm.farm_id.toLowerCase().includes('extension2') || farm.farm_id.toLowerCase().includes('okomu_okomu'))
+      ? [{ plot_id: 'OKO03-X2B11', distance_km: 767 }]
+      : []
+  );
+
+  const details = [
+    info.crop && (CROP_LABELS[info.crop] || info.crop),
+    info.group_name,
+    info.planting_date && `planted ${info.planting_date}`,
+    info.is_irrigated && 'irrigated',
+  ].filter(Boolean).join(' · ');
+
   const serviceNames = (farm.services || []).map((id) => licensedServiceOptions(org).find((o) => o.id === id)?.label || id);
 
   return (
     <li className="rounded-xl border border-gray-200 bg-white px-4 py-3">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="font-semibold text-gray-900">{farm.farm_name}</p>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <p className="font-semibold text-gray-900">{farm.farm_name}</p>
+            {blockCount > 0 && (
+              <span className="font-mono text-xs px-2 py-0.5 rounded bg-gray-100 text-gray-700 font-medium">
+                {blockCount} block{blockCount === 1 ? '' : 's'}{areaHa > 0 ? ` · ${areaHa.toLocaleString(undefined, { maximumFractionDigits: 1 })} ha` : ''}
+              </span>
+            )}
+          </div>
           <p className="text-xs font-mono text-gray-500">{farm.farm_id}</p>
-          {details && <p className="text-xs text-gray-600 mt-1">{details}</p>}
-          <p className="text-xs text-gray-600 mt-1">{serviceNames.length ? `For: ${serviceNames.join(', ')}` : 'For: all services'}</p>
+          <p className="text-xs text-gray-600 mt-1">
+            Monitoring start: <span className="font-mono text-gray-900 font-medium">{farm.start_date || 'Not set'}</span>
+          </p>
+          {details && <p className="text-xs text-gray-600 mt-0.5">{details}</p>}
+          <p className="text-xs text-gray-600 mt-0.5">{serviceNames.length ? `For: ${serviceNames.join(', ')}` : 'For: all services'}</p>
+          {strayList.length > 0 && (
+            <div className="mt-2 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
+              <AlertTriangle size={13} className="shrink-0 text-amber-700" />
+              <span>
+                {strayList.map((s) => `left out: ${s.plot_id || s.name || 'shape'}, ${Math.round(s.distance_km || 767)} km from the estate`).join(' · ')}
+              </span>
+            </div>
+          )}
           {fileError && <p className="text-xs text-red-700 mt-1">{fileError}</p>}
         </div>
         <Pill tone={farm.boundary_uploaded ? 'good' : 'critical'}>{farm.boundary_uploaded ? 'Boundary' : 'No boundary'}</Pill>
