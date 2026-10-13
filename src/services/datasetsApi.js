@@ -48,5 +48,8 @@ function rowsAsCsv(rows) {
 }
 export const validateRows = (id, rows) =>
   call(`/datasets/${encodeURIComponent(id)}/validate`, { method: 'POST', body: rowsAsCsv(rows) });
-export const commitRows = (id, rows) =>
-  call(`/datasets/${encodeURIComponent(id)}/records`, { method: 'POST', body: rowsAsCsv(rows) });
+export const commitRows = (id, rows, asTestData = false) => {
+  const form = rowsAsCsv(rows);
+  if (asTestData) form.append('as_test_data', 'true');
+  return call(`/datasets/${encodeURIComponent(id)}/records`, { method: 'POST', body: form });
+};
