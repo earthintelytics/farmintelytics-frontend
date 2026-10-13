@@ -14,10 +14,12 @@ import { licensedServiceOptions } from './organisation/serviceOptions';
 import OrgPeople from './organisation/OrgPeople';
 import OrgLicence from './organisation/OrgLicence';
 import OrgPipeline from './organisation/OrgPipeline';
+import OrgAlertEmails from './organisation/OrgAlertEmails';
 
 /**
- * One organisation in one place: its estates, its people (roles and the
- * account limit of its licence), its licence, and its data pipeline.
+ * One organisation in one place: its estates, alert email recipients, its
+ * people (roles and the account limit of its licence), its licence, and its
+ * data pipeline.
  */
 const OrgDetailPanel = ({ org: initialOrg, onClose }) => {
   const [org, setOrg] = useState(initialOrg);
@@ -56,9 +58,20 @@ const OrgDetailPanel = ({ org: initialOrg, onClose }) => {
           <IconButton label="Close" onClick={onClose}><X size={18} /></IconButton>
         </div>
         <div className="px-6 pt-4">
-          <Tabs value={tab} onChange={setTab} tabs={[{ id: 'estates', label: 'Estates', count: farms.length }, { id: 'people', label: 'People' }, { id: 'licence', label: 'Licence' }, { id: 'pipeline', label: 'Pipeline' }]} />
+          <Tabs
+            value={tab}
+            onChange={setTab}
+            tabs={[
+              { id: 'estates', label: 'Estates', count: farms.length },
+              { id: 'alerts', label: 'Alert emails' },
+              { id: 'people', label: 'People' },
+              { id: 'licence', label: 'Licence' },
+              { id: 'pipeline', label: 'Pipeline' },
+            ]}
+          />
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+          {tab === 'alerts' && <OrgAlertEmails org={org} />}
           {tab === 'people' && <OrgPeople org={org} />}
           {tab === 'licence' && <OrgLicence org={org} onSaved={setOrg} />}
           {tab === 'pipeline' && <OrgPipeline org={org} />}
