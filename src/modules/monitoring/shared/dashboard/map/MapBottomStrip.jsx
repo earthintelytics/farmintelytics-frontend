@@ -8,14 +8,12 @@ import { ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Play, Pause, Calenda
 import { indexName } from '../constants/indexNames';
 import { MONTH_NAMES } from '../constants/chartConfig';
 
-const BEST_ORDER = ['sentinel-2', 'landsat', 'sentinel-1'];
-const bestSensor = (sensors = []) => BEST_ORDER.find((s) => sensors.includes(s)) || sensors[0];
 const dayLabel = (d) => new Date(`${d}T00:00:00`).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
 const longLabel = (d) => new Date(`${d}T00:00:00`).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 
 export default function MapBottomStrip({ ctx, centerContent, hideTimeline }) {
   const {
-    TIMELINE_DATA, calendarDates, selectedTimelineIndex, compareTimelineIndex, isCompareMode, activeDateSlot,
+    TIMELINE_DATA, selectedTimelineIndex, compareTimelineIndex, isCompareMode, activeDateSlot,
     setSelectedTimelineIndex, setCompareTimelineIndex, isPlaying, togglePlay, timelineLoading, setRefreshSlider,
     isBottomPanelMinimized, setIsBottomPanelMinimized, selectedIndex, showCalendarTool,
   } = ctx;
@@ -92,7 +90,6 @@ export default function MapBottomStrip({ ctx, centerContent, hideTimeline }) {
               </div>
             );
           })}
-          {calendarDates?.length > count && <span className="self-center text-[11px] text-gray-400 pl-2 whitespace-nowrap">More dates in the calendar</span>}
         </div>
       )}
       {!isBottomPanelMinimized && centerContent && <div className="px-4 pb-3">{centerContent}</div>}
@@ -100,12 +97,12 @@ export default function MapBottomStrip({ ctx, centerContent, hideTimeline }) {
   );
 }
 
-/** Small month calendar in a pop-up: green days have an image; picking one shows its best image.
+/** Small month calendar in a pop-up: green days have an image of the layer on this page; picking one shows it.
  *  It stays open while dates are picked; the cross (or Esc) closes it. */
 function MonthPopover({ ctx, onClose }) {
   const {
     calendarMonth, calendarYear, calDaysInMonth, calFirstDay, canPrevCal, canNextCal, prevCalMonth, nextCalMonth,
-    latestCalDate, jumpToLatestMonth, calendarDates, TIMELINE_DATA, selectDateWithSensor, setSelectedTimelineIndex, selectedTimelineIndex,
+    latestCalDate, jumpToLatestMonth, TIMELINE_DATA, setSelectedTimelineIndex, selectedTimelineIndex,
     isCompareMode, activeDateSlot, setActiveDateSlot, compareTimelineIndex, setCompareTimelineIndex,
   } = ctx;
   const slotB = isCompareMode && activeDateSlot === 'B';
@@ -120,12 +117,12 @@ function MonthPopover({ ctx, onClose }) {
   const selectedDate = TIMELINE_DATA[selectedTimelineIndex]?.date;
   const dateB = isCompareMode ? TIMELINE_DATA[compareTimelineIndex]?.date : null;
   const pick = (dateStr) => {
-    const cov = (calendarDates || []).find((d) => d.date === dateStr);
     const idx = TIMELINE_DATA.findIndex((t) => t.date === dateStr);
-    // Split comparison: the pick goes to the side being set (date B is the second map).
-    if (slotB) { if (idx !== -1) setCompareTimelineIndex(idx); return; }
-    if (cov) selectDateWithSensor(dateStr, bestSensor(cov.sensors));
-    else if (idx !== -1) setSelectedTimelineIndex(idx);
+    // Only dates of this page's layer can be picked, so the pick never switches the page to another
+    // layer or satellite. Split comparison: the pick goes to the side being set.
+    if (idx === -1) return;
+    if (slotB) setCompareTimelineIndex(idx);
+    else setSelectedTimelineIndex(idx);
   };
   return (
     <div ref={ref} className="absolute bottom-full right-0 mb-2 z-[1200] w-72 bg-white border border-gray-200 rounded-xl shadow-lg p-3">
@@ -153,7 +150,7 @@ function MonthPopover({ ctx, onClose }) {
         {Array.from({ length: calDaysInMonth }, (_, i) => {
           const day = i + 1;
           const dateStr = `${prefix}-${String(day).padStart(2, '0')}`;
-          const has = (calendarDates || []).some((d) => d.date === dateStr) || TIMELINE_DATA.some((t) => t.date === dateStr);
+          const has = TIMELINE_DATA.some((t) => t.date === dateStr);
           const sel = dateStr === selectedDate;
           const selB = !!dateB && dateStr === dateB && !sel;
           return (

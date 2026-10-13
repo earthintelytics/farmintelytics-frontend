@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { KeyRound, BarChart3, Gauge, Check, Info, PlugZap } from 'lucide-react';
-import { fetchAiSettings, saveAiSettings, saveAiProvider, testAiProvider, saveAiPrices, fetchAiUsage, fetchAiLimits, saveAiLimits, AiNotConnected } from '../../services/aiAdminApi';
+import { fetchAiSettings, saveAiSettings, saveAiProvider, testAiProvider, saveAiPrices, deleteAiModel, fetchAiUsage, fetchAiLimits, saveAiLimits, AiNotConnected } from '../../services/aiAdminApi';
 import { fetchOrganizations, fetchCredentials } from '../../services/adminApi';
 
 /**
@@ -14,114 +14,13 @@ const PROVIDERS = [
   { id: 'anthropic', label: 'Anthropic Claude', hint: 'Key from console.anthropic.com' },
 ];
 
-export const PREDEFINED_MODELS = {
-  gemini: [
-    // ── Gemini 3.x series (current standard, 2026) ──────────────────────────
-    { value: 'gemini-3.8-flash', label: 'Gemini 3.8 Flash ★ (Latest / Recommended)' },
-    { value: 'gemini-3.7-flash', label: 'Gemini 3.7 Flash' },
-    { value: 'gemini-3.6-flash', label: 'Gemini 3.6 Flash' },
-    { value: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash' },
-    { value: 'gemini-3.5-flash-lite', label: 'Gemini 3.5 Flash Lite (Low Cost)' },
-    { value: 'gemini-3.1-pro', label: 'Gemini 3.1 Pro (High Capability)' },
-    { value: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash Lite' },
-    // ── Gemini 2.5 series (legacy, still supported) ─────────────────────────
-    { value: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro (Legacy)' },
-    { value: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash (Legacy)' },
-    { value: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite (Legacy)' },
-    { value: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash (Legacy)' },
-    { value: 'gemini-1.5-pro', label: 'Gemini 1.5 Pro (Legacy)' },
-    { value: 'gemini-1.5-flash', label: 'Gemini 1.5 Flash (Legacy)' },
-  ],
-  openai: [
-    // ── GPT-6 series (current flagship, Sep 2026) ────────────────────────────
-    { value: 'gpt-6-astra', label: 'GPT-6 Astra ★ (Flagship — Complex Reasoning & Agents)' },
-    { value: 'gpt-6.1-sol', label: 'GPT-6.1 Sol (Balanced Intelligence + Cost)' },
-    { value: 'gpt-6-sol', label: 'GPT-6 Sol (Balanced)' },
-    { value: 'gpt-6-luna', label: 'GPT-6 Luna (Cost-Optimised, High Volume)' },
-    // ── GPT-5.6 series (previous frontier, Jul 2026) ─────────────────────────
-    { value: 'gpt-5.6-sol', label: 'GPT-5.6 Sol (Previous Frontier)' },
-    { value: 'gpt-5.6-terra', label: 'GPT-5.6 Terra (All-Rounder)' },
-    { value: 'gpt-5.6-luna', label: 'GPT-5.6 Luna (Efficient)' },
-    // ── Legacy ───────────────────────────────────────────────────────────────
-    { value: 'gpt-4o', label: 'GPT-4o (Legacy Multimodal)' },
-    { value: 'gpt-4o-mini', label: 'GPT-4o Mini (Legacy)' },
-    { value: 'o3-mini', label: 'o3-mini (Legacy Reasoning)' },
-    { value: 'gpt-4-turbo', label: 'GPT-4 Turbo (Legacy)' },
-  ],
-  anthropic: [
-    // ── Claude 5.x / Fable series (current, 2026) ────────────────────────────
-    { value: 'claude-fable-5-1', label: 'Claude Fable 5.1 ★ (Frontier — Long-Horizon Agents)' },
-    { value: 'claude-opus-5-5', label: 'Claude Opus 5.5 (Complex Coding & Knowledge Work)' },
-    { value: 'claude-sonnet-5-5', label: 'Claude Sonnet 5.5 (Best Speed / Intelligence Balance)' },
-    { value: 'claude-haiku-4-5-20251001', label: 'Claude Haiku 4.5 (Fast & Low Cost)' },
-    // ── Legacy ───────────────────────────────────────────────────────────────
-    { value: 'claude-3-7-sonnet-20250219', label: 'Claude 3.7 Sonnet (Legacy)' },
-    { value: 'claude-3-5-sonnet-20241022', label: 'Claude 3.5 Sonnet (Legacy)' },
-    { value: 'claude-3-5-haiku-20241022', label: 'Claude 3.5 Haiku (Legacy)' },
-    { value: 'claude-3-opus-20240229', label: 'Claude 3 Opus (Legacy)' },
-  ],
-};
-
-function ModelSelector({ provider, value, serverModels = [], onChange, className = inputCls }) {
-  const [isCustom, setIsCustom] = useState(false);
-  const known = PREDEFINED_MODELS[provider] || [];
-  const knownValues = useMemo(() => new Set(known.map(m => m.value)), [known]);
-
-  const serverOptions = useMemo(() => (serverModels || []).filter(m => m && !knownValues.has(m)).map(m => ({ value: m, label: m })), [serverModels, knownValues]);
-  const customValueOption = useMemo(() => (value && !knownValues.has(value) && !serverOptions.some(m => m.value === value))
-    ? [{ value, label: `${value} (Custom)` }]
-    : [], [value, knownValues, serverOptions]);
-
-  const allOptions = useMemo(() => [...known, ...serverOptions, ...customValueOption], [known, serverOptions, customValueOption]);
-  const currentValueInOptions = useMemo(() => allOptions.some(o => o.value === value), [allOptions, value]);
-
-  useEffect(() => {
-    if (value && !currentValueInOptions && value !== '') {
-      setIsCustom(true);
-    }
-  }, [value, currentValueInOptions]);
-
-  if (isCustom) {
-    return (
-      <div className="flex gap-2">
-        <input
-          type="text"
-          className={className}
-          value={value || ''}
-          onChange={e => onChange(e.target.value)}
-          placeholder="Type custom model name..."
-        />
-        <button
-          type="button"
-          onClick={() => setIsCustom(false)}
-          className="px-3 py-2 text-xs font-semibold rounded-xl border border-gray-300 text-gray-700 bg-gray-50 hover:bg-gray-100 shrink-0"
-        >
-          List
-        </button>
-      </div>
-    );
-  }
-
+// The models of each provider come from the database (the price table below): add a model there
+// and it can be chosen as a provider's default. Nothing about models is fixed in the code.
+function ModelSelect({ value, models = [], onChange }) {
   return (
-    <select
-      className={className}
-      value={value || ''}
-      onChange={e => {
-        if (e.target.value === '__custom__') {
-          setIsCustom(true);
-          onChange('');
-        } else {
-          onChange(e.target.value);
-        }
-      }}
-    >
-      <option value="">Select a model...</option>
-      {allOptions.map(opt => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-      <option value="__custom__">+ Custom model name...</option>
+    <select className={inputCls} value={value || ''} onChange={(e) => onChange(e.target.value)}>
+      <option value="">{models.length ? 'Choose a model' : 'Add a model in the price table first'}</option>
+      {models.map((m) => <option key={m} value={m}>{m}</option>)}
     </select>
   );
 }
@@ -199,7 +98,7 @@ function ProvidersTab({ settings, setSettings, connected }) {
                 <input type="password" autoComplete="off" className={inputCls} value={keys[p.id] || ''} onChange={e => { setKeys(k => ({ ...k, [p.id]: e.target.value })); setDirty(d => ({ ...d, [p.id]: Boolean(e.target.value) || d[p.id] })); }} placeholder={p.hint} />
               </label>
               <label className="block space-y-1.5"><span className="text-xs font-semibold text-gray-700">Default model</span>
-                <ModelSelector provider={p.id} value={s.default_model || ''} serverModels={s.models} onChange={val => updateProv(p.id, { default_model: val })} />
+                <ModelSelect value={s.default_model || ''} models={s.models} onChange={val => updateProv(p.id, { default_model: val })} />
               </label>
               <label className="flex items-center gap-2 text-sm text-gray-800"><input type="checkbox" className="w-4 h-4 accent-green-700" checked={Boolean(s.enabled)} onChange={e => updateProv(p.id, { enabled: e.target.checked })} />Allowed</label>
               <div className="flex gap-2">
@@ -239,18 +138,25 @@ function PricesCard({ settings, setSettings, connected }) {
   const set = (i, patch) => setSettings(s => ({ ...s, prices: prices.map((p, j) => (j === i ? { ...p, ...patch } : p)) }));
   const save = async () => {
     if (prices.some(p => !p.model || p.input_per_1m < 0 || p.output_per_1m < 0)) return setMsg('Every row needs a model and non-negative prices.');
-    try { await saveAiPrices(prices); setMsg('Saved.'); } catch (e) { setMsg(e instanceof AiNotConnected ? 'Not connected yet.' : e.message); }
+    try { await saveAiPrices(prices); setMsg("Saved. Saved models can be chosen as a provider's default."); } catch (e) { setMsg(e instanceof AiNotConnected ? 'Not connected yet.' : e.message); }
+  };
+  const remove = async (i) => {
+    const p = prices[i];
+    const unsaved = () => setSettings(s => ({ ...s, prices: prices.filter((_, j) => j !== i) }));
+    if (!p.model) return unsaved();
+    try { const r = await deleteAiModel(p.provider, p.model); setSettings(s => ({ ...s, prices: r.prices || prices.filter((_, j) => j !== i) })); setMsg('Removed.'); }
+    catch (e) { setMsg(e instanceof AiNotConnected ? 'Not connected yet.' : e.message); }
   };
   return (
     <Card className="p-6 space-y-4">
-      <div><div className="text-sm font-semibold text-gray-900">Prices used to work out cost</div><div className="text-xs text-gray-500 mt-1">Per million tokens, from each provider's price page. Providers change prices, so keep these current; cost figures use this table.</div></div>
+      <div><div className="text-sm font-semibold text-gray-900">Models and prices</div><div className="text-xs text-gray-500 mt-1">The models each provider offers, with their price per million tokens from the provider's price page. Saved here in the database: add a model to make it selectable as a provider's default. Cost figures use these prices, so keep them current.</div></div>
       <table className="w-full text-sm">
-        <thead className="text-left text-xs font-semibold text-gray-500"><tr><th className="py-2">Provider</th><th className="py-2">Model</th><th className="py-2">Input (per 1M)</th><th className="py-2">Output (per 1M)</th><th className="py-2">Currency</th></tr></thead>
+        <thead className="text-left text-xs font-semibold text-gray-500"><tr><th className="py-2">Provider</th><th className="py-2">Model</th><th className="py-2">Input (per 1M)</th><th className="py-2">Output (per 1M)</th><th className="py-2">Currency</th><th className="py-2"><span className="sr-only">Remove</span></th></tr></thead>
         <tbody className="divide-y divide-gray-100">
           {prices.map((p, i) => (
             <tr key={i}>
               <td className="py-2 pr-2"><select className={inputCls} value={p.provider} onChange={e => set(i, { provider: e.target.value })}>{PROVIDERS.map(x => <option key={x.id} value={x.id}>{x.label}</option>)}</select></td>
-              <td className="py-2 pr-2"><ModelSelector provider={p.provider || 'gemini'} value={p.model || ''} onChange={val => set(i, { model: val })} /></td>
+              <td className="py-2 pr-2"><input className={inputCls} value={p.model || ''} onChange={e => set(i, { model: e.target.value.trim() })} placeholder="Model name, as the provider writes it" /></td>
               <td className="py-2 pr-2"><input type="number" min="0" step="0.01" className={inputCls} value={p.input_per_1m} onChange={e => set(i, { input_per_1m: Number(e.target.value) })} /></td>
               <td className="py-2 pr-2"><input type="number" min="0" step="0.01" className={inputCls} value={p.output_per_1m} onChange={e => set(i, { output_per_1m: Number(e.target.value) })} /></td>
               <td className="py-2">
@@ -258,6 +164,7 @@ function PricesCard({ settings, setSettings, connected }) {
                   {['USD', 'NGN', 'EUR', 'GBP'].map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
               </td>
+              <td className="py-2 pl-2"><button type="button" onClick={() => remove(i)} aria-label={`Remove ${p.model || 'this row'}`} className="px-2.5 py-2 rounded-lg text-xs font-semibold text-gray-600 hover:bg-gray-100">Remove</button></td>
             </tr>
           ))}
         </tbody>

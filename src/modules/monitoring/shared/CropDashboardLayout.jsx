@@ -1259,6 +1259,10 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       setSelectedIndex('ndwi');
     }
     setShowRasterLayer(true);
+    // Each sub-page has its own calendar: forget the last page's month and date, so the calendar
+    // opens on this layer's newest image once its timeline loads.
+    calendarInitializedRef.current = false;
+    pendingCalendarDateRef.current = null;
     // Which legend groups/cards were expanded is per-section UI state —
     // left as component-wide state, it carried over between pages (e.g.
     // Crop Health's "Vegetation Health" group left expanded would show as
@@ -1827,12 +1831,13 @@ Context: ${context}.`;
   // future months, and no empty months before the data starts.
   const calMonthKey = calendarYear * 12 + calendarMonth;
   const nowMonthKey = new Date().getFullYear() * 12 + new Date().getMonth();
+  // Dates of the layer on this page only (its own timeline), so the calendar matches the sub-page.
   const oldestMonthKey = useMemo(() => {
-    const dates = [...(calendarDates || []).map(d => d.date), ...(TIMELINE_DATA || []).map(t => t.date)].filter(Boolean).sort();
+    const dates = (TIMELINE_DATA || []).map(t => t.date).filter(Boolean).sort();
     if (!dates.length) return nowMonthKey;
     const [y, m] = dates[0].split('-').map(Number);
     return y * 12 + (m - 1);
-  }, [calendarDates, TIMELINE_DATA, nowMonthKey]);
+  }, [TIMELINE_DATA, nowMonthKey]);
   const canPrevCal = calMonthKey > oldestMonthKey;
   const canNextCal = calMonthKey < nowMonthKey;
   const prevCalMonth = () => {
@@ -1848,9 +1853,9 @@ Context: ${context}.`;
 
   // Newest image we hold, so the calendar can jump straight to it.
   const latestCalDate = useMemo(() => {
-    const dates = [...(calendarDates || []).map(d => d.date), ...(TIMELINE_DATA || []).map(t => t.date)].filter(Boolean).sort();
+    const dates = (TIMELINE_DATA || []).map(t => t.date).filter(Boolean).sort();
     return dates.length ? dates[dates.length - 1] : null;
-  }, [calendarDates, TIMELINE_DATA]);
+  }, [TIMELINE_DATA]);
   const jumpToLatestMonth = () => {
     if (!latestCalDate) return;
     const [y, m] = latestCalDate.split('-').map(Number);
