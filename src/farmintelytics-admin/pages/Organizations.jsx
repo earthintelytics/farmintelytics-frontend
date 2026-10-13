@@ -1,8 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Pencil, Trash2, Building2, Search, Copy, Check, ChevronRight, Plus } from 'lucide-react';
+import { Pencil, Trash2, Building2, Search, Copy, Check, ChevronRight, Plus, Download, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { fetchOrganizations, updateOrganization, deleteOrganization, uploadOrganizationLogo } from '../../services/adminApi';
-import { useConfirm } from '../components/ConfirmProvider';
+import {
+  fetchOrganizations,
+  updateOrganization,
+  uploadOrganizationLogo,
+  exportOrganizationData,
+  deleteOrganizationData,
+} from '../../services/adminApi';
 import ErrorBanner from '../components/ErrorBanner';
 import { SERVICE_GROUPS } from '../../constants/servicePhotos';
 import { ALL_CROPS, inputCls, toggleInList } from '../components/formHelpers';
@@ -14,13 +19,15 @@ import { copyText } from '../../utils/copyText';
 /** Client organisations: what each is licensed for, its sign-in link, and its estates. */
 const Organizations = () => {
   const navigate = useNavigate();
-  const confirm = useConfirm();
   const [orgs, setOrgs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null);
   const [detail, setDetail] = useState(null);
+  const [deletingOrg, setDeletingOrg] = useState(null);
+  const [exportingOrgId, setExportingOrgId] = useState(null);
   const [copied, setCopied] = useState(null);
 
   const load = async () => {
@@ -28,10 +35,21 @@ const Organizations = () => {
   };
   useEffect(() => { load(); }, []); // eslint-disable-line react-hooks/set-state-in-effect
 
-  const remove = async (org) => {
-    if (!(await confirm(`Delete ${org.display_name} and everything stored for it? This cannot be undone.`))) return;
-    try { await deleteOrganization(org.id); await load(); } catch (e) { setError(e.message); }
+  const handleExport = async (org) => {
+    setExportingOrgId(org.id);
+    setError('');
+    setSuccessMsg('');
+    try {
+      const res = await exportOrganizationData(org.id);
+      setSuccessMsg(`Exported ${res.filename} (${(res.size / 1024).toFixed(1)} KB)`);
+      setTimeout(() => setSuccessMsg(''), 5000);
+    } catch (e) {
+      setError(`Failed to export data for ${org.display_name}: ${e.message}`);
+    } finally {
+      setExportingOrgId(null);
+    }
   };
+
   const copyLink = async (schema) => {
     try { await copyText(`${window.location.origin}/org/${schema}/login`); setCopied(schema); setTimeout(() => setCopied(null), 2000); } catch { setError('Copy failed: select the link and copy it.'); }
   };
@@ -51,6 +69,13 @@ const Organizations = () => {
     >
       <ErrorBanner message={error} onDismiss={() => setError('')} onRetry={load} />
 
+      {successMsg && (
+        <div className="p-3.5 rounded-xl bg-green-50 border border-green-200 text-green-900 text-sm flex items-center justify-between">
+          <span>{successMsg}</span>
+          <button type="button" onClick={() => setSuccessMsg('')} className="text-green-700 hover:text-green-900 text-xs font-semibold">Dismiss</button>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-3">
         <label className="relative flex-1 max-w-md">
           <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -66,6 +91,7 @@ const Organizations = () => {
           {shown.map((org) => {
             const crops = org.allowed_crops || [];
             const services = (org.allowed_modules || []).filter((m) => !m.startsWith('rs-'));
+            const isExporting = exportingOrgId === org.id;
             return (
               <Card key={org.id} className="flex flex-col hover:border-gray-300 transition-colors">
                 <button type="button" onClick={() => setDetail(org)} className="text-left p-6 flex-1 space-y-4">
@@ -91,9 +117,12 @@ const Organizations = () => {
                 </div>
                 <div className="flex items-center justify-between gap-2 px-6 py-3 border-t border-gray-100">
                   <button type="button" onClick={() => setDetail(org)} className="inline-flex items-center gap-1 text-sm font-medium text-green-700 hover:text-green-800">Estates and boundaries<ChevronRight size={15} /></button>
-                  <div className="flex gap-1">
+                  <div className="flex items-center gap-1">
+                    <IconButton label="Export organisation data (ZIP)" onClick={() => handleExport(org)} disabled={isExporting}>
+                      <Download size={15} className={isExporting ? 'animate-bounce text-green-700' : ''} />
+                    </IconButton>
                     <IconButton label="Edit" onClick={() => setEditing(org)}><Pencil size={15} /></IconButton>
-                    <IconButton label="Delete" danger onClick={() => remove(org)}><Trash2 size={15} /></IconButton>
+                    <IconButton label="Delete organisation data" danger onClick={() => setDeletingOrg(org)}><Trash2 size={15} /></IconButton>
                   </div>
                 </div>
               </Card>
@@ -104,6 +133,17 @@ const Organizations = () => {
 
       {editing && <OrgModal org={editing} onClose={() => setEditing(null)} onSaved={async () => { setEditing(null); await load(); }} />}
       {detail && <OrgDetailPanel org={detail} onClose={() => setDetail(null)} />}
+      {deletingOrg && (
+        <DeleteOrgModal
+          org={deletingOrg}
+          onClose={() => setDeletingOrg(null)}
+          onDeleted={async () => {
+            setDeletingOrg(null);
+            setSuccessMsg(`Permanently deleted all data for ${deletingOrg.display_name}.`);
+            await load();
+          }}
+        />
+      )}
     </Page>
   );
 };
@@ -166,4 +206,60 @@ function OrgModal({ org, onClose, onSaved }) {
   );
 }
 
+function DeleteOrgModal({ org, onClose, onDeleted }) {
+  const [confirmation, setConfirmation] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const target = org.schema_name;
+  const isMatch = confirmation.trim().toLowerCase() === target.toLowerCase() ||
+                  confirmation.trim().toLowerCase() === (org.display_name || '').trim().toLowerCase();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!isMatch) return;
+    setBusy(true); setError('');
+    try {
+      await deleteOrganizationData(org.id, confirmation.trim());
+      onDeleted();
+    } catch (err) {
+      setError(err.message || 'Failed to delete organisation data');
+      setBusy(false);
+    }
+  };
+
+  return (
+    <Modal title="Delete organisation data" onClose={onClose}>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-900 space-y-2">
+          <div className="flex items-center gap-2 font-semibold">
+            <AlertTriangle size={18} className="text-red-600 shrink-0" />
+            <span>Permanent data deletion (NDPA 2023 &amp; Privacy Policy)</span>
+          </div>
+          <p>
+            This action will permanently delete <strong>{org.display_name}</strong> and all associated
+            records across the database and MinIO storage (<code>{org.schema_name}/*</code>).
+          </p>
+        </div>
+        {error && <p className="text-sm text-red-600">{error}</p>}
+        <Field label={`Type "${target}" to confirm deletion:`}>
+          <input
+            className={inputCls}
+            value={confirmation}
+            onChange={(e) => setConfirmation(e.target.value)}
+            placeholder={target}
+            autoFocus
+          />
+        </Field>
+        <div className="flex justify-end gap-2 pt-2">
+          <Button type="button" variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button>
+          <Button type="submit" variant="danger" disabled={!isMatch || busy}>
+            {busy ? 'Permanently deleting…' : 'Delete organisation data'}
+          </Button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
 export default Organizations;
+
