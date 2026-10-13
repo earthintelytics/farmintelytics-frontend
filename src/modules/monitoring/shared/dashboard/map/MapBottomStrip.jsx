@@ -45,8 +45,15 @@ export default function MapBottomStrip({ ctx, centerContent, hideTimeline }) {
             <div className="min-w-0 px-1">
               {timelineLoading ? <span className="text-sm text-gray-500">Loading images…</span>
                 : current ? (
-                  <span className="text-sm whitespace-nowrap"><span className="font-semibold text-gray-900">{current.date ? longLabel(current.date) : current.label}</span>
-                    <span className="text-gray-500"> · {measure}{count > 1 ? ` · ${Math.min(activeIdx, count - 1) + 1} of ${count}` : ''}</span></span>
+                  <span className="text-sm whitespace-nowrap">
+                    <span className="font-semibold text-gray-900">{current.date ? longLabel(current.date) : current.label}</span>
+                    <span className="text-gray-500"> · {measure}{count > 1 ? ` · ${Math.min(activeIdx, count - 1) + 1} of ${count}` : ''}</span>
+                    {(current.source === 'radar_estimate' || current.is_estimated) && (
+                      <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                        From radar (cloudy)
+                      </span>
+                    )}
+                  </span>
                 ) : <span className="text-sm text-gray-500">No satellite imagery yet. It appears after the first monitoring run.</span>}
             </div>
             <button type="button" className={iconBtn} disabled={!count || activeIdx >= count - 1} onClick={() => setActive(activeIdx + 1)} aria-label="Later image"><ChevronRight size={18} /></button>
@@ -81,11 +88,14 @@ export default function MapBottomStrip({ ctx, centerContent, hideTimeline }) {
                 {newMonth && <span className="text-[11px] font-medium text-gray-400 pb-1.5 pl-1">{t.date ? MONTH_NAMES[Number(t.date.slice(5, 7)) - 1].slice(0, 3) : ''}</span>}
                 <button type="button" role="option" aria-selected={i === activeIdx} data-active={i === activeIdx}
                   onClick={() => setActive(i)}
-                  className={`h-8 px-2.5 rounded-lg text-xs font-medium whitespace-nowrap border ${isA && isB ? 'bg-gradient-to-r from-[var(--brand-primary)] to-[var(--status-info)] text-white border-transparent'
+                  className={`h-8 px-2.5 rounded-lg text-xs font-medium whitespace-nowrap border inline-flex items-center gap-1.5 ${isA && isB ? 'bg-gradient-to-r from-[var(--brand-primary)] to-[var(--status-info)] text-white border-transparent'
                     : isA ? 'bg-[var(--brand-primary)] text-white border-transparent'
                       : isB ? 'bg-[var(--status-info)] text-white border-transparent'
                         : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50'}`}>
-                  {t.date ? dayLabel(t.date) : t.label}
+                  <span>{t.date ? dayLabel(t.date) : t.label}</span>
+                  {(t.source === 'radar_estimate' || t.is_estimated) && (
+                    <span className={`text-[9px] px-1 py-0.5 rounded font-normal ${isA || isB ? 'bg-white/20 text-white' : 'bg-amber-100 text-amber-800'}`}>Radar</span>
+                  )}
                 </button>
               </div>
             );

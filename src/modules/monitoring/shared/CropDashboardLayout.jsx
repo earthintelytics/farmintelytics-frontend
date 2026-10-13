@@ -215,7 +215,11 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       if (!active) return;
       const next = {};
       specs.forEach((s, i) => {
-        next[s.key] = (results[i]?.timeline || []).filter(t => t.mean != null);
+        next[s.key] = (results[i]?.timeline || []).filter(t => t.mean != null).map(t => ({
+          ...t,
+          is_estimated: Boolean(t.is_estimated || t.source === 'radar_estimate'),
+          source: t.source || (t.is_estimated ? 'radar_estimate' : null),
+        }));
       });
       setOverviewTrends(next);
     }
@@ -624,6 +628,8 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
         label: t.label,
         satellite: t.satellite || null,
         quality: '—',
+        source: t.source || (t.is_estimated ? 'radar_estimate' : null),
+        is_estimated: Boolean(t.is_estimated || t.source === 'radar_estimate'),
         ndvi: countNdvi > 0 ? sumNdvi / countNdvi : (t.ndvi ?? 0),
         ndmi: countNdmi > 0 ? sumNdmi / countNdmi : (t.ndmi ?? 0),
         evi: countEvi > 0 ? sumEvi / countEvi : 0,

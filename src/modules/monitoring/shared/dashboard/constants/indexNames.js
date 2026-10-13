@@ -3,8 +3,11 @@
  * `name` is the layer's title, `science` is shown only in the (i) hint.
  */
 export const INDEX_NAMES = {
-  ndvi: { short: 'Health', name: 'Vegetation health', science: 'NDVI, Normalised Difference Vegetation Index' },
-  evi: { short: 'Growth', name: 'Vegetation growth', science: 'EVI, Enhanced Vegetation Index' },
+  ndvi: { short: 'Condition', name: 'Crop condition', science: 'NDVI (Normalised Difference Vegetation Index) fused with Sentinel-1 radar (RVI); continuous reading through cloudy periods' },
+  evi: { short: 'Condition', name: 'Crop condition', science: 'EVI (Enhanced Vegetation Index) fused with Sentinel-1 radar (RVI); continuous reading through cloudy periods' },
+  fused_ndvi: { short: 'Condition', name: 'Crop condition', science: 'Optical NDVI and Sentinel-1 radar (RVI) fused into one continuous reading; sees through cloud' },
+  fused_evi: { short: 'Condition', name: 'Crop condition', science: 'Optical EVI and Sentinel-1 radar (RVI) fused into one continuous reading; sees through cloud' },
+  crop_condition: { short: 'Condition', name: 'Crop condition', science: 'Optical and Sentinel-1 radar fused into one continuous reading; sees through cloud' },
   ndmi: { short: 'Moisture', name: 'Vegetation moisture', science: 'NDMI, Normalised Difference Moisture Index' },
   lswi: { short: 'Water', name: 'Surface water', science: 'LSWI, Land Surface Water Index' },
   ndwi: { short: 'Water', name: 'Open water', science: 'NDWI, Normalised Difference Water Index' },

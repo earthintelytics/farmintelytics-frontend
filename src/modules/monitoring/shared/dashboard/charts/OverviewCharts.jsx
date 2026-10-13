@@ -5,10 +5,13 @@ import { SERIES } from './chartCatalog';
 const noLegend = { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } } };
 const CLASS_COLOUR = { best: '#3F8432', middle: '#D97706', worst: '#DC2626' };
 
-const ChartCard = ({ title, text, empty, children }) => (
+const ChartCard = ({ title, text, badge, empty, children }) => (
   <div className="bg-white p-6 rounded-2xl border border-gray-200 space-y-3">
     <div>
-      <h3 className="font-display text-base font-semibold text-gray-900">{title}</h3>
+      <div className="flex items-center justify-between gap-2 flex-wrap">
+        <h3 className="font-display text-base font-semibold text-gray-900">{title}</h3>
+        {badge}
+      </div>
       {text && <p className="text-sm text-gray-500 mt-1">{text}</p>}
     </div>
     <div className="h-[260px] relative">
@@ -20,7 +23,7 @@ const ChartCard = ({ title, text, empty, children }) => (
 /**
  * The charts chosen for this crop or service (chartCatalog.js), drawn from
  * real readings only.
- *   trends   { ndvi: [{ label, date, mean }], ... }   farm averages, 6 months
+ *   trends   { ndvi: [{ label, date, mean, is_estimated, source }], ... }   farm averages, 6 months
  *   plots    latest value per block: valueOf(plot, key); classify(plot, key) → { label, rank }
  */
 const OverviewCharts = ({ charts, trends, plots, classify, valueOf, primaryKey, unitLabel = 'blocks' }) => {
@@ -31,13 +34,43 @@ const OverviewCharts = ({ charts, trends, plots, classify, valueOf, primaryKey, 
     if (c.id.startsWith('trend:')) {
       const def = SERIES[c.index];
       const series = trends[c.index] || [];
+      const hasRadarEstimates = series.some((p) => p.is_estimated || p.source === 'radar_estimate');
       const data = {
         labels: series.map((p) => p.label || p.date),
-        datasets: [{ label: c.title || def.title, data: series.map((p) => p.mean), borderColor: def.colour, backgroundColor: `${def.colour}14`, fill: true, tension: 0.35, pointRadius: 3, pointBackgroundColor: def.colour }],
+        datasets: [{
+          label: c.title || def.title,
+          data: series.map((p) => p.mean),
+          borderColor: def.colour,
+          backgroundColor: `${def.colour}14`,
+          fill: true,
+          tension: 0.35,
+          pointRadius: series.map((p) => (p.is_estimated || p.source === 'radar_estimate' ? 4 : 3)),
+          pointBackgroundColor: series.map((p) => (p.is_estimated || p.source === 'radar_estimate' ? '#D97706' : def.colour)),
+        }],
       };
-      const opts = { ...noLegend, scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, suggestedMin: def.range[0], suggestedMax: def.range[1] } } };
+      const opts = {
+        ...noLegend,
+        plugins: {
+          ...noLegend.plugins,
+          tooltip: {
+            ...noLegend.plugins?.tooltip,
+            callbacks: {
+              afterLabel: (tooltipCtx) => {
+                const item = series[tooltipCtx.dataIndex];
+                return (item?.is_estimated || item?.source === 'radar_estimate') ? 'From radar (cloudy)' : '';
+              },
+            },
+          },
+        },
+        scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, suggestedMin: def.range[0], suggestedMax: def.range[1] } },
+      };
+      const radarBadge = hasRadarEstimates ? (
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200">
+          From radar (cloudy)
+        </span>
+      ) : null;
       return (
-        <ChartCard key={c.id} title={c.title || def.title} text={c.text || def.text} empty={series.length ? null : 'No readings in the last 6 months yet. They appear after the next monitoring run.'}>
+        <ChartCard key={c.id} title={c.title || def.title} text={c.text || def.text} badge={radarBadge} empty={series.length ? null : 'No readings in the last 6 months yet. They appear after the next monitoring run.'}>
           <Line data={data} options={opts} />
         </ChartCard>
       );

@@ -71,7 +71,17 @@ export default function PlotDetailPanel({ plot, series, indexLabel = 'Index', da
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
             <div style={fieldStyle}><span style={labelStyle}>Health</span><span style={{ ...valueStyle, color: plot.color || '#0f172a' }}>{plot.health || 'No Data'}</span></div>
             <div style={fieldStyle}><span style={labelStyle}>Area</span><span style={valueStyle}>{plot.area || '—'}</span></div>
-            {plot.indices?.ndvi != null && <div style={fieldStyle}><span style={labelStyle}>NDVI</span><span style={valueStyle}>{plot.indices.ndvi.toFixed(3)}</span></div>}
+            {(plot.indices?.fused_ndvi != null || plot.indices?.crop_condition != null || plot.indices?.ndvi != null) && (
+              <div style={fieldStyle}>
+                <span style={labelStyle}>Crop condition</span>
+                <span style={valueStyle}>
+                  {Number(plot.indices?.crop_condition ?? plot.indices?.fused_ndvi ?? plot.indices?.ndvi).toFixed(3)}
+                  {(plot.indices?.source === 'radar_estimate' || plot.is_estimated || plot.source === 'radar_estimate') && (
+                    <span style={{ display: 'block', fontSize: '10px', color: '#b45309', fontWeight: 500 }}>From radar (cloudy)</span>
+                  )}
+                </span>
+              </div>
+            )}
             {plot.indices?.ndmi != null && <div style={fieldStyle}><span style={labelStyle}>NDMI</span><span style={valueStyle}>{plot.indices.ndmi.toFixed(3)}</span></div>}
             {plot.indices?.chlorophyll != null && <div style={fieldStyle}><span style={labelStyle}>Chlorophyll</span><span style={valueStyle}>{plot.indices.chlorophyll.toFixed(3)}</span></div>}
             {plot.indices?.uas_anomaly_score != null && <div style={fieldStyle}><span style={labelStyle}>Anomaly score</span><span style={valueStyle}>{plot.indices.uas_anomaly_score.toFixed(3)}</span></div>}
