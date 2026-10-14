@@ -86,7 +86,7 @@ const PipelineRuns = () => {
               <tr key={j.id} onClick={() => setOpen(isOpen ? null : j.id)} className={`cursor-pointer ${j.status === 'failed' ? 'bg-red-50/40 hover:bg-red-50' : 'hover:bg-gray-50'}`}>
                 <Td><p className="font-semibold text-gray-900">{KINDS[j.kind] || j.kind}</p>{j.farm_id && <p className="text-xs text-gray-500">{j.farm_id}</p>}</Td>
                 <Td className="text-gray-700">{orgName(j.company_id)}</Td>
-                <Td><Pill tone={tone}>{label}{j.status === 'running' && j.progress != null ? ` · ${j.progress}%` : ''}</Pill></Td>
+                <Td><Pill tone={tone}>{label}{j.status === 'running' && j.progress != null ? ` · ${j.progress}%` : ''}{j.status === 'queued' && j.queue_position != null ? ` · #${j.queue_position}` : ''}</Pill></Td>
                 <Td className="text-gray-600">{j.step || '—'}</Td>
                 <Td className="text-xs text-gray-600">{fmt(j.started_at || j.created_at)}</Td>
                 <Td className="text-xs text-gray-600 font-mono">{took(j.started_at, j.finished_at)}</Td>
@@ -97,7 +97,7 @@ const PipelineRuns = () => {
                   <td colSpan={7} className="px-5 py-4 bg-gray-50 space-y-2 text-sm">
                     {j.error && <p className="text-red-800 font-mono text-xs whitespace-pre-wrap">{j.error}</p>}
                     <p className="text-gray-600">Results: {(j.outputs || []).length ? (j.outputs || []).map((o) => <code key={o} className="mr-2 text-xs">{o}</code>) : 'none stored'}</p>
-                    <p className="text-xs text-gray-500">Job {j.id} · asked by {j.created_by || 'schedule'} · {fmt(j.created_at)}</p>
+                    <p className="text-xs text-gray-500">Job {j.id} · priority: <span className="font-semibold text-gray-700">{j.priority || 'normal'}</span>{j.queue_position != null ? ` · place in queue: #${j.queue_position}` : ''} · asked by {j.created_by || 'schedule'} · {fmt(j.created_at)}</p>
                   </td>
                 </tr>
               ),
