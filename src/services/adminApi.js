@@ -499,3 +499,53 @@ export async function fetchEmailLogs({ companyId = '', limit = 100 } = {}) {
   return adminFetch(`/email-log?${p}`);
 }
 
+// ── Protected areas (WDPA & statutory reserves, T7 / T26) ───────────────────
+export async function fetchProtectedAreas({ search = '', source = '', active = null, limit = 50, offset = 0 } = {}) {
+  const p = new URLSearchParams();
+  if (search) p.set('search', search);
+  if (source) p.set('source', source);
+  if (active !== null) p.set('active', String(active));
+  if (limit) p.set('limit', String(limit));
+  if (offset) p.set('offset', String(offset));
+  return adminFetch(`/protected-areas?${p.toString()}`);
+}
+
+export async function fetchProtectedAreasGeojson({ active = true, source = '' } = {}) {
+  const p = new URLSearchParams();
+  if (active !== null) p.set('active', String(active));
+  if (source) p.set('source', source);
+  return adminFetch(`/protected-areas/geojson?${p.toString()}`);
+}
+
+export async function fetchProtectedArea(id) {
+  return adminFetch(`/protected-areas/${id}`);
+}
+
+export async function createProtectedArea(data) {
+  return adminFetch('/protected-areas', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateProtectedArea(id, data) {
+  return adminFetch(`/protected-areas/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteProtectedArea(id) {
+  return adminFetch(`/protected-areas/${id}`, { method: 'DELETE' });
+}
+
+export async function toggleProtectedArea(id) {
+  return adminFetch(`/protected-areas/${id}/toggle`, { method: 'POST' });
+}
+
+export async function uploadWdpaZip(file, sourceVersion = 'Oct2026', marginKm = 50.0) {
+  const fd = new FormData();
+  fd.append('file', file);
+  return adminUpload(`/protected-areas/upload?source_version=${encodeURIComponent(sourceVersion)}&margin_km=${marginKm}`, fd);
+}
+
