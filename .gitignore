@@ -28,6 +28,8 @@ dist-ssr
 /standardized-imagery
 /dist
 /references
+/playwright-report
+/test-results
 /backend/data
 playwright-report/
 test-results/
