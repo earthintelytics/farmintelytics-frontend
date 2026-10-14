@@ -172,6 +172,41 @@ export async function deleteOrganization(id) {
   return adminFetch(`/organizations/${id}`, { method: 'DELETE' });
 }
 
+export async function exportOrganizationData(orgId) {
+  const url = `${ADMIN_API_BASE}/organizations/${orgId}/export`;
+  const token = localStorage.getItem('fi_admin_token');
+  const headers = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const res = await fetch(url, { cache: 'no-store', headers });
+  if (res.status === 401 || (res.status === 403 && !hasValidTeamToken())) handleAdminAuthFailure();
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Export failed: ${text}`);
+  }
+  const blob = await res.blob();
+  const disposition = res.headers.get('Content-Disposition') || '';
+  const match = disposition.match(/filename="?([^"]+)"?/);
+  const filename = match ? match[1] : `organization_${orgId}_export.zip`;
+
+  const blobUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = blobUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(blobUrl);
+  return { filename, size: blob.size };
+}
+
+export async function deleteOrganizationData(id, confirmation) {
+  return adminFetch(`/organizations/${id}/delete-data`, {
+    method: 'POST',
+    body: JSON.stringify({ confirmation }),
+  });
+}
+
 // ─── Farms ────────────────────────────────────────────────────────────────────
 
 export async function fetchFarms(companyId) {

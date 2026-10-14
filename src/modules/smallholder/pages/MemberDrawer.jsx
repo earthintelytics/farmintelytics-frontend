@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Download, Trash2, AlertTriangle } from 'lucide-react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import { fetchParcels, updateMember } from '../../../services/smallholderApi';
+import { fetchParcels, updateMember, exportMember, deleteMember } from '../../../services/smallholderApi';
 import { StatusPill, SecondaryButton, PrimaryButton, ErrorNote } from '../../../components/page/PageKit';
 import { stateFromError } from '../../../components/page/useLoader';
 import { EUDR_STATUS, MEMBER_STATUS, PARCEL_CHECK } from '../smallholderLabels';
@@ -30,6 +30,9 @@ const MemberDrawer = ({ member, onClose, onSaved }) => {
   const [state, setState] = useState('loading');
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -49,6 +52,42 @@ const MemberDrawer = ({ member, onClose, onSaved }) => {
   const setStatus = async (status) => {
     setSaving(true); setError('');
     try { await updateMember(member.id, { status }); onSaved(); onClose(); } catch (e) { setError(e.message); setSaving(false); }
+  };
+
+  const handleExport = async () => {
+    setExporting(true);
+    setError('');
+    try {
+      const data = await exportMember(member.id);
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `member_${member.code || member.id}_dossier.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError(`Failed to export farmer dossier: ${e.message}`);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDelete = async (purge = false) => {
+    setDeleting(true);
+    setError('');
+    try {
+      await deleteMember(member.id, purge ? { purge: 'true' } : {});
+      setDeleteModal(false);
+      onSaved();
+      onClose();
+    } catch (e) {
+      setError(e.message || 'Failed to delete farmer record');
+      setDeleting(false);
+    }
   };
 
   return (
@@ -106,11 +145,73 @@ const MemberDrawer = ({ member, onClose, onSaved }) => {
           )}
         </section>
 
-        <div className="flex justify-end gap-3 pt-2">
-          {member.status !== 'suspended' && <SecondaryButton disabled={saving} onClick={() => setStatus('suspended')}>Suspend</SecondaryButton>}
-          {member.status !== 'active' && <PrimaryButton disabled={saving} onClick={() => setStatus('active')}>Make active</PrimaryButton>}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-gray-100">
+          <div className="flex gap-2">
+            <SecondaryButton disabled={exporting} onClick={handleExport}>
+              <Download size={15} />Export dossier
+            </SecondaryButton>
+            <SecondaryButton disabled={deleting} onClick={() => setDeleteModal(true)}>
+              <Trash2 size={15} className="text-red-600" />Delete / Erase
+            </SecondaryButton>
+          </div>
+          <div className="flex gap-2">
+            {member.status !== 'suspended' && <SecondaryButton disabled={saving} onClick={() => setStatus('suspended')}>Suspend</SecondaryButton>}
+            {member.status !== 'active' && <PrimaryButton disabled={saving} onClick={() => setStatus('active')}>Make active</PrimaryButton>}
+          </div>
         </div>
       </aside>
+
+      {deleteModal && (
+        <div className="fixed inset-0 z-[1100] bg-gray-900/40 flex items-center justify-center p-4" onClick={() => setDeleteModal(false)}>
+          <div className="w-full max-w-md bg-white rounded-2xl p-6 shadow-2xl border border-gray-200 space-y-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
+                <AlertTriangle size={20} />
+              </div>
+              <div className="min-w-0">
+                <h4 className="font-display text-lg font-semibold text-gray-900">Member deletion &amp; privacy</h4>
+                <p className="text-xs text-gray-500">NDPA 2023 Article 38 / Right to erasure</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-600">
+              Choose how to handle data for <strong>{member.name}</strong> ({member.code}):
+            </p>
+
+            <div className="space-y-3 pt-1">
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => handleDelete(false)}
+                className="w-full text-left p-3.5 rounded-xl border border-gray-200 hover:border-gray-400 hover:bg-gray-50 transition-colors"
+              >
+                <p className="text-sm font-semibold text-gray-900">Anonymise personal data (Recommended)</p>
+                <p className="text-xs text-gray-500 mt-1">
+                  Erases name, phone, NIN, and personal fields per NDPA 2023. Agricultural parcels and boundaries are preserved anonymously for co-operative records.
+                </p>
+              </button>
+
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={() => handleDelete(true)}
+                className="w-full text-left p-3.5 rounded-xl border border-red-200 bg-red-50/50 hover:bg-red-50 hover:border-red-300 transition-colors"
+              >
+                <p className="text-sm font-semibold text-red-900">Permanently delete member &amp; land records</p>
+                <p className="text-xs text-red-700 mt-1">
+                  Permanently purges member record, all associated parcels, photos, and form submission answers. Cannot be recovered.
+                </p>
+              </button>
+            </div>
+
+            <div className="flex justify-end pt-2">
+              <SecondaryButton onClick={() => setDeleteModal(false)} disabled={deleting}>
+                Cancel
+              </SecondaryButton>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
