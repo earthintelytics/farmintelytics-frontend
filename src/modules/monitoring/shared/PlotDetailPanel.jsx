@@ -77,7 +77,7 @@ export default function PlotDetailPanel({ plot, series, indexLabel = 'Index', da
                 <span style={valueStyle}>
                   {Number(plot.indices?.crop_condition ?? plot.indices?.fused_ndvi ?? plot.indices?.ndvi).toFixed(3)}
                   {(plot.indices?.source === 'radar_estimate' || plot.is_estimated || plot.source === 'radar_estimate') && (
-                    <span style={{ display: 'block', fontSize: '10px', color: '#b45309', fontWeight: 500 }}>From radar (cloudy)</span>
+                    <span style={{ display: 'block', fontSize: '11px', color: 'var(--status-warning, #b45309)', fontWeight: 500 }}>From radar (cloudy)</span>
                   )}
                 </span>
               </div>

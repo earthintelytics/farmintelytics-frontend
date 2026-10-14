@@ -3,8 +3,10 @@
  * `name` is the layer's title, `science` is shown only in the (i) hint.
  */
 export const INDEX_NAMES = {
-  ndvi: { short: 'Condition', name: 'Crop condition', science: 'NDVI (Normalised Difference Vegetation Index) fused with Sentinel-1 radar (RVI); continuous reading through cloudy periods' },
-  evi: { short: 'Condition', name: 'Crop condition', science: 'EVI (Enhanced Vegetation Index) fused with Sentinel-1 radar (RVI); continuous reading through cloudy periods' },
+  // Optical layers keep their own names: the map images are optical only. The fused reading
+  // (optical when clear, radar on cloudy dates) is crop_condition / fused_*, below.
+  ndvi: { short: 'Health', name: 'Vegetation health', science: 'NDVI, Normalised Difference Vegetation Index (optical, needs a clear sky)' },
+  evi: { short: 'Growth', name: 'Vegetation growth', science: 'EVI, Enhanced Vegetation Index (optical, needs a clear sky)' },
   fused_ndvi: { short: 'Condition', name: 'Crop condition', science: 'Optical NDVI and Sentinel-1 radar (RVI) fused into one continuous reading; sees through cloud' },
   fused_evi: { short: 'Condition', name: 'Crop condition', science: 'Optical EVI and Sentinel-1 radar (RVI) fused into one continuous reading; sees through cloud' },
   crop_condition: { short: 'Condition', name: 'Crop condition', science: 'Optical and Sentinel-1 radar fused into one continuous reading; sees through cloud' },

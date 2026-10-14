@@ -6,7 +6,7 @@ import { hexOf, legendFor, useLayerLegends } from '../legends/layerLegends';
 
 // Plain names and icons for the measure rail; the index name stays in the hover text only.
 const PLAIN = {
-  ndvi: ['Crop condition', Leaf], evi: ['Crop condition', Sprout],
+  ndvi: ['Health', Leaf], evi: ['Growth', Sprout],
   fused_ndvi: ['Crop condition', Leaf], fused_evi: ['Crop condition', Sprout],
   crop_condition: ['Crop condition', Leaf],
   ndmi: ['Moisture', Droplets], lswi: ['Water', Waves],
