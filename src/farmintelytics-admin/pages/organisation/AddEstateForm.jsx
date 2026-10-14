@@ -14,6 +14,11 @@ const INDICES = ['NDVI', 'EVI', 'NDMI', 'RECI', 'NDWI', 'LSWI'];
  */
 const AddEstateForm = ({ org, farms, onClose, onSaved }) => {
   const [name, setName] = useState('');
+  const [startDate, setStartDate] = useState(() => {
+    const d = new Date();
+    d.setFullYear(d.getFullYear() - 1);
+    return d.toISOString().slice(0, 10);
+  });
   const [sensors, setSensors] = useState(['sentinel-2', 'sentinel-1']);
   const [indices, setIndices] = useState(['NDVI', 'NDMI']);
   const [parent, setParent] = useState('');
@@ -36,26 +41,48 @@ const AddEstateForm = ({ org, farms, onClose, onSaved }) => {
   };
 
   const save = async () => {
+    if (!startDate) {
+      setError('Monitoring start date is required.');
+      return;
+    }
     setError(''); setProgress({ pct: 5, text: 'Creating the estate…' });
     try {
       const p = farms.find((f) => f.parent_farm_id === parent || f.farm_id === parent);
       const created = await createFarm({
         company_name: org.display_name, company_id: org.schema_name, farm_name: name.trim(), farm_id: '',
         parent_farm_id: parent || '', parent_farm_name: parent ? (p?.parent_farm_name || p?.farm_name || parent) : '',
-        services, sensors, indices, processing_level: 'plot_level', cloud_cover_threshold: 10, start_date: null, end_date: null,
+        services, sensors, indices, processing_level: 'plot_level', cloud_cover_threshold: 10,
+        start_date: startDate, end_date: null,
       });
-      await uploadBoundary(created.farm_id, file, (prog) => setProgress({ pct: Math.max(20, Math.min(95, 20 + Math.round(prog.percent * 0.75))), text: `Uploading the boundary (${prog.percent}%)…` }));
-      setProgress({ pct: 100, text: 'Estate added.' });
-      onSaved();
+      const uploadRes = await uploadBoundary(created.farm_id, file, (prog) => setProgress({ pct: Math.max(20, Math.min(95, 20 + Math.round(prog.percent * 0.75))), text: `Uploading the boundary (${prog.percent}%)…` }));
+      if (uploadRes?.stray_shapes?.length) {
+        const strayNotes = uploadRes.stray_shapes.map((s) => `${s.plot_id} (${Math.round(s.distance_km)} km away)`).join(', ');
+        setProgress({ pct: 100, text: `Estate added. Excluded stray shape(s): ${strayNotes}` });
+      } else {
+        setProgress({ pct: 100, text: 'Estate added.' });
+      }
+      setTimeout(() => onSaved(), 800);
     } catch (e) { setError(e.message); setProgress(null); }
   };
 
   const busy = Boolean(progress);
   return (
     <Modal title="Add an estate" text={org.display_name} onClose={busy ? undefined : onClose}
-      footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button><Button onClick={save} disabled={busy || !name.trim() || !file}>{busy ? `Adding (${progress.pct}%)…` : 'Add estate'}</Button></>}>
+      footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button><Button onClick={save} disabled={busy || !name.trim() || !startDate || !file}>{busy ? `Adding (${progress.pct}%)…` : 'Add estate'}</Button></>}>
       {error && <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
       <Field label="Estate name"><input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} disabled={busy} placeholder="e.g. North estate" /></Field>
+      <Field label="Monitoring start date" hint="Date monitoring begins (earliest 23 June 2015). The first run covers up to 12 months before today from this date.">
+        <input
+          type="date"
+          className={inputCls}
+          required
+          min="2015-06-23"
+          max={new Date().toISOString().slice(0, 10)}
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          disabled={busy}
+        />
+      </Field>
       <ServicesPicker org={org} value={services} onChange={setServices} disabled={busy} />
       <Field label="Imagery"><div className="flex flex-wrap gap-2">{SENSOR_OPTIONS.map((s) => <Chip key={s} on={sensors.includes(s)} onClick={() => setSensors((l) => toggleInList(l, s))}>{s}</Chip>)}</div></Field>
       <Field label="Indices processed"><div className="flex flex-wrap gap-2">{INDICES.map((i) => <Chip key={i} on={indices.includes(i)} onClick={() => setIndices((l) => toggleInList(l, i))}>{i}</Chip>)}</div></Field>
