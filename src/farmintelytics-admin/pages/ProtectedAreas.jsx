@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Shield, Plus, Upload, Search, RefreshCw, Trash2, Pencil, Check, X, MapPin, AlertCircle } from 'lucide-react';
+import { Shield, Plus, Upload, Search, RefreshCw, Trash2, Pencil, Check, X, AlertCircle } from 'lucide-react';
 import { MapContainer, TileLayer, Polygon, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -99,7 +99,7 @@ export default function ProtectedAreas() {
 
   useEffect(() => {
     loadData();
-  }, [loadData]);
+  }, [loadData]); // eslint-disable-line react-hooks/set-state-in-effect -- loading data on mount, as the other admin pages do
 
   const handleToggle = async (area) => {
     try {
