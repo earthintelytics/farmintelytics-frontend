@@ -296,9 +296,22 @@ export default function SystemStatus() {
                     </div>
                   ) : key === 'pipeline_worker' ? (
                     <>
+                      <div>Active workers: <span className="text-gray-800">{s.workers_count !== undefined ? s.workers_count : (s.status === 'ok' ? 1 : 0)}</span></div>
                       <div>State: <span className="font-semibold text-gray-800">{s.state || 'stopped'}</span></div>
                       {s.last_heartbeat_seconds_ago !== undefined && (
                         <div>Heartbeat: <span className="text-gray-800">{s.last_heartbeat_seconds_ago}s ago</span></div>
+                      )}
+                      {s.workers && s.workers.length > 0 && (
+                        <div className="mt-2 pt-2 border-t border-gray-100 space-y-1">
+                          {s.workers.map((w) => (
+                            <div key={w.worker_id} className="flex justify-between items-center text-[11px]">
+                              <span className="font-semibold text-gray-700 truncate max-w-[120px]">{w.worker_id}</span>
+                              <span className={w.is_healthy ? 'text-green-700' : 'text-amber-700'}>
+                                {w.state} ({w.last_heartbeat_seconds_ago}s ago)
+                              </span>
+                            </div>
+                          ))}
+                        </div>
                       )}
                     </>
                   ) : (
