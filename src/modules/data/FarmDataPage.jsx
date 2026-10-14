@@ -103,7 +103,7 @@ function CheckResult({ result, total }) {
   );
 }
 
-function SaveBar({ connected, disabled, saving, saved, error, onSave }) {
+function SaveBar({ connected, disabled, saving, saved, error, onSave, isTestData, setIsTestData }) {
   return (
     <div className="flex flex-wrap items-center gap-4 pt-2">
       <button
@@ -113,8 +113,28 @@ function SaveBar({ connected, disabled, saving, saved, error, onSave }) {
       >
         {saving ? 'Saving…' : 'Save'}
       </button>
+      {setIsTestData && (
+        <label className="inline-flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={Boolean(isTestData)}
+            onChange={e => setIsTestData(e.target.checked)}
+            className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+          />
+          Save as test data
+        </label>
+      )}
       {!connected && <span className="text-xs text-gray-600">Saving opens when the data service is connected. You can already prepare and check your data here.</span>}
-      {saved && <span className="text-sm font-semibold text-green-700 flex items-center gap-1.5"><CheckCircle2 size={15} /> Saved as version {saved.version} ({saved.rows_saved} rows)</span>}
+      {saved && (
+        <span className="text-sm font-semibold text-green-700 flex items-center gap-1.5">
+          <CheckCircle2 size={15} /> Saved as version {saved.version} ({saved.rows_saved} rows)
+          {saved.is_test_data && (
+            <span className="ml-2 text-[11px] font-bold px-2 py-0.5 rounded-full border border-amber-300 bg-amber-50 text-amber-800">
+              Test data
+            </span>
+          )}
+        </span>
+      )}
       {error && <span className="text-sm text-red-700">{error}</span>}
     </div>
   );
@@ -129,6 +149,7 @@ function UploadTab({ dataset, fieldIndex, connected }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(null);
   const [error, setError] = useState('');
+  const [isTestData, setIsTestData] = useState(false);
 
   const onFile = async (f) => {
     setError(''); setResult(null); setSaved(null);
@@ -159,7 +180,7 @@ function UploadTab({ dataset, fieldIndex, connected }) {
       const rows = stripFlags(result.rows);
       const server = await validateRows(dataset.id, rows);
       if (!server.ok) { setError(`The server found ${server.errors?.length || 0} problems. Fix them and check again.`); return; }
-      setSaved(await commitRows(dataset.id, rows)); setStep(4);
+      setSaved(await commitRows(dataset.id, rows, isTestData)); setStep(4);
     } catch (e) {
       setError(e instanceof NotConnectedError ? 'The data service is not connected yet.' : e.message);
     } finally { setSaving(false); }
@@ -234,7 +255,7 @@ function UploadTab({ dataset, fieldIndex, connected }) {
               <div className="flex items-center gap-4">
                 <button onClick={() => setStep(2)} className="px-4 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-gray-700 hover:bg-gray-50">Back to matching</button>
               </div>
-              <SaveBar connected={connected} disabled={!result || result.errors.length > 0} saving={saving} saved={saved} error={error} onSave={save} />
+              <SaveBar connected={connected} disabled={!result || result.errors.length > 0} saving={saving} saved={saved} error={error} onSave={save} isTestData={isTestData} setIsTestData={setIsTestData} />
             </>
           )}
         </div>
@@ -258,6 +279,7 @@ function ManualTab({ dataset, fieldIndex, blockOptions, connected }) {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(null);
   const [error, setError] = useState('');
+  const [isTestData, setIsTestData] = useState(false);
   const perField = dataset.columns.some(c => c.type === 'field_id');
 
   const set = (i, name, value) => { setRows(r => r.map((row, j) => j === i ? { ...row, [name]: value } : row)); setResult(null); };
@@ -268,7 +290,7 @@ function ManualTab({ dataset, fieldIndex, blockOptions, connected }) {
       const rs = stripFlags(result.rows);
       const server = await validateRows(dataset.id, rs);
       if (!server.ok) { setError(`The server found ${server.errors?.length || 0} problems.`); return; }
-      setSaved(await commitRows(dataset.id, rs));
+      setSaved(await commitRows(dataset.id, rs, isTestData));
       try { localStorage.removeItem(draftKey(dataset.id)); } catch { /* storage unavailable */ }
     } catch (e) {
       setError(e instanceof NotConnectedError ? 'The data service is not connected yet.' : e.message);
@@ -311,7 +333,7 @@ function ManualTab({ dataset, fieldIndex, blockOptions, connected }) {
         <button onClick={check} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-green-600 hover:bg-green-700">Check <ArrowRight size={15} /></button>
       </div>
       {result && <CheckResult result={result} total={rows.length} />}
-      {result && <SaveBar connected={connected} disabled={result.errors.length > 0} saving={saving} saved={saved} error={error} onSave={save} />}
+      {result && <SaveBar connected={connected} disabled={result.errors.length > 0} saving={saving} saved={saved} error={error} onSave={save} isTestData={isTestData} setIsTestData={setIsTestData} />}
     </div>
   );
 }
