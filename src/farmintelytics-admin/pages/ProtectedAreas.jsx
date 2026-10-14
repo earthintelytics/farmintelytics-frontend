@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Shield, Plus, Upload, Search, RefreshCw, Trash2, Pencil, Check, X, AlertCircle } from 'lucide-react';
-import { MapContainer, TileLayer, Polygon, GeoJSON, useMap, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -12,6 +12,9 @@ import {
   toggleProtectedArea,
   uploadWdpaZip,
 } from '../../services/adminApi';
+import { getCssToken } from '../../utils/tokens';
+import UploadWdpaModal from './protected_areas/UploadWdpaModal';
+import DrawAreaModal from './protected_areas/DrawAreaModal';
 
 const IMAGERY = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const LABELS = 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}';
@@ -31,15 +34,6 @@ function MapBoundsFitter({ geojson }) {
       }
     }
   }, [geojson, map]);
-  return null;
-}
-
-function DrawingMapEvents({ onAddPoint }) {
-  useMapEvents({
-    click: (e) => {
-      onAddPoint([e.latlng.lat, e.latlng.lng]);
-    },
-  });
   return null;
 }
 
@@ -98,8 +92,8 @@ export default function ProtectedAreas() {
   }, [search, sourceFilter, activeFilter]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]); // eslint-disable-line react-hooks/set-state-in-effect -- loading data on mount, as the other admin pages do
+    loadData(); // eslint-disable-line react-hooks/set-state-in-effect
+  }, [loadData]);
 
   const handleToggle = async (area) => {
     try {
@@ -295,17 +289,17 @@ export default function ProtectedAreas() {
                 key={JSON.stringify(geojson.features?.length)}
                 data={geojson}
                 style={{
-                  color: '#dc2626',
+                  color: getCssToken('--status-critical', '#DC2626'),
                   weight: 2,
-                  fillColor: '#ef4444',
+                  fillColor: getCssToken('--status-critical', '#DC2626'),
                   fillOpacity: 0.35,
                 }}
                 onEachFeature={(feature, layer) => {
                   const p = feature.properties || {};
                   layer.bindPopup(`
-                    <div style="font-family: sans-serif; font-size: 12px; line-height: 1.4;">
+                    <div style="font-family: var(--font-sans); font-size: 12px; line-height: 1.4;">
                       <strong>${p.name || 'Protected Area'}</strong><br/>
-                      <span style="color: #666;">Source: ${p.source === 'manual' ? 'Drawn by team' : (p.source_version || 'WDPA')}</span><br/>
+                      <span style="color: var(--text-muted, #64748b);">Source: ${p.source === 'manual' ? 'Drawn by team' : (p.source_version || 'WDPA')}</span><br/>
                       ${p.designation ? `<span>Desig: ${p.designation}</span><br/>` : ''}
                       <span>Status: ${p.active ? 'Active' : 'Inactive'}</span>
                     </div>
@@ -461,196 +455,36 @@ export default function ProtectedAreas() {
       </div>
 
       {/* Upload WDPA Modal */}
-      {uploadModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-gray-200 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="font-display text-xl font-semibold text-gray-900">Upload WDPA shapefile archive</h3>
-              <button
-                type="button"
-                onClick={() => setUploadModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <p className="text-sm text-gray-600">
-              Upload official Protected Planet release zip (polygons only). Official records are upserted without overwriting hand-drawn manual areas.
-            </p>
-
-            <form onSubmit={handleUploadSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
-                  Shapefile ZIP Archive
-                </label>
-                <input
-                  type="file"
-                  accept=".zip"
-                  required
-                  onChange={(e) => setUploadFile(e.target.files?.[0] || null)}
-                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
-                    Dataset Version
-                  </label>
-                  <input
-                    type="text"
-                    value={sourceVersion}
-                    onChange={(e) => setSourceVersion(e.target.value)}
-                    placeholder="e.g. Oct2026"
-                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-green-600"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
-                    Client AOI Margin (km)
-                  </label>
-                  <input
-                    type="number"
-                    value={marginKm}
-                    onChange={(e) => setMarginKm(e.target.value)}
-                    min={0}
-                    max={500}
-                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-green-600"
-                  />
-                </div>
-              </div>
-
-              {uploadCounts && (
-                <div className="p-3 bg-gray-50 rounded-xl text-xs space-y-1 border border-gray-200">
-                  <p className="font-semibold text-gray-800">Import report:</p>
-                  <p>Created: <span className="font-mono font-medium">{uploadCounts.created}</span></p>
-                  <p>Updated: <span className="font-mono font-medium">{uploadCounts.updated}</span></p>
-                  <p>Manual protected: <span className="font-mono font-medium">{uploadCounts.skipped_manual}</span></p>
-                  <p>Outside AOI: <span className="font-mono font-medium">{uploadCounts.skipped_outside}</span></p>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setUploadModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  Close
-                </button>
-                <button
-                  type="submit"
-                  disabled={uploading || !uploadFile}
-                  className="px-5 py-2 rounded-xl text-sm font-semibold bg-green-700 text-white hover:bg-green-800 disabled:opacity-50"
-                >
-                  {uploading ? 'Processing archive...' : 'Run import'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <UploadWdpaModal
+        isOpen={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        onSubmit={handleUploadSubmit}
+        uploadFile={uploadFile}
+        setUploadFile={setUploadFile}
+        sourceVersion={sourceVersion}
+        setSourceVersion={setSourceVersion}
+        marginKm={marginKm}
+        setMarginKm={setMarginKm}
+        uploading={uploading}
+        uploadCounts={uploadCounts}
+      />
 
       {/* Draw / Edit Manual Boundary Modal */}
-      {drawModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-xl border border-gray-200 space-y-5">
-            <div className="flex items-center justify-between">
-              <h3 className="font-display text-xl font-semibold text-gray-900">
-                {editArea ? `Edit ${editArea.name || 'Protected Area'}` : 'Draw manual protected reserve'}
-              </h3>
-              <button
-                type="button"
-                onClick={() => setDrawModalOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleSaveDraw} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
-                    Area Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={drawName}
-                    onChange={(e) => setDrawName(e.target.value)}
-                    placeholder="e.g. Okomu Sacred Grove Reserve"
-                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-green-600"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-gray-700 uppercase mb-1">
-                    Designation
-                  </label>
-                  <input
-                    type="text"
-                    value={drawDesignation}
-                    onChange={(e) => setDrawDesignation(e.target.value)}
-                    placeholder="e.g. Forest Sanctuary / High Conservation Zone"
-                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-sm focus:outline-none focus:border-green-600"
-                  />
-                </div>
-              </div>
-
-              {!editArea && (
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="block text-xs font-semibold text-gray-700 uppercase">
-                      Boundary points: click on satellite map ({drawPoints.length} vertices)
-                    </label>
-                    {drawPoints.length > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => setDrawPoints([])}
-                        className="text-xs text-red-600 hover:underline"
-                      >
-                        Clear vertices
-                      </button>
-                    )}
-                  </div>
-                  <div className="h-64 w-full rounded-xl overflow-hidden border border-gray-300 relative">
-                    <MapContainer center={mapCenter} zoom={6} className="h-full w-full">
-                      <TileLayer url={IMAGERY} maxZoom={18} />
-                      <DrawingMapEvents onAddPoint={(pt) => setDrawPoints((prev) => [...prev, pt])} />
-                      {drawPoints.length >= 3 && (
-                        <Polygon
-                          positions={drawPoints}
-                          pathOptions={{ color: '#9333ea', fillColor: '#a855f7', fillOpacity: 0.4 }}
-                        />
-                      )}
-                    </MapContainer>
-                  </div>
-                  <p className="text-xs text-gray-500">
-                    Click each corner of the polygon in order on the map. At least 3 points are required.
-                  </p>
-                </div>
-              )}
-
-              <div className="flex justify-end gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setDrawModalOpen(false)}
-                  className="px-4 py-2 rounded-xl text-sm font-semibold border border-gray-300 text-gray-700 hover:bg-gray-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingDraw}
-                  className="px-5 py-2 rounded-xl text-sm font-semibold bg-green-700 text-white hover:bg-green-800 disabled:opacity-50"
-                >
-                  {savingDraw ? 'Saving...' : 'Save & sync boundary'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <DrawAreaModal
+        isOpen={drawModalOpen}
+        onClose={() => setDrawModalOpen(false)}
+        onSubmit={handleSaveDraw}
+        editArea={editArea}
+        drawName={drawName}
+        setDrawName={setDrawName}
+        drawDesignation={drawDesignation}
+        setDrawDesignation={setDrawDesignation}
+        drawPoints={drawPoints}
+        setDrawPoints={setDrawPoints}
+        savingDraw={savingDraw}
+        mapCenter={mapCenter}
+        imageryUrl={IMAGERY}
+      />
     </div>
   );
 }

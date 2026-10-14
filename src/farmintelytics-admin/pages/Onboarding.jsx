@@ -21,6 +21,7 @@ import { SERVICE_CATALOG } from '../../modules/services/serviceCatalog';
 import { SMALLHOLDER_SERVICES, resolveModule, moduleName } from '../../modules/registry';
 import { DATASET_DEFINITIONS, datasetsForScope } from '../../modules/data/datasetDefinitions';
 import { copyText } from '../../utils/copyText';
+import { getCssToken } from '../../utils/tokens';
 
 /**
  * Onboard an organisation — one flow, dynamic by design (docs/FINDINGS.md,
@@ -518,7 +519,15 @@ const Onboarding = () => {
                       {e.geojson ? (
                         <MapContainer preferCanvas center={[6.43, 5.27]} zoom={11} style={{ width: '100%', height: '100%' }} zoomControl={false} attributionControl={false}>
                           <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" maxZoom={19} />
-                          <GeoJSON data={e.geojson} style={{ color: '#3F8432', weight: 2, fillColor: '#22c55e', fillOpacity: 0.2 }} />
+                          <GeoJSON
+                            data={e.geojson}
+                            style={{
+                              color: getCssToken('--brand-primary', '#3F8432'),
+                              weight: 2,
+                              fillColor: getCssToken('--status-good', '#3F8432'),
+                              fillOpacity: 0.2,
+                            }}
+                          />
                           <FitToBounds data={e.geojson} />
                         </MapContainer>
                       ) : <div className="h-full flex items-center justify-center text-xs text-gray-500">Map preview appears here</div>}
