@@ -42,6 +42,18 @@ export default defineConfig({
           if (id.includes('node_modules/react-dom') || id.includes('node_modules/react/') || id.includes('node_modules/react-router')) {
             return 'vendor-react';
           }
+          if (id.includes('node_modules/chart.js') || id.includes('node_modules/react-chartjs-2')) {
+            return 'vendor-charts';
+          }
+          if (id.includes('node_modules/leaflet')) {
+            return 'vendor-leaflet';
+          }
+          if (id.includes('node_modules/lucide-react')) {
+            return 'vendor-lucide';
+          }
+          if (id.includes('node_modules/jszip')) {
+            return 'vendor-jszip';
+          }
         },
       },
     },

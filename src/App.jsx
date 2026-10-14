@@ -70,7 +70,7 @@ const ContactPage = lazyWithReload(() => import('./pages/public/ContactPage'));
 const CropPortal = lazyWithReload(() => import('./modules/monitoring/CropPortal'));
 
 // === Super Admin Portal ===
-import AdminLogin from './farmintelytics-admin/AdminLogin';
+const AdminLogin = lazyWithReload(() => import('./farmintelytics-admin/AdminLogin'));
 const AdminPortal = lazyWithReload(() => import('./farmintelytics-admin/AdminPortal'));
 
 import { resolveModule, canonicalModuleId, SMALLHOLDER_SERVICES, moduleName as moduleDisplayName } from './modules/registry';
@@ -86,10 +86,10 @@ const RouteLoading = () => (
 // the hub and locks users into that single module.
 const RESTRICTED_MODULE = import.meta.env.VITE_RESTRICT_TO_MODULE || null;
 
-import OrgShell from './pages/org/OrgShell';
-import OrgServicesPage from './pages/org/OrgServicesPage';
-import OrgSettingsPage from './pages/org/OrgSettingsPage';
-import FieldPage from './pages/org/FieldPage';
+const OrgShell = lazyWithReload(() => import('./pages/org/OrgShell'));
+const OrgServicesPage = lazyWithReload(() => import('./pages/org/OrgServicesPage'));
+const OrgSettingsPage = lazyWithReload(() => import('./pages/org/OrgSettingsPage'));
+const FieldPage = lazyWithReload(() => import('./pages/org/FieldPage'));
 import { readOrgProfile } from './pages/org/orgProfile';
 import { paths, sessionTenant } from './routes/paths';
 import { clearTenantSession, clearTeamSession, hasValidTeamToken } from './services/session';
