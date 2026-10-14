@@ -71,7 +71,7 @@ const OrgPipeline = ({ org }) => {
               return (
                 <li key={j.id} className="px-4 py-2.5 flex items-center justify-between gap-3 text-sm">
                   <div className="min-w-0"><p className="text-gray-900">{KINDS[j.kind] || j.kind}{j.farm_id ? ` · ${j.farm_id}` : ''}</p><p className="text-xs text-gray-500">{fmt(j.created_at)}{j.error ? ` · ${j.error.slice(0, 80)}` : ''}</p></div>
-                  <Pill tone={tone}>{label}</Pill>
+                  <Pill tone={tone}>{label}{j.status === 'queued' && j.queue_position != null ? ` · #${j.queue_position}` : ''}</Pill>
                 </li>
               );
             })}
