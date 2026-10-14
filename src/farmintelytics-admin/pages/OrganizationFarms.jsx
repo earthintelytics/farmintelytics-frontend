@@ -143,12 +143,9 @@ function EstateRow({ org, farm, onDelete, onReplace, onSaved }) {
     if (a && !isNaN(Number(a))) areaHa += Number(a);
   }
 
-  // Shapes left out at upload: from upload response, boundary metadata, or Okomu Cameroon exclusion
-  const strayList = strayUploads || boundaryData?.stray_shapes || (
-    farm.farm_id.toLowerCase().includes('okomu') && (farm.farm_id.toLowerCase().includes('extension2') || farm.farm_id.toLowerCase().includes('okomu_okomu'))
-      ? [{ plot_id: 'OKO03-X2B11', distance_km: 767 }]
-      : []
-  );
+  // Shapes left out at upload, as the backend reports them (from the upload response or the saved
+  // boundary). Never typed in here: rule no. 1, nothing about a client is fixed in code.
+  const strayList = strayUploads || boundaryData?.stray_shapes || [];
 
   const details = [
     info.crop && (CROP_LABELS[info.crop] || info.crop),
