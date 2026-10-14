@@ -6,7 +6,10 @@ import { hexOf, legendFor, useLayerLegends } from '../legends/layerLegends';
 
 // Plain names and icons for the measure rail; the index name stays in the hover text only.
 const PLAIN = {
-  ndvi: ['Greenness', Leaf], evi: ['Growth', Sprout], ndmi: ['Moisture', Droplets], lswi: ['Water', Waves],
+  ndvi: ['Crop condition', Leaf], evi: ['Crop condition', Sprout],
+  fused_ndvi: ['Crop condition', Leaf], fused_evi: ['Crop condition', Sprout],
+  crop_condition: ['Crop condition', Leaf],
+  ndmi: ['Moisture', Droplets], lswi: ['Water', Waves],
   ndwi: ['Water', Waves], reci: ['Leaf colour', Palette], ndre: ['Nitrogen', FlaskConical], cvi: ['Leaf colour', Palette],
   gndvi: ['Greenness', Leaf], rvi: ['Radar', Radar], lai: ['Leaf cover', Leaf], msavi2: ['Ground cover', Sprout],
   lst: ['Heat', Thermometer], rainfall: ['Rain', CloudRain],
