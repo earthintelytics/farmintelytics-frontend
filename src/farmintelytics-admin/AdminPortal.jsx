@@ -19,6 +19,7 @@ import {
   Radio,
   Mail,
   Shield,
+  FileText,
 } from 'lucide-react';
 
 import Onboarding from './pages/Onboarding';
@@ -36,6 +37,7 @@ import Integrations from './pages/Integrations';
 import EmailLog from './pages/EmailLog';
 import ProtectedAreas from './pages/ProtectedAreas';
 import SystemStatus from './pages/SystemStatus';
+import ActivityLog from './pages/Activity';
 import { fetchSystemStatus } from '../services/adminApi';
 import { hasValidTeamToken, redirectToTeamSignIn, teamRole, TEAM_ROLES } from '../services/session';
 import { ConfirmProvider } from './components/ConfirmProvider';
@@ -55,17 +57,16 @@ const NAV_GROUPS = [
     { id: 'scheduler',     label: 'Monitoring schedule',  icon: Clock,     path: '/admin/scheduler' },
     { id: 'runs',          label: 'Pipeline runs',        icon: PlayCircle,  path: '/admin/runs' },
     { id: 'inventory',     label: 'Storage',              icon: Database,  path: '/admin/inventory' },
+    { id: 'activity',      label: 'Activity',             icon: FileText,  path: '/admin/activity' },
     { id: 'emaillog',      label: 'Email log',            icon: Mail,      path: '/admin/email-log' },
     { id: 'logs',          label: 'Logs',                 icon: Activity,  path: '/admin/logs' },
     { id: 'reports',       label: 'Problem reports',      icon: LifeBuoy,  path: '/admin/reports' },
   ]},
   { label: 'Configuration', items: [
-    { id: 'thresholds',    label: 'Map classes',          icon: SlidersHorizontal, path: '/admin/thresholds' },
-    { id: 'ai',            label: 'AI settings',          icon: Sparkles,  path: '/admin/ai', owner: true },
-    { id: 'integrations',  label: 'Integrations',         icon: Radio,     path: '/admin/integrations', owner: true },
     { id: 'thresholds',      label: 'Map classes',          icon: SlidersHorizontal, path: '/admin/thresholds' },
     { id: 'protected-areas', label: 'Protected areas',      icon: Shield,            path: '/admin/protected-areas' },
     { id: 'ai',              label: 'AI settings',          icon: Sparkles,          path: '/admin/ai', owner: true },
+    { id: 'integrations',    label: 'Integrations',         icon: Radio,             path: '/admin/integrations', owner: true },
   ]},
 ];
 const NAV_ITEMS = NAV_GROUPS.flatMap(g => g.items);
@@ -228,14 +229,11 @@ const AdminPortal = () => {
             <Route path="scheduler"     element={<Scheduler />} />
             <Route path="runs"          element={<PipelineRuns />} />
             <Route path="email-log"     element={<EmailLog />} />
-            <Route path="thresholds"    element={<CropThresholds />} />
-            <Route path="ai"            element={ownerOnly(<AiSettings />)} />
-            <Route path="integrations"  element={ownerOnly(<Integrations />)} />
-            <Route path="logs"          element={<Logs />} />
-            <Route path="reports"       element={<ProblemReports />} />
+            <Route path="activity"        element={<ActivityLog />} />
             <Route path="thresholds"      element={<CropThresholds />} />
             <Route path="protected-areas" element={<ProtectedAreas />} />
             <Route path="ai"              element={ownerOnly(<AiSettings />)} />
+            <Route path="integrations"    element={ownerOnly(<Integrations />)} />
             <Route path="logs"            element={<Logs />} />
             <Route path="reports"         element={<ProblemReports />} />
           </Routes>
