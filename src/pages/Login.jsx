@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   ArrowRight,
   Lock,
@@ -27,10 +27,12 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
   const currentDesign = signInDesignFor(moduleId);
   const demos = demoAccounts('tenant');
 
-  useEffect(() => {
+  const [prevDefaults, setPrevDefaults] = useState({ defaultEmail, defaultCode });
+  if (defaultEmail !== prevDefaults.defaultEmail || defaultCode !== prevDefaults.defaultCode) {
+    setPrevDefaults({ defaultEmail, defaultCode });
     setEmail(defaultEmail);
     setAccessCode(defaultCode);
-  }, [defaultEmail, defaultCode]);
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

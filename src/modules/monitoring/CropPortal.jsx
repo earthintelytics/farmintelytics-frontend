@@ -4,7 +4,7 @@ import { fetchCropIndices } from '../../services/cropMonitoringApi';
 import { fetchCropMonitoringConfig } from '../../services/organizationMonitorApi';
 import 'leaflet/dist/leaflet.css';
 
-// Module id → crop key used by the backend (api) and by the dashboard (layout).
+// eslint-disable-next-line react-refresh/only-export-components
 export const CROP_PORTALS = {
   'rs-ffb': { api: 'ffb', layout: 'oil_palm' },
   'rs-cocoa': { api: 'cocoa', layout: 'cocoa' },

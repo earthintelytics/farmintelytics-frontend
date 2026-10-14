@@ -74,7 +74,7 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
           <Opacity value={outlines.opacity} onChange={outlines.setOpacity} />
         </Row>
       )}
-      {false && colourBy && (
+      {colourBy?.enabled && (
         <div className="border border-gray-200 rounded-xl p-3.5 space-y-2.5">
           <p className="text-sm font-semibold text-gray-900">Colour the {unit} by</p>
           {colourBy.options.length ? (
