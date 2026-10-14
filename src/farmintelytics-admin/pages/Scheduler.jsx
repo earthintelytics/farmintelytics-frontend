@@ -271,9 +271,9 @@ const Scheduler = () => {
               <div className="min-w-0">
                 <h2 className="font-display text-lg font-semibold text-gray-900">{gOrg ? (gOrg.display_name || gOrg.schema_name) : 'Not linked to an organisation'}</h2>
                 {gOrg && (
-                  <div className="flex flex-wrap gap-1.5 mt-1.5">
-                    {services.length ? services.map((s) => <span key={s.id} className="text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200 text-gray-700">{s.label}</span>) : <span className="text-xs text-gray-500">No monitored services licensed</span>}
-                  </div>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    {services.length ? `${services.length} monitored service${services.length === 1 ? '' : 's'}` : 'No monitored services licensed'}
+                  </p>
                 )}
               </div>
               {gOrg && (orgStarted[key]

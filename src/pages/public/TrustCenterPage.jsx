@@ -1,9 +1,11 @@
-import PublicLayout, { Section } from './PublicLayout';
+import PublicLayout, { Section, PageAside } from './PublicLayout';
+
+const SECTIONS = ['Each organisation sees only its own data', 'People see what their role allows', 'The farm advisor only knows your farm', 'We do not sell your data', 'Where the numbers come from', 'Questions or a problem'];
 
 /** What we actually do to keep each organisation's data safe. Only true statements belong here. */
 export default function TrustCenterPage() {
   return (
-    <PublicLayout eyebrow="Trust centre" title="How we look after your data"
+    <PublicLayout eyebrow="Trust centre" title="How we look after your data" aside={<PageAside sections={SECTIONS} />}
       intro="FarmIntelytics holds farm boundaries, satellite results, field visits and member records for each organisation. This page says plainly how that data is kept apart and who can see it.">
       <Section title="Each organisation sees only its own data">
         <p>Every account belongs to one organisation, and every request is checked against it. Maps, results, alerts, reports, forms and member records are filtered to that organisation, and automated tests check that one organisation can never read another's.</p>

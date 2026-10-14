@@ -1,5 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
-import PublicLayout, { Section, CapsuleTabs } from './PublicLayout';
+import PublicLayout, { Section, CapsuleTabs, PageAside } from './PublicLayout';
 
 /**
  * Policies: three sub-pages behind capsule buttons, the terms of service, the privacy policy and the
@@ -100,9 +100,9 @@ function Credits() {
 }
 
 const TABS = [
-  { id: 'terms', label: 'Terms of service', title: 'Terms of service', intro: "The main points of using FarmIntelytics. Your organisation's agreement with us sets out the full terms.", Body: Terms },
-  { id: 'privacy', label: 'Privacy policy', title: 'Privacy policy', intro: 'What we collect, why, who can see it and what you can ask us to do. Last updated 12 October 2026.', Body: Privacy },
-  { id: 'credits', label: 'Data credits', title: 'Data credits', intro: 'The open data FarmIntelytics is built on, and the credit each source asks for.', Body: Credits },
+  { id: 'terms', sections: ['Your data stays yours', 'Results are decision support', 'Fair use', 'The full terms'], label: 'Terms of service', title: 'Terms of service', intro: "The main points of using FarmIntelytics. Your organisation's agreement with us sets out the full terms.", Body: Terms },
+  { id: 'privacy', sections: ['What we collect', 'How we use it', 'Who can see it', 'How long we keep it', 'Your rights'], label: 'Privacy policy', title: 'Privacy policy', intro: 'What we collect, why, who can see it and what you can ask us to do. Last updated 12 October 2026.', Body: Privacy },
+  { id: 'credits', sections: CREDITS.map(([g]) => g), label: 'Data credits', title: 'Data credits', intro: 'The open data FarmIntelytics is built on, and the credit each source asks for.', Body: Credits },
 ];
 
 export default function PoliciesPage() {
@@ -110,7 +110,7 @@ export default function PoliciesPage() {
   const active = TABS.find((t) => t.id === params.get('tab')) || TABS[0];
   const { Body } = active;
   return (
-    <PublicLayout eyebrow="Policies" title={active.title} intro={active.intro}>
+    <PublicLayout eyebrow="Policies" title={active.title} intro={active.intro} aside={<PageAside sections={active.sections} />}>
       <CapsuleTabs label="Policies" tabs={TABS} active={active.id} onChange={(id) => setParams({ tab: id })} />
       <div className="mt-10"><Body /></div>
     </PublicLayout>

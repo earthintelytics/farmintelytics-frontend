@@ -611,3 +611,8 @@ export async function sendTestSystemAlert(message = '') {
     body: JSON.stringify({ message }),
   });
 }
+
+/** GET /admin/system-status/storage — MinIO space in total and per organisation */
+export async function fetchStorageUsage(refresh = false) {
+  return adminFetch(`/system-status/storage${refresh ? '?refresh=true' : ''}`);
+}

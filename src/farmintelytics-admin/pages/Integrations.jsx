@@ -18,6 +18,7 @@ import {
   testSmtpConnection,
   testCdseConnection,
 } from '../../services/adminApi';
+import { Tabs } from '../components/ui';
 
 const inputCls =
   'w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-sm text-gray-900 outline-none focus:border-green-600 transition-colors';
@@ -27,6 +28,15 @@ const Card = ({ className = '', children }) => (
     {children}
   </div>
 );
+
+// Sub-pages of the Integrations page. An integration not listed here appears under "Other", so a new
+// one added on the backend is never hidden.
+const GROUPS = [
+  { id: 'email', label: 'Email', members: ['smtp', 'alerts'] },
+  { id: 'data', label: 'Data', members: ['cdse'] },
+  { id: 'maps', label: 'Maps', members: ['maps'] },
+];
+const groupOf = (id) => (GROUPS.find((g) => g.members.includes(id)) || { id: 'other' }).id;
 
 const INTEGRATION_ICONS = {
   smtp: Mail,
@@ -50,6 +60,7 @@ export default function Integrations() {
   const [testResult, setTestResult] = useState({});
   // Busy spinner state: string ('save:smtp', 'test:smtp', etc.)
   const [busy, setBusy] = useState('');
+  const [tab, setTab] = useState('email');
 
   const loadData = async () => {
     setLoading(true);
@@ -200,9 +211,14 @@ export default function Integrations() {
         </div>
       )}
 
-      {/* ── Integrations List ── */}
+      <Tabs value={tab} onChange={setTab} tabs={[
+        ...GROUPS.map((g) => ({ id: g.id, label: g.label })),
+        ...(integrations.some((i) => groupOf(i.integration) === 'other') ? [{ id: 'other', label: 'Other' }] : []),
+      ]} />
+
+      {/* ── Integrations of the chosen sub-page ── */}
       <div className="space-y-6">
-        {integrations.map((integ) => {
+        {integrations.filter((integ) => groupOf(integ.integration) === tab).map((integ) => {
           const Icon = INTEGRATION_ICONS[integ.integration] || Radio;
           const isConfigured = integ.fields.some((f) => f.is_set);
           const isSaving = busy === `save:${integ.integration}`;

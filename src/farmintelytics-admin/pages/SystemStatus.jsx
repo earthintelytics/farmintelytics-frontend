@@ -20,6 +20,8 @@ import {
   resolveSystemAlert,
   sendTestSystemAlert,
 } from '../../services/adminApi';
+import { Tabs } from '../components/ui';
+import StorageUsage from './system/StorageUsage';
 
 const SERVICE_META = {
   backend:         { name: 'Backend API',        icon: Server,    desc: 'Core Django & Ninja REST API services' },
@@ -36,6 +38,7 @@ export default function SystemStatus() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [resolvingId, setResolvingId] = useState(null);
+  const [tab, setTab] = useState('overview');
 
   // Team alert emails editor
   const [emailsInput, setEmailsInput] = useState('');
@@ -130,7 +133,8 @@ export default function SystemStatus() {
 
   const services = data?.services || {};
   const activeAlerts = data?.active_alerts || [];
-  const overallStatus = data?.status || 'unknown';
+  // Until the first check returns, the status is unknown: show that, never an outage.
+  const overallStatus = data?.status || 'checking';
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8 space-y-8">
@@ -139,7 +143,7 @@ export default function SystemStatus() {
         <div>
           <h1 className="font-display text-3xl font-semibold text-gray-900">System status</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Real-time health check across all platform services and operational alerts (T38).
+            Health of every platform service, storage use, incidents and who is told about them.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -164,10 +168,20 @@ export default function SystemStatus() {
         </div>
       )}
 
+      <Tabs value={tab} onChange={setTab} tabs={[
+        { id: 'overview', label: 'Overview' },
+        { id: 'storage', label: 'Storage' },
+        { id: 'incidents', label: 'Incidents', count: activeAlerts.length },
+        { id: 'notices', label: 'Team notices' },
+      ]} />
+
+      {tab === 'overview' && (<>
       {/* ── Overall System Banner ── */}
       <div
         className={`p-6 rounded-2xl border flex flex-col md:flex-row md:items-center justify-between gap-4 ${
-          overallStatus === 'healthy'
+          overallStatus === 'checking'
+            ? 'bg-white border-gray-200 text-gray-800'
+            : overallStatus === 'healthy'
             ? 'bg-green-50/50 border-green-200 text-green-900'
             : overallStatus === 'degraded'
             ? 'bg-amber-50/60 border-amber-200 text-amber-900'
@@ -177,14 +191,18 @@ export default function SystemStatus() {
         <div className="flex items-center gap-4">
           <div
             className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${
-              overallStatus === 'healthy'
+              overallStatus === 'checking'
+                ? 'bg-gray-100 text-gray-500'
+                : overallStatus === 'healthy'
                 ? 'bg-green-100 text-green-700'
                 : overallStatus === 'degraded'
                 ? 'bg-amber-100 text-amber-700'
                 : 'bg-red-100 text-red-700'
             }`}
           >
-            {overallStatus === 'healthy' ? (
+            {overallStatus === 'checking' ? (
+              <RefreshCw size={22} className="animate-spin" />
+            ) : overallStatus === 'healthy' ? (
               <CheckCircle2 size={24} />
             ) : overallStatus === 'degraded' ? (
               <AlertTriangle size={24} />
@@ -194,15 +212,19 @@ export default function SystemStatus() {
           </div>
           <div>
             <h2 className="font-display text-lg font-semibold capitalize">
-              {overallStatus === 'healthy'
+              {overallStatus === 'checking'
+                ? 'Checking services…'
+                : overallStatus === 'healthy'
                 ? 'All systems operational'
                 : overallStatus === 'degraded'
                 ? 'System performance degraded'
                 : 'System outage / attention required'}
             </h2>
             <p className="text-xs opacity-80 mt-0.5">
-              {activeAlerts.length === 0
-                ? 'Zero unhandled errors or operational bottlenecks flagged.'
+              {overallStatus === 'checking'
+                ? 'Asking each service for its state.'
+                : activeAlerts.length === 0
+                ? 'No unhandled errors or bottlenecks flagged.'
                 : `${activeAlerts.length} active incident(s) require operator review.`}
             </p>
           </div>
@@ -210,7 +232,7 @@ export default function SystemStatus() {
 
         {activeAlerts.length > 0 && (
           <span className="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 self-start md:self-auto">
-            {activeAlerts.length} Action Needed
+            {activeAlerts.length} need action
           </span>
         )}
       </div>
@@ -297,6 +319,11 @@ export default function SystemStatus() {
         </div>
       </div>
 
+      </>)}
+
+      {tab === 'storage' && <StorageUsage disk={services.disk} />}
+
+      {tab === 'incidents' && (<>
       {/* ── Active Incidents Section ── */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
@@ -353,6 +380,9 @@ export default function SystemStatus() {
         )}
       </div>
 
+      </>)}
+
+      {tab === 'notices' && (<>
       {/* ── Team Notifications Setting (alerts.team_emails) ── */}
       <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
         <div className="flex items-center gap-2.5">
@@ -412,6 +442,7 @@ export default function SystemStatus() {
           </div>
         </form>
       </div>
+      </>)}
     </div>
   );
 }
