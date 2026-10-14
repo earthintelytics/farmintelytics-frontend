@@ -35,6 +35,8 @@ import ProblemReports from './pages/ProblemReports';
 import Integrations from './pages/Integrations';
 import EmailLog from './pages/EmailLog';
 import ProtectedAreas from './pages/ProtectedAreas';
+import SystemStatus from './pages/SystemStatus';
+import { fetchSystemStatus } from '../services/adminApi';
 import { hasValidTeamToken, redirectToTeamSignIn, teamRole, TEAM_ROLES } from '../services/session';
 import { ConfirmProvider } from './components/ConfirmProvider';
 
@@ -49,6 +51,7 @@ const NAV_GROUPS = [
     { id: 'team',          label: 'Team accounts',        icon: ShieldCheck, path: '/admin/team', owner: true },
   ]},
   { label: 'Operations', items: [
+    { id: 'status',        label: 'System status',        icon: Activity,  path: '/admin/system-status' },
     { id: 'scheduler',     label: 'Monitoring schedule',  icon: Clock,     path: '/admin/scheduler' },
     { id: 'runs',          label: 'Pipeline runs',        icon: PlayCircle,  path: '/admin/runs' },
     { id: 'inventory',     label: 'Storage',              icon: Database,  path: '/admin/inventory' },
@@ -71,6 +74,7 @@ const AdminPortal = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [systemHealth, setSystemHealth] = useState(null);
   const adminEmail = localStorage.getItem('fi_admin_email') || '';
   const role = teamRole();
   const groups = NAV_GROUPS.map((g) => ({ ...g, items: g.items.filter((i) => !i.owner || role === 'owner') })).filter((g) => g.items.length);
@@ -84,6 +88,17 @@ const AdminPortal = () => {
   useEffect(() => {
     // An outdated or missing team sign-in goes to the sign-in page, not to "Forbidden".
     if (!hasValidTeamToken()) redirectToTeamSignIn();
+
+    // Check system status for top red alert banner (T38)
+    let isMounted = true;
+    const checkHealth = () => {
+      fetchSystemStatus()
+        .then((res) => { if (isMounted) setSystemHealth(res); })
+        .catch(() => {});
+    };
+    checkHealth();
+    const timer = setInterval(checkHealth, 30000);
+    return () => { isMounted = false; clearInterval(timer); };
   }, [navigate]);
 
   const handleSignOut = () => {
@@ -95,6 +110,8 @@ const AdminPortal = () => {
   const activeId = NAV_ITEMS.find(n => location.pathname.startsWith(n.path))?.id || 'organizations';
 
   const activeItem = NAV_ITEMS.find(n => n.id === activeId);
+  const activeAlertsCount = systemHealth?.active_alerts_count || 0;
+  const isSystemDegraded = systemHealth?.status === 'degraded' || systemHealth?.status === 'unhealthy';
 
   return (
     <ConfirmProvider>
@@ -175,6 +192,27 @@ const AdminPortal = () => {
           </>}
         </header>
 
+        {/* ── Red status alert line on admin console (T38) ── */}
+        {(activeAlertsCount > 0 || isSystemDegraded) && (
+          <div className="shrink-0 bg-red-50 border-b border-red-200 px-8 py-2.5 flex items-center justify-between text-xs text-red-900">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse shrink-0" />
+              <span className="font-semibold">System attention required:</span>
+              <span>
+                {activeAlertsCount > 0
+                  ? `${activeAlertsCount} active operational issue(s) detected (${systemHealth.active_alerts[0]?.title}).`
+                  : 'Platform health degraded. Check system services.'}
+              </span>
+            </div>
+            <button
+              onClick={() => navigate('/admin/system-status')}
+              className="font-medium underline hover:text-red-950 shrink-0 ml-4"
+            >
+              View system status →
+            </button>
+          </div>
+        )}
+
         {role === 'support' && (
           <p className="shrink-0 px-8 py-2 bg-amber-50 border-b border-amber-200 text-sm text-amber-900">Support access: you can look at everything, but changes will be refused.</p>
         )}
@@ -184,6 +222,7 @@ const AdminPortal = () => {
             <Route path="onboarding"    element={<Onboarding />} />
             <Route path="team"          element={ownerOnly(<TeamAccounts />)} />
             <Route path="organizations" element={<Organizations />} />
+            <Route path="system-status" element={<SystemStatus />} />
             <Route path="inventory"     element={<Inventory />} />
             <Route path="credentials"   element={<Credentials />} />
             <Route path="scheduler"     element={<Scheduler />} />
@@ -208,3 +247,4 @@ const AdminPortal = () => {
 };
 
 export default AdminPortal;
+

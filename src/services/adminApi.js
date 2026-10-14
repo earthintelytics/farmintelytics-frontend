@@ -478,6 +478,27 @@ export async function testCdseConnection() {
   });
 }
 
+// ── System status & health diagnostics (T38) ────────────────────────────────
+/** GET /admin/system-status — health per service, active alerts, team emails */
+export async function fetchSystemStatus() {
+  return adminFetch('/system-status');
+}
+
+/** PUT /admin/system-status/settings { team_emails: [] } */
+export async function updateSystemAlertSettings(teamEmails) {
+  return adminFetch('/system-status/settings', {
+    method: 'PUT',
+    body: JSON.stringify({ team_emails: teamEmails }),
+  });
+}
+
+/** POST /admin/system-status/alerts/{id}/resolve */
+export async function resolveSystemAlert(alertId) {
+  return adminFetch(`/system-status/alerts/${encodeURIComponent(alertId)}/resolve`, {
+    method: 'POST',
+  });
+}
+
 // ── Alert emails and email log (T2/T28) ──────────────────────────────────────
 /** GET /admin/organizations/{id}/alert-recipients */
 export async function fetchAlertRecipients(orgId) {
@@ -548,4 +569,10 @@ export async function uploadWdpaZip(file, sourceVersion = 'Oct2026', marginKm = 
   fd.append('file', file);
   return adminUpload(`/protected-areas/upload?source_version=${encodeURIComponent(sourceVersion)}&margin_km=${marginKm}`, fd);
 }
-
+/** POST /admin/system-status/test-alert { message } */
+export async function sendTestSystemAlert(message = '') {
+  return adminFetch('/system-status/test-alert', {
+    method: 'POST',
+    body: JSON.stringify({ message }),
+  });
+}
