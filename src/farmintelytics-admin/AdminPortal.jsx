@@ -16,7 +16,8 @@ import {
   Sparkles,
   ShieldCheck,
   LifeBuoy,
-  Radio
+  Radio,
+  Mail
 } from 'lucide-react';
 
 import Onboarding from './pages/Onboarding';
@@ -31,6 +32,7 @@ import PipelineRuns from './pages/PipelineRuns';
 import TeamAccounts from './pages/TeamAccounts';
 import ProblemReports from './pages/ProblemReports';
 import Integrations from './pages/Integrations';
+import EmailLog from './pages/EmailLog';
 import { hasValidTeamToken, redirectToTeamSignIn, teamRole, TEAM_ROLES } from '../services/session';
 import { ConfirmProvider } from './components/ConfirmProvider';
 
@@ -48,6 +50,7 @@ const NAV_GROUPS = [
     { id: 'scheduler',     label: 'Monitoring schedule',  icon: Clock,     path: '/admin/scheduler' },
     { id: 'runs',          label: 'Pipeline runs',        icon: PlayCircle,  path: '/admin/runs' },
     { id: 'inventory',     label: 'Storage',              icon: Database,  path: '/admin/inventory' },
+    { id: 'emaillog',      label: 'Email log',            icon: Mail,      path: '/admin/email-log' },
     { id: 'logs',          label: 'Logs',                 icon: Activity,  path: '/admin/logs' },
     { id: 'reports',       label: 'Problem reports',      icon: LifeBuoy,  path: '/admin/reports' },
   ]},
@@ -180,6 +183,7 @@ const AdminPortal = () => {
             <Route path="credentials"   element={<Credentials />} />
             <Route path="scheduler"     element={<Scheduler />} />
             <Route path="runs"          element={<PipelineRuns />} />
+            <Route path="email-log"     element={<EmailLog />} />
             <Route path="thresholds"    element={<CropThresholds />} />
             <Route path="ai"            element={ownerOnly(<AiSettings />)} />
             <Route path="integrations"  element={ownerOnly(<Integrations />)} />

@@ -469,3 +469,24 @@ export async function testCdseConnection() {
   });
 }
 
+// ── Alert emails and email log (T2/T28) ──────────────────────────────────────
+/** GET /admin/organizations/{id}/alert-recipients */
+export async function fetchAlertRecipients(orgId) {
+  return adminFetch(`/organizations/${encodeURIComponent(orgId)}/alert-recipients`);
+}
+
+/** PUT /admin/organizations/{id}/alert-recipients */
+export async function updateAlertRecipients(orgId, recipients) {
+  return adminFetch(`/organizations/${encodeURIComponent(orgId)}/alert-recipients`, {
+    method: 'PUT',
+    body: JSON.stringify({ alert_recipients: recipients }),
+  });
+}
+
+/** GET /admin/email-log?company_id=&limit= */
+export async function fetchEmailLogs({ companyId = '', limit = 100 } = {}) {
+  const p = new URLSearchParams({ limit });
+  if (companyId) p.set('company_id', companyId);
+  return adminFetch(`/email-log?${p}`);
+}
+
