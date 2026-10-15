@@ -67,7 +67,7 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
         </Row>
       )}
       {satellite && !satellite.available && (
-        <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-xl p-3">No image for this date yet. It appears after the first monitoring run.</p>
+        <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-xl p-3">No data for this date yet. It appears after the first monitoring run.</p>
       )}
       {outlines && (
         <Row label={`Outlines of the ${unit}`} text="Click one to see its details" on={outlines.on} onChange={outlines.onChange}>

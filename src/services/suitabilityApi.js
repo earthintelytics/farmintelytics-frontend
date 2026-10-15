@@ -5,6 +5,7 @@
  */
 import { NotConnectedError } from './datasetsApi';
 import { API_BASE } from './apiBase';
+import { responseError } from './apiError';
 
 const BASE_URL = `${API_BASE}/suitability`;
 
@@ -26,8 +27,7 @@ async function call(path, options = {}) {
     throw new NotConnectedError();
   }
   if (!res.ok) {
-    const text = await res.text().catch(() => '');
-    throw new Error(`Suitability service error ${res.status}${text ? `: ${text.slice(0, 200)}` : ''}`);
+    throw await responseError(res);
   }
   return res.json();
 }

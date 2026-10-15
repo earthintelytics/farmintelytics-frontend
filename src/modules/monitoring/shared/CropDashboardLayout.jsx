@@ -748,6 +748,13 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     const est = estates.find(e => e.name === filterEstate);
     return plotsDataA.filter(p => p.subfarm === filterEstate || (est && p.farmId === est.farm_id));
   }, [plotsDataA, filterEstate, estates]);
+  // The raw plots of the chosen estate: every section's map, chart and table (health, moisture,
+  // yield, climate, restoration) is built from this, so the estate dropdown scopes them all.
+  const estatePlots = useMemo(() => {
+    if (!plots || !filterEstate || filterEstate === 'All') return plots || [];
+    const est = estates.find(e => e.name === filterEstate);
+    return plots.filter(p => (p.subfarm || p.division) === filterEstate || (est && p.farm_id === est.farm_id));
+  }, [plots, filterEstate, estates]);
 
   // Admin-configured dashboard filters (Super Admin onboarding) narrowed to
   // just the intelligence-layers map view — other tabs/charts keep reading
@@ -1295,8 +1302,8 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
 
 
   const healthPlotsDataA = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map(p => {
+    if (estatePlots.length > 0) {
+      return estatePlots.map(p => {
         const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
           ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
           : [];
@@ -1319,11 +1326,11 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       });
     }
     return [];
-  }, [plots, currentTimelineA]);
+  }, [estatePlots, currentTimelineA]);
 
   const healthPlotsDataB = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map(p => {
+    if (estatePlots.length > 0) {
+      return estatePlots.map(p => {
         const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
           ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
           : [];
@@ -1346,13 +1353,13 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       });
     }
     return [];
-  }, [plots, currentTimelineB]);
+  }, [estatePlots, currentTimelineB]);
 
   const healthPlotsData = healthPlotsDataA;
 
   const moisturePlotsDataA = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map(p => {
+    if (estatePlots.length > 0) {
+      return estatePlots.map(p => {
         let coords = [];
         if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
           coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
@@ -1397,11 +1404,11 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       });
     }
     return [];
-  }, [plots, currentTimelineA, selectedIndex]);
+  }, [estatePlots, currentTimelineA, selectedIndex]);
 
   const moisturePlotsDataB = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map(p => {
+    if (estatePlots.length > 0) {
+      return estatePlots.map(p => {
         let coords = [];
         if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
           coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
@@ -1446,13 +1453,13 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       });
     }
     return [];
-  }, [plots, currentTimelineB, selectedIndex]);
+  }, [estatePlots, currentTimelineB, selectedIndex]);
 
   const moisturePlotsData = moisturePlotsDataA;
 
   const yieldPlotsDataA = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map(p => {
+    if (estatePlots.length > 0) {
+      return estatePlots.map(p => {
         const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
           ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
           : [];
@@ -1467,11 +1474,11 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       });
     }
     return [];
-  }, [plots, currentTimelineA]);
+  }, [estatePlots, currentTimelineA]);
 
   const yieldPlotsDataB = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map(p => {
+    if (estatePlots.length > 0) {
+      return estatePlots.map(p => {
         const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
           ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
           : [];
@@ -1486,13 +1493,13 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       });
     }
     return [];
-  }, [plots, currentTimelineB]);
+  }, [estatePlots, currentTimelineB]);
 
   const yieldPlotsData = yieldPlotsDataA;
 
   const climatePlotsDataA = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map((p) => {
+    if (estatePlots.length > 0) {
+      return estatePlots.map((p) => {
         const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
           ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
           : [];
@@ -1510,11 +1517,11 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       });
     }
     return [];
-  }, [plots, currentTimelineA, selectedTimelineIndex, plotsTelemetry]);
+  }, [estatePlots, currentTimelineA, selectedTimelineIndex, plotsTelemetry]);
 
   const climatePlotsDataB = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map((p) => {
+    if (estatePlots.length > 0) {
+      return estatePlots.map((p) => {
         const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
           ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
           : [];
@@ -1530,7 +1537,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       });
     }
     return [];
-  }, [plots, currentTimelineB, compareTimelineIndex, plotsTelemetry]);
+  }, [estatePlots, currentTimelineB, compareTimelineIndex, plotsTelemetry]);
 
   const climatePlotsData = climatePlotsDataA;
 

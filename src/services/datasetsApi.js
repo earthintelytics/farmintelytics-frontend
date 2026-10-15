@@ -1,5 +1,6 @@
 import { API_BASE } from './apiBase';
 import { trackChange } from '../farmintelytics-admin/components/activityBus';
+import { responseError } from './apiError';
 /**
  * Client data (open questions and calibration) — contract in docs/WORK_SPLIT.md,
  * "Client data". Endpoints are built by the backend team; until they exist
@@ -28,7 +29,7 @@ async function rawCall(path, options = {}) {
   // Route not built yet (404/405) or answered by the portal's own index.html
   const type = res.headers.get('content-type') || '';
   if (res.status === 404 || res.status === 405 || !type.includes('json')) throw new NotConnectedError();
-  if (!res.ok) throw new Error(`Data service error ${res.status}: ${await res.text()}`);
+  if (!res.ok) throw await responseError(res);
   return res.json();
 }
 

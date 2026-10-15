@@ -1,5 +1,6 @@
 import { redirectToTenantSignIn } from './session';
 import { API_BASE } from './apiBase';
+import { responseError } from './apiError';
 /**
  * cropMonitoringApi.js
  * API client for the crop-specific monitoring endpoints.
@@ -25,8 +26,7 @@ async function apiFetch(path, options = {}) {
     handleTenantAuthFailure();
   }
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API ${res.status} – ${path}: ${text}`);
+    throw await responseError(res, path);
   }
   return res.json();
 }

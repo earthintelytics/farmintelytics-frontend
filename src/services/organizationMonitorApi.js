@@ -10,6 +10,7 @@ import { redirectToTenantSignIn } from './session';
 
 import proj4 from 'proj4';
 import { API_BASE } from './apiBase';
+import { responseError } from './apiError';
 
 
 function handleTenantAuthFailure() {
@@ -41,8 +42,7 @@ async function apiFetch(path, options = {}) {
     handleTenantAuthFailure();
   }
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`API ${res.status} – ${path}: ${text}`);
+    throw await responseError(res, path);
   }
   return res.json();
 }

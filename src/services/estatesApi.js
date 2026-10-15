@@ -5,6 +5,7 @@
  */
 import { NotConnectedError } from './datasetsApi';
 import { API_BASE } from './apiBase';
+import { responseError } from './apiError';
 
 
 // Until the backend ships GET /estates, remember that for the browser session
@@ -25,6 +26,6 @@ export async function fetchEstates() {
     sessionStorage.setItem(UNAVAILABLE, '1');
     throw new NotConnectedError();
   }
-  if (!res.ok) throw new Error(`Estates error ${res.status}`);
+  if (!res.ok) throw await responseError(res);
   return res.json();
 }
