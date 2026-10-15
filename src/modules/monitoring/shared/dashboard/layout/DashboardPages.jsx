@@ -101,7 +101,8 @@ export function renderDashboardPages(ctx) {
                   
                   {/* Active Filter Dropdowns */}
                   <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                    {/* Estate Filter */}
+                    {/* Estate Filter: only when this service has two or more of its own estates */}
+                    {estateOptions.length >= 2 && (
                     <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2">
                       <span className="text-[11px] font-semibold text-gray-600">Estate</span>
                       <select
@@ -115,6 +116,7 @@ export function renderDashboardPages(ctx) {
                         ))}
                       </select>
                     </div>
+                    )}
 
                     {/* Plot Filter — populated from real plot IDs */}
                     <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2">
