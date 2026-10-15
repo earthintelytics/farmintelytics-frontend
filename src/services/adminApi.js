@@ -22,7 +22,7 @@ const handleAdminAuthFailure = redirectToTeamSignIn;
  * Admin API call. Changes (POST/PUT/PATCH/DELETE, except signing in) show the
  * console's progress bar and a "Saved" or "Not saved" message.
  */
-function adminFetch(path, options = {}) {
+export function adminFetch(path, options = {}) {
   const method = (options.method || 'GET').toUpperCase();
   const isChange = method !== 'GET' && !path.startsWith('/auth/');
   return isChange ? trackChange(rawAdminFetch(path, options), { success: method === 'DELETE' ? 'Removed' : 'Saved' }) : rawAdminFetch(path, options);

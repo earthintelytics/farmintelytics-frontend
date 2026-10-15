@@ -26,8 +26,8 @@ This directory contains a static, cloud-free Sentinel-2 true-colour alternative 
 
 Path format supported:
 - Standard slippy map: `/landing/tiles/16/{y}/{x}.jpg`
-- Direct z/y/x: `/landing/16/{y}/{x}.jpg`
-- Single full mosaic image: `/landing/mosaic.jpg` or `/landing/sentinel2_kura_kano_mosaic.jpg`
+
+- Single full mosaic image: `/landing/mosaic.jpg`
 
 ---
 
