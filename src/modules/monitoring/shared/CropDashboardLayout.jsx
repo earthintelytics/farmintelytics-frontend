@@ -119,7 +119,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     || (tenant ? tenant.charAt(0).toUpperCase() + tenant.slice(1) : '');
   // Map center comes from TenantConfig: the mapCenter prop (fetched live) first,
   // then the copy stored at login, then a neutral default.
-  let storedMapCenter = null;
+  let storedMapCenter;
   try { storedMapCenter = JSON.parse(localStorage.getItem('fi_map_center') || 'null'); } catch { storedMapCenter = null; }
   const defaultMapCenter = mapCenter
     || (Array.isArray(storedMapCenter) && storedMapCenter.length === 2 ? storedMapCenter : [6.436, 5.273]);
@@ -165,7 +165,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   useEffect(() => {
     if (isAiOnly) {
       setActiveTab('ai-assistant');
-      setActiveSidebarItem('analytics');
+      setActiveSidebarItem('analytics'); // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, [isAiOnly, service?.id]);
 
@@ -350,7 +350,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   // switching away so a stale composite tile never lingers under a static
   // basemap.
   useEffect(() => {
-    if (!activeComposite) { setCompositeSliderData(null); return; }
+    if (!activeComposite) { setCompositeSliderData(null); return; } // eslint-disable-line react-hooks/set-state-in-effect
     let active = true;
     async function loadCompositeSlider() {
       try {
@@ -449,7 +449,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   useEffect(() => {
     if (primaryAppliedRef.current || !cropPrimaryIndex || !availableIndices.length) return;
     const exists = availableIndices.some(i => String(i.index).toLowerCase() === cropPrimaryIndex);
-    if (exists) setSelectedIndex(cropPrimaryIndex);
+    if (exists) setSelectedIndex(cropPrimaryIndex); // eslint-disable-line react-hooks/set-state-in-effect
     primaryAppliedRef.current = true;
   }, [cropPrimaryIndex, availableIndices]);
 
@@ -599,7 +599,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   // This guarantees currentTimeline.date always matches sliderData.tiles keys.
   useEffect(() => {
     if (!sliderData) return;
-    setTimelineLoading(false);
+    setTimelineLoading(false); // eslint-disable-line react-hooks/set-state-in-effect
     if (!sliderData.timeline?.length) {
       setTIMELINE_DATA([]);
       return;
@@ -680,7 +680,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const sliderTimerB = useRef(null);
 
   useEffect(() => {
-    setSliderPending(true);
+    setSliderPending(true); // eslint-disable-line react-hooks/set-state-in-effect
     clearTimeout(sliderTimerA.current);
     sliderTimerA.current = setTimeout(() => {
       setActiveTimelineIndex(selectedTimelineIndex);
@@ -706,12 +706,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const plotsDataA = useMemo(() => {
     if (plots && plots.length > 0) {
       return plots.map(p => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
+          : [];
         const ndviVal = p.indices?.ndvi ?? null; // null until the first satellite result: never counted as stressed
         const ndmiVal = p.indices?.ndmi ?? null;
         const healthVal = ndviVal == null ? 'No data' : ndviVal > 0.7 ? 'Optimal' : ndviVal > 0.55 ? 'Good' : 'Stressed';
@@ -725,12 +722,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const plotsDataB = useMemo(() => {
     if (plots && plots.length > 0) {
       return plots.map(p => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
+          : [];
         const ndviVal = p.indices?.ndvi ?? null; // null until the first satellite result: never counted as stressed
         const ndmiVal = p.indices?.ndmi ?? null;
         const healthVal = ndviVal == null ? 'No data' : ndviVal > 0.7 ? 'Optimal' : ndviVal > 0.55 ? 'Good' : 'Stressed';
@@ -797,7 +791,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   // Brief flash to signal tile refresh to user when tile URL changes
   useEffect(() => {
     if (!currentTileUrl) return;
-    setTileRefreshing(true);
+    setTileRefreshing(true); // eslint-disable-line react-hooks/set-state-in-effect
     const t = setTimeout(() => setTileRefreshing(false), 1800);
     return () => clearTimeout(t);
   }, [currentTileUrl]);
@@ -1303,12 +1297,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const healthPlotsDataA = useMemo(() => {
     if (plots && plots.length > 0) {
       return plots.map(p => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
+          : [];
         const ndviVal = p.indices?.ndvi ?? null; // null until the first satellite result: never counted as stressed
         const healthVal = ndviVal == null ? 'No data' : ndviVal > 0.7 ? 'Optimal' : ndviVal > 0.55 ? 'Good' : 'Stressed';
         return {
@@ -1333,12 +1324,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const healthPlotsDataB = useMemo(() => {
     if (plots && plots.length > 0) {
       return plots.map(p => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
+          : [];
         const ndviVal = p.indices?.ndvi ?? null; // null until the first satellite result: never counted as stressed
         const healthVal = ndviVal == null ? 'No data' : ndviVal > 0.7 ? 'Optimal' : ndviVal > 0.55 ? 'Good' : 'Stressed';
         return {
@@ -1465,12 +1453,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const yieldPlotsDataA = useMemo(() => {
     if (plots && plots.length > 0) {
       return plots.map(p => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
+          : [];
         return {
           id: p.plot_id,
           name: p.name || p.plot_id,
@@ -1487,12 +1472,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const yieldPlotsDataB = useMemo(() => {
     if (plots && plots.length > 0) {
       return plots.map(p => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
+          : [];
         return {
           id: p.plot_id,
           name: p.name || p.plot_id,
@@ -1511,12 +1493,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const climatePlotsDataA = useMemo(() => {
     if (plots && plots.length > 0) {
       return plots.map((p) => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
+          : [];
         // Rain and surface heat per block from /plots/telemetry; null when
         // the run had no reading, never invented.
         const telemetry = (plotsTelemetry || []).find(t => t.plot_id === p.plot_id);
@@ -1536,12 +1515,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const climatePlotsDataB = useMemo(() => {
     if (plots && plots.length > 0) {
       return plots.map((p) => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
+          : [];
         const telemetry = (plotsTelemetry || []).find(t => t.plot_id === p.plot_id);
         return {
           id: p.plot_id,
@@ -1561,12 +1537,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const restorationPlotsDataA = useMemo(() => {
     if (restorationZones && restorationZones.length > 0) {
       return restorationZones.map(z => {
-        let coords = [];
-        if (z.boundary && z.boundary.coordinates && z.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(z.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (z.boundary && z.boundary.coordinates && z.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(z.boundary.coordinates[0])
+          : [];
         return {
           id: z.zone_id,
           name: z.name,
@@ -1590,12 +1563,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const restorationPlotsDataB = useMemo(() => {
     if (restorationZones && restorationZones.length > 0) {
       return restorationZones.map(z => {
-        let coords = [];
-        if (z.boundary && z.boundary.coordinates && z.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(z.boundary.coordinates[0]);
-        } else {
-          coords = [];
-        }
+        const coords = (z.boundary && z.boundary.coordinates && z.boundary.coordinates[0])
+          ? api.geoJsonToLeaflet(z.boundary.coordinates[0])
+          : [];
         return {
           id: z.zone_id,
           name: z.name,
@@ -1735,7 +1705,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
 
   // Reset timeline selection to middle index when changing month/year
   useEffect(() => {
-    setSelectedTimelineIndex(2);
+    setSelectedTimelineIndex(2); // eslint-disable-line react-hooks/set-state-in-effect
   }, [calendarMonth, calendarYear]);
 
   const [chatLoading, setChatLoading] = useState(false);
@@ -1780,7 +1750,7 @@ Context: ${context}.`;
   useEffect(() => {
     if (selectedPlot) {
       const updated = plotsData.find(p => p.id === selectedPlot.id);
-      if (updated) setSelectedPlot(updated);
+      if (updated) setSelectedPlot(updated); // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, [plotsData]);
 
@@ -1813,7 +1783,7 @@ Context: ${context}.`;
   // Stop playing when leaving map view
   useEffect(() => {
     if (!['crop-health', 'crop-yield', 'climate', 'land-restoration'].includes(activeSidebarItem)) {
-      setIsPlaying(false);
+      setIsPlaying(false); // eslint-disable-line react-hooks/set-state-in-effect
     }
   }, [activeSidebarItem]);
 

@@ -59,7 +59,7 @@ export default function GroundScoutingModal({ alert, onClose, onAlertUpdated, vi
 
   useEffect(() => {
     if (activeTab === 'history' && alert?.plot_id) {
-      setLoadingPast(true);
+      setLoadingPast(true); // eslint-disable-line react-hooks/set-state-in-effect
       fetchScoutingObservations(alert.plot_id, alert.alert_id)
         .then((res) => {
           setPastObservations(Array.isArray(res) ? res : []);
