@@ -112,10 +112,10 @@ export const MODAL_HELP = {
     ],
   },
   suitabilityRun: {
-    intro: 'Starts an analysis of where this crop fits. The result opens when the run is finished.',
+    intro: 'Starts an analysis of where this crop fits, for any client. Fields marked * are required; the run is refused with a message if something is missing. The result opens when the run is finished.',
     items: [
-      ['Organisation', 'Type the client\'s name and pick it from the list. The analysis and report belong to them.'],
-      ['Where', 'A registered estate, all estates, or an uploaded area such as a planned expansion.'],
+      ['Client', 'Any organisation or person; suitability is our own engine. A registered organisation can use its estates and uploaded data; anyone else uploads the area.'],
+      ['Where', 'For a registered organisation: one estate, all estates, or an uploaded area. For anyone else: an uploaded area, such as land they are considering.'],
       ['Variety or system', 'Variants set in the admin for this crop change the thresholds used.'],
       ['Irrigated', 'Rainfall limits are relaxed because water is supplied.'],
       ['Organisation\'s own data', 'Uses the client\'s soil samples, weather records or yields where uploaded, instead of regional data.'],

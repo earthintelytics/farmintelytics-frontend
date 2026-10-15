@@ -33,7 +33,7 @@ const Card = ({ className = '', children }) => (
 // one added on the backend is never hidden.
 const GROUPS = [
   { id: 'email', label: 'Email', members: ['smtp', 'alerts'] },
-  { id: 'data', label: 'Data', members: ['cdse', 'stac'] },
+  { id: 'data', label: 'Data', members: ['cdse', 'earthdata', 'stac'] },
   { id: 'maps', label: 'Maps', members: ['maps'] },
 ];
 const groupOf = (id) => (GROUPS.find((g) => g.members.includes(id)) || { id: 'other' }).id;
@@ -41,6 +41,7 @@ const groupOf = (id) => (GROUPS.find((g) => g.members.includes(id)) || { id: 'ot
 const INTEGRATION_ICONS = {
   smtp: Mail,
   cdse: Satellite,
+  earthdata: Satellite,
   alerts: Bell,
   maps: MapPin,
 };

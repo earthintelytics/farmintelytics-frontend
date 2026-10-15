@@ -61,9 +61,9 @@ export const SecondaryButton = ({ children, className = '', ...props }) => (
   <button {...props} className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-gray-700 bg-white border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}>{children}</button>
 );
 
-export const Field = ({ label, hint, error, children }) => (
+export const Field = ({ label, hint, error, required = false, children }) => (
   <label className="block">
-    <span className="block text-sm font-semibold text-gray-800 mb-1.5">{label}</span>
+    <span className="block text-sm font-semibold text-gray-800 mb-1.5">{label}{required && <span className="text-red-600" aria-label="required"> *</span>}</span>
     {children}
     {error ? <span className="block text-xs text-red-700 mt-1">{error}</span> : hint && <span className="block text-xs text-gray-500 mt-1">{hint}</span>}
   </label>

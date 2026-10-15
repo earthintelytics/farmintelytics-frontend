@@ -37,9 +37,11 @@ const SuitabilityPortal = ({ onBack, onSignOut }) => {
   const [wizard, setWizard] = useState(null);
 
   const load = useCallback(async () => {
-    const lists = await Promise.all(orgs.map((o) => fetchSuitabilityRuns(o.company_id)
-      .then((rs) => rs.map((r) => ({ ...r, company_id: r.company_id || o.company_id, company_name: o.company_name || o.company_id })))));
-    return lists.flat().sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+    // Every client's runs, registered organisations or not (suitability is our own engine).
+    const names = Object.fromEntries(orgs.map((o) => [o.company_id, o.company_name || o.company_id]));
+    const all = await fetchSuitabilityRuns();
+    return all.map((r) => ({ ...r, company_name: names[r.company_id] || r.company_name || r.company_id }))
+      .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
   }, [orgs]);
   const runsLoader = useLoader(load);
   const { reload } = runsLoader;
@@ -53,7 +55,6 @@ const SuitabilityPortal = ({ onBack, onSignOut }) => {
   const body = () => {
     if (companies.state === 'not_connected') return <NotConnectedNote what="The suitability service" />;
     if (companies.state === 'error') return <ErrorNote message={companies.error} onRetry={companies.reload} />;
-    if (companies.state === 'ready' && !orgs.length) return <EmptyState title="No organisations yet" text="Onboard an organisation in the admin console first." />;
     if (openRun) return <RunResult runId={openRun.runId} companyId={openRun.companyId} onBack={() => setOpenRun(null)} />;
     const runsState = runsLoader.state === 'not_connected' ? <NotConnectedNote what="Suitability analyses" />
       : runsLoader.state === 'error' ? <ErrorNote message={runsLoader.error} onRetry={reload} />

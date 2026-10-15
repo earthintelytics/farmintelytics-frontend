@@ -21,11 +21,12 @@ const STRICTNESS = [
  * real run; progress comes from the run status, nothing is simulated.
  */
 const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
-  const [companyId, setCompanyId] = useState(orgs.length === 1 ? orgs[0].company_id : '');
+  const [companyId, setCompanyId] = useState('');
   const [farms, setFarms] = useState([]);
   const crop = initialCrop || CROPS[0].id;
   const cropName = CROPS.find((c) => c.id === crop)?.name || crop;
-  const [orgText, setOrgText] = useState(orgs.length === 1 ? (orgs[0].company_name || orgs[0].company_id) : '');
+  const [orgText, setOrgText] = useState('');
+  const registered = orgs.some((o) => o.company_id === companyId);
   const [variants, setVariants] = useState([]);
   const [form, setForm] = useState({ area: 'estate', farm_id: '', variant: '', irrigated: false, strictness: 'standard', use_soil_samples: true });
   const [geojson, setGeojson] = useState(null);
@@ -33,14 +34,15 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
   const [fileError, setFileError] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [tried, setTried] = useState(false);
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
 
   useEffect(() => {
     let live = true;
-    if (!companyId) return undefined;
+    if (!companyId || !orgs.some((o) => o.company_id === companyId)) return undefined;
     fetchFarms(companyId).then((f) => { if (live) setFarms(Array.isArray(f) ? f : []); }).catch(() => {});
     return () => { live = false; };
-  }, [companyId]);
+  }, [companyId, orgs]);
 
   // Variants come from the admin's suitability settings for the crop.
   useEffect(() => {
@@ -62,15 +64,22 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
     setGeojson(parsed); setFileNote(`${check.polygons} polygon${check.polygons > 1 ? 's' : ''} read.`);
   };
 
-  const areaReady = Boolean(companyId) && (form.area === 'estate' ? true : Boolean(geojson));
+  // Everything a run needs, checked when Start is clicked; each problem is shown on its field.
+  const problems = {
+    org: !companyId ? "Type the client's name." : null,
+    area: (form.area === 'upload' || !registered) && !geojson ? (fileError || 'Choose the area file (GeoJSON polygons in longitude/latitude).') : null,
+  };
+  const missing = Object.values(problems).filter(Boolean);
   const start = async () => {
+    setTried(true);
+    if (missing.length) { setError(`The analysis cannot start yet: ${missing.join(' ')}`); return; }
     setBusy(true); setError('');
     try {
       const run = await submitSuitabilityRun({
-        crop, company_id: companyId,
-        farm_id: form.area === 'estate' ? form.farm_id || null : null,
-        area: form.area === 'upload' ? { geojson } : null,
-        variant: form.variant || null, irrigated: form.irrigated, strictness: form.strictness, use_soil_samples: form.use_soil_samples,
+        crop, company_id: companyId, client_name: orgText.trim(),
+        farm_id: form.area === 'estate' && registered ? form.farm_id || null : null,
+        area: form.area === 'upload' || !registered ? { geojson } : null,
+        variant: form.variant || null, irrigated: form.irrigated, strictness: form.strictness, use_soil_samples: registered && form.use_soil_samples,
       });
       onStarted(run, companyId);
     } catch (e) { setError(e.message); setBusy(false); }
@@ -78,27 +87,33 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
 
   return (
     <Modal help={MODAL_HELP.suitabilityRun} wide title={`New ${cropName.toLowerCase()} analysis`} onClose={onClose}
-      footer={<><SecondaryButton onClick={onClose}>Cancel</SecondaryButton><PrimaryButton onClick={start} disabled={busy || !areaReady}>{busy ? 'Starting…' : 'Start the analysis'}</PrimaryButton></>}>
+      footer={<><span className="mr-auto self-center text-xs text-gray-500"><span className="text-red-600">*</span> required</span><SecondaryButton onClick={onClose}>Cancel</SecondaryButton><PrimaryButton onClick={start} disabled={busy}>{busy ? 'Starting…' : 'Start the analysis'}</PrimaryButton></>}>
       {error && <ErrorNote message={error} />}
-      <Field label="Organisation" hint={companyId ? null : "Type the organisation's name and pick it from the list."}>
-        <input className={inputCls} list="suit-orgs" value={orgText} placeholder="Type the organisation's name" autoComplete="off"
+      <Field label="Client" required error={tried ? problems.org : null}
+        hint={!companyId ? 'Any organisation or person. Registered organisations appear in the list.' : registered ? 'Registered organisation: its estates and uploaded data can be used.' : 'Not a registered organisation: upload the area to analyse.'}>
+        <input className={inputCls} list="suit-orgs" value={orgText} placeholder="Type the client's name" autoComplete="off"
           onChange={(e) => {
             const v = e.target.value; setOrgText(v);
-            const hit = orgs.find((o) => (o.company_name || o.company_id).toLowerCase() === v.trim().toLowerCase() || o.company_id === v.trim());
-            const id = hit ? hit.company_id : '';
-            if (id !== companyId) { setCompanyId(id); setFarms([]); set('farm_id', ''); }
+            // Capitals, spaces, underscores and dashes do not matter: "Sammy_Test" finds "Sammy Test" or sammy_test.
+            const norm = (t) => String(t || '').toLowerCase().replace(/[\s_-]+/g, '');
+            const want = norm(v);
+            const hit = want ? orgs.find((o) => norm(o.company_name) === want || norm(o.company_id) === want) : null;
+            // Any client: a registered organisation keeps its id; anyone else gets one made from the name.
+            const slug = v.trim().toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+            const id = hit ? hit.company_id : (slug ? `client_${slug}` : '');
+            if (id !== companyId) { setCompanyId(id); setFarms([]); set('farm_id', ''); if (!hit) set('area', 'upload'); }
           }} />
         <datalist id="suit-orgs">{orgs.map((o) => <option key={o.company_id} value={o.company_name || o.company_id} />)}</datalist>
       </Field>
       <p className="text-sm text-gray-600">Crop: <span className="font-semibold text-gray-900">{cropName}</span>. Rainfall, temperature, terrain, soil, flooding, forest in 2020 and protected areas are fetched by the pipeline.</p>
 
-      <Field label="Where">
+      <Field label="Where" required error={tried ? problems.area : null}>
         <div className="flex gap-2 mb-3">
-          {[['estate', 'A registered estate'], ['upload', 'Upload an area']].map(([id, label]) => (
+          {[['estate', 'A registered estate'], ['upload', 'Upload an area']].filter(([id]) => id === 'upload' || registered).map(([id, label]) => (
             <button key={id} type="button" onClick={() => set('area', id)} className={`px-3 py-2 rounded-xl border text-sm ${form.area === id ? 'border-green-600 bg-green-50 text-green-900 font-semibold' : 'border-gray-300 bg-white text-gray-700'}`}>{label}</button>
           ))}
         </div>
-        {form.area === 'estate' ? (
+        {form.area === 'estate' && registered ? (
           <select className={inputCls} value={form.farm_id} onChange={(e) => set('farm_id', e.target.value)}>
             <option value="">All estates of the organisation</option>
             {farms.map((f) => <option key={f.farm_id} value={f.farm_id}>{f.farm_name}</option>)}
@@ -120,11 +135,11 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
         </Field>
         <div className="space-y-2 pt-7">
           <label className="flex items-center gap-2 text-sm text-gray-800"><input type="checkbox" checked={form.irrigated} onChange={(e) => set('irrigated', e.target.checked)} />Irrigated (rainfall limits are relaxed)</label>
-          <label className="flex items-start gap-2 text-sm text-gray-800"><input type="checkbox" className="mt-0.5" checked={form.use_soil_samples} onChange={(e) => set('use_soil_samples', e.target.checked)} />
+          {registered && <label className="flex items-start gap-2 text-sm text-gray-800"><input type="checkbox" className="mt-0.5" checked={form.use_soil_samples} onChange={(e) => set('use_soil_samples', e.target.checked)} />
             <span>Use the organisation's own data where uploaded
               <span className="block text-xs text-gray-500">{dataForCrop(crop).map((d) => DATASET_DEFINITIONS.find((x) => x.id === d.dataset)?.name).filter(Boolean).join(', ')}</span>
             </span>
-          </label>
+          </label>}
         </div>
       </div>
 

@@ -806,15 +806,17 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const activePlotBounds = useMemo(() => {
     // For the raster overlay we want full-farm coverage, not a single plot.
     // Priority: all-plots bbox → farm boundary bbox → single plot fallback.
-    if (plotsData && plotsData.length > 0) {
-      const allLats = plotsData.flatMap(p => (p.coords || []).map(c => c[0]));
-      const allLngs = plotsData.flatMap(p => (p.coords || []).map(c => c[1]));
-      if (allLats.length > 0) {
-        return [
-          [Math.min(...allLats), Math.min(...allLngs)],
-          [Math.max(...allLats), Math.max(...allLngs)],
-        ];
+    // A loop, not Math.min(...list): a large estate has more corner points than a spread allows.
+    const bbox = (coordLists) => {
+      let a = Infinity, b = Infinity, c = -Infinity, d = -Infinity;
+      for (const coords of coordLists) for (const [lat, lng] of coords || []) {
+        if (lat < a) a = lat; if (lng < b) b = lng; if (lat > c) c = lat; if (lng > d) d = lng;
       }
+      return a === Infinity ? null : [[a, b], [c, d]];
+    };
+    if (plotsData && plotsData.length > 0) {
+      const all = bbox(plotsData.map(p => p.coords));
+      if (all) return all;
     }
     if (farmBoundary?.properties?.bbox) {
       const { min_lat, max_lat, min_lng, max_lng } = farmBoundary.properties.bbox;
@@ -823,12 +825,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     // Last resort: single selected/first plot
     const activePlot = selectedPlot || (plotsData && plotsData[0]);
     if (!activePlot || !activePlot.coords) return null;
-    const lats = activePlot.coords.map(c => c[0]);
-    const lngs = activePlot.coords.map(c => c[1]);
-    return [
-      [Math.min(...lats), Math.min(...lngs)],
-      [Math.max(...lats), Math.max(...lngs)],
-    ];
+    return bbox([activePlot.coords]);
   }, [selectedPlot, plotsData, farmBoundary]);
 
   // Bounds used for the raster ImageOverlay: prefer zarr-derived bounds (exact pixel coverage)

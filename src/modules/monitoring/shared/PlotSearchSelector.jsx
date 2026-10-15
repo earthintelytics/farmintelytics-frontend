@@ -29,7 +29,7 @@ export default function PlotSearchSelector({ plotsData = [], onSelect, placehold
   const estates = Object.values(plotsData.reduce((acc, p) => {
     const e = p.subfarm; if (!e) return acc;
     (acc[e] ||= { id: `estate:${e}`, name: e, isEstate: true, count: 0, coords: [] });
-    acc[e].count += 1; acc[e].coords.push(...(p.coords || []));
+    acc[e].count += 1; for (const c of p.coords || []) acc[e].coords.push(c);
     return acc;
   }, {}));
   const estateMatches = q.length === 0 ? [] : estates.filter((e) => e.name.toLowerCase().includes(q));
