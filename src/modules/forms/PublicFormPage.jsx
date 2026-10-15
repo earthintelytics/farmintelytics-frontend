@@ -53,7 +53,7 @@ const PublicFormPage = () => {
   };
 
   const shell = (children) => (
-    <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
+    <div className="min-h-screen bg-white text-gray-900 font-sans">
       <div className="max-w-lg mx-auto px-4 py-6 space-y-6">{children}</div>
     </div>
   );

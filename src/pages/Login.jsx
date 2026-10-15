@@ -134,7 +134,7 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
           {onBack && (
             <button
               onClick={onBack}
-              className="flex items-center gap-2 px-3.5 py-2 rounded-[10px] border border-[var(--border-light)] text-sm font-medium hover:bg-[var(--bg-main)] transition-colors"
+              className="flex items-center gap-2 px-3.5 py-2 rounded-[10px] border border-[var(--border-light)] text-sm font-medium hover:bg-[var(--bg-subtle)] transition-colors"
             >
               <Grid size={15} /> <span className="hidden sm:inline">Back to your</span> services
             </button>
@@ -228,7 +228,7 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
                 <span>Demo account:</span>
                 {demos.map((d) => (
                   <button key={d.email} type="button" onClick={() => { setEmail(d.email); setAccessCode(d.code); setError(''); }}
-                    className="px-3 py-1.5 rounded-lg border border-[var(--border-light)] bg-white hover:bg-[var(--bg-main)] text-[var(--text-main)] font-medium">
+                    className="px-3 py-1.5 rounded-lg border border-[var(--border-light)] bg-white hover:bg-[var(--bg-subtle)] text-[var(--text-main)] font-medium">
                     {d.label || d.email}
                   </button>
                 ))}

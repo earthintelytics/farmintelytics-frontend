@@ -117,7 +117,7 @@ const AdminLogin = ({ onSuccess = null, context = 'admin' }) => {
               <span>Demo account:</span>
               {TEAM_DEMOS.map((d) => (
                 <button key={d.email} type="button" onClick={() => { setEmail(d.email); setCode(d.code); setError(''); }}
-                  className="px-3 py-1.5 rounded-lg border border-[var(--border-light)] bg-white hover:bg-[var(--bg-main)] text-[var(--text-main)] font-medium">
+                  className="px-3 py-1.5 rounded-lg border border-[var(--border-light)] bg-white hover:bg-[var(--bg-subtle)] text-[var(--text-main)] font-medium">
                   {d.label || d.email}
                 </button>
               ))}

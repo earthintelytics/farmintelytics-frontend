@@ -269,7 +269,7 @@ const PortalPage = () => {
   }
 
   const backButton = (label, onClick) => (
-    <button onClick={onClick} className="mt-8 px-6 py-3 bg-white text-[var(--text-main)] border border-[var(--border-light)] rounded-xl font-semibold text-sm hover:bg-[var(--bg-main)] transition-colors">{label}</button>
+    <button onClick={onClick} className="mt-8 px-6 py-3 bg-white text-[var(--text-main)] border border-[var(--border-light)] rounded-xl font-semibold text-sm hover:bg-[var(--bg-subtle)] transition-colors">{label}</button>
   );
   const exitAction = backButton(isToolRoute ? 'Back to hub' : 'Back to your services', () => navigate(isToolRoute ? paths.teamHub : paths.orgHub(tenant)));
 

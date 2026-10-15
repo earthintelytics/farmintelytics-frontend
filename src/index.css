@@ -24,7 +24,9 @@
   --brand-primary-dark: #2D6A2C;
   --brand-leaf: #5AA041;
   --brand-forest: #034321;
-  --bg-main: #f8fafc;
+  /* Pages are white (product owner's rule). --bg-subtle is only for hover, pressed and inset areas. */
+  --bg-main: #ffffff;
+  --bg-subtle: #f8fafc;
   --bg-card: #ffffff;
   --text-main: #0f172a;
   --text-muted: #64748b;
