@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { useModalHelp } from '../../../components/page/ModalHelp';
+import { MODAL_HELP } from '../../../components/page/modalHelpText';
 import { X, Upload, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
@@ -44,6 +46,7 @@ export default function UploadBoundaryModal({ open, area, onClose, onSaved }) {
     setF(area ? Object.fromEntries(Object.keys(EMPTY).map((k) => [k, area[k] ?? EMPTY[k]])) : EMPTY);
   }, [open, area]);
 
+  const help = useModalHelp(MODAL_HELP.protectedAreaFile);
   if (!open) return null;
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
 
@@ -76,11 +79,12 @@ export default function UploadBoundaryModal({ open, area, onClose, onSaved }) {
     <div className="fixed inset-0 z-[1100] flex items-start sm:items-center justify-center p-4 bg-black/40 overflow-y-auto">
       <form onSubmit={save} className="bg-white rounded-2xl max-w-3xl w-full border border-gray-200 shadow-xl my-8">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-          <h3 className="font-display text-xl font-semibold text-gray-900">{area ? `Update ${area.name || 'protected area'}` : 'Add a protected area from a file'}</h3>
+          <div className="flex items-center gap-2.5"><h3 className="font-display text-xl font-semibold text-gray-900">{area ? `Update ${area.name || 'protected area'}` : 'Add a protected area from a file'}</h3>{help.button}</div>
           <button type="button" onClick={onClose} aria-label="Close" className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-[var(--bg-subtle)]"><X size={18} /></button>
         </div>
 
         <div className="px-6 py-5 space-y-6 max-h-[75vh] overflow-y-auto">
+          {help.panel}
           <section className="space-y-3">
             <h4 className="text-sm font-semibold text-gray-900">1. Boundary file</h4>
             <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-gray-300 hover:border-green-600 cursor-pointer">

@@ -4,6 +4,7 @@ import { inputCls } from '../../../farmintelytics-admin/components/formHelpers';
 import { emailError } from '../../../farmintelytics-admin/components/validation';
 import { ROLES } from '../orgProfile';
 
+import { MODAL_HELP } from '../../../components/page/modalHelpText';
 /**
  * Add or edit one account. Services: none ticked = every service the
  * organisation has; ticked = only those (DEVELOPMENT.md, "Access model").
@@ -38,7 +39,7 @@ const MemberModal = ({ member, services, onSave, onClose }) => {
   };
 
   return (
-    <Modal
+    <Modal help={MODAL_HELP.orgAccount}
       title={editing ? 'Edit account' : 'Add an account'}
       text={editing ? member.email : 'They sign in at your organisation’s address with this email and password.'}
       onClose={onClose}

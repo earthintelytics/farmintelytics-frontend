@@ -9,6 +9,7 @@ import { inputCls } from '../components/formHelpers';
 import { Page, Card, CardHeader, Button, IconButton, Field, Pill, Modal, Toggle, Loading, Note } from '../components/ui';
 import { copyText } from '../../utils/copyText';
 
+import { MODAL_HELP } from '../../components/page/modalHelpText';
 const fmt = (d) => (d ? new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'Never');
 const ME = () => (localStorage.getItem('fi_admin_email') || '').toLowerCase();
 
@@ -117,7 +118,7 @@ const TeamAccounts = () => {
       </Card>
 
       {adding && (
-        <Modal title="Add team member" text="They get a sign-in code, shown once after you add them." onClose={() => setAdding(null)}
+        <Modal help={MODAL_HELP.addTeamMember} title="Add team member" text="They get a sign-in code, shown once after you add them." onClose={() => setAdding(null)}
           footer={<><Button variant="secondary" onClick={() => setAdding(null)}>Cancel</Button><Button onClick={add} disabled={busy || !!problem}>{busy ? 'Adding…' : 'Add'}</Button></>}>
           <div className="space-y-4">
             <Field label="Email" error={adding.email && problem}><input className={inputCls} type="email" value={adding.email} onChange={(e) => setAdding({ ...adding, email: e.target.value })} /></Field>

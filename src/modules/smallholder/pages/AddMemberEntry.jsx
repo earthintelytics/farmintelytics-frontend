@@ -7,6 +7,7 @@ import FormRenderer from '../../forms/FormRenderer';
 import { Modal, PrimaryButton, SecondaryButton, ErrorNote, NotConnectedNote } from '../../../components/page/PageKit';
 import { useLoader } from '../../../components/page/useLoader';
 
+import { MODAL_HELP } from '../../../components/page/modalHelpText';
 const registrationForm = (forms) => (Array.isArray(forms) ? forms : []).find((f) => f.purpose === 'registration') || null;
 
 /**
@@ -40,7 +41,7 @@ const AddMemberEntry = ({ onClose, onSaved, onDesign }) => {
   };
 
   return (
-    <Modal
+    <Modal help={MODAL_HELP.addMember}
       wide
       title={form ? form.title : 'Add member'}
       onClose={onClose}

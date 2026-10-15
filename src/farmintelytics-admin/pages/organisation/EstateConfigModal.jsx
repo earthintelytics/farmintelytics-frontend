@@ -4,6 +4,7 @@ import { generateFarmConfig, fetchPipelineConfigContent, savePipelineConfig, del
 import { useConfirm } from '../../components/ConfirmProvider';
 import { Button, Modal, Note, Loading } from '../../components/ui';
 
+import { MODAL_HELP } from '../../../components/page/modalHelpText';
 /**
  * The pipeline settings file for one estate ({farm_id}_config.yaml, read by
  * the scheduler). Generated from the estate's settings; editable here.
@@ -42,7 +43,7 @@ const EstateConfigModal = ({ farm, onClose }) => {
   };
 
   return (
-    <Modal size="lg" title="Pipeline settings" text={`${farm.farm_name} · ${filename}`} onClose={onClose}
+    <Modal help={MODAL_HELP.pipelineSettings} size="lg" title="Pipeline settings" text={`${farm.farm_name} · ${filename}`} onClose={onClose}
       footer={state === 'ready' ? <>
         <Button variant="danger" onClick={remove} disabled={!!busy}><Trash2 size={14} />Delete</Button>
         <Button variant="secondary" onClick={generate} disabled={!!busy}><Sparkles size={14} />{busy === 'generate' ? 'Making…' : 'Make again from settings'}</Button>

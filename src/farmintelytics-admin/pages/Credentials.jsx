@@ -8,6 +8,7 @@ import { inputCls } from '../components/formHelpers';
 import { Page, Card, Button, IconButton, Field, Pill, Modal, Empty, Loading } from '../components/ui';
 import { copyText } from '../../utils/copyText';
 
+import { MODAL_HELP } from '../../components/page/modalHelpText';
 const ROLES = [
   { id: 'admin', label: 'Admin', text: 'Everything the organisation is licensed for' },
   { id: 'analyst', label: 'Analyst', text: 'Monitoring and reports' },
@@ -137,7 +138,7 @@ function NewCredential({ orgs, onClose, onSaved }) {
   };
 
   return (
-    <Modal title="New sign-in" text="The person signs in with this email and access code on the organisation's own sign-in page." onClose={onClose}
+    <Modal help={MODAL_HELP.newSignIn} title="New sign-in" text="The person signs in with this email and access code on the organisation's own sign-in page." onClose={onClose}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button onClick={save} disabled={!valid || saving}>{saving ? 'Creating…' : 'Create sign-in'}</Button></>}>
       {error && <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
       <Field label="Organisation">

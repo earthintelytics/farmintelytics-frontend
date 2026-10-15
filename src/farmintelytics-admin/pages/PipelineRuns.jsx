@@ -7,6 +7,7 @@ import { Page, Button, IconButton, Chip, Pill, Table, Td, Empty, Loading, Stat, 
 import ErrorBox from './runlogs/ErrorBox';
 import { copyText } from '../../utils/copyText';
 
+import { MODAL_HELP } from '../../components/page/modalHelpText';
 const KINDS = {
   monitoring_run: 'Satellite monitoring',
   suitability_run: 'Suitability analysis',
@@ -48,7 +49,7 @@ function JobDetailModal({ job, orgName, onClose, onRetry }) {
   };
 
   return (
-    <Modal
+    <Modal help={MODAL_HELP.pipelineRun}
       size="lg"
       title={`${KINDS[job.kind] || job.kind}: ${orgName(job.company_id)}`}
       text={`Job ID: ${job.id}`}

@@ -16,6 +16,7 @@ import { Page, Card, Button, IconButton, Field, Chip, Pill, Modal, Empty, Loadin
 import OrgDetailPanel from './OrganizationFarms';
 import { copyText } from '../../utils/copyText';
 
+import { MODAL_HELP } from '../../components/page/modalHelpText';
 /** Client organisations: what each is licensed for, its sign-in link, and its estates. */
 const Organizations = () => {
   const navigate = useNavigate();
@@ -179,7 +180,7 @@ function OrgModal({ org, onClose, onSaved }) {
   };
 
   return (
-    <Modal size="lg" title={`Edit ${org.display_name}`} text="Name, logo, and what the organisation is licensed for." onClose={onClose}
+    <Modal help={MODAL_HELP.editOrganisation} size="lg" title={`Edit ${org.display_name}`} text="Name, logo, and what the organisation is licensed for." onClose={onClose}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button onClick={save} disabled={saving || !form.company_name?.trim()}>{saving ? 'Saving…' : 'Save changes'}</Button></>}>
       {error && <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
       <div className="flex items-end gap-4">
@@ -228,7 +229,7 @@ function DeleteOrgModal({ org, onClose, onDeleted }) {
   };
 
   return (
-    <Modal title="Delete organisation data" onClose={onClose}>
+    <Modal help={MODAL_HELP.deleteOrganisationData} title="Delete organisation data" onClose={onClose}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-sm text-red-900 space-y-2">
           <div className="flex items-center gap-2 font-semibold">

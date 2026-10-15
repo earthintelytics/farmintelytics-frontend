@@ -3,6 +3,8 @@
  * matching the Register / Check / Log pages: white cards, gray borders,
  * sentence case, status colours from tokens, no glows.
  */
+import { useModalHelp } from './ModalHelp';
+
 
 export const PageHeader = ({ title, text, actions }) => (
   <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -67,12 +69,19 @@ export const Field = ({ label, hint, error, children }) => (
   </label>
 );
 
-export const Modal = ({ title, children, onClose, footer, wide = false }) => (
-  <div className="fixed inset-0 z-[1100] bg-gray-900/30 flex items-center justify-center p-4" onClick={onClose}>
-    <div className={`w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 shadow-xl p-7 space-y-5`} onClick={(e) => e.stopPropagation()}>
-      <h3 className="font-display text-xl font-semibold text-gray-900">{title}</h3>
-      {children}
-      {footer && <div className="flex justify-end gap-3 pt-2">{footer}</div>}
+export const Modal = ({ title, children, onClose, footer, wide = false, help }) => {
+  const { button, panel } = useModalHelp(help);
+  return (
+    <div className="fixed inset-0 z-[1100] bg-gray-900/30 flex items-center justify-center p-4" onClick={onClose}>
+      <div className={`w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 shadow-xl p-7 space-y-5`} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-2.5">
+          <h3 className="font-display text-xl font-semibold text-gray-900">{title}</h3>
+          {button}
+        </div>
+        {panel}
+        {children}
+        {footer && <div className="flex justify-end gap-3 pt-2">{footer}</div>}
+      </div>
     </div>
-  </div>
-);
+  );
+};

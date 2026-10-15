@@ -8,6 +8,7 @@ import { inputCls } from '../components/formHelpers';
 import { Page, Button, IconButton, Field, Pill, Modal, Table, Td, Empty, Loading, Note } from '../components/ui';
 import { copyText } from '../../utils/copyText';
 
+import { MODAL_HELP } from '../../components/page/modalHelpText';
 const ACCOUNT_TYPES = [
   { value: 'platform_admin', label: 'Platform admin', tone: 'info' },
   { value: 'organization_owner', label: 'Organisation owner', tone: 'good' },
@@ -176,7 +177,7 @@ function UserModal({ user, onClose, onSaved }) {
   };
 
   return (
-    <Modal title={isNew ? 'New user' : `Edit ${user.email}`} onClose={onClose}
+    <Modal help={MODAL_HELP.userAccount} title={isNew ? 'New user' : `Edit ${user.email}`} onClose={onClose}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button onClick={save} disabled={!valid || saving}>{saving ? 'Saving…' : isNew ? 'Create user' : 'Save changes'}</Button></>}>
       {error && <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

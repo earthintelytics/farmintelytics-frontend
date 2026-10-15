@@ -6,6 +6,7 @@ import { SENSOR_OPTIONS, toggleInList, inputCls } from '../../components/formHel
 import { Button, Field, Chip, Modal } from '../../components/ui';
 import { ServicesPicker } from './BoundaryServices';
 
+import { MODAL_HELP } from '../../../components/page/modalHelpText';
 const INDICES = ['NDVI', 'EVI', 'NDMI', 'RECI', 'NDWI', 'LSWI'];
 
 /**
@@ -67,7 +68,7 @@ const AddEstateForm = ({ org, farms, onClose, onSaved }) => {
 
   const busy = Boolean(progress);
   return (
-    <Modal title="Add an estate" text={org.display_name} onClose={busy ? undefined : onClose}
+    <Modal help={MODAL_HELP.addEstate} title="Add an estate" text={org.display_name} onClose={busy ? undefined : onClose}
       footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button><Button onClick={save} disabled={busy || !name.trim() || !startDate || !file}>{busy ? `Adding (${progress.pct}%)…` : 'Add estate'}</Button></>}>
       {error && <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
       <Field label="Estate name"><input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} disabled={busy} placeholder="e.g. North estate" /></Field>

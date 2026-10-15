@@ -8,6 +8,7 @@ import { CROPS } from '../suitabilityLabels';
 import { dataForCrop } from '../suitabilityData';
 import { DATASET_DEFINITIONS } from '../../data/datasetDefinitions';
 
+import { MODAL_HELP } from '../../../components/page/modalHelpText';
 const STRICTNESS = [
   { id: 'estate', label: 'Commercial estate', text: 'Stricter: only the best land counts as well suited' },
   { id: 'standard', label: 'Standard', text: 'The default thresholds' },
@@ -22,7 +23,9 @@ const STRICTNESS = [
 const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
   const [companyId, setCompanyId] = useState(orgs.length === 1 ? orgs[0].company_id : '');
   const [farms, setFarms] = useState([]);
-  const [crop, setCrop] = useState(initialCrop || CROPS[0].id);
+  const crop = initialCrop || CROPS[0].id;
+  const cropName = CROPS.find((c) => c.id === crop)?.name || crop;
+  const [orgText, setOrgText] = useState(orgs.length === 1 ? (orgs[0].company_name || orgs[0].company_id) : '');
   const [variants, setVariants] = useState([]);
   const [form, setForm] = useState({ area: 'estate', farm_id: '', variant: '', irrigated: false, strictness: 'standard', use_soil_samples: true });
   const [geojson, setGeojson] = useState(null);
@@ -74,24 +77,20 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
   };
 
   return (
-    <Modal wide title="New analysis" onClose={onClose}
+    <Modal help={MODAL_HELP.suitabilityRun} wide title={`New ${cropName.toLowerCase()} analysis`} onClose={onClose}
       footer={<><SecondaryButton onClick={onClose}>Cancel</SecondaryButton><PrimaryButton onClick={start} disabled={busy || !areaReady}>{busy ? 'Starting…' : 'Start the analysis'}</PrimaryButton></>}>
       {error && <ErrorNote message={error} />}
-      <Field label="Organisation">
-        <select className={inputCls} value={companyId} onChange={(e) => { setCompanyId(e.target.value); setFarms([]); set('farm_id', ''); }}>
-          <option value="" disabled>Select</option>
-          {orgs.map((o) => <option key={o.company_id} value={o.company_id}>{o.company_name || o.company_id}</option>)}
-        </select>
+      <Field label="Organisation" hint={companyId ? null : "Type the organisation's name and pick it from the list."}>
+        <input className={inputCls} list="suit-orgs" value={orgText} placeholder="Type the organisation's name" autoComplete="off"
+          onChange={(e) => {
+            const v = e.target.value; setOrgText(v);
+            const hit = orgs.find((o) => (o.company_name || o.company_id).toLowerCase() === v.trim().toLowerCase() || o.company_id === v.trim());
+            const id = hit ? hit.company_id : '';
+            if (id !== companyId) { setCompanyId(id); setFarms([]); set('farm_id', ''); }
+          }} />
+        <datalist id="suit-orgs">{orgs.map((o) => <option key={o.company_id} value={o.company_name || o.company_id} />)}</datalist>
       </Field>
-      <p className="text-sm text-gray-600">Rainfall, temperature, terrain, soil, flooding, forest in 2020 and protected areas are fetched by the pipeline.</p>
-
-      <Field label="Crop">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {CROPS.map((c) => (
-            <button key={c.id} type="button" onClick={() => { setCrop(c.id); set('variant', ''); }} className={`px-3 py-2 rounded-xl border text-sm ${crop === c.id ? 'border-green-600 bg-green-50 text-green-900 font-semibold' : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'}`}>{c.name}</button>
-          ))}
-        </div>
-      </Field>
+      <p className="text-sm text-gray-600">Crop: <span className="font-semibold text-gray-900">{cropName}</span>. Rainfall, temperature, terrain, soil, flooding, forest in 2020 and protected areas are fetched by the pipeline.</p>
 
       <Field label="Where">
         <div className="flex gap-2 mb-3">

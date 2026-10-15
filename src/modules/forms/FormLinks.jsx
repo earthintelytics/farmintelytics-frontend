@@ -6,6 +6,7 @@ import { Card, Field, PrimaryButton, SecondaryButton, StatusPill, ErrorNote, Mod
 import { inputCls, stateFromError } from '../../components/page/useLoader';
 import { copyText } from '../../utils/copyText';
 
+import { MODAL_HELP } from '../../components/page/modalHelpText';
 // Always the page farmers open (/f/<token>) on this site. The server's `url`
 // is its own API address (/public/forms/<token>), which opens nothing on a phone.
 const publicUrl = (link) => {
@@ -77,7 +78,7 @@ const FormLinks = ({ form }) => {
       ))}
 
       {qr && (
-        <Modal title={form.title} onClose={() => setQr(null)} footer={<>
+        <Modal help={MODAL_HELP.formLink} title={form.title} onClose={() => setQr(null)} footer={<>
           <SecondaryButton onClick={() => setQr(null)}>Close</SecondaryButton>
           <a href={qr.src} download={`${form.title || 'form'}-qr.png`} className="inline-flex items-center px-4 py-2.5 rounded-xl text-sm font-semibold text-white bg-green-700 hover:bg-green-800">Download</a>
         </>}>

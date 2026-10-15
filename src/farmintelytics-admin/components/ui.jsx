@@ -5,6 +5,7 @@
  * no glows.
  */
 import { X } from 'lucide-react';
+import { useModalHelp } from '../../components/page/ModalHelp';
 
 export const Page = ({ eyebrow, title, text, actions, children, wide = false }) => (
   <div className="h-full overflow-y-auto bg-white">
@@ -108,21 +109,27 @@ export const Note = ({ tone = 'info', children }) => (
   <div className={`rounded-xl border px-4 py-3 text-sm ${tone === 'info' ? 'bg-sky-50 border-sky-200 text-sky-900' : tone === 'warning' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-green-50 border-green-200 text-green-900'}`}>{children}</div>
 );
 
-export const Modal = ({ title, text, onClose, footer, children, size = 'md' }) => (
-  <div className="fixed inset-0 z-[1100] bg-gray-900/30 flex items-center justify-center p-4" onClick={onClose}>
-    <div className={`w-full ${size === 'lg' ? 'max-w-3xl' : size === 'xl' ? 'max-w-5xl' : 'max-w-lg'} max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 shadow-xl`} onClick={(e) => e.stopPropagation()}>
-      <div className="flex items-start justify-between gap-4 px-7 pt-6">
-        <div>
-          <h3 className="font-display text-xl font-semibold text-gray-900">{title}</h3>
-          {text && <p className="text-sm text-gray-500 mt-1">{text}</p>}
+export const Modal = ({ title, text, onClose, footer, children, size = 'md', help }) => {
+  const { button, panel } = useModalHelp(help);
+  return (
+    <div className="fixed inset-0 z-[1100] bg-gray-900/30 flex items-center justify-center p-4" onClick={onClose}>
+      <div className={`w-full ${size === 'lg' ? 'max-w-3xl' : size === 'xl' ? 'max-w-5xl' : 'max-w-lg'} max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 shadow-xl`} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-start justify-between gap-4 px-7 pt-6">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h3 className="font-display text-xl font-semibold text-gray-900">{title}</h3>
+              {button}
+            </div>
+            {text && <p className="text-sm text-gray-500 mt-1">{text}</p>}
+          </div>
+          <IconButton label="Close" onClick={onClose}><X size={18} /></IconButton>
         </div>
-        <IconButton label="Close" onClick={onClose}><X size={18} /></IconButton>
+        <div className="px-7 py-5 space-y-5">{panel}{children}</div>
+        {footer && <div className="flex justify-end gap-3 px-7 pb-6">{footer}</div>}
       </div>
-      <div className="px-7 py-5 space-y-5">{children}</div>
-      {footer && <div className="flex justify-end gap-3 px-7 pb-6">{footer}</div>}
     </div>
-  </div>
-);
+  );
+};
 
 export const Stat = ({ label, value, sub }) => (
   <Card className="p-5">

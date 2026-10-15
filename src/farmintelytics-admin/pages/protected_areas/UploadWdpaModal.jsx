@@ -1,4 +1,6 @@
 import { X } from 'lucide-react';
+import { useModalHelp } from '../../../components/page/ModalHelp';
+import { MODAL_HELP } from '../../../components/page/modalHelpText';
 
 export default function UploadWdpaModal({
   isOpen,
@@ -13,13 +15,14 @@ export default function UploadWdpaModal({
   uploading,
   uploadCounts,
 }) {
+  const help = useModalHelp(MODAL_HELP.wdpaUpload);
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-[1100] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl border border-gray-200 space-y-5">
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-xl font-semibold text-gray-900">Upload WDPA shapefile archive</h3>
+          <div className="flex items-center gap-2.5"><h3 className="font-display text-xl font-semibold text-gray-900">Upload WDPA shapefile archive</h3>{help.button}</div>
           <button
             type="button"
             onClick={onClose}
@@ -28,6 +31,7 @@ export default function UploadWdpaModal({
             <X size={20} />
           </button>
         </div>
+        {help.panel}
         <p className="text-sm text-gray-600">
           Upload official Protected Planet release zip (polygons only). Official records are upserted without overwriting hand-drawn manual areas.
         </p>

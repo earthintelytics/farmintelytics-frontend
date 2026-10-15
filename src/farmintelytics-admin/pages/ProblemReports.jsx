@@ -5,6 +5,7 @@ import { copyText } from '../../utils/copyText';
 import ErrorBanner from '../components/ErrorBanner';
 import { Page, Tabs, Empty, Loading, Pill, Button, Modal, Field } from '../components/ui';
 
+import { MODAL_HELP } from '../../components/page/modalHelpText';
 const when = (d) => (d ? new Date(d).toLocaleString(undefined, { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—');
 const selectCls = 'px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-sm text-gray-900 outline-none focus:border-green-600';
 
@@ -99,7 +100,7 @@ const ProblemReports = () => {
       )}
 
       {open && (
-        <Modal title="Problem report" text={`${orgName(open.company_id)} · ${when(open.created_at)}`} onClose={() => setOpen(null)} size="lg"
+        <Modal help={MODAL_HELP.problemReport} title="Problem report" text={`${orgName(open.company_id)} · ${when(open.created_at)}`} onClose={() => setOpen(null)} size="lg"
           footer={<>
             <Button variant="secondary" onClick={() => copyDetails(open)}><Copy size={14} />{copied ? 'Copied' : 'Copy details'}</Button>
             {open.is_handled

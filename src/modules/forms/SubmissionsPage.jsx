@@ -8,6 +8,7 @@ import GeometryPreview from './inputs/GeometryPreview';
 import SecurePhoto from '../../components/SecurePhoto';
 import { useSecurePhoto } from '../../components/useSecurePhoto';
 
+import { MODAL_HELP } from '../../components/page/modalHelpText';
 const STATUS = {
   new: ['To review', 'info'],
   approved: ['Approved', 'good'],
@@ -125,7 +126,7 @@ const SubmissionDialog = ({ form, submission, onClose, onDone }) => {
   };
   const pending = submission.status === 'new' || submission.status === 'changes_requested';
   return (
-    <Modal wide title={form.title} onClose={onClose} footer={pending ? <>
+    <Modal help={MODAL_HELP.formAnswers} wide title={form.title} onClose={onClose} footer={pending ? <>
       <SecondaryButton disabled={busy} onClick={() => act('reject')}>Reject</SecondaryButton>
       <SecondaryButton disabled={busy || !note.trim()} onClick={() => act('request-changes')}>Ask for changes</SecondaryButton>
       <PrimaryButton disabled={busy} onClick={() => act('approve')}>Approve</PrimaryButton>

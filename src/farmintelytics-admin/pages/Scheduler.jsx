@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useModalHelp } from '../../components/page/ModalHelp';
+import { MODAL_HELP } from '../../components/page/modalHelpText';
 import { Clock, Plus, Trash2, Pencil, X, Check, ChevronDown, Play, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
@@ -131,6 +133,7 @@ export function CustomRule({ value, onChange }) {
 }
 
 function JobModal({ job, orgs, configs, onSave, onClose }) {
+  const help = useModalHelp(MODAL_HELP.schedule);
   const parsed = job ? parseCron(job.cron) : DEFAULT_SCHEDULE;
   const [schedule, setSchedule] = useState(parsed || { ...DEFAULT_SCHEDULE, mode: 'custom', custom: job?.cron || '' });
   const [org, setOrg] = useState(() => (job ? orgs.find((o) => (job.company_id && o.schema_name === job.company_id) || job.name.startsWith(o.schema_name))?.schema_name || '' : ''));
@@ -168,9 +171,10 @@ function JobModal({ job, orgs, configs, onSave, onClose }) {
     <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-gray-900/30 p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="w-full max-w-lg bg-white rounded-2xl border border-gray-200 shadow-xl p-7 space-y-5 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-lg font-semibold text-gray-900">{job ? 'Edit schedule' : 'New schedule'}</h3>
+          <div className="flex items-center gap-2.5"><h3 className="font-display text-lg font-semibold text-gray-900">{job ? 'Edit schedule' : 'New schedule'}</h3>{help.button}</div>
           <button onClick={onClose} className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100" aria-label="Close"><X size={18} /></button>
         </div>
+        {help.panel}
         <ErrorBanner message={error} onDismiss={() => setError('')} />
         {!job && (
           <div className="grid grid-cols-1 gap-4">
@@ -215,6 +219,7 @@ function JobModal({ job, orgs, configs, onSave, onClose }) {
 }
 
 function RunServicesModal({ org, onClose, onStarted }) {
+  const help = useModalHelp(MODAL_HELP.runNow);
   const options = runnableServiceOptions(org);
   const [chosen, setChosen] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -229,9 +234,10 @@ function RunServicesModal({ org, onClose, onStarted }) {
     <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-gray-900/30 p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="w-full max-w-lg bg-white rounded-2xl border border-gray-200 shadow-xl p-7 space-y-5">
         <div className="flex items-center justify-between">
-          <h3 className="font-display text-lg font-semibold text-gray-900">Run now: {org.display_name || org.schema_name}</h3>
+          <div className="flex items-center gap-2.5"><h3 className="font-display text-lg font-semibold text-gray-900">Run now: {org.display_name || org.schema_name}</h3>{help.button}</div>
           <button onClick={onClose} className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100" aria-label="Close"><X size={18} /></button>
         </div>
+        {help.panel}
         <ErrorBanner message={error} onDismiss={() => setError('')} />
         {options.length === 0 ? (
           <p className="text-sm text-gray-600">This organisation has no licensed service that a monitoring run covers. Turn one on under its licence first.</p>
