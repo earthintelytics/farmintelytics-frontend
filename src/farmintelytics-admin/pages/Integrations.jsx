@@ -33,7 +33,7 @@ const Card = ({ className = '', children }) => (
 // one added on the backend is never hidden.
 const GROUPS = [
   { id: 'email', label: 'Email', members: ['smtp', 'alerts'] },
-  { id: 'data', label: 'Data', members: ['cdse'] },
+  { id: 'data', label: 'Data', members: ['cdse', 'stac'] },
   { id: 'maps', label: 'Maps', members: ['maps'] },
 ];
 const groupOf = (id) => (GROUPS.find((g) => g.members.includes(id)) || { id: 'other' }).id;
