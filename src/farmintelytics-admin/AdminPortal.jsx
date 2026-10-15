@@ -60,12 +60,10 @@ const NAV_GROUPS = [
     { id: 'reports',       label: 'Problem reports',      icon: LifeBuoy,  path: '/admin/reports' },
   ]},
   { label: 'Configuration', items: [
-    { id: 'thresholds',    label: 'Map classes',          icon: SlidersHorizontal, path: '/admin/thresholds' },
-    { id: 'ai',            label: 'AI settings',          icon: Sparkles,  path: '/admin/ai', owner: true },
-    { id: 'integrations',  label: 'Integrations',         icon: Radio,     path: '/admin/integrations', owner: true },
-    { id: 'thresholds',      label: 'Map classes',          icon: SlidersHorizontal, path: '/admin/thresholds' },
-    { id: 'protected-areas', label: 'Protected areas',      icon: Shield,            path: '/admin/protected-areas' },
-    { id: 'ai',              label: 'AI settings',          icon: Sparkles,          path: '/admin/ai', owner: true },
+    { id: 'thresholds',      label: 'Map classes',     icon: SlidersHorizontal, path: '/admin/thresholds' },
+    { id: 'protected-areas', label: 'Protected areas', icon: Shield,            path: '/admin/protected-areas' },
+    { id: 'ai',              label: 'AI settings',     icon: Sparkles,          path: '/admin/ai', owner: true },
+    { id: 'integrations',    label: 'Integrations',    icon: Radio,             path: '/admin/integrations', owner: true },
   ]},
 ];
 const NAV_ITEMS = NAV_GROUPS.flatMap(g => g.items);
@@ -233,11 +231,7 @@ const AdminPortal = () => {
             <Route path="integrations"  element={ownerOnly(<Integrations />)} />
             <Route path="logs"          element={<Logs />} />
             <Route path="reports"       element={<ProblemReports />} />
-            <Route path="thresholds"      element={<CropThresholds />} />
             <Route path="protected-areas" element={<ProtectedAreas />} />
-            <Route path="ai"              element={ownerOnly(<AiSettings />)} />
-            <Route path="logs"            element={<Logs />} />
-            <Route path="reports"         element={<ProblemReports />} />
           </Routes>
         </main>
       </div>

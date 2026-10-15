@@ -89,7 +89,7 @@ const MembersPage = ({ onOpenForms, onOpenAnswers }) => {
       {state === 'ready' && rows.length > 0 && (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600">
+            <thead className="bg-white text-left text-xs font-semibold text-gray-600">
               <tr>
                 <th className="px-5 py-3">Member</th>
                 <th className="px-5 py-3">Group</th>

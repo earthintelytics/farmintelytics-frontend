@@ -231,7 +231,7 @@ export default function Integrations() {
               {/* Section Header */}
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-gray-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0 text-gray-700">
+                  <div className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center shrink-0 text-gray-700">
                     <Icon className="w-5 h-5" />
                   </div>
                   <div>
@@ -249,7 +249,7 @@ export default function Integrations() {
                     className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border ${
                       isConfigured
                         ? 'bg-green-50 text-green-700 border-green-200'
-                        : 'bg-gray-50 text-gray-600 border-gray-200'
+                        : 'bg-white text-gray-600 border-gray-200'
                     }`}
                   >
                     <span
@@ -290,7 +290,7 @@ export default function Integrations() {
                       {/* Secret Field with Masked Preview */}
                       {isSecret && isSet && !isReplacing ? (
                         <div className="flex items-center gap-2">
-                          <div className="flex-1 px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-mono text-gray-700 flex items-center justify-between">
+                          <div className="flex-1 px-3.5 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-mono text-gray-700 flex items-center justify-between">
                             <span className="flex items-center gap-1.5 text-xs text-gray-500">
                               <Lock className="w-3.5 h-3.5 text-gray-400" />
                               Stored key

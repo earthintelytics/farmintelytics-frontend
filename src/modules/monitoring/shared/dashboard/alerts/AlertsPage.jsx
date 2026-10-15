@@ -35,7 +35,7 @@ const AlertsPage = ({ alerts, places, serviceId, cropType, onAcknowledge, onAckn
   const counts = Object.keys(SEVERITY).reduce((c, k) => ({ ...c, [k]: open.filter((a) => a.severity === k).length }), {});
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50">
+    <div className="h-full overflow-y-auto bg-white">
       <div className="max-w-7xl mx-auto px-6 py-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div>

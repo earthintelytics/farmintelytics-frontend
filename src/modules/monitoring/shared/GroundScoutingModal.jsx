@@ -218,7 +218,7 @@ export default function GroundScoutingModal({ alert, onClose, onAlertUpdated, vi
 
         {/* The alert, in its own words */}
         {!visitOnly && (
-          <div className="px-5 py-3 bg-gray-50 border-b border-gray-200 flex items-start justify-between gap-3 text-sm text-gray-700">
+          <div className="px-5 py-3 bg-white border-b border-gray-200 flex items-start justify-between gap-3 text-sm text-gray-700">
             <span>{alert.message}</span>
             <span className="shrink-0 px-2 py-0.5 rounded-md text-xs font-semibold bg-white border border-gray-200 text-gray-700">
               {({ open: 'Open', scout_assigned: 'Someone sent', resolved: 'Closed', dismissed: 'Dismissed' })[alert.status] || 'Open'}
@@ -488,7 +488,7 @@ export default function GroundScoutingModal({ alert, onClose, onAlertUpdated, vi
             ) : (
               <div className="space-y-3">
                 {pastObservations.map((obs, idx) => (
-                  <div key={obs.observation_id || idx} className="p-3.5 rounded-xl bg-gray-50 border border-gray-200/80 text-xs space-y-2">
+                  <div key={obs.observation_id || idx} className="p-3.5 rounded-xl bg-white border border-gray-200/80 text-xs space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <span className="font-bold text-gray-800">{obs.scout_name || 'Field Officer'}</span>

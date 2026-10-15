@@ -165,7 +165,7 @@ function JobModal({ job, orgs, configs, onSave, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-gray-900/30 p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-gray-900/30 p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="w-full max-w-lg bg-white rounded-2xl border border-gray-200 shadow-xl p-7 space-y-5 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between">
           <h3 className="font-display text-lg font-semibold text-gray-900">{job ? 'Edit schedule' : 'New schedule'}</h3>
@@ -226,7 +226,7 @@ function RunServicesModal({ org, onClose, onStarted }) {
     try { const res = await runOrganizationServices(org.schema_name, chosen); onStarted(res); } catch (e) { setError(e.message); setBusy(false); }
   };
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-gray-900/30 p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+    <div className="fixed inset-0 z-[1100] flex items-center justify-center bg-gray-900/30 p-4" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="w-full max-w-lg bg-white rounded-2xl border border-gray-200 shadow-xl p-7 space-y-5">
         <div className="flex items-center justify-between">
           <h3 className="font-display text-lg font-semibold text-gray-900">Run now: {org.display_name || org.schema_name}</h3>
@@ -371,7 +371,7 @@ const Scheduler = () => {
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600">
+                  <thead className="bg-white text-left text-xs font-semibold text-gray-600">
                     <tr>
                       <th className="px-5 py-3">Service</th>
                       <th className="px-5 py-3">Schedule</th>
@@ -386,10 +386,10 @@ const Scheduler = () => {
                       const serviceOption = services.find((s) => s.id === serviceName || s.id === `rs-${serviceName}`);
                       const displayTitle = serviceOption?.label || (serviceName ? `${serviceName.replace(/_/g, ' ')} monitoring` : (site?.batch_name || job.config_path.replace('configs/', '').replace(/\.ya?ml$/, '')));
                       return (
-                        <tr key={job.name} className={job.enabled ? 'hover:bg-gray-50/50' : 'bg-gray-50/60'}>
+                        <tr key={job.name} className={job.enabled ? 'hover:bg-gray-50/50' : 'bg-white'}>
                           <td className="px-5 py-4">
                             <div className="flex items-center gap-3">
-                              <span className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${job.enabled ? 'bg-green-50 border-green-200 text-green-700' : 'bg-gray-50 border-gray-200 text-gray-400'}`}>
+                              <span className={`w-9 h-9 rounded-xl border flex items-center justify-center shrink-0 ${job.enabled ? 'bg-green-50 border-green-200 text-green-700' : 'bg-white border-gray-200 text-gray-400'}`}>
                                 <Clock size={16} />
                               </span>
                               <div>

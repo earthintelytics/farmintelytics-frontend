@@ -92,7 +92,7 @@ function ProvidersTab({ settings, setSettings, connected }) {
             <Card key={p.id} className="p-5 space-y-4">
               <div className="flex items-center justify-between">
                 <div className="text-sm font-semibold text-gray-900">{p.label}</div>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${s.configured ? 'bg-green-50 text-green-800 border-green-200' : 'bg-gray-50 text-gray-600 border-gray-200'}`}>{s.configured ? `Key set ···${s.key_last4 || ''}` : 'No key'}</span>
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${s.configured ? 'bg-green-50 text-green-800 border-green-200' : 'bg-white text-gray-600 border-gray-200'}`}>{s.configured ? `Key set ···${s.key_last4 || ''}` : 'No key'}</span>
               </div>
               <label className="block space-y-1.5"><span className="text-xs font-semibold text-gray-700">{s.configured ? 'Replace key' : 'API key'}</span>
                 <input type="password" autoComplete="off" className={inputCls} value={keys[p.id] || ''} onChange={e => { setKeys(k => ({ ...k, [p.id]: e.target.value })); setDirty(d => ({ ...d, [p.id]: Boolean(e.target.value) || d[p.id] })); }} placeholder={p.hint} />
@@ -214,7 +214,7 @@ function UsageTab({ connected, orgNames }) {
       <Card className="overflow-hidden">
         {!live || !data?.rows?.length ? <div className="p-10 text-center text-sm text-gray-500">{!connected ? 'Usage appears here once the AI settings service records it.' : !live ? 'Usage recording is not live yet: figures appear once each AI call is recorded with its tokens and cost.' : 'No AI use in this period.'}</div> : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600"><tr><th className="px-5 py-3 capitalize">{group}</th><th className="px-5 py-3">Requests</th><th className="px-5 py-3">Tokens in / out</th><th className="px-5 py-3">Cost</th><th className="px-5 py-3">Of limit</th></tr></thead>
+            <thead className="bg-white text-left text-xs font-semibold text-gray-600"><tr><th className="px-5 py-3 capitalize">{group}</th><th className="px-5 py-3">Requests</th><th className="px-5 py-3">Tokens in / out</th><th className="px-5 py-3">Cost</th><th className="px-5 py-3">Of limit</th></tr></thead>
             <tbody className="divide-y divide-gray-100">
               {data.rows.map(r => (
                 <tr key={r.key}>
@@ -274,7 +274,7 @@ function LimitsTab({ connected, orgs }) {
       <Card className="overflow-hidden">
         <div className="px-6 pt-5 pb-3 text-sm font-semibold text-gray-900">Per organisation (monthly)</div>
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600"><tr><th className="px-6 py-3">Organisation</th><th className="px-6 py-3">Budget</th><th className="px-6 py-3">Tokens</th></tr></thead>
+          <thead className="bg-white text-left text-xs font-semibold text-gray-600"><tr><th className="px-6 py-3">Organisation</th><th className="px-6 py-3">Budget</th><th className="px-6 py-3">Tokens</th></tr></thead>
           <tbody className="divide-y divide-gray-100">
             {orgs.map(o => { const l = orgLimit(o.schema_name); return (
               <tr key={o.schema_name}>
@@ -293,10 +293,10 @@ function LimitsTab({ connected, orgs }) {
         </div>
         {logins.length === 0 ? <div className="px-6 pb-6 text-sm text-gray-500">No user logins found.</div> : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600"><tr><th className="px-6 py-3">User</th><th className="px-6 py-3">Organisation</th><th className="px-6 py-3">AI allowed</th><th className="px-6 py-3">Daily requests</th></tr></thead>
+            <thead className="bg-white text-left text-xs font-semibold text-gray-600"><tr><th className="px-6 py-3">User</th><th className="px-6 py-3">Organisation</th><th className="px-6 py-3">AI allowed</th><th className="px-6 py-3">Daily requests</th></tr></thead>
             <tbody className="divide-y divide-gray-100">
               {logins.filter(c => !userQuery || `${c.email} ${c.full_name || ''} ${c.company_id}`.toLowerCase().includes(userQuery.toLowerCase())).map(c => { const u = userLimit(c.email, c.company_id); return (
-                <tr key={`${c.company_id}-${c.email}`} className={u.ai_enabled === false ? 'bg-gray-50/70' : ''}>
+                <tr key={`${c.company_id}-${c.email}`} className={u.ai_enabled === false ? 'bg-white' : ''}>
                   <td className="px-6 py-3"><div className="font-semibold text-gray-900">{c.full_name || c.email}</div>{c.full_name && <div className="text-xs text-gray-500">{c.email}</div>}</td>
                   <td className="px-6 py-3 text-gray-700">{orgs.find(o => o.schema_name === c.company_id)?.display_name || c.company_id}</td>
                   <td className="px-6 py-3">
@@ -329,7 +329,7 @@ export default function AiSettings() {
   }, []);
   const orgNames = useMemo(() => Object.fromEntries(orgs.map(o => [o.schema_name, o.display_name || o.schema_name])), [orgs]);
   return (
-    <div className="h-full overflow-y-auto bg-gray-50">
+    <div className="h-full overflow-y-auto bg-white">
       <div className="max-w-6xl mx-auto px-6 py-10 space-y-8">
         <div>
           <p className="text-sm font-medium text-green-700">Configuration</p>

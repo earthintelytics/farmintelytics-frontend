@@ -43,7 +43,7 @@ const GroupCarbonPage = () => {
       {groups.length > 0 && (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600">
+            <thead className="bg-white text-left text-xs font-semibold text-gray-600">
               <tr><th className="px-5 py-3">Group / member</th><th className="px-5 py-3">Area</th><th className="px-5 py-3">Estimated carbon</th></tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -76,7 +76,7 @@ const GroupRows = ({ group, open, onToggle }) => (
       <td className="px-5 py-3 font-mono text-gray-900">{range(group.carbon_t)}</td>
     </tr>
     {open && (group.members || []).map((m) => (
-      <tr key={m.id} className="bg-gray-50/50">
+      <tr key={m.id} className="bg-white">
         <td className="pl-12 pr-5 py-2.5 text-gray-700">{m.name}</td>
         <td className="px-5 py-2.5 font-mono text-gray-600">{ha(m.area_ha)}</td>
         <td className="px-5 py-2.5 font-mono text-gray-700">

@@ -13,7 +13,7 @@ import { parseCsv, suggestMapping, applyMapping, checkRows, templateCsv, buildFi
  */
 
 const STATUS = {
-  missing: { label: 'Not provided yet', cls: 'bg-gray-50 text-gray-700 border-gray-200' },
+  missing: { label: 'Not provided yet', cls: 'bg-white text-gray-700 border-gray-200' },
   due: { label: 'Update due', cls: 'bg-sky-50 text-sky-700 border-sky-200' },
   ok: { label: 'Up to date', cls: 'bg-green-50 text-green-700 border-green-200' },
 };
@@ -46,7 +46,7 @@ const StepBar = ({ step }) => (
       <React.Fragment key={label}>
         {i > 0 && <span className="w-6 h-px bg-gray-200" />}
         <span className={`flex items-center gap-2 font-semibold ${i + 1 === step ? 'text-green-700' : i + 1 < step ? 'text-gray-700' : 'text-gray-400'}`}>
-          <span className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs ${i + 1 === step ? 'border-green-600 bg-green-50' : i + 1 < step ? 'border-gray-300 bg-gray-50' : 'border-gray-200'}`}>{i + 1}</span>
+          <span className={`w-6 h-6 rounded-full border flex items-center justify-center text-xs ${i + 1 === step ? 'border-green-600 bg-green-50' : i + 1 < step ? 'border-gray-300 bg-white' : 'border-gray-200'}`}>{i + 1}</span>
           {label}
         </span>
       </React.Fragment>
@@ -73,7 +73,7 @@ function CheckResult({ result, total }) {
         ))}
       </div>
       {result.unknownIds.length > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+        <div className="rounded-xl border border-gray-200 bg-white p-4">
           <div className="text-sm font-semibold text-gray-900">These blocks are not registered for your organisation</div>
           <p className="text-xs text-gray-600 mt-1">Check the spelling, or the estate column if you have several estates. Blocks are registered with your boundary at onboarding.</p>
           <div className="flex flex-wrap gap-1.5 mt-3">
@@ -85,7 +85,7 @@ function CheckResult({ result, total }) {
       {problems > 0 ? (
         <div className="rounded-xl border border-gray-200 overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-[11px]  text-gray-600">
+            <thead className="bg-white text-left text-[11px]  text-gray-600">
               <tr><th className="px-4 py-2.5">Row</th><th className="px-4 py-2.5">Column</th><th className="px-4 py-2.5">Problem</th></tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
@@ -94,7 +94,7 @@ function CheckResult({ result, total }) {
               ))}
             </tbody>
           </table>
-          {problems > 100 && <div className="px-4 py-2 text-xs text-gray-500 bg-gray-50">Showing the first 100 of {problems} problems.</div>}
+          {problems > 100 && <div className="px-4 py-2 text-xs text-gray-500 bg-white">Showing the first 100 of {problems} problems.</div>}
         </div>
       ) : (
         <div className="flex items-center gap-2 text-sm font-semibold text-green-700"><CheckCircle2 size={16} /> Every row passed the checks.</div>
@@ -190,7 +190,7 @@ function UploadTab({ dataset, fieldIndex, connected }) {
     <div className="space-y-6">
       <StepBar step={step} />
       {step === 1 && (
-        <label className="block rounded-2xl border-2 border-dashed border-gray-300 hover:border-green-500 bg-gray-50/50 p-10 text-center cursor-pointer transition-colors">
+        <label className="block rounded-2xl border-2 border-dashed border-gray-300 hover:border-green-500 bg-white p-10 text-center cursor-pointer transition-colors">
           <input type="file" accept=".csv,text/csv" className="hidden" onChange={e => onFile(e.target.files?.[0])} />
           <FileSpreadsheet className="mx-auto text-gray-400" size={36} />
           <div className="text-base font-semibold text-gray-900 mt-3">Choose a CSV file</div>
@@ -212,7 +212,7 @@ function UploadTab({ dataset, fieldIndex, connected }) {
             <>
               <div className="rounded-xl border border-gray-200 overflow-hidden">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-left text-[11px]  text-gray-600">
+                  <thead className="bg-white text-left text-[11px]  text-gray-600">
                     <tr><th className="px-4 py-2.5 w-[40%]">Our column</th><th className="px-4 py-2.5 w-[30%]">Your column</th><th className="px-4 py-2.5">Example from your file</th></tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -315,7 +315,7 @@ function ManualTab({ dataset, fieldIndex, blockOptions, connected }) {
       {blockOptions.length > 0 && <datalist id={`blocks-${dataset.id}`}>{blockOptions.map(b => <option key={b} value={b} />)}</datalist>}
       <div className="rounded-xl border border-gray-200 overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-[11px]  text-gray-600">
+          <thead className="bg-white text-left text-[11px]  text-gray-600">
             <tr>{dataset.columns.map(c => <th key={c.name} className="px-3 py-2.5 whitespace-nowrap">{c.name.replace(/_/g, ' ')}{c.required ? ' *' : ''}</th>)}<th className="w-10" /></tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -347,7 +347,7 @@ function ColumnGuide({ dataset }) {
       </div>
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-[11px]  text-gray-600">
+          <thead className="bg-white text-left text-[11px]  text-gray-600">
             <tr><th className="px-4 py-2.5">Column</th><th className="px-4 py-2.5">Meaning</th><th className="px-4 py-2.5">Format</th><th className="px-4 py-2.5">Example</th></tr>
           </thead>
           <tbody className="divide-y divide-gray-100">

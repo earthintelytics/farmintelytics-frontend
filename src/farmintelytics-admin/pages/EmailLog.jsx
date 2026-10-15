@@ -222,7 +222,7 @@ const EmailLog = () => {
       {/* Detail inspect modal */}
       {inspectLog && (
         <div
-          className="fixed inset-0 z-[1000] bg-gray-900/30 flex items-center justify-center p-4"
+          className="fixed inset-0 z-[1100] bg-gray-900/30 flex items-center justify-center p-4"
           onClick={() => setInspectLog(null)}
         >
           <div
@@ -247,7 +247,7 @@ const EmailLog = () => {
             </div>
 
             <div className="px-7 py-5 space-y-4 text-sm">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-gray-50 p-3.5 rounded-xl border border-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs bg-white p-3.5 rounded-xl border border-gray-100">
                 <div>
                   <span className="text-gray-500 block">Organisation</span>
                   <span className="font-semibold text-gray-800">{orgName(inspectLog.company_id)}</span>
@@ -305,7 +305,7 @@ const EmailLog = () => {
                   <label className="text-xs font-semibold text-gray-700 block mb-1.5">
                     Message body
                   </label>
-                  <pre className="p-3.5 bg-gray-50 rounded-xl border border-gray-200 font-mono text-xs text-gray-800 whitespace-pre-wrap overflow-x-auto max-h-60 leading-relaxed">
+                  <pre className="p-3.5 bg-white rounded-xl border border-gray-200 font-mono text-xs text-gray-800 whitespace-pre-wrap overflow-x-auto max-h-60 leading-relaxed">
                     {inspectLog.body}
                   </pre>
                 </div>

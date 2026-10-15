@@ -93,7 +93,7 @@ const FormBuilder = ({ initial, onSave, onCancel, saving, error }) => {
 
         <div className="space-y-2">
           <p className="text-xs font-medium text-gray-600">Preview on a phone</p>
-          <div className="mx-auto w-[320px] h-[600px] rounded-[2rem] border-8 border-gray-200 bg-gray-50 overflow-y-auto">
+          <div className="mx-auto w-[320px] h-[600px] rounded-[2rem] border-8 border-gray-200 bg-white overflow-y-auto">
             <div className="p-5 space-y-4">
               <h3 className="font-display text-xl font-semibold text-gray-900">{form.title || 'Form title'}</h3>
               {form.description && <p className="text-sm text-gray-600">{form.description}</p>}

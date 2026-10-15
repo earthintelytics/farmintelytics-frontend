@@ -107,7 +107,7 @@ const ProblemReports = () => {
               : <Button onClick={() => mark(open, true)} disabled={busy === open.id}><Check size={14} />Mark handled</Button>}
           </>}>
           <Field label="What happened"><p className="text-sm text-gray-800 whitespace-pre-wrap">{open.what}</p></Field>
-          {open.error && <Field label="Error shown"><pre className="text-xs text-gray-800 bg-gray-50 border border-gray-200 rounded-xl p-3 whitespace-pre-wrap break-words max-h-60 overflow-auto">{open.error}</pre></Field>}
+          {open.error && <Field label="Error shown"><pre className="text-xs text-gray-800 bg-white border border-gray-200 rounded-xl p-3 whitespace-pre-wrap break-words max-h-60 overflow-auto">{open.error}</pre></Field>}
           <dl className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
             <div><dt className="text-xs text-gray-500">From</dt><dd className="text-gray-900">{open.sender_email || '—'}{open.sender_role ? ` (${open.sender_role})` : ''}</dd></div>
             <div><dt className="text-xs text-gray-500">Page</dt><dd className="text-gray-900 break-all">{open.page || '—'}</dd></div>

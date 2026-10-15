@@ -87,7 +87,7 @@ export function renderDashboardHeader(ctx) {
             </button>
             {showNotifications && (
               <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-2xl shadow-xl z-[500] overflow-hidden">
-                <div className="px-4 py-3.5 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <div className="px-4 py-3.5 border-b border-gray-100 flex justify-between items-center bg-white">
                   <div className="text-xs font-bold text-gray-700">Live alerts feed</div>
                   <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${'bg-green-50 text-green-700'}`}>
                     {alerts.filter(a => a.status === 'Active').length} Active
@@ -132,7 +132,7 @@ export function renderDashboardHeader(ctx) {
             </button>
             {showUserMenu && (
               <div className="absolute right-0 top-full mt-2.5 w-64 bg-white border border-gray-200 rounded-2xl shadow-xl z-[500] overflow-hidden">
-                <div className="p-4 bg-gray-50/50 flex flex-col items-center text-center border-b border-gray-100">
+                <div className="p-4 bg-white flex flex-col items-center text-center border-b border-gray-100">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-semibold text-white text-lg mb-2.5 bg-green-700">
                     {profileInitials}
                   </div>

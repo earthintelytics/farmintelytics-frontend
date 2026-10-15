@@ -88,7 +88,7 @@ const SubmissionsPage = ({ formId: initialFormId }) => {
       {rows.length > 0 && form && (
         <Card className="overflow-hidden">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600">
+            <thead className="bg-white text-left text-xs font-semibold text-gray-600">
               <tr><th className="px-5 py-3">Sent</th><th className="px-5 py-3">First answer</th><th className="px-5 py-3">Photos</th><th className="px-5 py-3">Status</th></tr>
             </thead>
             <tbody className="divide-y divide-gray-100">

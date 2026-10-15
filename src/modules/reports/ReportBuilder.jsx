@@ -351,7 +351,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
               )}
             </div>
             {level === 'blocks' && (
-              <div className="rounded-xl border border-gray-200 p-3 space-y-2 bg-gray-50/50">
+              <div className="rounded-xl border border-gray-200 p-3 space-y-2 bg-white">
                 <input
                   value={blockQuery}
                   onChange={e => setBlockQuery(e.target.value)}
@@ -602,7 +602,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
               </div>
               <div className="space-y-3">
                 {(report.risks || []).map((r, i) => (
-                  <div key={i} className="p-3.5 rounded-xl border border-gray-100 bg-gray-50/70 space-y-1">
+                  <div key={i} className="p-3.5 rounded-xl border border-gray-100 bg-white space-y-1">
                     <div className="flex items-center justify-between text-xs font-semibold">
                       <span className="text-gray-900">{r.risk}</span>
                       <span
@@ -631,7 +631,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
               </div>
               <ul className="space-y-2.5 text-xs text-gray-700">
                 {(report.findings || []).map((f, i) => (
-                  <li key={i} className="flex items-start gap-2.5 p-2 rounded-lg bg-gray-50">
+                  <li key={i} className="flex items-start gap-2.5 p-2 rounded-lg bg-white">
                     <CheckCircle2 size={15} className="text-green-600 shrink-0 mt-0.5" />
                     <span>{f}</span>
                   </li>
@@ -656,7 +656,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="border-b border-gray-200 text-gray-500 font-semibold bg-gray-50/50">
+                  <thead className="border-b border-gray-200 text-gray-500 font-semibold bg-white">
                     <tr>
                       <th className="py-2.5 px-3">Block</th>
                       <th className="py-2.5 px-3">Estate</th>
@@ -709,7 +709,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
           </div>
 
           {/* SECTION 7: Interactive AI Assistant on this Report */}
-          <Card className="p-6 border-green-200 bg-gray-50/60 space-y-4 no-print">
+          <Card className="p-6 border-green-200 bg-white space-y-4 no-print">
             <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
               <BrainCircuit size={16} className="text-green-700" />
               Ask AI agronomist about this report
@@ -762,7 +762,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
           </Card>
 
           {/* SECTION 9: Technical appendix (included by default; for agronomists, buyers and auditors) */}
-          <Card className="p-6 space-y-4 bg-gray-50/60">
+          <Card className="p-6 space-y-4 bg-white">
             <div className="text-sm font-bold text-gray-900">Technical appendix</div>
             <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-xs text-gray-700">
               <div><dt className="font-semibold text-gray-900">Imagery</dt><dd>{(report.data_used?.sources || []).join('; ') || 'Not recorded for this report'}</dd></div>

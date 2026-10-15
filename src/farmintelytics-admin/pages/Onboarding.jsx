@@ -378,7 +378,7 @@ const Onboarding = () => {
   });
 
   return (
-    <div className="h-full overflow-y-auto bg-gray-50">
+    <div className="h-full overflow-y-auto bg-white">
       <div className="max-w-4xl mx-auto px-6 py-10 space-y-8">
         <div>
           <p className="text-sm font-medium text-green-700">Setup</p>
@@ -509,7 +509,7 @@ const Onboarding = () => {
                     )}
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
-                    <label className={`flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed cursor-pointer ${e.boundaryFile ? 'border-green-600 bg-green-50/40' : 'border-gray-300 bg-gray-50 hover:border-gray-400'}`}>
+                    <label className={`flex flex-col items-center justify-center gap-2 p-6 rounded-xl border-2 border-dashed cursor-pointer ${e.boundaryFile ? 'border-green-600 bg-green-50/40' : 'border-gray-300 bg-white hover:border-gray-400'}`}>
                       <UploadCloud size={24} className={e.boundaryFile ? 'text-green-700' : 'text-gray-400'} />
                       <span className="text-sm font-semibold text-gray-800 text-center">{e.boundaryFile ? e.boundaryFile.name : 'Choose the boundary file (.geojson)'}</span>
                       <span className="text-xs text-gray-500 text-center">The outline of the estate, with its blocks if you have them</span>
@@ -769,7 +769,7 @@ const Onboarding = () => {
                   {done.configs.map(c => (
                     <div key={c.filename} className="space-y-1.5">
                       <div className="text-xs font-semibold text-gray-700">Pipeline configuration <span className="font-mono">{c.filename}</span></div>
-                      {c.content && <pre className="text-xs font-mono text-gray-700 bg-gray-50 border border-gray-200 rounded-lg p-3 overflow-x-auto max-h-60">{c.content}</pre>}
+                      {c.content && <pre className="text-xs font-mono text-gray-700 bg-white border border-gray-200 rounded-lg p-3 overflow-x-auto max-h-60">{c.content}</pre>}
                     </div>
                   ))}
                   {done.schedulers.map(s => <div key={s.name} className="text-xs text-gray-600">Schedule <span className="font-mono">{s.name}</span> · <span className="font-mono">{s.cron}</span></div>)}

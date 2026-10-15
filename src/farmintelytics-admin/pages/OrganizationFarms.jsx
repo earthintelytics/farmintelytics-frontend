@@ -52,10 +52,10 @@ const OrgDetailPanel = ({ org: initialOrg, onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[1000] bg-gray-900/30 flex justify-end" onClick={onClose}>
+    <div className="fixed inset-0 z-[1100] bg-gray-900/30 flex justify-end" onClick={onClose}>
       <aside className="w-full max-w-2xl h-full bg-white border-l border-gray-200 flex flex-col" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-start gap-3 px-6 py-5 border-b border-gray-100">
-          <span className="w-10 h-10 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+          <span className="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
             {org.logo_url ? <img src={org.logo_url} alt="" className="w-full h-full object-contain p-1" /> : <Building2 size={18} className="text-gray-400" />}
           </span>
           <div className="flex-1 min-w-0">

@@ -57,7 +57,7 @@ export default function StorageUsage({ disk }) {
 
       <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600">
+          <thead className="bg-white text-left text-xs font-semibold text-gray-600">
             <tr><th className="px-5 py-3">Organisation</th><th className="px-5 py-3">Space used</th><th className="px-5 py-3 w-1/3">Share</th><th className="px-5 py-3">Files</th></tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
@@ -77,7 +77,7 @@ export default function StorageUsage({ disk }) {
                   <td className="px-5 py-3 font-mono text-gray-600">{o.objects.toLocaleString()}</td>
                 </tr>,
                 open === o.id && (
-                  <tr key={`${o.id}-areas`} className="bg-gray-50/60">
+                  <tr key={`${o.id}-areas`} className="bg-white">
                     <td colSpan={4} className="px-5 py-3">
                       <ul className="grid gap-x-8 gap-y-1 sm:grid-cols-2 text-xs">
                         {o.areas.map((a) => <li key={a.id} className="flex justify-between"><span className="text-gray-600">{a.label}</span><span className="font-mono text-gray-900">{fmtBytes(a.bytes)}</span></li>)}

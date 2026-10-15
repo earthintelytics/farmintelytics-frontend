@@ -66,7 +66,7 @@ const AddMemberEntry = ({ onClose, onSaved, onDesign }) => {
         <>
           {form.description && <p className="text-sm text-gray-600">{form.description}</p>}
           <FormRenderer fields={form.fields} answers={answers} onChange={setAnswers} errors={errors} />
-          <label className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-700">
+          <label className="flex items-start gap-3 p-4 rounded-xl border border-gray-200 bg-white text-sm text-gray-700">
             <input type="checkbox" className="mt-1" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} />
             <span><strong>The farmer agreed to this:</strong> “{consentText(org)}”</span>
           </label>

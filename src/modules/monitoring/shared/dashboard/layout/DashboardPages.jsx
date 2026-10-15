@@ -34,7 +34,7 @@ import ScenarioBuilder from '../../../../assistant/ScenarioBuilder';
 export function renderDashboardPages(ctx) {
   const { blockMeasures, TIMELINE_DATA, activeAnalyticsSubpage, activeSidebarItem, activeTab, alerts, answersForm, basemapAttribution, basemapMaxNativeZoom, basemapUrl, blockValue, chatEndRef, chatInput, chatLoading, chatMessages, climateBoundariesOpacity, climatePlotsData, climatePlotsDataA, climatePlotsDataB, climateShowBoundaries, climateShowLayers, cropLabel, cropProfileEntries, cropType, currentTileUrl, currentTileUrlB, currentTimelineA, currentTimelineB, dashboardFilterKeys, dataFocus, defaultMapCenter, dynamicFilterValues, estateOptions, farmBoundary, filterDate, filterEstate, filterPlot, filteredPlotsData, glossaryFocus, handleAcknowledgeAlert, handleChatSubmit, handleEstateChange, handlePlotClick, handlePlotFilterChange, handleSidebarClick, handleSplitDragStart, healthBoundariesOpacity, healthPlotsData, healthPlotsDataA, healthPlotsDataB, healthShowBoundaries, healthShowLayers, intelBoundariesOpacity, intelShowBoundaries, intelShowLayers, isAiOnly, isCompareMode, isOrg, kpiContext, landUseChange, landUseChangeLoading, loadIssues, mapOpacity, moistureBoundariesOpacity, moisturePlotsData, moisturePlotsDataA, moisturePlotsDataB, moistureShowBoundaries, moistureShowLayers, nutrientData, overviewTrends, pageSet, pick, pixelTimeseries, plots, plotsData, plotsDataA, plotsDataB, rasterOverlayBounds, renderClimatePolygons, renderFloatingBasemapSelector, renderHealthPolygons, renderInfoTooltip, renderIntelPolygons, renderLegendCards, renderMapBottomPanel, renderMoisturePolygons, renderRestorePolygons, renderYieldPolygons, restorationPlotsData, restorationPlotsDataA, restorationPlotsDataB, restoreBoundariesOpacity, restoreShowBoundaries, restoreShowLayers, scenarioFormOpen, selectedIndex, selectedPlot, service, setActiveAnalyticsSubpage, setActiveSidebarItem, setActiveTab, setAnswersForm, setChatInput, setChatMessages, setClimateBoundariesOpacity, setClimateShowBoundaries, setClimateShowLayers, setDataFocus, setDynamicFilterValues, setFilterDate, setFilterEstate, setFilterPlot, setHealthBoundariesOpacity, setHealthShowBoundaries, setHealthShowLayers, setIntelBoundariesOpacity, setIntelShowBoundaries, setIntelShowLayers, setLoadIssues, setMapOpacity, setMoistureBoundariesOpacity, setMoistureShowBoundaries, setMoistureShowLayers, setRestoreBoundariesOpacity, setRestoreShowBoundaries, setRestoreShowLayers, setScenarioFormOpen, setSelectedPlot, setShowRasterLayer, setYieldBoundariesOpacity, setYieldShowBoundaries, setYieldShowLayers, showRasterLayer, splitPosition, tenant, tenantDisplayName, tileRefreshing, waterDemandData, waterDemandLoading, yieldBoundariesOpacity, yieldPlotsData, yieldPlotsDataA, yieldPlotsDataB, yieldShowBoundaries, yieldShowLayers, zarrBounds } = ctx;
   return (
-<main className={`flex-1 flex flex-col relative bg-gray-50 ${['intelligence-layers', 'crop-health', 'crop-yield', 'moisture-content', 'climate', 'land-restoration', 'block-summary'].includes(activeSidebarItem) ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+<main className={`flex-1 flex flex-col relative bg-white ${['intelligence-layers', 'crop-health', 'crop-yield', 'moisture-content', 'climate', 'land-restoration', 'block-summary'].includes(activeSidebarItem) ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           {loadIssues.length > 0 && (
             <div role="alert" className="shrink-0 mx-4 mt-3 px-4 py-2.5 rounded-xl border border-amber-200 bg-amber-50 text-sm text-amber-900 flex items-center justify-between gap-3 z-[1100]">
               <span>Could not load {loadIssues.join(', ')}. What is shown may be incomplete.</span>
@@ -95,14 +95,14 @@ export function renderDashboardPages(ctx) {
                     <input
                       type="text"
                       placeholder="Search blocks, parameters, anomalies..."
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-11 pr-4 text-sm font-medium outline-none focus:border-green-500 focus:bg-white transition-all text-gray-700"
+                      className="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-11 pr-4 text-sm font-medium outline-none focus:border-green-500 focus:bg-white transition-all text-gray-700"
                     />
                   </div>
                   
                   {/* Active Filter Dropdowns */}
                   <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
                     {/* Estate Filter */}
-                    <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2">
                       <span className="text-[11px] font-semibold text-gray-600">Estate</span>
                       <select
                         value={filterEstate}
@@ -117,7 +117,7 @@ export function renderDashboardPages(ctx) {
                     </div>
 
                     {/* Plot Filter — populated from real plot IDs */}
-                    <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2">
                       <span className="text-[11px] font-semibold text-gray-600">Plot</span>
                       <select
                         value={filterPlot}
@@ -132,7 +132,7 @@ export function renderDashboardPages(ctx) {
                     </div>
 
                     {/* Date Filter */}
-                    <div className="flex items-center gap-2 bg-gray-50 border border-gray-200 rounded-xl px-3 py-2">
+                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2">
                       <span className="text-[11px] font-semibold text-gray-600">Date</span>
                       <select
                         value={filterDate}
@@ -299,7 +299,7 @@ export function renderDashboardPages(ctx) {
                             <div className="px-4 py-3 border-b border-gray-100 text-xs font-bold text-gray-700">Per-Plot Crop Water Demand</div>
                             <div className="max-h-80 overflow-y-auto">
                               <table className="w-full text-xs">
-                                <thead className="bg-gray-50 text-gray-600 text-[11px]">
+                                <thead className="bg-white text-gray-600 text-[11px]">
                                   <tr>
                                     <th className="text-left px-4 py-2">Plot</th>
                                     <th className="text-left px-4 py-2">Area (ha)</th>
@@ -365,7 +365,7 @@ export function renderDashboardPages(ctx) {
                               { name: 'Available Phosphorus (P)', value: '—', status: '—', color: 'text-gray-500' },
                               { name: 'Exchangeable Potassium (K)', value: '—', status: '—', color: 'text-gray-500' }
                             ].map((item, idx) => (
-                              <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+                              <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100">
                                 <span className="text-xs font-bold text-gray-500">{item.name}</span>
                                 <span className={`text-xs font-bold ${item.color}`}>{item.value}</span>
                               </div>
@@ -483,7 +483,7 @@ export function renderDashboardPages(ctx) {
               )}
 
               {/* Main Content Area */}
-              <div className="flex-1 overflow-y-auto flex flex-col min-h-0 bg-gray-50/20">
+              <div className="flex-1 overflow-y-auto flex flex-col min-h-0 bg-white">
                 {chatMessages.length === 1 ? (
                   /* Start page: what-ifs, scrolls from the top so nothing is cut off */
                   <div className="w-full max-w-4xl mx-auto px-6 py-8">

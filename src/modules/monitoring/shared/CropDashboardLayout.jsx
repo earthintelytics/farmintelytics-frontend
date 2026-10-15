@@ -1847,7 +1847,7 @@ Context: ${context}.`;
   // ─── Health badge helper ────────────────────────────────────────────────
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 text-gray-900 font-sans antialiased overflow-hidden">
+    <div className="h-screen flex flex-col bg-white text-gray-900 font-sans antialiased overflow-hidden">
       {hasSession && (
         <DataNeededDialog
           cropType={isOrg ? null : cropType}

@@ -358,7 +358,7 @@ export default function ProtectedAreas() {
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+            <thead className="bg-white border-b border-gray-200 text-xs font-semibold text-gray-600 uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-3.5">Protected area name</th>
                 <th className="px-6 py-3.5">Source & version</th>
@@ -448,7 +448,7 @@ export default function ProtectedAreas() {
             </tbody>
           </table>
         </div>
-        <div className="px-6 py-3 border-t border-gray-200 bg-gray-50 flex items-center justify-between text-xs text-gray-500">
+        <div className="px-6 py-3 border-t border-gray-200 bg-white flex items-center justify-between text-xs text-gray-500">
           <span>Showing {areas.length} of {total} registered boundaries</span>
           <span>Layer export: shared/protected_areas/active.geojson</span>
         </div>

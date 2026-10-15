@@ -111,7 +111,7 @@ const ScenarioBuilder = ({ cropType, serviceId, estates = [], onRun, onFormOpen 
           </div>
         )}
         <FieldNotes value={notes} onChange={setNotes} placeholder="e.g. Block 4B has yellow leaves near the drain; fertiliser went on 12 March." />
-        <div className="rounded-xl bg-gray-50 border border-gray-200 p-4">
+        <div className="rounded-xl bg-white border border-gray-200 p-4">
           <p className="text-xs font-semibold text-gray-500">The question that will be asked</p>
           <p className="text-sm text-gray-800 leading-relaxed mt-1">{fill(active.question, values)}</p>
         </div>

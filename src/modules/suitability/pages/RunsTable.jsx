@@ -7,7 +7,7 @@ const when = (t) => (t ? new Date(t).toLocaleDateString(undefined, { day: 'numer
 const RunsTable = ({ runs, onOpen, showCrop = true }) => (
   <Card className="overflow-x-auto">
     <table className="w-full text-sm">
-      <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600">
+      <thead className="bg-white text-left text-xs font-semibold text-gray-600">
         <tr>
           <th className="px-5 py-3">Organisation</th>
           {showCrop && <th className="px-5 py-3">Crop</th>}

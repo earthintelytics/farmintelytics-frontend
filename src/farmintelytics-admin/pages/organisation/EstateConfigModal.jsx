@@ -59,7 +59,7 @@ const EstateConfigModal = ({ farm, onClose }) => {
       )}
       {state === 'ready' && (
         <textarea value={content} onChange={(e) => setContent(e.target.value)} spellCheck={false}
-          className="w-full min-h-[340px] p-4 rounded-xl border border-gray-300 bg-gray-50 font-mono text-xs text-gray-800 outline-none focus:border-green-600 resize-y" />
+          className="w-full min-h-[340px] p-4 rounded-xl border border-gray-300 bg-white font-mono text-xs text-gray-800 outline-none focus:border-green-600 resize-y" />
       )}
     </Modal>
   );

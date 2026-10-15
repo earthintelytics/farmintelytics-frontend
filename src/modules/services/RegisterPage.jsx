@@ -11,7 +11,7 @@ const STATUS = {
   pass: ['No deforestation found', 'bg-green-50 text-green-800 border-green-200'],
   review: ['Needs review', 'bg-amber-50 text-amber-800 border-amber-200'],
   fail: ['Deforestation found', 'bg-red-50 text-red-700 border-red-200'],
-  not_checked: ['Not checked', 'bg-gray-50 text-gray-600 border-gray-200'],
+  not_checked: ['Not checked', 'bg-white text-gray-600 border-gray-200'],
 };
 
 function cell(col, plot) {
@@ -63,7 +63,7 @@ const RegisterPage = ({ register, plots }) => {
           <div className="p-10 text-center text-sm text-gray-600">No registered plots yet. Plots appear here once their boundaries are uploaded at onboarding.</div>
         ) : (
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600"><tr>{cols.map(c => <th key={c.id} className="px-5 py-3">{c.label}</th>)}</tr></thead>
+            <thead className="bg-white text-left text-xs font-semibold text-gray-600"><tr>{cols.map(c => <th key={c.id} className="px-5 py-3">{c.label}</th>)}</tr></thead>
             <tbody className="divide-y divide-gray-100">{rows.map(p => <tr key={p.id}>{cols.map(c => <td key={c.id} className="px-5 py-3 text-gray-700">{cell(c, p)}</td>)}</tr>)}</tbody>
           </table>
         )}

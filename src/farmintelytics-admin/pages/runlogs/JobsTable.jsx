@@ -27,7 +27,7 @@ const JobsTable = ({ jobs }) => {
             </tr>
             {isOpen && (
               <tr>
-                <td colSpan={7} className="px-5 py-4 bg-gray-50 space-y-3">
+                <td colSpan={7} className="px-5 py-4 bg-white space-y-3">
                   <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[['Created', fmtTime(job.created_at)], ['Finished', fmtTime(job.completed_at)], ['Imagery', job.sensor || '—'], ['Dates', `${job.start_date || '—'} to ${job.end_date || '—'}`]].map(([k, v]) => (
                       <div key={k}><dt className="text-xs text-gray-500">{k}</dt><dd className="text-sm text-gray-900 mt-0.5">{v}</dd></div>

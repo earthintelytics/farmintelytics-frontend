@@ -66,7 +66,7 @@ const LegendEditor = ({ item, cropType, companyId, onSaved, onError }) => {
             <p className="text-xs text-gray-500 mt-2">How the map looks, lowest value on the left.</p>
           </div>
         )}
-        {item.notes && <p className="text-sm text-gray-600 bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">{item.notes}</p>}
+        {item.notes && <p className="text-sm text-gray-600 bg-white border border-gray-200 rounded-xl px-4 py-3">{item.notes}</p>}
         {item.formula && <p className="text-xs font-mono text-gray-500">{item.formula}</p>}
 
         <div className="space-y-3">

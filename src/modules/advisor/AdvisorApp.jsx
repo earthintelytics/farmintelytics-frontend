@@ -201,7 +201,7 @@ function AdvisoriesTab({ onAsk }) {
             <p className="text-sm text-gray-500 mt-1">Advisories appear here when a satellite run finds a problem in a block.</p>
           </div>
         ) : ordered.map((a) => {
-          const [label, cls] = SEVERITY[a.severity] || ['Note', 'border-gray-200 bg-gray-50 text-gray-700'];
+          const [label, cls] = SEVERITY[a.severity] || ['Note', 'border-gray-200 bg-white text-gray-700'];
           return (
             <article key={a.alert_id || `${a.plot_id}-${a.type}`} className="rounded-xl border border-gray-200 p-4 space-y-2">
               <div className="flex items-center gap-2 flex-wrap">

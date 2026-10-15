@@ -1,13 +1,13 @@
 /**
  * Admin console building blocks, taken from the Scheduler and AI settings
- * pages so every admin page looks and behaves the same: white cards on gray,
+ * pages so every admin page looks and behaves the same: white pages and cards,
  * Sora headings, sentence case, status colours from tokens, no inline styles,
  * no glows.
  */
 import { X } from 'lucide-react';
 
 export const Page = ({ eyebrow, title, text, actions, children, wide = false }) => (
-  <div className="h-full overflow-y-auto bg-gray-50">
+  <div className="h-full overflow-y-auto bg-white">
     <div className={`${wide ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-6 py-10 space-y-8`}>
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
@@ -70,7 +70,7 @@ const PILL = {
   warning: 'bg-amber-50 text-amber-800 border-amber-200',
   critical: 'bg-red-50 text-red-700 border-red-200',
   info: 'bg-sky-50 text-sky-800 border-sky-200',
-  neutral: 'bg-gray-50 text-gray-700 border-gray-200',
+  neutral: 'bg-white text-gray-700 border-gray-200',
 };
 export const Pill = ({ tone = 'neutral', children }) => <span className={`inline-flex items-center text-xs font-semibold px-2 py-0.5 rounded-full border ${PILL[tone] || PILL.neutral}`}>{children}</span>;
 
@@ -93,7 +93,7 @@ export const Tabs = ({ tabs, value, onChange }) => (
 export const Table = ({ columns, children }) => (
   <div className="bg-white border border-gray-200 rounded-2xl overflow-x-auto">
     <table className="w-full text-sm">
-      <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600">
+      <thead className="bg-white text-left text-xs font-semibold text-gray-600">
         <tr>{columns.map((c) => <th key={c.key || c.label} className={`px-5 py-3 ${c.className || ''}`}>{c.label}</th>)}</tr>
       </thead>
       <tbody className="divide-y divide-gray-100">{children}</tbody>
@@ -109,7 +109,7 @@ export const Note = ({ tone = 'info', children }) => (
 );
 
 export const Modal = ({ title, text, onClose, footer, children, size = 'md' }) => (
-  <div className="fixed inset-0 z-[1000] bg-gray-900/30 flex items-center justify-center p-4" onClick={onClose}>
+  <div className="fixed inset-0 z-[1100] bg-gray-900/30 flex items-center justify-center p-4" onClick={onClose}>
     <div className={`w-full ${size === 'lg' ? 'max-w-3xl' : size === 'xl' ? 'max-w-5xl' : 'max-w-lg'} max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 shadow-xl`} onClick={(e) => e.stopPropagation()}>
       <div className="flex items-start justify-between gap-4 px-7 pt-6">
         <div>

@@ -187,7 +187,7 @@ function FileViewer({ file, onClose }) {
       footer={<><Button variant="secondary" onClick={() => copyText(content)} disabled={!content}>Copy</Button><Button onClick={onClose}>Close</Button></>}>
       {state === 'loading' && <Loading />}
       {state === 'error' && <p className="text-sm text-red-800">{error}</p>}
-      {state === 'ready' && <pre className="text-xs font-mono text-gray-800 bg-gray-50 border border-gray-200 rounded-xl p-4 max-h-[60vh] overflow-auto whitespace-pre-wrap">{content}</pre>}
+      {state === 'ready' && <pre className="text-xs font-mono text-gray-800 bg-white border border-gray-200 rounded-xl p-4 max-h-[60vh] overflow-auto whitespace-pre-wrap">{content}</pre>}
     </Modal>
   );
 }

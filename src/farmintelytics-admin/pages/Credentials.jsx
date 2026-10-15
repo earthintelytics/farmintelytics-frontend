@@ -71,7 +71,7 @@ const Credentials = () => {
         const org = orgs.find((o) => o.schema_name === companyId);
         return (
           <Card key={companyId} className="overflow-hidden">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 px-6 py-4 bg-gray-50 border-b border-gray-100">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 px-6 py-4 bg-white border-b border-gray-100">
               <div className="flex items-center gap-3">
                 <span className="w-9 h-9 rounded-xl bg-green-50 border border-green-200 text-green-700 flex items-center justify-center"><Shield size={16} /></span>
                 <div>

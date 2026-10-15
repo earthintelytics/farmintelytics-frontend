@@ -32,7 +32,7 @@ const OrganisationCard = ({ profile, services, canEdit, onLogo }) => {
       <CardHeader title="Organisation" text="Your logo appears in the header and on reports." />
       <div className="p-6 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl border border-gray-200 bg-gray-50 flex items-center justify-center overflow-hidden shrink-0">
+          <div className="w-20 h-20 rounded-2xl border border-gray-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
             {profile.logoUrl ? <img src={profile.logoUrl} alt="" className="w-full h-full object-contain" /> : <Building2 size={32} className="text-gray-400" />}
           </div>
           <div className="flex-1 min-w-0">

@@ -121,7 +121,7 @@ export default function DocumentationPage() {
                 ))}
               </ol>
               {active.tip && (
-                <div className="mt-8 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                <div className="mt-8 rounded-xl border border-gray-200 bg-white px-4 py-3">
                   <p className="text-sm text-gray-700"><span className="font-semibold text-gray-900">Tip: </span>{active.tip}</p>
                 </div>
               )}

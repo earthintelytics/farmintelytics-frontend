@@ -81,7 +81,7 @@ function JobDetailModal({ job, orgName, onClose, onRetry }) {
 
       {job.error && <ErrorBox error={job.error} />}
 
-      <dl className="grid grid-cols-2 sm:grid-cols-5 gap-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
+      <dl className="grid grid-cols-2 sm:grid-cols-5 gap-4 bg-white border border-gray-200 rounded-xl p-4">
         {[
           ['Organisation', orgName(job.company_id)],
           ['Service / Farm', job.service || job.farm_id || 'All licensed'],
@@ -97,7 +97,7 @@ function JobDetailModal({ job, orgName, onClose, onRetry }) {
       </dl>
 
       {job.step && (
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-700">
+        <div className="bg-white border border-gray-200 rounded-xl p-3 text-xs text-gray-700">
           <span className="font-semibold text-gray-900 mr-2">Current step:</span>
           {job.step}
         </div>
@@ -106,7 +106,7 @@ function JobDetailModal({ job, orgName, onClose, onRetry }) {
       <div>
         <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Stored output files</p>
         {(job.outputs || []).length > 0 ? (
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 max-h-40 overflow-y-auto space-y-1">
+          <div className="bg-white border border-gray-200 rounded-xl p-3 max-h-40 overflow-y-auto space-y-1">
             {job.outputs.map((o) => (
               <p key={o} className="text-xs font-mono text-gray-800 break-all select-all">{o}</p>
             ))}

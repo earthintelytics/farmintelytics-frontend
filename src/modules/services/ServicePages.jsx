@@ -25,7 +25,7 @@ const CHECK = {
   pass: ['No deforestation found', 'bg-green-50 text-green-800 border-green-200'],
   review: ['Needs review', 'bg-amber-50 text-amber-800 border-amber-200'],
   fail: ['Deforestation found', 'bg-red-50 text-red-700 border-red-200'],
-  not_checked: ['Not checked', 'bg-gray-50 text-gray-600 border-gray-200'],
+  not_checked: ['Not checked', 'bg-white text-gray-600 border-gray-200'],
 };
 
 // Check: per-plot result with the evidence behind it (EUDR)
@@ -57,7 +57,7 @@ export function CheckPage({ page, plots, onOpenData }) {
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
           <Card className="overflow-hidden">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600"><tr><th className="px-5 py-3">Plot</th><th className="px-5 py-3">Estate</th><th className="px-5 py-3">Result</th></tr></thead>
+              <thead className="bg-white text-left text-xs font-semibold text-gray-600"><tr><th className="px-5 py-3">Plot</th><th className="px-5 py-3">Estate</th><th className="px-5 py-3">Result</th></tr></thead>
               <tbody className="divide-y divide-gray-100">
                 {rows.map(({ plot, r }) => (
                   <tr key={plot.id} onClick={() => setPicked(plot.id)} className={`cursor-pointer ${sel?.plot.id === plot.id ? 'bg-green-50/40' : 'hover:bg-gray-50'}`}>
@@ -99,7 +99,7 @@ export function AdvicePage({ page, alerts, onAsk }) {
       ) : (
         <div className="space-y-3">
           {sorted.map(a => {
-            const [label, cls] = SEV[a.severity] || ['Keep an eye on', 'bg-gray-50 text-gray-700 border-gray-200'];
+            const [label, cls] = SEV[a.severity] || ['Keep an eye on', 'bg-white text-gray-700 border-gray-200'];
             return (
               <Card key={a.id} className="p-5 flex items-start justify-between gap-4">
                 <div>

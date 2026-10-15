@@ -23,7 +23,7 @@ const RunLogModal = ({ log, onClose }) => {
       {tab === 'summary' ? (
         <>
           {log.error && <ErrorBox error={log.error} />}
-          <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-gray-50 border border-gray-200 rounded-xl p-4">
+          <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 bg-white border border-gray-200 rounded-xl p-4">
             {[['Job', log.job_name || '—'], ['When', fmtTime(log.timestamp)], ['Took', log.duration != null ? `${Number(log.duration).toFixed(1)} s` : '—'], ['Blocks processed', log.plots_processed ?? '—']].map(([k, v]) => (
               <div key={k}><dt className="text-xs text-gray-500">{k}</dt><dd className="text-sm font-semibold text-gray-900 mt-0.5">{v}</dd></div>
             ))}
@@ -38,7 +38,7 @@ const RunLogModal = ({ log, onClose }) => {
           </div>
         </>
       ) : (
-        <pre className="m-0 p-4 bg-gray-50 border border-gray-200 rounded-xl text-xs font-mono text-gray-800 whitespace-pre-wrap break-words max-h-[55vh] overflow-auto">{JSON.stringify(record, null, 2)}</pre>
+        <pre className="m-0 p-4 bg-white border border-gray-200 rounded-xl text-xs font-mono text-gray-800 whitespace-pre-wrap break-words max-h-[55vh] overflow-auto">{JSON.stringify(record, null, 2)}</pre>
       )}
     </Modal>
   );

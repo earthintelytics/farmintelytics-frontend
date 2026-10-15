@@ -42,7 +42,7 @@ const BoundaryModal = ({ farm, onClose }) => {
 
   return (
     <Modal size="lg" title={`${farm.farm_name}: boundary`} text={farm.boundary_minio_path} onClose={onClose}>
-      <div className="h-[420px] rounded-xl overflow-hidden border border-gray-200 bg-gray-50 relative">
+      <div className="h-[420px] rounded-xl overflow-hidden border border-gray-200 bg-white relative">
         {loading && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-sm text-gray-600 text-center px-6">
             <span>Loading the boundary… {seconds}s</span>

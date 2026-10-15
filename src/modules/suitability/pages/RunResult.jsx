@@ -235,7 +235,7 @@ const RunResult = ({ runId, companyId, onBack }) => {
 
             {/* Plain Legend per Layer */}
             {currentLegend?.items?.length ? (
-              <div className="px-5 py-3.5 border-t border-gray-100 bg-gray-50/70">
+              <div className="px-5 py-3.5 border-t border-gray-100 bg-white">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
                   <span className="text-xs font-semibold text-gray-800">
                     {currentLegend.name || LAYER_LABELS[selectedLayer] || selectedLayer}
@@ -259,7 +259,7 @@ const RunResult = ({ runId, companyId, onBack }) => {
                 </div>
               </div>
             ) : (
-              <div className="flex flex-wrap gap-4 px-5 py-3 border-t border-gray-100 text-xs text-gray-600 bg-gray-50/70">
+              <div className="flex flex-wrap gap-4 px-5 py-3 border-t border-gray-100 text-xs text-gray-600 bg-white">
                 {CLASSES.map((c) => (
                   <span key={c.key} className="inline-flex items-center gap-1.5">
                     <span className={`w-3 h-3 rounded-sm ${c.bar}`} />
@@ -288,7 +288,7 @@ const RunResult = ({ runId, companyId, onBack }) => {
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600">
+                  <thead className="bg-white text-left text-xs font-semibold text-gray-600">
                     <tr>
                       <th className="px-5 py-3">Field</th>
                       <th className="px-5 py-3">Result</th>

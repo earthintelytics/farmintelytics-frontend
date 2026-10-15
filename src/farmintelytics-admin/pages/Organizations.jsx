@@ -96,7 +96,7 @@ const Organizations = () => {
               <Card key={org.id} className="flex flex-col hover:border-gray-300 transition-colors">
                 <button type="button" onClick={() => setDetail(org)} className="text-left p-6 flex-1 space-y-4">
                   <div className="flex items-center gap-3">
-                    <span className="w-12 h-12 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
+                    <span className="w-12 h-12 rounded-xl bg-white border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
                       {org.logo_url ? <img src={org.logo_url} alt="" className="w-full h-full object-contain p-1" /> : <Building2 size={20} className="text-gray-400" />}
                     </span>
                     <div className="min-w-0">
@@ -112,7 +112,7 @@ const Organizations = () => {
                   </div>
                 </button>
                 <div className="px-6 pb-3 flex items-center gap-2">
-                  <code className="flex-1 min-w-0 truncate text-xs text-gray-600 bg-gray-50 border border-gray-200 px-2.5 py-1.5 rounded-lg">/org/{org.schema_name}/login</code>
+                  <code className="flex-1 min-w-0 truncate text-xs text-gray-600 bg-white border border-gray-200 px-2.5 py-1.5 rounded-lg">/org/{org.schema_name}/login</code>
                   <IconButton label="Copy sign-in link" onClick={() => copyLink(org.schema_name)}>{copied === org.schema_name ? <Check size={15} /> : <Copy size={15} />}</IconButton>
                 </div>
                 <div className="flex items-center justify-between gap-2 px-6 py-3 border-t border-gray-100">
@@ -183,7 +183,7 @@ function OrgModal({ org, onClose, onSaved }) {
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button onClick={save} disabled={saving || !form.company_name?.trim()}>{saving ? 'Saving…' : 'Save changes'}</Button></>}>
       {error && <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
       <div className="flex items-end gap-4">
-        <button type="button" onClick={() => fileRef.current?.click()} className="w-16 h-16 rounded-xl bg-gray-50 border border-dashed border-gray-300 flex items-center justify-center overflow-hidden shrink-0" aria-label="Change logo">
+        <button type="button" onClick={() => fileRef.current?.click()} className="w-16 h-16 rounded-xl bg-white border border-dashed border-gray-300 flex items-center justify-center overflow-hidden shrink-0" aria-label="Change logo">
           {preview ? <img src={preview} alt="" className="w-full h-full object-contain p-1" /> : <Building2 size={22} className="text-gray-400" />}
         </button>
         <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) { setLogo(f); setPreview(URL.createObjectURL(f)); } }} />

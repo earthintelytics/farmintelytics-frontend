@@ -45,7 +45,7 @@ const PILL = {
   warning: 'bg-amber-50 text-[var(--status-warning)] border-amber-200',
   critical: 'bg-red-50 text-[var(--status-critical)] border-red-200',
   info: 'bg-sky-50 text-[var(--status-info)] border-sky-200',
-  neutral: 'bg-gray-50 text-gray-700 border-gray-200',
+  neutral: 'bg-white text-gray-700 border-gray-200',
 };
 export const StatusPill = ({ tone = 'neutral', children }) => (
   <span className={`inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full border ${PILL[tone] || PILL.neutral}`}>{children}</span>
@@ -68,7 +68,7 @@ export const Field = ({ label, hint, error, children }) => (
 );
 
 export const Modal = ({ title, children, onClose, footer, wide = false }) => (
-  <div className="fixed inset-0 z-[1000] bg-gray-900/30 flex items-center justify-center p-4" onClick={onClose}>
+  <div className="fixed inset-0 z-[1100] bg-gray-900/30 flex items-center justify-center p-4" onClick={onClose}>
     <div className={`w-full ${wide ? 'max-w-3xl' : 'max-w-lg'} max-h-[90vh] overflow-y-auto bg-white rounded-2xl border border-gray-200 shadow-xl p-7 space-y-5`} onClick={(e) => e.stopPropagation()}>
       <h3 className="font-display text-xl font-semibold text-gray-900">{title}</h3>
       {children}

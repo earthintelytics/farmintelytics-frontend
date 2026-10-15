@@ -103,7 +103,7 @@ const UsersPage = () => {
             const name = `${u.first_name || ''} ${u.last_name || ''}`.trim();
             const joined = u.date_joined || u.created_at;
             return (
-              <tr key={u.id} className={u.is_active ? '' : 'bg-gray-50/60'}>
+              <tr key={u.id} className={u.is_active ? '' : 'bg-white'}>
                 <Td>
                   <p className="font-semibold text-gray-900">{name || u.email}</p>
                   {name && <p className="text-xs text-gray-500">{u.email}</p>}

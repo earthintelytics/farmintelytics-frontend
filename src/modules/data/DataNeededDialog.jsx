@@ -85,7 +85,7 @@ const DataNeededDialog = ({ cropType, serviceId, onFill }) => {
             </li>
           ))}
         </ul>
-        <div className="px-7 py-4 flex justify-end bg-gray-50/60">
+        <div className="px-7 py-4 flex justify-end bg-white">
           <button onClick={later} className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:text-gray-900 hover:bg-gray-100">Remind me later</button>
         </div>
       </div>

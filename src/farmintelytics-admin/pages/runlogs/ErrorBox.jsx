@@ -32,7 +32,7 @@ const ErrorBox = ({ error, compact = false }) => {
         <span className="flex items-center gap-2 text-sm font-semibold text-red-800"><AlertTriangle size={15} />{e.title}</span>
         {copyBtn}
       </div>
-      <pre className="m-0 px-4 py-3 bg-gray-50 text-xs font-mono text-gray-800 whitespace-pre-wrap break-words max-h-60 overflow-auto">{e.full}</pre>
+      <pre className="m-0 px-4 py-3 bg-white text-xs font-mono text-gray-800 whitespace-pre-wrap break-words max-h-60 overflow-auto">{e.full}</pre>
     </div>
   );
 };

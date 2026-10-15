@@ -171,7 +171,7 @@ const OrgAlertEmails = ({ org }) => {
             {recipients.map((email) => (
               <li key={email} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <span className="w-7 h-7 rounded-lg bg-gray-50 border border-gray-200 flex items-center justify-center shrink-0 text-gray-500">
+                  <span className="w-7 h-7 rounded-lg bg-white border border-gray-200 flex items-center justify-center shrink-0 text-gray-500">
                     <Mail size={14} />
                   </span>
                   <span className="font-mono text-xs text-gray-900 truncate">{email}</span>

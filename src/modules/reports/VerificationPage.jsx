@@ -12,7 +12,7 @@ const STATUS = {
   passed: ['Passed', 'bg-green-50 text-green-800 border-green-200'],
   review: ['Needs review', 'bg-amber-50 text-amber-800 border-amber-200'],
   failed: ['Failed', 'bg-red-50 text-red-700 border-red-200'],
-  not_checked: ['Not checked', 'bg-gray-50 text-gray-600 border-gray-200'],
+  not_checked: ['Not checked', 'bg-white text-gray-600 border-gray-200'],
 };
 const KINDS = {
   boundary: 'Boundaries and geolocation',
@@ -93,7 +93,7 @@ export default function VerificationPage({ plots, serviceId, onOpenData }) {
               <ChevronDown size={16} className={`text-gray-400 mt-1 transition-transform ${open === c.id ? 'rotate-180' : ''}`} />
             </button>
             {open === c.id && (
-              <div className="mt-3 rounded-xl bg-gray-50 border border-gray-100 p-4 text-sm text-gray-700 space-y-1">
+              <div className="mt-3 rounded-xl bg-white border border-gray-100 p-4 text-sm text-gray-700 space-y-1">
                 <div><span className="font-semibold">Data used:</span> {(c.evidence?.sources || []).join(', ') || '—'}</div>
                 <div><span className="font-semibold">Checked:</span> {c.ran_at ? new Date(c.ran_at).toLocaleString() : c.status === 'not_checked' ? 'not yet' : 'now, on your registered plots'}</div>
               </div>

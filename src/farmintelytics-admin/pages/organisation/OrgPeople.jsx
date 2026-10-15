@@ -71,7 +71,7 @@ const OrgPeople = ({ org }) => {
       {error && <Note tone="warning">{error}</Note>}
 
       {adding && !full && (
-        <div className="rounded-xl border border-gray-200 bg-gray-50 p-4 space-y-3">
+        <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="First name *"><input className={inputCls} value={form.first_name} onChange={(e) => setForm({ ...form, first_name: e.target.value })} required /></Field>
             <Field label="Last name *"><input className={inputCls} value={form.last_name} onChange={(e) => setForm({ ...form, last_name: e.target.value })} required /></Field>
