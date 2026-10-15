@@ -609,7 +609,7 @@ export async function checkProtectedAreaBoundary(file, areaId = null) {
   const fd = new FormData();
   fd.append('file', file);
   if (areaId) fd.append('area_id', areaId);
-  return adminUpload('/protected-areas/boundary/check', fd);
+  return adminUpload('/protected-area-boundaries/check', fd);
 }
 
 /** Saves an uploaded protected-area boundary with its source details; with areaId, replaces that area (T66). */
@@ -618,7 +618,7 @@ export async function saveProtectedAreaBoundary(file, details, areaId = null) {
   if (file) fd.append('file', file);
   if (areaId) fd.append('area_id', areaId);
   Object.entries(details).forEach(([k, v]) => fd.append(k, v ?? ''));
-  return adminUpload('/protected-areas/boundary', fd);
+  return adminUpload('/protected-area-boundaries', fd);
 }
 /** POST /admin/system-status/test-alert { message } */
 export async function sendTestSystemAlert(message = '') {
