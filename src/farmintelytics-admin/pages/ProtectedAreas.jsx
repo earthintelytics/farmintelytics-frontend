@@ -1,20 +1,18 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Shield, Plus, Upload, Search, RefreshCw, Trash2, Pencil, Check, X, AlertCircle } from 'lucide-react';
+import { Shield, Plus, Upload, Search, RefreshCw, Trash2, Pencil, Check, X, AlertCircle, ExternalLink } from 'lucide-react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
   fetchProtectedAreas,
   fetchProtectedAreasGeojson,
-  createProtectedArea,
-  updateProtectedArea,
   deleteProtectedArea,
   toggleProtectedArea,
   uploadWdpaZip,
 } from '../../services/adminApi';
 import { getCssToken } from '../../utils/tokens';
 import UploadWdpaModal from './protected_areas/UploadWdpaModal';
-import DrawAreaModal from './protected_areas/DrawAreaModal';
+import UploadBoundaryModal from './protected_areas/UploadBoundaryModal';
 
 const IMAGERY = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 const LABELS = 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}';
@@ -56,12 +54,8 @@ export default function ProtectedAreas() {
   const [marginKm, setMarginKm] = useState(50);
   const [uploadCounts, setUploadCounts] = useState(null);
 
-  const [drawModalOpen, setDrawModalOpen] = useState(false);
+  const [boundaryOpen, setBoundaryOpen] = useState(false);
   const [editArea, setEditArea] = useState(null);
-  const [drawName, setDrawName] = useState('');
-  const [drawDesignation, setDrawDesignation] = useState('');
-  const [drawPoints, setDrawPoints] = useState([]);
-  const [savingDraw, setSavingDraw] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -136,83 +130,19 @@ export default function ProtectedAreas() {
     }
   };
 
-  const handleSaveDraw = async (e) => {
-    e.preventDefault();
-    if (!drawName.trim()) {
-      setError('Please provide an area name.');
-      return;
-    }
-    if (!editArea && drawPoints.length < 3) {
-      setError('Please click at least 3 points on the map to define the polygon boundary.');
-      return;
-    }
-
-    try {
-      setSavingDraw(true);
-      setError('');
-
-      if (editArea) {
-        const payload = {
-          name: drawName.trim(),
-          designation: drawDesignation.trim(),
-        };
-        if (drawPoints.length >= 3) {
-          const coords = [...drawPoints.map(([lat, lng]) => [lng, lat])];
-          coords.push(coords[0]);
-          payload.geometry = {
-            type: 'Polygon',
-            coordinates: [coords],
-          };
-        }
-        await updateProtectedArea(editArea.id, payload);
-        setSuccessMsg('Protected area updated successfully.');
-      } else {
-        const coords = [...drawPoints.map(([lat, lng]) => [lng, lat])];
-        coords.push(coords[0]);
-        await createProtectedArea({
-          name: drawName.trim(),
-          designation: drawDesignation.trim(),
-          geometry: {
-            type: 'Polygon',
-            coordinates: [coords],
-          },
-          active: true,
-        });
-        setSuccessMsg('Manual protected area created and synced to active layer.');
-      }
-
-      setDrawModalOpen(false);
-      setEditArea(null);
-      setDrawPoints([]);
-      setDrawName('');
-      setDrawDesignation('');
-      loadData();
-    } catch (err) {
-      setError(err.message || 'Failed to save protected area boundary.');
-    } finally {
-      setSavingDraw(false);
-    }
-  };
-
-  const openEditModal = (area) => {
-    setEditArea(area);
-    setDrawName(area.name || '');
-    setDrawDesignation(area.designation || '');
-    setDrawPoints([]);
-    setDrawModalOpen(true);
-  };
-
-  const openCreateModal = () => {
+  const openEditModal = (area) => { setEditArea(area); setBoundaryOpen(true); };
+  const openCreateModal = () => { setEditArea(null); setBoundaryOpen(true); };
+  const onBoundarySaved = (res) => {
+    setBoundaryOpen(false);
+    setSuccessMsg(editArea ? 'Protected area updated.' : `${res.saved} protected area${res.saved === 1 ? '' : 's'} added from the file.`);
     setEditArea(null);
-    setDrawName('');
-    setDrawDesignation('');
-    setDrawPoints([]);
-    setDrawModalOpen(true);
+    loadData();
   };
 
   const sourceLabel = (area) => {
+    if (area.source === 'upload') return 'Uploaded boundary';
     if (area.source === 'manual') return 'Drawn by the team';
-    return `WDPA, ${area.source_version || 'October 2026'}`;
+    return `WDPA${area.source_version ? `, ${area.source_version}` : ''}`;
   };
 
   const mapCenter = useMemo(() => [9.082, 8.6753], []); // Nigeria center
@@ -243,7 +173,7 @@ export default function ProtectedAreas() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-green-700 text-white hover:bg-green-800 transition-colors shadow-sm"
           >
             <Plus size={16} />
-            Draw boundary
+            Add from a file
           </button>
         </div>
       </div>
@@ -279,7 +209,7 @@ export default function ProtectedAreas() {
             {geojson?.features?.length || 0} active boundaries loaded in local layer
           </span>
         </div>
-        <div className="h-80 w-full relative bg-gray-100">
+        <div className="h-80 w-full relative isolate bg-white">
           <MapContainer center={mapCenter} zoom={6} scrollWheelZoom={false} className="h-full w-full">
             <TileLayer url={IMAGERY} maxZoom={18} />
             <TileLayer url={LABELS} maxZoom={18} />
@@ -331,6 +261,7 @@ export default function ProtectedAreas() {
           >
             <option value="">All sources</option>
             <option value="wdpa">Official WDPA</option>
+            <option value="upload">Uploaded boundaries</option>
             <option value="manual">Drawn by team</option>
           </select>
           <select
@@ -361,9 +292,10 @@ export default function ProtectedAreas() {
             <thead className="bg-white border-b border-gray-200 text-xs font-semibold text-gray-600 uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-3.5">Protected area name</th>
-                <th className="px-6 py-3.5">Source & version</th>
+                <th className="px-6 py-3.5">Source</th>
                 <th className="px-6 py-3.5">Designation</th>
-                <th className="px-6 py-3.5">Country</th>
+                <th className="px-6 py-3.5">Size</th>
+                <th className="px-6 py-3.5">Added</th>
                 <th className="px-6 py-3.5">Active</th>
                 <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
@@ -371,14 +303,14 @@ export default function ProtectedAreas() {
             <tbody className="divide-y divide-gray-200">
               {loading && areas.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
                     Loading protected areas registry...
                   </td>
                 </tr>
               ) : areas.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-gray-500">
-                    No protected areas found. Upload an official WDPA shapefile zip or draw a boundary to initialize.
+                  <td colSpan={7} className="px-6 py-12 text-center text-gray-500">
+                    No protected areas yet. Upload the WDPA archive, or add a boundary from a file.
                   </td>
                 </tr>
               ) : (
@@ -398,12 +330,19 @@ export default function ProtectedAreas() {
                       }`}>
                         {sourceLabel(area)}
                       </span>
+                      {area.source_name && <div className="text-xs text-gray-600 mt-1">{area.source_name}{area.source_date ? `, ${area.source_date}` : ''}</div>}
+                      {area.source_url && <a href={area.source_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-xs text-green-700 hover:underline mt-0.5">Open source<ExternalLink size={11} /></a>}
                     </td>
                     <td className="px-6 py-4 text-gray-600">
-                      {area.designation || 'Nature Reserve'}
+                      {area.designation || '—'}
+                      {area.country && <div className="text-xs text-gray-500 font-mono">{area.country}</div>}
                     </td>
-                    <td className="px-6 py-4 text-gray-600 font-mono text-xs">
-                      {area.country || 'NGA'}
+                    <td className="px-6 py-4 text-gray-700 font-mono text-xs whitespace-nowrap">
+                      {area.area_ha != null ? `${Number(area.area_ha).toLocaleString(undefined, { maximumFractionDigits: 1 })} ha` : '—'}
+                    </td>
+                    <td className="px-6 py-4 text-xs text-gray-600">
+                      <div>{area.edited_by || '—'}</div>
+                      {area.updated_at && <div className="text-gray-500">{new Date(area.updated_at).toLocaleDateString()}</div>}
                     </td>
                     <td className="px-6 py-4">
                       <button
@@ -431,7 +370,7 @@ export default function ProtectedAreas() {
                       >
                         <Pencil size={15} />
                       </button>
-                      {area.source === 'manual' && (
+                      {area.source !== 'wdpa' && (
                         <button
                           type="button"
                           onClick={() => handleDelete(area)}
@@ -469,21 +408,11 @@ export default function ProtectedAreas() {
         uploadCounts={uploadCounts}
       />
 
-      {/* Draw / Edit Manual Boundary Modal */}
-      <DrawAreaModal
-        isOpen={drawModalOpen}
-        onClose={() => setDrawModalOpen(false)}
-        onSubmit={handleSaveDraw}
-        editArea={editArea}
-        drawName={drawName}
-        setDrawName={setDrawName}
-        drawDesignation={drawDesignation}
-        setDrawDesignation={setDrawDesignation}
-        drawPoints={drawPoints}
-        setDrawPoints={setDrawPoints}
-        savingDraw={savingDraw}
-        mapCenter={mapCenter}
-        imageryUrl={IMAGERY}
+      <UploadBoundaryModal
+        open={boundaryOpen}
+        area={editArea}
+        onClose={() => { setBoundaryOpen(false); setEditArea(null); }}
+        onSaved={onBoundarySaved}
       />
     </div>
   );

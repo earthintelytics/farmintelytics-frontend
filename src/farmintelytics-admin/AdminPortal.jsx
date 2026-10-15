@@ -113,7 +113,7 @@ const AdminPortal = () => {
 
   return (
     <ConfirmProvider>
-    <div className="flex h-screen overflow-hidden bg-[var(--bg-main)] text-[var(--text-main)] font-sans">
+    <div className="relative flex h-screen overflow-hidden bg-[var(--bg-main)] text-[var(--text-main)] font-sans">
 
       {/* ── Sidebar ── */}
       <aside className={`relative flex flex-col shrink-0 bg-white border-r border-gray-200 transition-[width] duration-200 ${sidebarOpen ? 'w-64' : 'w-[68px]'}`}>
@@ -214,7 +214,7 @@ const AdminPortal = () => {
         {role === 'support' && (
           <p className="shrink-0 px-8 py-2 bg-amber-50 border-b border-amber-200 text-sm text-amber-900">Support access: you can look at everything, but changes will be refused.</p>
         )}
-        <main className="flex-1 overflow-auto">
+        <main className="relative flex-1 overflow-auto">
           <Routes>
             <Route index element={<Navigate to="organizations" replace />} />
             <Route path="onboarding"    element={<Onboarding />} />
