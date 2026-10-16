@@ -65,13 +65,6 @@ export const MODAL_HELP = {
       ['Can sign in', 'Switch off to stop the person signing in without deleting them.'],
     ],
   },
-  userAccount: {
-    intro: 'A platform user account.',
-    items: [
-      ['Account type', 'What the account can do.'],
-      ['Password', 'For a new account, the first password. Use "Reset password" to set a new one later.'],
-    ],
-  },
   problemReport: {
     intro: 'A problem a client reported from the portal.',
     items: [
