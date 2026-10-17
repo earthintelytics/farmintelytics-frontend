@@ -1,103 +1,78 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, FileDown, Layers, RefreshCw, Share2 } from 'lucide-react';
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
 import { fetchSuitabilityRun, generateReportPdf } from '../../../services/suitabilityApi';
 import { fetchSuitabilityThresholds } from '../../../services/adminApi';
-import { Card, StatusPill, SecondaryButton, ErrorNote, EmptyState } from '../../../components/page/PageKit';
-import { CLASSES, classLabel, classTone, runStatus, isFinished, cropName, adviceFor, CROPS } from '../suitabilityLabels';
+import { ErrorNote } from '../../../components/page/PageKit';
+import { CROPS, isFinished } from '../suitabilityLabels';
 import ShareModal from '../components/ShareModal';
+import SuitabilityHeader from '../components/SuitabilityHeader';
+import SuitabilitySidebar from '../components/SuitabilitySidebar';
+import SuitabilityMapView from '../components/SuitabilityMapView';
+import SuitabilityAnalyticsView from '../components/SuitabilityAnalyticsView';
+import SuitabilityReportView from '../components/SuitabilityReportView';
+import SuitabilityAiView from '../components/SuitabilityAiView';
 
 const POLL_MS = 5000;
-// Shares may arrive as fractions (0–1) or percentages.
-const pct = (v) => { const n = Number(v) || 0; return Math.round(n <= 1 ? n * 100 : n); };
-const ha = (v) => (v != null ? `${Number(v).toLocaleString(undefined, { maximumFractionDigits: 1 })} ha` : '—');
 
-const LAYER_LABELS = {
-  final_class: 'Final class',
-  rainfall: 'Rainfall',
-  dry_season: 'Dry season',
-  temperature: 'Temperature',
-  surface_heat: 'Surface heat (LST)',
-  slope: 'Slope',
-  soil_ph: 'Soil pH',
-  soil_depth: 'Soil depth',
-  distance_to_water: 'Distance to water',
-  flood_frequency: 'Flood frequency',
-  wetness: 'Canopy moisture (NDMI)',
-  elevation: 'Elevation (30 m DEM)',
-  land_cover: 'Land cover (ESA 2021)',
-  forest_loss: 'Tree loss after 2020 (EUDR)',
-  forest_2020: 'Forest 2020 (EUDR cut-off)',
-  protected_exclusion: 'Protected areas (WDPA)',
-};
-
-function Fit({ geometry }) {
-  const map = useMap();
-  useEffect(() => {
-    if (!geometry) return;
-    try {
-      const b = L.geoJSON(geometry).getBounds();
-      if (b.isValid()) {
-        map.fitBounds(b, { padding: [24, 24], maxZoom: 16 });
-      }
-    } catch {
-      // ignore
-    }
-  }, [geometry, map]);
-  return null;
-}
-
-/**
- * One analysis: its real status (re-checked until it finishes), area per
- * class, the result map with factor layer switching, plain legends, field outlines,
- * and every field with its limiting factors, missing factors, confidence, and advice.
- */
-const RunResult = ({ runId, companyId, onBack }) => {
+export default function RunResult({ runId, companyId, onBack }) {
   const [run, setRun] = useState(null);
   const [error, setError] = useState('');
   const [actions, setActions] = useState({});
   const [pdf, setPdf] = useState({ busy: false, msg: '' });
-  const [selectedLayer, setSelectedLayer] = useState('final_class');
   const [shareOpen, setShareOpen] = useState(false);
 
+  // Top Tabs: 'assessment' | 'report' | 'ai-assistant'
+  const [activeTopTab, setActiveTopTab] = useState('assessment');
+
+  // Left Sub-pages: 'map-view' | 'analytics'
+  const [activeView, setActiveView] = useState('map-view');
+
+  // Map state
+  const [selectedLayer, setSelectedLayer] = useState('final_class');
+  const [layerOpacity, setLayerOpacity] = useState(0.8);
+  const [basemap, setBasemap] = useState('satellite');
+  const [showOverlay, setShowOverlay] = useState(true);
+
+  // Preloaded question for AI assistant
+  const [aiQuestion, setAiQuestion] = useState('');
+
+  // 1. Poll / load run result
   useEffect(() => {
     let live = true;
     let timer;
-    const load = () => fetchSuitabilityRun(runId)
-      .then((r) => { if (!live) return; setRun(r); setError(''); if (!isFinished(r.status)) timer = setTimeout(load, POLL_MS); })
-      .catch((e) => { if (live) setError(e.message); });
+    const load = () =>
+      fetchSuitabilityRun(runId)
+        .then((r) => {
+          if (!live) return;
+          setRun(r);
+          setError('');
+          if (!isFinished(r.status)) timer = setTimeout(load, POLL_MS);
+        })
+        .catch((e) => {
+          if (live) setError(e.message);
+        });
     load();
-    return () => { live = false; clearTimeout(timer); };
+    return () => {
+      live = false;
+      clearTimeout(timer);
+    };
   }, [runId]);
 
+  // 2. Fetch thresholds & farmer actions
   useEffect(() => {
     if (!run?.crop) return undefined;
     let live = true;
     const admin = CROPS.find((c) => c.id === run.crop)?.admin || run.crop;
-    fetchSuitabilityThresholds(admin, companyId).then((d) => { if (live) setActions(d?.farmer_actions || {}); }).catch(() => {});
-    return () => { live = false; };
+    fetchSuitabilityThresholds(admin, companyId)
+      .then((d) => {
+        if (live) setActions(d?.farmer_actions || {});
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
   }, [run?.crop, companyId]);
 
-  const report = async () => {
-    setPdf({ busy: true, msg: '' });
-    try {
-      const r = await generateReportPdf(runId);
-      if (r?.pdf_url && r.status === 'ready') window.open(r.pdf_url, '_blank', 'noopener');
-      setPdf({ busy: false, msg: r?.status === 'ready' ? '' : 'The report is being prepared.' });
-    } catch (e) { setPdf({ busy: false, msg: e.message }); }
-  };
-
-  const back = <button onClick={onBack} className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"><ArrowLeft size={15} />All analyses</button>;
-  if (error && !run) return <div className="space-y-6">{back}<ErrorNote message={error} /></div>;
-  if (!run) return <div className="space-y-6">{back}<p className="text-sm text-gray-500">Loading the analysis…</p></div>;
-
-  const [statusLabel, statusTone] = runStatus(run.status);
-  const total = Object.values(run.classes_area_ha || {}).reduce((a, b) => a + (Number(b) || 0), 0) || Number(run.total_area_ha) || 0;
-  const done = isFinished(run.status) && run.status !== 'failed';
-
-  // Compute available factor layers
+  // 3. Available layers list
   const availableLayers = (() => {
     const set = new Set();
     set.add('final_class');
@@ -109,357 +84,134 @@ const RunResult = ({ runId, companyId, onBack }) => {
     return ['final_class', ...list];
   })();
 
-  // Compute tile URL for selected layer
-  const currentTileUrl = selectedLayer === 'final_class'
-    ? run?.tiles?.result || run?.tiles?.factors?.final_class || null
-    : run?.tiles?.factors?.[selectedLayer] || null;
-
-  const currentLegend = run.factor_legends?.[selectedLayer] || run.layer_legends?.[selectedLayer];
-
-  const onEachField = (feature, layer) => {
-    const props = feature.properties || {};
-    const title = props.name || props.field_id || 'Field';
-    const cls = props.overall_class ? classLabel(props.overall_class) : '—';
-    const area = props.area_ha != null ? `${props.area_ha} ha` : '';
-    const limits = (props.limiting_factors || []).join(', ');
-    const missing = (props.missing_factors || []).join(', ');
-    const conf = props.confidence ? `Confidence: ${props.confidence}` : '';
-
-    const html = `
-      <div style="font-family: inherit; font-size: 12px; line-height: 1.4; color: #111827; min-width: 140px;">
-        <div style="font-weight: 600; font-size: 13px; margin-bottom: 2px;">${title}</div>
-        <div style="color: #4b5563; margin-bottom: 4px;">${cls}${area ? ` · ${area}` : ''}</div>
-        ${conf ? `<div style="color: #047857; font-weight: 500; margin-bottom: 2px;">${conf}</div>` : ''}
-        ${limits ? `<div style="color: #b45309; margin-top: 2px;">Limits: ${limits}</div>` : ''}
-        ${missing ? `<div style="color: #6b7280; font-size: 11px; margin-top: 2px;">Missing: ${missing}</div>` : ''}
-      </div>
-    `;
-    layer.bindPopup(html);
+  // 4. Download report action
+  const handleDownloadReport = async () => {
+    setPdf({ busy: true, msg: '' });
+    try {
+      const r = await generateReportPdf(runId);
+      if (r?.pdf_url && r.status === 'ready') {
+        window.open(r.pdf_url, '_blank', 'noopener');
+      }
+      setPdf({ busy: false, msg: r?.status === 'ready' ? '' : 'The report is being prepared.' });
+    } catch (e) {
+      setPdf({ busy: false, msg: e.message });
+    }
   };
 
-  return (
-    <div className="space-y-8">
-      {back}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-green-700">{cropName(run.crop)}{run.variant ? ` · ${run.variant}` : ''}</p>
-          <h2 className="font-display text-3xl font-semibold text-gray-900 tracking-tight mt-1">Where {cropName(run.crop).toLowerCase()} fits</h2>
-          <p className="text-sm text-gray-500 mt-2">{[run.irrigated ? 'Irrigated' : 'Rain-fed', run.strictness && `${run.strictness} thresholds`, run.created_at && new Date(run.created_at).toLocaleString()].filter(Boolean).join(' · ')}</p>
-        </div>
-        <div className="flex items-center gap-3">
-          <StatusPill tone={statusTone}>{statusLabel}{!isFinished(run.status) && run.progress != null ? ` · ${run.progress}%` : ''}</StatusPill>
-          {done && (
-            <>
-              <SecondaryButton onClick={() => setShareOpen(true)}>
-                <Share2 size={15} />
-                Share with client
-              </SecondaryButton>
-              <SecondaryButton onClick={report} disabled={pdf.busy}>
-                <FileDown size={15} />
-                {pdf.busy ? 'Preparing…' : 'Report (PDF)'}
-              </SecondaryButton>
-            </>
-          )}
+  // 5. Ask AI about a layer action
+  const handleAskAiAboutLayer = (questionText) => {
+    setAiQuestion(questionText);
+    setActiveTopTab('ai-assistant');
+  };
+
+  if (error && !run) {
+    return (
+      <div className="fixed inset-0 z-50 bg-gray-50 flex items-center justify-center p-6">
+        <div className="max-w-md w-full space-y-4">
+          <ErrorNote message={error} />
+          <button
+            onClick={onBack}
+            className="w-full py-2.5 px-4 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+          >
+            Back to analyses
+          </button>
         </div>
       </div>
-      {pdf.msg && <p className="text-sm text-gray-600">{pdf.msg}</p>}
+    );
+  }
 
-      {!isFinished(run.status) && (
-        <Card className="p-6 flex items-center gap-3 text-sm text-gray-700">
-          <RefreshCw size={16} className="animate-spin text-green-700" />
-          The pipeline is working on this analysis. This page updates by itself.
-        </Card>
-      )}
-      {run.status === 'failed' && <ErrorNote message="This analysis failed in the pipeline. Start it again, or check Admin → Logs." />}
+  if (!run) {
+    return (
+      <div className="fixed inset-0 z-50 bg-gray-50 flex items-center justify-center">
+        <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-200">
+          <div className="w-5 h-5 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
+          <span className="text-sm font-semibold text-gray-700">Loading suitability evaluation…</span>
+        </div>
+      </div>
+    );
+  }
 
-      {done && (
-        <>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {CLASSES.map((c) => {
-              const v = Number(run.classes_area_ha?.[c.key] || 0);
-              return (
-                <Card key={c.key} className="p-5">
-                  <StatusPill tone={c.tone}>{c.label}</StatusPill>
-                  <p className="font-mono text-2xl text-gray-900 mt-3">{ha(v)}</p>
-                  <p className="text-xs text-gray-500 mt-1">{total ? `${Math.round((v / total) * 100)} % of the area` : '—'}</p>
-                </Card>
-              );
-            })}
-          </div>
+  return (
+    <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col overflow-hidden font-sans">
+      {/* ── TOP HEADER (Dashboard Chrome) ── */}
+      <SuitabilityHeader
+        run={run}
+        activeTopTab={activeTopTab}
+        onSelectTopTab={setActiveTopTab}
+        onBack={onBack}
+        onOpenShare={() => setShareOpen(true)}
+        onDownloadReport={handleDownloadReport}
+        pdfBusy={pdf.busy}
+      />
 
-          <Card className="overflow-hidden">
-            {/* Factor Layer Switcher */}
-            <div className="p-4 border-b border-gray-100 bg-white">
-              <div className="flex items-center justify-between gap-3 mb-2.5">
-                <div className="flex items-center gap-2">
-                  <Layers size={15} className="text-gray-500" />
-                  <span className="text-xs font-semibold text-gray-700 uppercase tracking-wider">
-                    Suitability Layers
-                  </span>
-                </div>
-                <span className="text-xs text-gray-500 font-mono">
-                  {availableLayers.length} {availableLayers.length === 1 ? 'layer' : 'layers'} available
-                </span>
-              </div>
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-thin">
-                {availableLayers.map((layerKey) => {
-                  const active = selectedLayer === layerKey;
-                  const label = LAYER_LABELS[layerKey] || layerKey.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-                  return (
-                    <button
-                      key={layerKey}
-                      type="button"
-                      onClick={() => setSelectedLayer(layerKey)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
-                        active
-                          ? 'bg-green-700 text-white shadow-sm'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                      }`}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+      {/* ── MAIN WORKSPACE CONTAINER ── */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {activeTopTab === 'assessment' ? (
+          <>
+            {/* Left Sidebar (Views & 30m Layers) */}
+            <SuitabilitySidebar
+              activeView={activeView}
+              onSelectView={setActiveView}
+              availableLayers={availableLayers}
+              selectedLayer={selectedLayer}
+              onSelectLayer={setSelectedLayer}
+              layerOpacity={layerOpacity}
+              onChangeOpacity={setLayerOpacity}
+              basemap={basemap}
+              onChangeBasemap={setBasemap}
+              showOverlay={showOverlay}
+              onToggleOverlay={() => setShowOverlay(!showOverlay)}
+            />
 
-            {/* Map Canvas */}
-            <div className="h-[460px] relative">
-              <MapContainer center={[0, 0]} zoom={2} className="h-full w-full">
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-                  attribution="Esri"
+            {/* View Content (Map Studio or Analytics Hub) */}
+            <main className="flex-1 h-full overflow-hidden relative flex flex-col">
+              {activeView === 'map-view' ? (
+                <SuitabilityMapView
+                  run={run}
+                  selectedLayer={selectedLayer}
+                  availableLayers={availableLayers}
+                  onSelectLayer={setSelectedLayer}
+                  layerOpacity={layerOpacity}
+                  basemap={basemap}
+                  showOverlay={showOverlay}
+                  onAskAiAboutLayer={handleAskAiAboutLayer}
                 />
-                {currentTileUrl && (
-                  <TileLayer
-                    key={`${selectedLayer}-${currentTileUrl}`}
-                    url={currentTileUrl}
-                    opacity={0.8}
+              ) : (
+                <div className="flex-1 overflow-y-auto">
+                  <SuitabilityAnalyticsView
+                    run={run}
+                    actions={actions}
+                    onAskAi={(q) => handleAskAiAboutLayer(q)}
                   />
-                )}
-                {run.fields_geojson && (
-                  <GeoJSON
-                    key={`fields-${runId}`}
-                    data={run.fields_geojson}
-                    style={{ color: '#ffffff', weight: 2.5, fillOpacity: 0.05 }}
-                    onEachFeature={onEachField}
-                  />
-                )}
-                {run.fields_geojson && <Fit geometry={run.fields_geojson} />}
-              </MapContainer>
-            </div>
-
-            {/* Legend per Layer */}
-            {currentLegend?.kind === 'ramp' ? (
-              <div className="px-5 py-3.5 border-t border-gray-100 bg-white">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
-                  <span className="text-xs font-semibold text-gray-800">
-                    {LAYER_LABELS[selectedLayer] || selectedLayer} ({currentLegend.unit || 'm'})
-                  </span>
-                  <span className="text-[11px] text-gray-500 font-mono">
-                    30 m digital elevation model (Copernicus DEM GLO-30)
-                  </span>
-                </div>
-                <div className="flex items-center gap-2 max-w-md">
-                  <span className="text-xs font-mono text-gray-600 font-medium">{currentLegend.edges?.[0] != null ? `${currentLegend.edges[0]} ${currentLegend.unit || 'm'}` : 'Low'}</span>
-                  <div
-                    className="flex-1 h-3 rounded-full shadow-inner"
-                    style={{ background: `linear-gradient(to right, ${(currentLegend.colours || []).join(', ')})` }}
-                  />
-                  <span className="text-xs font-mono text-gray-600 font-medium">{currentLegend.edges?.[currentLegend.edges.length - 1] != null ? `${currentLegend.edges[currentLegend.edges.length - 1]} ${currentLegend.unit || 'm'}` : 'High'}</span>
-                </div>
-              </div>
-            ) : currentLegend?.kind === 'categories' ? (
-              <div className="px-5 py-3.5 border-t border-gray-100 bg-white">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
-                  <span className="text-xs font-semibold text-gray-800">
-                    {LAYER_LABELS[selectedLayer] || selectedLayer}
-                  </span>
-                  <span className="text-[11px] text-gray-500 font-mono">
-                    ESA WorldCover (30 m real satellite pixels)
-                  </span>
-                </div>
-                <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
-                  {Object.entries(currentLegend.items || {}).map(([name, col]) => (
-                    <span key={name} className="inline-flex items-center gap-1.5">
-                      <span className="w-3.5 h-3.5 rounded-sm flex-shrink-0 shadow-xs" style={{ backgroundColor: col }} />
-                      <span className="text-gray-800 capitalize font-medium">{name.replace(/_/g, ' ')}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ) : currentLegend?.kind === 'exclusion' ? (
-              <div className="px-5 py-3.5 border-t border-gray-100 bg-red-50/50 flex items-center gap-3 text-xs">
-                <span className="w-4 h-4 rounded-sm bg-red-700 flex-shrink-0 shadow-xs" />
-                <span className="text-red-900 font-medium">
-                  Regulatory & Environmental Exclusion: {currentLegend.meaning}
-                </span>
-              </div>
-            ) : currentLegend?.items?.length ? (
-              <div className="px-5 py-3.5 border-t border-gray-100 bg-white">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
-                  <span className="text-xs font-semibold text-gray-800">
-                    {currentLegend.name || LAYER_LABELS[selectedLayer] || selectedLayer}
-                    {currentLegend.unit ? ` (${currentLegend.unit})` : ''}
-                  </span>
-                  <span className="text-[11px] text-gray-500">Evaluation thresholds & class ranges</span>
-                </div>
-                <div className="flex flex-wrap gap-x-5 gap-y-2 text-xs">
-                  {currentLegend.items.map((item, idx) => (
-                    <span key={item.class || idx} className="inline-flex items-center gap-1.5 text-gray-700">
-                      <span
-                        className="w-3.5 h-3.5 rounded-sm flex-shrink-0 shadow-xs"
-                        style={{ backgroundColor: item.color || '#2e7d32' }}
-                      />
-                      <span className="font-medium text-gray-900">{item.label || item.class}</span>
-                      {item.range && (
-                        <span className="font-mono text-gray-500 text-[11px]">({item.range})</span>
-                      )}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-4 px-5 py-3 border-t border-gray-100 text-xs text-gray-600 bg-white">
-                {CLASSES.map((c) => (
-                  <span key={c.key} className="inline-flex items-center gap-1.5">
-                    <span className={`w-3 h-3 rounded-sm ${c.bar}`} />
-                    <span className="font-medium text-gray-900">{c.label}</span>
-                  </span>
-                ))}
-              </div>
-            )}
-          </Card>
-
-          {/* Per-field table with limiting factors, missing factors, and confidence */}
-          {(run.fields || []).length === 0 ? (
-            <EmptyState title="No field results" text="This analysis has no per-field breakdown." />
-          ) : (
-            <Card className="overflow-hidden">
-              <div className="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-white">
-                <div>
-                  <h3 className="text-base font-semibold text-gray-900">Per-field evaluation breakdown</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">
-                    Confidence rating, missing factors, and limiting conditions for each parcel.
-                  </p>
-                </div>
-                <span className="text-xs font-mono text-gray-500">
-                  {run.fields.length} {run.fields.length === 1 ? 'field' : 'fields'}
-                </span>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead className="bg-white text-left text-xs font-semibold text-gray-600">
-                    <tr>
-                      <th className="px-5 py-3">Field</th>
-                      <th className="px-5 py-3">Result</th>
-                      <th className="px-5 py-3">Confidence</th>
-                      <th className="px-5 py-3">Missing factors</th>
-                      <th className="px-5 py-3">Share of the field</th>
-                      <th className="px-5 py-3">What limits it</th>
-                      <th className="px-5 py-3">What to do</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {run.fields.map((f) => {
-                      const advice = (f.limiting_factors || []).map((x) => adviceFor(x, actions)).find(Boolean);
-                      const confTone =
-                        f.confidence === 'High' || (f.data_coverage != null && f.data_coverage >= 0.8)
-                          ? 'good'
-                          : f.confidence === 'Low' || (f.data_coverage != null && f.data_coverage < 0.5)
-                          ? 'critical'
-                          : 'warning';
-                      const confText = f.confidence || (f.data_coverage != null ? `${Math.round(f.data_coverage * 100)}% coverage` : 'Standard');
-                      const missingList = f.missing_factors || [];
-
-                      return (
-                        <tr key={f.field_id} className="hover:bg-gray-50/50 transition-colors">
-                          <td className="px-5 py-3 font-semibold text-gray-900">{f.name || f.field_id}</td>
-                          <td className="px-5 py-3">
-                            <StatusPill tone={classTone(f.overall_class)}>{classLabel(f.overall_class)}</StatusPill>
-                          </td>
-                          <td className="px-5 py-3">
-                            <StatusPill tone={confTone}>{confText}</StatusPill>
-                          </td>
-                          <td className="px-5 py-3 text-xs">
-                            {missingList.length === 0 ? (
-                              <span className="text-gray-400">None</span>
-                            ) : (
-                              <span className="text-amber-700 font-medium">{missingList.join(', ')}</span>
-                            )}
-                          </td>
-                          <td className="px-5 py-3">
-                            <div className="flex h-2.5 w-36 rounded-full overflow-hidden bg-gray-100">
-                              {CLASSES.map((c) => (
-                                <span key={c.key} className={c.bar} style={{ width: `${pct(f.share?.[c.key])}%` }} />
-                              ))}
-                            </div>
-                          </td>
-                          <td className="px-5 py-3 text-gray-700">{(f.limiting_factors || []).join(', ') || 'Nothing'}</td>
-                          <td className="px-5 py-3 text-gray-700">
-                            {advice || (f.limiting_factors?.length ? (
-                              <span className="text-gray-400">Set advice in Admin → Map classes and suitability</span>
-                            ) : (
-                              'Plant as usual'
-                            ))}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </Card>
-          )}
-
-          <details className="text-sm text-gray-600 bg-white border border-gray-200 rounded-2xl p-5">
-            <summary className="cursor-pointer text-gray-800 font-semibold text-base">
-              Technical Audit & Data Sources
-            </summary>
-            <div className="mt-4 space-y-3">
-              <p className="text-xs text-gray-600 leading-relaxed">
-                Evaluated against FAO land evaluation standards at 30 m resolution. Terrain, slope, climate, and soil
-                are drawn directly from verified earth observation platforms with exclusions strictly enforced.
-              </p>
-              {run.sources?.length > 0 && (
-                <div className="pt-2 border-t border-gray-100">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Earth Observation Sources Used</h4>
-                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    {run.sources.map((src, i) => (
-                      <li key={i} className="flex items-start gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
-                        <span className="w-1.5 h-1.5 rounded-full bg-green-600 mt-1.5 flex-shrink-0" />
-                        <div>
-                          <span className="font-semibold text-gray-900">{src.name}</span>
-                          <span className="text-gray-500 block">{src.measures}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               )}
-              {run.limits?.length > 0 && (
-                <div className="pt-2 border-t border-gray-100">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Operational Notes & Constraints</h4>
-                  <ul className="list-disc list-inside text-xs text-gray-700 space-y-1">
-                    {run.limits.map((lim, i) => (
-                      <li key={i}>{lim}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </details>
+            </main>
+          </>
+        ) : activeTopTab === 'report' ? (
+          <main className="flex-1 overflow-y-auto bg-gray-50">
+            <SuitabilityReportView
+              run={run}
+              onDownloadPdf={handleDownloadReport}
+              pdfBusy={pdf.busy}
+              pdfMsg={pdf.msg}
+            />
+          </main>
+        ) : (
+          <main className="flex-1 overflow-y-auto bg-gray-50">
+            <SuitabilityAiView run={run} preloadedQuestion={aiQuestion} />
+          </main>
+        )}
+      </div>
 
-          <ShareModal
-            runId={runId}
-            crop={run.crop}
-            isOpen={shareOpen}
-            onClose={() => setShareOpen(false)}
-          />
-        </>
+      {/* ── SHARE WITH CLIENT MODAL ── */}
+      {shareOpen && (
+        <ShareModal
+          runId={runId}
+          companyId={companyId || run?.company_id || ''}
+          cropName={run?.crop || 'Crop'}
+          onClose={() => setShareOpen(false)}
+        />
       )}
     </div>
   );
-};
-
-export default RunResult;
+}

@@ -50,12 +50,15 @@ const SuitabilityPortal = ({ onBack, onSignOut }) => {
   const crop = CROPS.find((c) => c.id === cropId);
   const cropRuns = runs.filter((r) => r.crop === cropId || r.crop === crop?.admin);
   const open = (r) => setOpenRun({ runId: r.run_id, companyId: r.company_id });
-  const back = openRun ? () => setOpenRun(null) : crop ? () => setCropId(null) : onBack;
+  const back = crop ? () => setCropId(null) : onBack;
+
+  if (openRun) {
+    return <RunResult runId={openRun.runId} companyId={openRun.companyId} onBack={() => setOpenRun(null)} onSignOut={onSignOut} />;
+  }
 
   const body = () => {
     if (companies.state === 'not_connected') return <NotConnectedNote what="The suitability service" />;
     if (companies.state === 'error') return <ErrorNote message={companies.error} onRetry={companies.reload} />;
-    if (openRun) return <RunResult runId={openRun.runId} companyId={openRun.companyId} onBack={() => setOpenRun(null)} />;
     const runsState = runsLoader.state === 'not_connected' ? <NotConnectedNote what="Suitability analyses" />
       : runsLoader.state === 'error' ? <ErrorNote message={runsLoader.error} onRetry={reload} />
         : runsLoader.state === 'loading' ? <p className="text-sm text-gray-500">Loading analyses…</p> : null;
