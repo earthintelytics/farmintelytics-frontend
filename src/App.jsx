@@ -59,6 +59,7 @@ const AdvisorApp = lazyWithReload(() => import('./modules/advisor/AdvisorApp'));
 const SuitabilityPortal = lazyWithReload(() => import('./modules/suitability/SuitabilityPortal'));
 const SmallholderHub = lazyWithReload(() => import('./modules/smallholder/SmallholderHub'));
 const PublicFormPage = lazyWithReload(() => import('./modules/forms/PublicFormPage'));
+const PublicSuitabilitySharePage = lazyWithReload(() => import('./modules/suitability/pages/PublicSuitabilitySharePage'));
 
 // === Public Information & Compliance Pages ===
 const TrustCenterPage = lazyWithReload(() => import('./pages/public/TrustCenterPage'));
@@ -356,6 +357,7 @@ const AppRoutes = () => {
         <Route path="/platformhub"              element={<TeamHubPage />} />
         <Route path="/hub"                      element={<Navigate to="/platformhub" replace />} />
         <Route path="/f/:token"                 element={<PublicFormPage />} />
+        <Route path="/s/:token"                 element={<PublicSuitabilitySharePage />} />
         <Route path="/tools/:moduleId"          element={<PortalPage />} />
         <Route path="/org/:tenant"              element={<OrgPage view="services" />} />
         <Route path="/org/:tenant/settings"     element={<OrgPage view="settings" />} />

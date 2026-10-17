@@ -39,8 +39,11 @@ export const cropName = (id) => CROPS.find((c) => c.id === id || c.admin === id)
 export function adviceFor(factor, actions = {}) {
   const f = String(factor || '').toLowerCase();
   if (/slope|terrain/.test(f)) return actions.slope;
-  if (/rain|dry season|water|drought/.test(f)) return actions.rainfall;
+  if (/rain|dry season|drought/.test(f)) return actions.rainfall;
   if (/ph|acid|soil|texture|depth/.test(f)) return actions.soil_ph;
   if (/flood|waterlog|drain/.test(f)) return actions.drainage;
+  if (/forest|eudr|tree cover|loss/.test(f)) return actions.forest;
+  if (/elevation|temp|heat/.test(f)) return actions.elevation;
+  if (/distance to water|water body|riparian/.test(f)) return actions.water_access;
   return null;
 }

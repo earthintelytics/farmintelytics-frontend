@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, FileDown, Layers, RefreshCw } from 'lucide-react';
+import { ArrowLeft, FileDown, Layers, RefreshCw, Share2 } from 'lucide-react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -7,6 +7,7 @@ import { fetchSuitabilityRun, generateReportPdf } from '../../../services/suitab
 import { fetchSuitabilityThresholds } from '../../../services/adminApi';
 import { Card, StatusPill, SecondaryButton, ErrorNote, EmptyState } from '../../../components/page/PageKit';
 import { CLASSES, classLabel, classTone, runStatus, isFinished, cropName, adviceFor, CROPS } from '../suitabilityLabels';
+import ShareModal from '../components/ShareModal';
 
 const POLL_MS = 5000;
 // Shares may arrive as fractions (0–1) or percentages.
@@ -25,7 +26,10 @@ const LAYER_LABELS = {
   distance_to_water: 'Distance to water',
   flood_frequency: 'Flood frequency',
   wetness: 'Canopy moisture (NDMI)',
-  forest_2020: 'Forest 2020 (EUDR)',
+  elevation: 'Elevation (30 m DEM)',
+  land_cover: 'Land cover (ESA 2021)',
+  forest_loss: 'Tree loss after 2020 (EUDR)',
+  forest_2020: 'Forest 2020 (EUDR cut-off)',
   protected_exclusion: 'Protected areas (WDPA)',
 };
 
@@ -56,6 +60,7 @@ const RunResult = ({ runId, companyId, onBack }) => {
   const [actions, setActions] = useState({});
   const [pdf, setPdf] = useState({ busy: false, msg: '' });
   const [selectedLayer, setSelectedLayer] = useState('final_class');
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     let live = true;
@@ -109,7 +114,7 @@ const RunResult = ({ runId, companyId, onBack }) => {
     ? run?.tiles?.result || run?.tiles?.factors?.final_class || null
     : run?.tiles?.factors?.[selectedLayer] || null;
 
-  const currentLegend = run.factor_legends?.[selectedLayer];
+  const currentLegend = run.factor_legends?.[selectedLayer] || run.layer_legends?.[selectedLayer];
 
   const onEachField = (feature, layer) => {
     const props = feature.properties || {};
@@ -143,7 +148,18 @@ const RunResult = ({ runId, companyId, onBack }) => {
         </div>
         <div className="flex items-center gap-3">
           <StatusPill tone={statusTone}>{statusLabel}{!isFinished(run.status) && run.progress != null ? ` · ${run.progress}%` : ''}</StatusPill>
-          {done && <SecondaryButton onClick={report} disabled={pdf.busy}><FileDown size={15} />{pdf.busy ? 'Preparing…' : 'Report (PDF)'}</SecondaryButton>}
+          {done && (
+            <>
+              <SecondaryButton onClick={() => setShareOpen(true)}>
+                <Share2 size={15} />
+                Share with client
+              </SecondaryButton>
+              <SecondaryButton onClick={report} disabled={pdf.busy}>
+                <FileDown size={15} />
+                {pdf.busy ? 'Preparing…' : 'Report (PDF)'}
+              </SecondaryButton>
+            </>
+          )}
         </div>
       </div>
       {pdf.msg && <p className="text-sm text-gray-600">{pdf.msg}</p>}
@@ -233,8 +249,53 @@ const RunResult = ({ runId, companyId, onBack }) => {
               </MapContainer>
             </div>
 
-            {/* Plain Legend per Layer */}
-            {currentLegend?.items?.length ? (
+            {/* Legend per Layer */}
+            {currentLegend?.kind === 'ramp' ? (
+              <div className="px-5 py-3.5 border-t border-gray-100 bg-white">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                  <span className="text-xs font-semibold text-gray-800">
+                    {LAYER_LABELS[selectedLayer] || selectedLayer} ({currentLegend.unit || 'm'})
+                  </span>
+                  <span className="text-[11px] text-gray-500 font-mono">
+                    30 m digital elevation model (Copernicus DEM GLO-30)
+                  </span>
+                </div>
+                <div className="flex items-center gap-2 max-w-md">
+                  <span className="text-xs font-mono text-gray-600 font-medium">{currentLegend.edges?.[0] != null ? `${currentLegend.edges[0]} ${currentLegend.unit || 'm'}` : 'Low'}</span>
+                  <div
+                    className="flex-1 h-3 rounded-full shadow-inner"
+                    style={{ background: `linear-gradient(to right, ${(currentLegend.colours || []).join(', ')})` }}
+                  />
+                  <span className="text-xs font-mono text-gray-600 font-medium">{currentLegend.edges?.[currentLegend.edges.length - 1] != null ? `${currentLegend.edges[currentLegend.edges.length - 1]} ${currentLegend.unit || 'm'}` : 'High'}</span>
+                </div>
+              </div>
+            ) : currentLegend?.kind === 'categories' ? (
+              <div className="px-5 py-3.5 border-t border-gray-100 bg-white">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                  <span className="text-xs font-semibold text-gray-800">
+                    {LAYER_LABELS[selectedLayer] || selectedLayer}
+                  </span>
+                  <span className="text-[11px] text-gray-500 font-mono">
+                    ESA WorldCover (30 m real satellite pixels)
+                  </span>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs">
+                  {Object.entries(currentLegend.items || {}).map(([name, col]) => (
+                    <span key={name} className="inline-flex items-center gap-1.5">
+                      <span className="w-3.5 h-3.5 rounded-sm flex-shrink-0 shadow-xs" style={{ backgroundColor: col }} />
+                      <span className="text-gray-800 capitalize font-medium">{name.replace(/_/g, ' ')}</span>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ) : currentLegend?.kind === 'exclusion' ? (
+              <div className="px-5 py-3.5 border-t border-gray-100 bg-red-50/50 flex items-center gap-3 text-xs">
+                <span className="w-4 h-4 rounded-sm bg-red-700 flex-shrink-0 shadow-xs" />
+                <span className="text-red-900 font-medium">
+                  Regulatory & Environmental Exclusion: {currentLegend.meaning}
+                </span>
+              </div>
+            ) : currentLegend?.items?.length ? (
               <div className="px-5 py-3.5 border-t border-gray-100 bg-white">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
                   <span className="text-xs font-semibold text-gray-800">
@@ -351,10 +412,50 @@ const RunResult = ({ runId, companyId, onBack }) => {
             </Card>
           )}
 
-          <details className="text-sm text-gray-600">
-            <summary className="cursor-pointer text-gray-800 font-medium">How this was worked out</summary>
-            <p className="mt-2 max-w-3xl">FAO land evaluation: each factor (rainfall and dry season from CHIRPS, temperature from ERA5-Land, slope and wetness from the Copernicus 30 m terrain model, soil from SoilGrids 250 m, flooding from radar) is scored for the crop with the thresholds set in the admin; forest on 31 December 2020 (JRC GFC2020), protected areas (WDPA) and river banks are excluded. Soil at 250 m and rainfall at 5 km make this a planning screen, not a field survey.</p>
+          <details className="text-sm text-gray-600 bg-white border border-gray-200 rounded-2xl p-5">
+            <summary className="cursor-pointer text-gray-800 font-semibold text-base">
+              Technical Audit & Data Sources
+            </summary>
+            <div className="mt-4 space-y-3">
+              <p className="text-xs text-gray-600 leading-relaxed">
+                Evaluated against FAO land evaluation standards at 30 m resolution. Terrain, slope, climate, and soil
+                are drawn directly from verified earth observation platforms with exclusions strictly enforced.
+              </p>
+              {run.sources?.length > 0 && (
+                <div className="pt-2 border-t border-gray-100">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Earth Observation Sources Used</h4>
+                  <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    {run.sources.map((src, i) => (
+                      <li key={i} className="flex items-start gap-2 bg-gray-50 p-2.5 rounded-xl border border-gray-100">
+                        <span className="w-1.5 h-1.5 rounded-full bg-green-600 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <span className="font-semibold text-gray-900">{src.name}</span>
+                          <span className="text-gray-500 block">{src.measures}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {run.limits?.length > 0 && (
+                <div className="pt-2 border-t border-gray-100">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Operational Notes & Constraints</h4>
+                  <ul className="list-disc list-inside text-xs text-gray-700 space-y-1">
+                    {run.limits.map((lim, i) => (
+                      <li key={i}>{lim}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
           </details>
+
+          <ShareModal
+            runId={runId}
+            crop={run.crop}
+            isOpen={shareOpen}
+            onClose={() => setShareOpen(false)}
+          />
         </>
       )}
     </div>

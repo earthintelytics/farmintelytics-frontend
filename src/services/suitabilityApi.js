@@ -50,3 +50,38 @@ export const submitSuitabilityRun = (payload) => call('/runs', { method: 'POST',
 
 export const generateReportPdf = (runId) =>
   call(`/runs/${encodeURIComponent(runId)}/report/pdf`, { method: 'POST' });
+
+export const fetchSuitabilityShares = (runId) =>
+  call(`/runs/${encodeURIComponent(runId)}/shares`);
+
+export const createSuitabilityShare = (runId, payload) =>
+  call(`/runs/${encodeURIComponent(runId)}/shares`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+
+export const revokeSuitabilityShare = (shareId) =>
+  call(`/shares/${encodeURIComponent(shareId)}/revoke`, {
+    method: 'POST',
+  });
+
+export const fetchPublicSuitability = async (token) => {
+  const res = await fetch(`${API_BASE}/public/suitability/${encodeURIComponent(token)}`, {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) throw await responseError(res);
+  return res.json();
+};
+
+export const askPublicSuitabilityAi = async (token, question) => {
+  const res = await fetch(`${API_BASE}/public/suitability/${encodeURIComponent(token)}/ask`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ question }),
+  });
+  if (!res.ok) throw await responseError(res);
+  return res.json();
+};
+
+export const publicReportPdfUrl = (token) =>
+  `${API_BASE}/public/suitability/${encodeURIComponent(token)}/report.pdf`;

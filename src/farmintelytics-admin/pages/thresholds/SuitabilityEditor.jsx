@@ -8,6 +8,9 @@ const ACTIONS = [
   { key: 'rainfall', label: 'When rainfall or the dry season limits it', placeholder: 'e.g. Plan irrigation or a drought-tolerant variety' },
   { key: 'soil_ph', label: 'When soil acidity or texture limits it', placeholder: 'e.g. Lime after a soil test' },
   { key: 'drainage', label: 'When waterlogging or flooding limits it', placeholder: 'e.g. Open drains before planting' },
+  { key: 'forest', label: 'When post-2020 tree loss or forest baseline limits it', placeholder: 'e.g. Exclude parcel for EUDR compliance or ground-truth canopy history' },
+  { key: 'elevation', label: 'When elevation or temperature limits it', placeholder: 'e.g. Select altitude-adapted or thermal-tolerant cultivars' },
+  { key: 'water_access', label: 'When distance to water limits it', placeholder: 'e.g. Plan boreholes or gravity-fed irrigation reservoirs' },
 ];
 
 /**
