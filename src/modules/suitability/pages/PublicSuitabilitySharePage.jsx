@@ -228,8 +228,10 @@ export const PublicSuitabilitySharePage = () => {
                   availableLayers={availableLayers}
                   onSelectLayer={setSelectedLayer}
                   layerOpacity={layerOpacity}
+                  onChangeOpacity={setLayerOpacity}
                   basemap={basemap}
                   showOverlay={showOverlay}
+                  onToggleOverlay={() => setShowOverlay(!showOverlay)}
                   onAskAiAboutLayer={handleAskAiAboutLayer}
                 />
               ) : (

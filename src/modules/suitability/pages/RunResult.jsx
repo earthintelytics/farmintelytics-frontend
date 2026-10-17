@@ -177,8 +177,10 @@ export default function RunResult({ runId, companyId, onBack }) {
                   availableLayers={availableLayers}
                   onSelectLayer={setSelectedLayer}
                   layerOpacity={layerOpacity}
+                  onChangeOpacity={setLayerOpacity}
                   basemap={basemap}
                   showOverlay={showOverlay}
+                  onToggleOverlay={() => setShowOverlay(!showOverlay)}
                   onAskAiAboutLayer={handleAskAiAboutLayer}
                 />
               ) : (
