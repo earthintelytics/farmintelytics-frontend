@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Download, CheckCircle2, X } from 'lucide-react';
 import { submitSuitabilityRun } from '../../../services/suitabilityApi';
 import { fetchFarms, fetchSuitabilityThresholds } from '../../../services/adminApi';
 import { boundaryCheck } from '../../../farmintelytics-admin/components/validation';
@@ -7,8 +8,8 @@ import { inputCls } from '../../../components/page/useLoader';
 import { CROPS } from '../suitabilityLabels';
 import { dataForCrop } from '../suitabilityData';
 import { DATASET_DEFINITIONS } from '../../data/datasetDefinitions';
-
 import { MODAL_HELP } from '../../../components/page/modalHelpText';
+
 const STRICTNESS = [
   { id: 'estate', label: 'Commercial estate', text: 'Stricter: only the best land counts as well suited' },
   { id: 'standard', label: 'Standard', text: 'The default thresholds' },
@@ -16,8 +17,83 @@ const STRICTNESS = [
 ];
 
 /**
+ * Parses point samples from CSV or GeoJSON for IDW spatial interpolation.
+ */
+const parsePointSamples = async (file) => {
+  const text = await file.text();
+  const name = (file.name || '').toLowerCase();
+
+  if (name.endsWith('.geojson') || name.endsWith('.json')) {
+    let parsed;
+    try { parsed = JSON.parse(text); } catch { throw new Error('Invalid GeoJSON/JSON file format.'); }
+    const features = parsed.features || (parsed.type === 'Feature' ? [parsed] : []);
+    const points = [];
+    for (const f of features) {
+      if (f.geometry && f.geometry.type === 'Point' && Array.isArray(f.geometry.coordinates)) {
+        const [lon, lat] = f.geometry.coordinates;
+        if (!isNaN(lat) && !isNaN(lon)) {
+          points.push({ lat: Number(lat), lon: Number(lon), ...(f.properties || {}) });
+        }
+      }
+    }
+    if (!points.length) {
+      throw new Error('No valid Point features with [longitude, latitude] coordinates found in GeoJSON.');
+    }
+    return points;
+  }
+
+  // Parse CSV
+  const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (lines.length < 2) {
+    throw new Error('CSV file must have a header row and at least one data row.');
+  }
+  const headers = lines[0].split(',').map((h) => h.trim().toLowerCase().replace(/['"]/g, ''));
+  const latIdx = headers.findIndex((h) => ['lat', 'latitude', 'y', 'gps_lat'].includes(h));
+  const lonIdx = headers.findIndex((h) => ['lon', 'lng', 'longitude', 'long', 'x', 'gps_lon', 'gps_lng'].includes(h));
+
+  if (latIdx === -1 || lonIdx === -1) {
+    throw new Error("CSV must include 'latitude' (or lat) and 'longitude' (or lon) columns.");
+  }
+
+  const points = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map((c) => c.trim().replace(/['"]/g, ''));
+    if (cols.length <= Math.max(latIdx, lonIdx)) continue;
+    const lat = parseFloat(cols[latIdx]);
+    const lon = parseFloat(cols[lonIdx]);
+    if (isNaN(lat) || isNaN(lon)) continue;
+
+    const row = { lat, lon };
+    headers.forEach((h, idx) => {
+      if (idx !== latIdx && idx !== lonIdx && cols[idx] !== undefined && cols[idx] !== '') {
+        const num = parseFloat(cols[idx]);
+        row[h] = isNaN(num) ? cols[idx] : num;
+      }
+    });
+    points.push(row);
+  }
+
+  if (!points.length) {
+    throw new Error('No valid coordinate rows found in CSV.');
+  }
+  return points;
+};
+
+const downloadSampleTemplate = () => {
+  const csv = [
+    'latitude,longitude,soil_ph,soil_depth_cm,nitrogen_mg_kg,clay_pct',
+    '6.5244,3.3792,5.8,120,45,28',
+    '6.5310,3.3850,6.2,140,52,32',
+    '6.5180,3.3920,5.4,95,38,24',
+  ].join('\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  Object.assign(document.createElement('a'), { href: url, download: 'field_samples_template.csv' }).click();
+  URL.revokeObjectURL(url);
+};
+
+/**
  * New analysis: area (a registered estate or an uploaded boundary that is
- * actually sent), crop, and the questions that change the result. Starts a
+ * actually sent), crop, and optional point observations (soil/weather). Starts a
  * real run; progress comes from the run status, nothing is simulated.
  */
 const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
@@ -32,6 +108,10 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
   const [geojson, setGeojson] = useState(null);
   const [fileNote, setFileNote] = useState('');
   const [fileError, setFileError] = useState('');
+  const [pointSamples, setPointSamples] = useState([]);
+  const [samplesNote, setSamplesNote] = useState('');
+  const [samplesError, setSamplesError] = useState('');
+  const [detectedKeys, setDetectedKeys] = useState([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [tried, setTried] = useState(false);
@@ -64,6 +144,27 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
     setGeojson(parsed); setFileNote(`${check.polygons} polygon${check.polygons > 1 ? 's' : ''} read.`);
   };
 
+  const pickSamples = async (e) => {
+    const f = e.target.files?.[0];
+    setPointSamples([]); setSamplesNote(''); setSamplesError(''); setDetectedKeys([]);
+    if (!f) return;
+    try {
+      const pts = await parsePointSamples(f);
+      const keys = new Set();
+      pts.forEach((p) => {
+        Object.keys(p).forEach((k) => {
+          if (!['lat', 'lon', 'latitude', 'longitude'].includes(k.toLowerCase())) keys.add(k);
+        });
+      });
+      const keyList = Array.from(keys);
+      setPointSamples(pts);
+      setDetectedKeys(keyList);
+      setSamplesNote(`${pts.length} point sample${pts.length > 1 ? 's' : ''} loaded. IDW spatial interpolation will generate continuous raster surfaces.`);
+    } catch (err) {
+      setSamplesError(err.message || 'Could not parse sample points.');
+    }
+  };
+
   // Everything a run needs, checked when Start is clicked; each problem is shown on its field.
   const problems = {
     org: !companyId ? "Type the client's name." : null,
@@ -79,7 +180,9 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
         crop, company_id: companyId, client_name: orgText.trim(),
         farm_id: form.area === 'estate' && registered ? form.farm_id || null : null,
         area: form.area === 'upload' || !registered ? { geojson } : null,
-        variant: form.variant || null, irrigated: form.irrigated, strictness: form.strictness, use_soil_samples: registered && form.use_soil_samples,
+        variant: form.variant || null, irrigated: form.irrigated, strictness: form.strictness,
+        use_soil_samples: registered && form.use_soil_samples,
+        soil_samples: pointSamples.length ? pointSamples : null,
       });
       onStarted(run, companyId);
     } catch (e) { setError(e.message); setBusy(false); }
@@ -107,7 +210,7 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
       </Field>
       <p className="text-sm text-gray-600">Crop: <span className="font-semibold text-gray-900">{cropName}</span>. Rainfall, temperature, terrain, soil, flooding, forest in 2020 and protected areas are fetched by the pipeline.</p>
 
-      <Field label="Where" required error={tried ? problems.area : null}>
+      <Field label="Where" required error={tried ? problems.area : null} hint="Select an existing estate or upload your own farm boundary (GeoJSON polygon).">
         <div className="flex gap-2 mb-3">
           {[['estate', 'A registered estate'], ['upload', 'Upload an area']].filter(([id]) => id === 'upload' || registered).map(([id, label]) => (
             <button key={id} type="button" onClick={() => set('area', id)} className={`px-3 py-2 rounded-xl border text-sm ${form.area === id ? 'border-green-600 bg-green-50 text-green-900 font-semibold' : 'border-gray-300 bg-white text-gray-700'}`}>{label}</button>
@@ -124,6 +227,64 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
             <p className={`text-xs mt-1 ${fileError ? 'text-red-700' : 'text-gray-500'}`}>{fileError || fileNote || 'GeoJSON polygons in longitude/latitude, e.g. a planned expansion area.'}</p>
           </>
         )}
+      </Field>
+
+      {/* Optional Ground Sample Points / Soil & Weather Observations with IDW interpolation */}
+      <Field
+        label={
+          <div className="flex items-center justify-between w-full">
+            <span className="font-semibold text-gray-900">Field sample points</span>
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Optional</span>
+          </div>
+        }
+        hint="Have GPS soil lab test points (pH, depth, nitrogen) or weather stations? Upload a CSV or GeoJSON here. Our engine automatically applies IDW spatial interpolation across your farm to generate continuous raster surfaces. If omitted, global satellite and SoilGrids baselines are used automatically."
+      >
+        <div className="border border-gray-200 rounded-xl p-3 bg-gray-50/70 space-y-2">
+          {!pointSamples.length ? (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <input
+                type="file"
+                accept=".csv,.geojson,.json"
+                onChange={pickSamples}
+                className="block w-full text-xs text-gray-700 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border file:border-gray-300 file:bg-white file:text-xs file:font-medium hover:file:bg-gray-50"
+              />
+              <button
+                type="button"
+                onClick={downloadSampleTemplate}
+                className="shrink-0 inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 font-semibold py-1 px-2 rounded-lg hover:bg-green-100/50"
+                title="Download a CSV template with standard column names"
+              >
+                <Download size={13} />
+                <span>Download CSV template</span>
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between bg-white border border-green-200 rounded-lg p-2.5 shadow-sm">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-green-600 shrink-0" />
+                <div>
+                  <p className="text-xs font-medium text-gray-900">
+                    <span className="font-bold text-green-800">{pointSamples.length} point samples</span> loaded for IDW interpolation
+                  </p>
+                  <p className="text-[11px] text-gray-500">
+                    {detectedKeys.length ? `Detected parameters: ${detectedKeys.join(', ')}` : 'Spatial coordinates verified'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => { setPointSamples([]); setSamplesNote(''); setSamplesError(''); setDetectedKeys([]); }}
+                className="text-gray-400 hover:text-red-600 p-1 rounded-lg hover:bg-gray-100"
+                title="Remove uploaded samples"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          )}
+
+          {samplesError && <p className="text-xs text-red-600">{samplesError}</p>}
+          {samplesNote && !samplesError && !pointSamples.length && <p className="text-xs text-gray-600">{samplesNote}</p>}
+        </div>
       </Field>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
