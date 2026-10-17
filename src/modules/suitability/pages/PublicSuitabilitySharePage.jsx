@@ -98,9 +98,28 @@ export const PublicSuitabilitySharePage = () => {
     return ['final_class', ...list];
   })();
 
-  const handleDownloadPdf = () => {
-    const url = publicReportPdfUrl(token);
-    window.open(url, '_blank', 'noopener');
+  const [pdfBusy, setPdfBusy] = useState(false);
+
+  const handleDownloadPdf = async () => {
+    setPdfBusy(true);
+    try {
+      const url = publicReportPdfUrl(token);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('PDF not ready');
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `suitability_report_${crop.toLowerCase()}_${token.slice(0, 8)}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(a);
+    } catch {
+      window.open(publicReportPdfUrl(token), '_blank', 'noopener');
+    } finally {
+      setPdfBusy(false);
+    }
   };
 
   const handleAskAiAboutLayer = (questionText) => {
@@ -229,8 +248,9 @@ export const PublicSuitabilitySharePage = () => {
             <SuitabilityReportView
               run={runWithToken}
               onDownloadPdf={handleDownloadPdf}
-              pdfBusy={false}
+              pdfBusy={pdfBusy}
               pdfMsg=""
+              onAskAi={handleAskAiAboutLayer}
             />
           </main>
         ) : (

@@ -51,6 +51,25 @@ export const submitSuitabilityRun = (payload) => call('/runs', { method: 'POST',
 export const generateReportPdf = (runId) =>
   call(`/runs/${encodeURIComponent(runId)}/report/pdf`, { method: 'POST' });
 
+export const downloadSuitabilityPdf = async (runId) => {
+  const token = localStorage.getItem('fi_admin_token');
+  const headers = {};
+  if (token) headers.Authorization = `Bearer ${token}`;
+  const res = await fetch(`${BASE_URL}/runs/${encodeURIComponent(runId)}/report.pdf`, {
+    headers,
+  });
+  if (!res.ok) throw await responseError(res);
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `suitability_report_${runId}.pdf`;
+  document.body.appendChild(a);
+  a.click();
+  window.URL.revokeObjectURL(url);
+  document.body.removeChild(a);
+};
+
 export const fetchSuitabilityShares = (runId) =>
   call(`/runs/${encodeURIComponent(runId)}/shares`);
 

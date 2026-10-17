@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { fetchSuitabilityRun, generateReportPdf } from '../../../services/suitabilityApi';
+import { fetchSuitabilityRun, generateReportPdf, downloadSuitabilityPdf } from '../../../services/suitabilityApi';
 import { fetchSuitabilityThresholds } from '../../../services/adminApi';
 import { ErrorNote } from '../../../components/page/PageKit';
 import { CROPS, isFinished } from '../suitabilityLabels';
@@ -88,13 +88,18 @@ export default function RunResult({ runId, companyId, onBack }) {
   const handleDownloadReport = async () => {
     setPdf({ busy: true, msg: '' });
     try {
-      const r = await generateReportPdf(runId);
-      if (r?.pdf_url && r.status === 'ready') {
-        window.open(r.pdf_url, '_blank', 'noopener');
-      }
-      setPdf({ busy: false, msg: r?.status === 'ready' ? '' : 'The report is being prepared.' });
+      await downloadSuitabilityPdf(runId);
+      setPdf({ busy: false, msg: '' });
     } catch (e) {
-      setPdf({ busy: false, msg: e.message });
+      try {
+        const r = await generateReportPdf(runId);
+        if (r?.pdf_url && r.status === 'ready') {
+          window.open(r.pdf_url, '_blank', 'noopener');
+        }
+        setPdf({ busy: false, msg: '' });
+      } catch (err) {
+        setPdf({ busy: false, msg: e.message || err.message });
+      }
     }
   };
 
@@ -194,6 +199,7 @@ export default function RunResult({ runId, companyId, onBack }) {
               onDownloadPdf={handleDownloadReport}
               pdfBusy={pdf.busy}
               pdfMsg={pdf.msg}
+              onAskAi={handleAskAiAboutLayer}
             />
           </main>
         ) : (
