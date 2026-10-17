@@ -48,6 +48,8 @@ export const fetchSuitabilityRun = (runId) => call(`/runs/${encodeURIComponent(r
 
 export const submitSuitabilityRun = (payload) => call('/runs', { method: 'POST', body: JSON.stringify(payload) });
 
+export const deleteSuitabilityRun = (runId) => call(`/runs/${encodeURIComponent(runId)}`, { method: 'DELETE' });
+
 export const generateReportPdf = (runId) =>
   call(`/runs/${encodeURIComponent(runId)}/report/pdf`, { method: 'POST' });
 

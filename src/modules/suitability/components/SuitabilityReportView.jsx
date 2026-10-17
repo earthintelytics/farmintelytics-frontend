@@ -154,14 +154,6 @@ export default function SuitabilityReportView({
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => window.print()}
-            className="px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-semibold text-gray-700 hover:bg-gray-50 flex items-center gap-1.5 transition-all shadow-xs"
-          >
-            <Printer size={14} className="text-gray-500" />
-            <span>Print</span>
-          </button>
           <span className="text-xs font-semibold text-gray-400">Past Reports (0)</span>
         </div>
       </div>

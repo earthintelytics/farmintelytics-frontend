@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, useMap, ZoomControl } from 'react-leaflet';
+import { MapContainer, TileLayer, GeoJSON, useMap, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -29,7 +29,7 @@ function Fit({ geometry }) {
     try {
       const b = L.geoJSON(geometry).getBounds();
       if (b.isValid()) {
-        map.fitBounds(b, { padding: [16, 16], maxZoom: 18 });
+        map.fitBounds(b, { padding: [24, 24], maxZoom: 18 });
         const z = map.getZoom();
         if (z < 14) {
           map.setZoom(Math.min(15, z + 2));
@@ -54,7 +54,7 @@ function ResizeMap({ trigger }) {
 }
 
 const CATEGORY_META = {
-  Summary: { name: 'Overall Evaluation', icon: Layers, order: 1 },
+  Summary: { name: 'Suitability Analysis', icon: Layers, order: 1 },
   Terrain: { name: 'Topography & Terrain', icon: Mountain, order: 2 },
   Climate: { name: 'Climate & Rainfall', icon: CloudRain, order: 3 },
   Soil: { name: 'Soil Chemistry & Acidity', icon: FlaskConical, order: 4 },
@@ -74,19 +74,17 @@ export default function SuitabilityMapView({
   showOverlay = true,
   onToggleOverlay,
   onAskAiAboutLayer,
+  selectedAreaId = '',
 }) {
   const [showRightLegend, setShowRightLegend] = useState(true);
   const [showBasemapDropdown, setShowBasemapDropdown] = useState(false);
+  const [showBoundaries, setShowBoundaries] = useState(true);
+  const [boundaryOpacity, setBoundaryOpacity] = useState(1.0);
   const crop = cropName(run?.crop);
 
-  // Expanded groups & layers state
-  const [expandedGroups, setExpandedGroups] = useState(null);
-  const [expandedLayers, setExpandedLayers] = useState([selectedLayer]);
-
-  // Keep selected layer expanded whenever it changes
-  useEffect(() => {
-    setExpandedLayers((prev) => (prev.includes(selectedLayer) ? prev : [...prev, selectedLayer]));
-  }, [selectedLayer]);
+  // Layer categories & individual cards collapsed by default
+  const [expandedGroups, setExpandedGroups] = useState([]);
+  const [expandedLayers, setExpandedLayers] = useState([]);
 
   const currentTileUrl =
     selectedLayer === 'final_class'
@@ -185,6 +183,35 @@ export default function SuitabilityMapView({
             />
           )}
 
+          {/* Farm Boundary Vector Polygons (crisp overlay) */}
+          {showBoundaries && run?.fields_geojson && (
+            <GeoJSON
+              key={`boundary-${selectedAreaId}-${run?.run_id}-${boundaryOpacity}`}
+              data={run.fields_geojson}
+              style={(feature) => {
+                const fid = String(feature?.properties?.id || feature?.properties?.field_id || feature?.properties?.plot_id || '');
+                const isSelected = selectedAreaId && fid === selectedAreaId;
+                const cls = feature?.properties?.overall_class;
+                const color = cls === 'S1' ? '#2e7d32' : cls === 'S2' ? '#7cb342' : cls === 'S3' ? '#fbc02d' : cls === 'N' ? '#c62828' : '#3F8432';
+                return {
+                  color: isSelected ? '#ffffff' : '#f59e0b',
+                  weight: isSelected ? 3.5 : 2,
+                  opacity: boundaryOpacity,
+                  dashArray: isSelected ? undefined : '4, 4',
+                  fillColor: color,
+                  fillOpacity: isSelected ? 0.35 * boundaryOpacity : 0.15 * boundaryOpacity,
+                };
+              }}
+              onEachFeature={(feature, layer) => {
+                const p = feature.properties || {};
+                const id = p.id || p.field_id || p.plot_id || 'Plot';
+                const cls = p.overall_class ? ` · ${p.overall_class}` : '';
+                const ha = p.area_ha ? ` (${Number(p.area_ha).toFixed(1)} ha)` : '';
+                layer.bindTooltip(`<b>${id}</b>${cls}${ha}`, { sticky: true });
+              }}
+            />
+          )}
+
           {/* Camera Auto-Fit */}
           {run?.fields_geojson && <Fit geometry={run.fields_geojson} />}
 
@@ -195,7 +222,7 @@ export default function SuitabilityMapView({
           <ResizeMap trigger={showRightLegend} />
         </MapContainer>
 
-        {/* ── TOP-LEFT FLOATING CONTROLS (Basemap Selector & Active Layer Chip) ── */}
+        {/* ── TOP-LEFT FLOATING CONTROLS (Basemap Selector) ── */}
         <div className="absolute top-4 left-4 z-[400] flex items-center gap-2 pointer-events-auto">
           {/* Floating Basemap Selector (Matches main dashboard renderFloatingBasemapSelector) */}
           <div className="relative">
@@ -240,16 +267,6 @@ export default function SuitabilityMapView({
                 </button>
               </div>
             )}
-          </div>
-
-          {/* Active Layer Chip */}
-          <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-xs border border-gray-200 text-xs font-semibold text-gray-800">
-            <span className="w-2.5 h-2.5 rounded-full bg-green-600 animate-pulse shrink-0" />
-            <span className="text-gray-500">Active Layer:</span>
-            <span className="font-bold text-green-900">{activeExplanation.label}</span>
-            <span className="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md">
-              30m Pixels
-            </span>
           </div>
         </div>
 
@@ -302,12 +319,59 @@ export default function SuitabilityMapView({
 
           {/* Panel Content: Grouped Layers Used in the Analysis */}
           <div className="p-4 space-y-4 flex-1 text-xs">
+            {/* ── PARCEL BOUNDARIES (Matches Screenshot 1 Outlines of the blocks) ── */}
+            {run?.fields_geojson && (
+              <div className="border border-gray-200 rounded-xl p-3 bg-white space-y-2.5">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-0.5">
+                    <span className="font-bold text-gray-900 text-xs block">
+                      Outlines of the blocks
+                    </span>
+                    <p className="text-[11px] text-gray-500 font-medium">
+                      Click one to see its details
+                    </p>
+                  </div>
+
+                  {/* Toggle Switch */}
+                  <button
+                    type="button"
+                    onClick={() => setShowBoundaries(!showBoundaries)}
+                    title={showBoundaries ? 'Hide parcel boundary outlines' : 'Show parcel boundary outlines'}
+                    className={`w-9 h-5 rounded-full p-0.5 transition-colors shrink-0 ${
+                      showBoundaries ? 'bg-green-700' : 'bg-gray-300 hover:bg-gray-400'
+                    }`}
+                  >
+                    <div
+                      className={`w-4 h-4 rounded-full bg-white shadow transition-transform duration-150 ${
+                        showBoundaries ? 'translate-x-4' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                {showBoundaries && (
+                  <div className="pt-2 border-t border-gray-100 space-y-1">
+                    <div className="flex items-center justify-between text-[11px] font-semibold text-gray-700">
+                      <span>Opacity</span>
+                      <span className="font-mono text-gray-500">{Math.round(boundaryOpacity * 100)}%</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="0.2"
+                      max="1.0"
+                      step="0.05"
+                      value={boundaryOpacity}
+                      onChange={(e) => setBoundaryOpacity(parseFloat(e.target.value))}
+                      className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-green-700"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
             {legendGroups.map((group) => {
               const isGroupOpen = openGroupIds.includes(group.id);
               const GroupIcon = group.icon || Layers;
-              const activeCountInGroup = group.entries.filter(
-                (e) => e.key === selectedLayer && showOverlay
-              ).length;
 
               return (
                 <div key={group.id} className="space-y-2">
@@ -322,12 +386,6 @@ export default function SuitabilityMapView({
                       <span className="uppercase tracking-wider">{group.name}</span>
                       <span className="font-semibold text-gray-400">({group.entries.length})</span>
                     </div>
-
-                    {activeCountInGroup > 0 && (
-                      <span className="text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-2 py-0.5">
-                        Active on map
-                      </span>
-                    )}
                   </div>
 
                   {/* Group Layer Cards */}
@@ -336,7 +394,7 @@ export default function SuitabilityMapView({
                       {group.entries.map((entry) => {
                         const isSelected = selectedLayer === entry.key;
                         const isOnMap = isSelected && showOverlay;
-                        const isCardOpen = isSelected || expandedLayers.includes(entry.key);
+                        const isCardOpen = expandedLayers.includes(entry.key);
                         const info = entry.info;
                         const legend = entry.legend;
 
@@ -482,9 +540,9 @@ export default function SuitabilityMapView({
                                   )}
                                 </div>
 
-                                {/* ── PLAIN-ENGLISH MEANING ── */}
+                                {/* ── INTERPRETATION ── */}
                                 <div className="space-y-1 leading-snug">
-                                  <span className="font-bold text-gray-900 block text-[11px]">What this means:</span>
+                                  <span className="font-bold text-gray-900 block text-[11px]">Interpretation:</span>
                                   <p className="text-gray-600 text-[11px] leading-relaxed">{info.whatItMeans}</p>
                                 </div>
 

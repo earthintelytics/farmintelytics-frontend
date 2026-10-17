@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { fetchSuitabilityRun, generateReportPdf, downloadSuitabilityPdf } from '../../../services/suitabilityApi';
+import { fetchSuitabilityRun, generateReportPdf, downloadSuitabilityPdf, deleteSuitabilityRun } from '../../../services/suitabilityApi';
 import { fetchSuitabilityThresholds } from '../../../services/adminApi';
 import { ErrorNote } from '../../../components/page/PageKit';
-import { CROPS, isFinished } from '../suitabilityLabels';
+import { CROPS, cropName, isFinished } from '../suitabilityLabels';
 import ShareModal from '../components/ShareModal';
 import SuitabilityHeader from '../components/SuitabilityHeader';
 import SuitabilitySidebar from '../components/SuitabilitySidebar';
@@ -10,6 +10,7 @@ import SuitabilityMapView from '../components/SuitabilityMapView';
 import SuitabilityAnalyticsView from '../components/SuitabilityAnalyticsView';
 import SuitabilityReportView from '../components/SuitabilityReportView';
 import SuitabilityAiView from '../components/SuitabilityAiView';
+import FactorGuide from './FactorGuide';
 
 const POLL_MS = 5000;
 
@@ -19,11 +20,13 @@ export default function RunResult({ runId, companyId, onBack }) {
   const [actions, setActions] = useState({});
   const [pdf, setPdf] = useState({ busy: false, msg: '' });
   const [shareOpen, setShareOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [selectedAreaId, setSelectedAreaId] = useState('');
 
   // Top Tabs: 'assessment' | 'report' | 'ai-assistant'
   const [activeTopTab, setActiveTopTab] = useState('assessment');
 
-  // Left Sub-pages: 'analytics' | 'map-view'
+  // Left Sub-pages: 'analytics' | 'map-view' | 'glossary'
   const [activeView, setActiveView] = useState('analytics');
 
   // Map state
@@ -109,6 +112,22 @@ export default function RunResult({ runId, companyId, onBack }) {
     setActiveTopTab('ai-assistant');
   };
 
+  // 6. Delete analysis run
+  const handleDeleteRun = async () => {
+    const name = cropName(run?.crop);
+    if (!window.confirm(`Permanently delete this ${name} suitability analysis and all associated map rasters? This cannot be undone.`)) {
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteSuitabilityRun(runId);
+      if (onBack) onBack();
+    } catch (err) {
+      alert(`Could not delete analysis: ${err.message}`);
+      setDeleting(false);
+    }
+  };
+
   if (error && !run) {
     return (
       <div className="fixed inset-0 z-50 bg-gray-50 flex items-center justify-center p-6">
@@ -116,7 +135,7 @@ export default function RunResult({ runId, companyId, onBack }) {
           <ErrorNote message={error} />
           <button
             onClick={onBack}
-            className="w-full py-2.5 px-4 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+            className="w-full py-2.5 px-4 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 cursor-pointer"
           >
             Back to analyses
           </button>
@@ -130,7 +149,7 @@ export default function RunResult({ runId, companyId, onBack }) {
       <div className="fixed inset-0 z-50 bg-gray-50 flex items-center justify-center">
         <div className="flex items-center gap-3 bg-white px-6 py-4 rounded-2xl shadow-sm border border-gray-200">
           <div className="w-5 h-5 border-2 border-green-700 border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm font-semibold text-gray-700">Loading suitability evaluation…</span>
+          <span className="text-sm font-semibold text-gray-700">Loading suitability analysis…</span>
         </div>
       </div>
     );
@@ -144,9 +163,10 @@ export default function RunResult({ runId, companyId, onBack }) {
         activeTopTab={activeTopTab}
         onSelectTopTab={setActiveTopTab}
         onBack={onBack}
-        onOpenShare={() => setShareOpen(true)}
-        onDownloadReport={handleDownloadReport}
-        pdfBusy={pdf.busy}
+        selectedAreaId={selectedAreaId}
+        onSelectArea={setSelectedAreaId}
+        onDeleteRun={handleDeleteRun}
+        deleting={deleting}
       />
 
       {/* ── MAIN WORKSPACE CONTAINER ── */}
@@ -156,11 +176,17 @@ export default function RunResult({ runId, companyId, onBack }) {
             {/* Left Sidebar (Views) */}
             <SuitabilitySidebar
               activeView={activeView}
-              onSelectView={setActiveView}
+              onSelectView={(v) => {
+                if (v === 'ai-assistant') {
+                  setActiveTopTab('ai-assistant');
+                } else {
+                  setActiveView(v);
+                }
+              }}
               onOpenShare={() => setShareOpen(true)}
             />
 
-            {/* View Content (Map Studio or Analytics Hub) */}
+            {/* View Content (Map Studio, Analytics Hub, or Glossary) */}
             <main className="flex-1 h-full overflow-hidden relative flex flex-col">
               {activeView === 'map-view' ? (
                 <SuitabilityMapView
@@ -175,13 +201,25 @@ export default function RunResult({ runId, companyId, onBack }) {
                   showOverlay={showOverlay}
                   onToggleOverlay={() => setShowOverlay(!showOverlay)}
                   onAskAiAboutLayer={handleAskAiAboutLayer}
+                  selectedAreaId={selectedAreaId}
                 />
+              ) : activeView === 'glossary' ? (
+                <div className="flex-1 overflow-y-auto p-6 max-w-5xl mx-auto w-full">
+                  <div className="mb-6">
+                    <h2 className="text-xl font-bold text-gray-900">Factor Thresholds & Methodology Guide</h2>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Scientific criteria, threshold ranges (S1, S2, S3, N), and corrective actions defined for {cropName(run?.crop)}.
+                    </p>
+                  </div>
+                  <FactorGuide companyId={companyId || run?.company_id || ''} cropId={run?.crop} />
+                </div>
               ) : (
                 <div className="flex-1 overflow-y-auto">
                   <SuitabilityAnalyticsView
                     run={run}
                     actions={actions}
                     onAskAi={(q) => handleAskAiAboutLayer(q)}
+                    selectedAreaId={selectedAreaId}
                   />
                 </div>
               )}
@@ -208,8 +246,9 @@ export default function RunResult({ runId, companyId, onBack }) {
       {shareOpen && (
         <ShareModal
           runId={runId}
-          companyId={companyId || run?.company_id || ''}
-          cropName={run?.crop || 'Crop'}
+          isOpen={shareOpen}
+          cropName={cropName(run?.crop)}
+          companyName={run?.company_name || run?.company_id || 'Estate'}
           onClose={() => setShareOpen(false)}
         />
       )}

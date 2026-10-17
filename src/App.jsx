@@ -358,6 +358,7 @@ const AppRoutes = () => {
         <Route path="/hub"                      element={<Navigate to="/platformhub" replace />} />
         <Route path="/f/:token"                 element={<PublicFormPage />} />
         <Route path="/s/:token"                 element={<PublicSuitabilitySharePage />} />
+        <Route path="/suitability"              element={<Navigate to="/tools/suitability-tool" replace />} />
         <Route path="/tools/:moduleId"          element={<PortalPage />} />
         <Route path="/org/:tenant"              element={<OrgPage view="services" />} />
         <Route path="/org/:tenant/settings"     element={<OrgPage view="settings" />} />

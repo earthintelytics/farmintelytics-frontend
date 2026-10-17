@@ -3,6 +3,7 @@ import { Download, CheckCircle2, X } from 'lucide-react';
 import { submitSuitabilityRun } from '../../../services/suitabilityApi';
 import { fetchFarms, fetchSuitabilityThresholds } from '../../../services/adminApi';
 import { boundaryCheck } from '../../../farmintelytics-admin/components/validation';
+import { readGeoFile } from '../../forms/geo';
 import { Modal, Field, PrimaryButton, SecondaryButton, ErrorNote } from '../../../components/page/PageKit';
 import { inputCls } from '../../../components/page/useLoader';
 import { CROPS } from '../suitabilityLabels';
@@ -138,10 +139,29 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
     const f = e.target.files?.[0];
     setGeojson(null); setFileNote(''); setFileError('');
     if (!f) return;
-    let parsed; try { parsed = JSON.parse(await f.text()); } catch { parsed = null; }
-    const check = boundaryCheck(parsed, f.size);
-    if (check.error) { setFileError(check.error); return; }
-    setGeojson(parsed); setFileNote(`${check.polygons} polygon${check.polygons > 1 ? 's' : ''} read.`);
+    try {
+      const { geometry, note } = await readGeoFile(f, 'area');
+      const featColl = {
+        type: 'FeatureCollection',
+        features: [{
+          type: 'Feature',
+          geometry,
+          properties: { id: f.name.replace(/\.[^/.]+$/, '') || 'Custom_Farm' },
+        }],
+      };
+      setGeojson(featColl);
+      setFileNote(note);
+    } catch (err) {
+      try {
+        const parsed = JSON.parse(await f.text());
+        const check = boundaryCheck(parsed, f.size);
+        if (check.error) { setFileError(check.error); return; }
+        setGeojson(parsed);
+        setFileNote(`${check.polygons} polygon${check.polygons > 1 ? 's' : ''} read.`);
+      } catch {
+        setFileError(err.message || 'Could not read boundary file. Use GeoJSON, KML, KMZ or Shapefile (.zip).');
+      }
+    }
   };
 
   const pickSamples = async (e) => {
@@ -223,8 +243,8 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
           </select>
         ) : (
           <>
-            <input type="file" accept=".geojson,.json,application/geo+json" onChange={pick} className="block w-full text-sm text-gray-700 file:mr-3 file:px-3 file:py-2 file:rounded-lg file:border file:border-gray-300 file:bg-white file:text-sm" />
-            <p className={`text-xs mt-1 ${fileError ? 'text-red-700' : 'text-gray-500'}`}>{fileError || fileNote || 'GeoJSON polygons in longitude/latitude, e.g. a planned expansion area.'}</p>
+            <input type="file" accept=".geojson,.json,.kml,.kmz,.zip,application/geo+json,application/zip" onChange={pick} className="block w-full text-sm text-gray-700 file:mr-3 file:px-3 file:py-2 file:rounded-lg file:border file:border-gray-300 file:bg-white file:text-sm" />
+            <p className={`text-xs mt-1 ${fileError ? 'text-red-700' : 'text-gray-500'}`}>{fileError || fileNote || 'Upload your farm boundary: GeoJSON, KML, KMZ or Shapefile (.zip) in WGS 84 (longitude/latitude).'}</p>
           </>
         )}
       </Field>

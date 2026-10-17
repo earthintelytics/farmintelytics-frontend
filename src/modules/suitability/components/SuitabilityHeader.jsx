@@ -1,19 +1,18 @@
-import { ArrowLeft, FileDown, Layers, FileText, Sparkles, Share2, Compass } from 'lucide-react';
-import { StatusPill } from '../../../components/page/PageKit';
-import { cropName, runStatus, isFinished } from '../suitabilityLabels';
+import { ArrowLeft, Layers, FileText, Sparkles, Compass, Trash2 } from 'lucide-react';
+import { cropName } from '../suitabilityLabels';
 
 export default function SuitabilityHeader({
   run,
   activeTopTab,
   onSelectTopTab,
   onBack,
-  onOpenShare,
-  onDownloadReport,
-  pdfBusy,
+  selectedAreaId = '',
+  onSelectArea,
+  onDeleteRun,
+  deleting = false,
 }) {
-  const [statusLabel, statusTone] = runStatus(run?.status);
-  const done = isFinished(run?.status) && run?.status !== 'failed';
   const crop = cropName(run?.crop);
+  const fields = run?.fields || [];
 
   return (
     <header className="h-[72px] bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-8 z-[100] shadow-sm shrink-0">
@@ -40,16 +39,6 @@ export default function SuitabilityHeader({
                 </span>
               )}
             </h1>
-            <p className="text-xs font-medium mt-1 leading-none text-gray-500">
-              {[
-                run?.company_name || run?.company_id || 'Estate Analysis',
-                run?.total_area_ha ? `${Number(run.total_area_ha).toLocaleString()} ha` : null,
-                run?.irrigated ? 'Irrigated' : 'Rain-fed',
-                run?.resolution_m ? `${run.resolution_m} m pixels` : '30 m pixels',
-              ]
-                .filter(Boolean)
-                .join(' · ')}
-            </p>
           </div>
         </div>
       </div>
@@ -79,34 +68,40 @@ export default function SuitabilityHeader({
         })}
       </div>
 
-      {/* Right Controls */}
+      {/* Right Controls: Area selector & Delete run action */}
       <div className="flex items-center gap-3">
-        <StatusPill tone={statusTone}>
-          {statusLabel}
-          {!isFinished(run?.status) && run?.progress != null ? ` · ${run.progress}%` : ''}
-        </StatusPill>
+        {fields.length > 0 && onSelectArea && (
+          <select
+            value={selectedAreaId}
+            onChange={(e) => onSelectArea(e.target.value)}
+            className="bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-700 rounded-xl px-3 py-2 focus:outline-none focus:border-green-600 cursor-pointer shadow-2xs"
+            title="Filter by specific plot/block"
+          >
+            <option value="">All Areas ({fields.length} plots · {Math.round(Number(run?.total_area_ha || 0)).toLocaleString()} ha)</option>
+            {fields.map((f) => {
+              const fid = String(f.field_id || f.id || '');
+              const name = f.name || f.field_id || f.id || 'Plot';
+              const ha = f.area_ha ? `${Number(f.area_ha).toFixed(1)} ha` : '';
+              const cls = f.overall_class ? ` [${f.overall_class}]` : '';
+              return (
+                <option key={fid} value={fid}>
+                  {name} {cls} {ha ? `(${ha})` : ''}
+                </option>
+              );
+            })}
+          </select>
+        )}
 
-        {done && (
-          <>
-            <button
-              type="button"
-              onClick={onOpenShare}
-              className="hidden sm:inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-all shadow-xs"
-            >
-              <Share2 size={14} className="text-green-700" />
-              <span>Share with client</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onDownloadReport}
-              disabled={pdfBusy}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-green-700 text-white hover:bg-green-800 transition-all shadow-xs disabled:opacity-50"
-            >
-              <FileDown size={14} />
-              <span>{pdfBusy ? 'Preparing…' : 'PDF Report'}</span>
-            </button>
-          </>
+        {onDeleteRun && (
+          <button
+            type="button"
+            onClick={onDeleteRun}
+            disabled={deleting}
+            title="Delete this analysis run and artifacts"
+            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl border border-gray-200 transition-colors disabled:opacity-50"
+          >
+            <Trash2 size={16} />
+          </button>
         )}
       </div>
     </header>

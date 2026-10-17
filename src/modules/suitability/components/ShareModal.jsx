@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Copy, Check, Trash2, Globe, Clock, MessageSquare, Share2, Sparkles, ExternalLink } from 'lucide-react';
+import { Copy, Check, Trash2, Globe, Clock, MessageSquare, Share2, Sparkles, ExternalLink, Mail, MessageCircle } from 'lucide-react';
 import { Modal, PrimaryButton, SecondaryButton, StatusPill, ErrorNote, Field } from '../../../components/page/PageKit';
 import { fetchSuitabilityShares, createSuitabilityShare, revokeSuitabilityShare } from '../../../services/suitabilityApi';
 
-export const ShareModal = ({ runId, isOpen, onClose }) => {
+export const ShareModal = ({ runId, isOpen = true, onClose, cropName = 'Crop', companyName = 'Estate' }) => {
   const [shares, setShares] = useState([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -37,9 +37,20 @@ export const ShareModal = ({ runId, isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      loadShares(); // eslint-disable-line react-hooks/set-state-in-effect
+      loadShares();
     }
   }, [isOpen, runId]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const activeShare = shares.find((s) => s.state === 'active') || null;
+  const currentShareUrl = newlyCreatedUrl || activeShare?.url || (typeof window !== 'undefined' ? `${window.location.origin}/suitability/share/${runId}` : '');
+
+  const shareSubject = `${cropName} Land Suitability Analysis - ${companyName}`;
+  const shareMessage = `Hello,
+
+Here is your interactive Land Suitability Analysis for ${cropName} on ${companyName}:
+${currentShareUrl}
+
+You can explore high-resolution 30m terrain, climate, and soil maps, inspect planting recommendations, review the FAO class evaluation, and ask questions to the AI agronomic advisor.`;
 
   const handleCreate = async (e) => {
     e.preventDefault();
@@ -88,9 +99,29 @@ export const ShareModal = ({ runId, isOpen, onClose }) => {
   };
 
   const copyToClipboard = (text, id) => {
-    navigator.clipboard.writeText(text);
+    if (navigator?.clipboard?.writeText) {
+      navigator.clipboard.writeText(text);
+    } else {
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+    }
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2500);
+  };
+
+  const handleShareWhatsApp = () => {
+    const text = encodeURIComponent(shareMessage);
+    window.open(`https://api.whatsapp.com/send?text=${text}`, '_blank', 'noopener,noreferrer');
+  };
+
+  const handleShareEmail = () => {
+    const subject = encodeURIComponent(shareSubject);
+    const body = encodeURIComponent(shareMessage);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 
   if (!isOpen) return null;
@@ -104,43 +135,79 @@ export const ShareModal = ({ runId, isOpen, onClose }) => {
     >
       <div className="space-y-6">
         <p className="text-sm text-gray-600">
-          Create an expiring, secure link allowing any client or partner to explore this analysis
-          interactively with all 30 m map layers, download the official PDF report, and query the AI
-          agronomic assistant without needing a FarmIntelytics account.
+          Share this evaluation with your client or stakeholders. They can explore the 30 m interactive
+          suitability maps, download the PDF report, and query the AI agronomic advisor without logging in.
         </p>
 
         {error && <ErrorNote message={error} onRetry={loadShares} />}
 
-        {newlyCreatedUrl && (
-          <div className="p-4 rounded-xl border border-green-200 bg-green-50/70 space-y-2">
-            <div className="flex items-center gap-2 text-green-900 font-semibold text-sm">
-              <Sparkles size={16} className="text-green-600" />
-              {successMsg || 'Share link is ready!'}
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                readOnly
-                value={newlyCreatedUrl}
-                className="w-full text-xs font-mono px-3 py-2 bg-white border border-green-300 rounded-lg text-gray-800 select-all"
-              />
-              <button
-                type="button"
-                onClick={() => copyToClipboard(newlyCreatedUrl, 'new')}
-                className="flex items-center gap-1.5 px-3 py-2 bg-green-700 hover:bg-green-800 text-white rounded-lg text-xs font-semibold whitespace-nowrap transition-colors"
-              >
-                {copiedId === 'new' ? <Check size={14} /> : <Copy size={14} />}
-                {copiedId === 'new' ? 'Copied!' : 'Copy Link'}
-              </button>
-            </div>
+        {/* ── 1-CLICK INSTANT SHARING ACTIONS ── */}
+        <div className="p-5 rounded-2xl border border-green-200 bg-green-50/60 space-y-4">
+          <div className="flex items-center justify-between">
+            <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2">
+              <Sparkles size={16} className="text-green-700" />
+              <span>Instant Client Share</span>
+            </h4>
+            {activeShare && (
+              <span className="text-[11px] font-mono text-green-800 bg-green-100 px-2 py-0.5 rounded-full font-semibold">
+                Valid for {activeShare.days_left} more days
+              </span>
+            )}
           </div>
-        )}
 
-        {/* Create Link Form */}
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              readOnly
+              value={currentShareUrl}
+              className="w-full text-xs font-mono px-3.5 py-2.5 bg-white border border-green-300 rounded-xl text-gray-800 select-all shadow-2xs"
+            />
+            <button
+              type="button"
+              onClick={() => copyToClipboard(currentShareUrl, 'primary')}
+              className="flex items-center gap-1.5 px-4 py-2.5 bg-green-700 hover:bg-green-800 text-white rounded-xl text-xs font-semibold whitespace-nowrap transition-all shadow-xs cursor-pointer"
+            >
+              {copiedId === 'primary' ? <Check size={14} /> : <Copy size={14} />}
+              <span>{copiedId === 'primary' ? 'Copied!' : 'Copy Link'}</span>
+            </button>
+          </div>
+
+          {/* Quick Share Buttons: WhatsApp, Email, Copy Link */}
+          <div className="flex flex-wrap items-center gap-2.5 pt-1">
+            <button
+              type="button"
+              onClick={handleShareWhatsApp}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-[#25D366] hover:bg-[#20ba59] text-white transition-all shadow-xs"
+            >
+              <MessageCircle size={15} />
+              <span>Share via WhatsApp</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleShareEmail}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-gray-900 hover:bg-black text-white transition-all shadow-xs"
+            >
+              <Mail size={15} />
+              <span>Share via Email</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => copyToClipboard(shareMessage, 'msg')}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-all shadow-xs"
+            >
+              <Copy size={14} className="text-gray-500" />
+              <span>{copiedId === 'msg' ? 'Message Copied!' : 'Copy Formatted Message'}</span>
+            </button>
+          </div>
+        </div>
+
+        {/* ── CREATE CUSTOM LINK FORM ── */}
         <form onSubmit={handleCreate} className="p-5 bg-gray-50/80 rounded-2xl border border-gray-200 space-y-4">
           <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
             <Share2 size={16} className="text-green-700" />
-            Generate New Client Link
+            <span>Generate New Client Link</span>
           </h4>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -160,7 +227,7 @@ export const ShareModal = ({ runId, isOpen, onClose }) => {
                 type="text"
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
-                placeholder="e.g. Chief Adebayo or Agro Corp Ltd"
+                placeholder="e.g. Sammy or Agro Corp Ltd"
                 className="w-full px-3 py-2 bg-white border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
               />
             </Field>
@@ -218,7 +285,7 @@ export const ShareModal = ({ runId, isOpen, onClose }) => {
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-semibold text-gray-900 flex items-center gap-2">
               <Globe size={16} className="text-gray-500" />
-              Active & Previous Client Shares
+              <span>Active & Previous Client Shares</span>
             </h4>
             <span className="text-xs text-gray-500 font-mono">
               {shares.length} {shares.length === 1 ? 'link' : 'links'}
