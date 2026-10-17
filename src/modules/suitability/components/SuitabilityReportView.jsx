@@ -11,7 +11,7 @@ export default function SuitabilityReportView({ run, onDownloadPdf, pdfBusy, pdf
   return (
     <div className="p-6 lg:p-8 max-w-5xl mx-auto space-y-6">
       {/* ── TOP ACTION BANNER ── */}
-      <Card className="p-6 bg-gradient-to-r from-green-50 via-white to-white border-green-200 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <Card className="p-6 bg-white border border-gray-100 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <span className="text-xs font-bold text-green-800 uppercase tracking-wider block mb-1">
             Official Assessment Report

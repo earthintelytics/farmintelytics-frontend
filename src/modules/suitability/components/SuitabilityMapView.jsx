@@ -136,9 +136,9 @@ export default function SuitabilityMapView({
 
         {/* ── BOTTOM DOCKED PANEL: FARMER INTERPRETATION & DYNAMIC LEGEND ── */}
         {panelOpen && (
-          <div className="absolute bottom-4 left-4 right-4 z-[400] max-w-4xl mx-auto bg-white/95 backdrop-blur-md rounded-2xl shadow-xl border border-gray-200 overflow-hidden transition-all">
+          <div className="absolute bottom-4 left-4 right-4 z-[400] max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden transition-all">
             {/* Header of Drawer */}
-            <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-green-50/70 to-white">
+            <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between bg-white">
               <div className="flex items-center gap-2.5">
                 <span className="p-1 rounded-lg bg-green-700 text-white">
                   <Sparkles size={14} />
@@ -157,7 +157,7 @@ export default function SuitabilityMapView({
                 <button
                   type="button"
                   onClick={() => onAskAiAboutLayer(explanation.farmerQuestions[0])}
-                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-100 text-green-800 hover:bg-green-200 text-xs font-semibold transition-colors"
+                  className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-green-50 text-green-700 hover:bg-green-100 text-xs font-semibold transition-colors"
                 >
                   <Sparkles size={12} className="text-green-700" />
                   <span>Ask AI about this layer</span>

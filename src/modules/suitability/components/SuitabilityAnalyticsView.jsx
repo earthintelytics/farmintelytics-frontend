@@ -83,7 +83,7 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
             const share = totalArea > 0 ? Math.round((v / totalArea) * 100) : 0;
 
             return (
-              <Card key={c.key} className="p-5 border-t-4" style={{ borderTopColor: c.key === 'S1' ? '#2e7d32' : c.key === 'S2' ? '#7cb342' : c.key === 'S3' ? '#fbc02d' : '#c62828' }}>
+              <Card key={c.key} className="p-5">
                 <div className="flex items-center justify-between">
                   <StatusPill tone={c.tone}>{c.label}</StatusPill>
                   <span className="text-xs font-bold font-mono text-gray-400">{c.key}</span>
@@ -102,20 +102,20 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
       </div>
 
       {/* ── EXECUTIVE FARMER BRIEFING (Plain English) ── */}
-      <Card className="p-6 bg-gradient-to-r from-green-50/60 via-white to-white border-green-200/80 shadow-xs">
+      <Card className="p-6 bg-white border border-gray-100 shadow-sm">
         <div className="flex items-start gap-4">
-          <div className="p-2.5 rounded-2xl bg-green-700 text-white shadow-xs shrink-0 mt-0.5">
+          <div className="p-2.5 rounded-2xl bg-green-700 text-white shrink-0 mt-0.5">
             <Sprout size={22} />
           </div>
           <div className="space-y-2 flex-1 text-sm">
             <div className="flex items-center justify-between">
-              <h4 className="font-display font-bold text-gray-900 text-base">
+              <h4 className="font-bold text-gray-900 text-base">
                 Agronomic Plain-English Briefing for Farmers
               </h4>
               <button
                 type="button"
                 onClick={() => onAskAi?.('Give me a detailed 5-point action plan for developing this farm based on this suitability run.')}
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-green-800 hover:text-green-900 bg-green-100/80 hover:bg-green-100 px-3 py-1.5 rounded-lg transition-colors"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 hover:text-green-800 bg-green-50 hover:bg-green-100 px-3 py-1.5 rounded-xl transition-colors"
               >
                 <Sparkles size={13} className="text-green-700" />
                 Ask AI for Field Action Plan
