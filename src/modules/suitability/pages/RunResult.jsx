@@ -157,6 +157,7 @@ export default function RunResult({ runId, companyId, onBack }) {
             <SuitabilitySidebar
               activeView={activeView}
               onSelectView={setActiveView}
+              onOpenShare={() => setShareOpen(true)}
             />
 
             {/* View Content (Map Studio or Analytics Hub) */}

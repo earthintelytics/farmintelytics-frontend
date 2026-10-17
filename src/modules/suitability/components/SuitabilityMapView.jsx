@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { MapContainer, TileLayer, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, useMap, ZoomControl } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
@@ -17,6 +17,7 @@ import {
   Sliders,
   Check,
   CheckCircle2,
+  Search,
 } from 'lucide-react';
 import { getFarmerLayerExplanation, FARMER_LAYER_EXPLANATIONS } from '../farmerLayerExplanations';
 import { CLASSES, cropName } from '../suitabilityLabels';
@@ -187,6 +188,9 @@ export default function SuitabilityMapView({
           {/* Camera Auto-Fit */}
           {run?.fields_geojson && <Fit geometry={run.fields_geojson} />}
 
+          {/* Leaflet Zoom Control Bottom-Right (Matches Screenshot 1) */}
+          <ZoomControl position="bottomright" />
+
           {/* Map resize invalidate trigger when legend toggles */}
           <ResizeMap trigger={showRightLegend} />
         </MapContainer>
@@ -249,12 +253,24 @@ export default function SuitabilityMapView({
           </div>
         </div>
 
-        {/* ── TOP-RIGHT TOGGLE BUTTON (Matches Main Dashboard CropHealthMapPage) ── */}
+        {/* ── TOP-CENTER FLOATING SEARCH BAR (Matches Screenshot 1) ── */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-[400] w-[min(380px,calc(100%-2rem))] pointer-events-auto">
+          <div className="relative">
+            <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Find an estate or block..."
+              className="w-full bg-white border border-gray-200 rounded-xl py-2 pl-9 pr-4 text-xs font-medium text-gray-700 shadow-xs outline-none focus:border-green-600 transition-all placeholder:text-gray-400"
+            />
+          </div>
+        </div>
+
+        {/* ── TOP-RIGHT TOGGLE BUTTON (Matches Screenshot 1 CropHealthMapPage) ── */}
         <button
           type="button"
           onClick={() => setShowRightLegend(!showRightLegend)}
           aria-pressed={showRightLegend}
-          className={`absolute top-4 right-4 z-[400] flex items-center gap-2 px-3 py-2 rounded-xl border bg-white text-xs font-semibold shadow-xs transition-all ${
+          className={`absolute top-4 right-4 z-[400] flex items-center gap-2 px-3.5 py-2 rounded-xl border bg-white text-xs font-semibold shadow-xs transition-all ${
             showRightLegend
               ? 'border-green-600 text-green-800 ring-2 ring-green-100'
               : 'border-gray-200 text-gray-700 hover:bg-gray-50'
@@ -265,12 +281,12 @@ export default function SuitabilityMapView({
         </button>
       </div>
 
-      {/* ── RIGHT-SIDE LEGEND & LAYERS PANEL (Matches Main Dashboard MapLayersPanel Layout) ── */}
+      {/* ── RIGHT-SIDE LEGEND & LAYERS PANEL (Matches Screenshot 1 MapLayersPanel Layout) ── */}
       {showRightLegend && (
-        <aside className="w-[330px] lg:w-[360px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-20 shadow-xs animate-in slide-in-from-right duration-150">
-          {/* Header */}
-          <div className="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0 sticky top-0 z-30">
-            <span className="flex items-center gap-2 text-sm font-bold text-gray-900">
+        <aside className="w-[310px] lg:w-[350px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-20 shadow-xs animate-in slide-in-from-right duration-150">
+          {/* Header (Matches Screenshot 1) */}
+          <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between bg-white shrink-0 sticky top-0 z-30">
+            <span className="flex items-center gap-2 font-display text-base font-semibold text-gray-900">
               <Layers size={18} className="text-green-700" />
               <span>Map layers</span>
             </span>
@@ -280,7 +296,7 @@ export default function SuitabilityMapView({
               aria-label="Close map layers"
               className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
             >
-              <X size={17} />
+              <X size={18} />
             </button>
           </div>
 
