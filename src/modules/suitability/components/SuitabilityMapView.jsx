@@ -16,6 +16,7 @@ import {
   Trees,
   Sliders,
   Check,
+  CheckCircle2,
 } from 'lucide-react';
 import { getFarmerLayerExplanation, FARMER_LAYER_EXPLANATIONS } from '../farmerLayerExplanations';
 import { CLASSES, cropName } from '../suitabilityLabels';
@@ -68,11 +69,13 @@ export default function SuitabilityMapView({
   layerOpacity = 0.8,
   onChangeOpacity,
   basemap = 'satellite',
+  onChangeBasemap,
   showOverlay = true,
   onToggleOverlay,
   onAskAiAboutLayer,
 }) {
   const [showRightLegend, setShowRightLegend] = useState(true);
+  const [showBasemapDropdown, setShowBasemapDropdown] = useState(false);
   const crop = cropName(run?.crop);
 
   // Expanded groups & layers state
@@ -188,50 +191,93 @@ export default function SuitabilityMapView({
           <ResizeMap trigger={showRightLegend} />
         </MapContainer>
 
-        {/* ── TOP-LEFT FLOATING ACTIVE LAYER CHIP ── */}
-        <div className="absolute top-4 left-4 z-[400] pointer-events-auto flex items-center gap-2 bg-white/95 backdrop-blur-xs px-3.5 py-2 rounded-xl shadow-sm border border-gray-200 text-xs font-semibold text-gray-800">
-          <span className="w-2.5 h-2.5 rounded-full bg-green-600 animate-pulse shrink-0" />
-          <span className="text-gray-500">Active Layer:</span>
-          <span className="font-bold text-green-900">{activeExplanation.label}</span>
-          <span className="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md">
-            30m Pixels
-          </span>
+        {/* ── TOP-LEFT FLOATING CONTROLS (Basemap Selector & Active Layer Chip) ── */}
+        <div className="absolute top-4 left-4 z-[400] flex items-center gap-2 pointer-events-auto">
+          {/* Floating Basemap Selector (Matches main dashboard renderFloatingBasemapSelector) */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowBasemapDropdown(!showBasemapDropdown)}
+              className="bg-white border border-gray-200 px-3 py-2 rounded-xl shadow-xs hover:bg-gray-50 flex items-center gap-1.5 font-bold text-xs text-gray-700 transition-all"
+            >
+              <span>{basemap === 'street' ? 'Streets' : 'Satellite (Esri)'}</span>
+              <ChevronDown
+                size={13}
+                className={`text-gray-500 transition-transform ${showBasemapDropdown ? 'rotate-180' : ''}`}
+              />
+            </button>
+            {showBasemapDropdown && (
+              <div className="absolute left-0 top-full mt-1.5 w-44 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden py-1 z-[500]">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onChangeBasemap) onChangeBasemap('satellite');
+                    setShowBasemapDropdown(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs text-left transition-colors ${
+                    basemap === 'satellite' ? 'bg-green-50 text-green-800 font-bold' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <span>Satellite (Esri)</span>
+                  {basemap === 'satellite' && <CheckCircle2 size={13} className="text-green-700" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onChangeBasemap) onChangeBasemap('street');
+                    setShowBasemapDropdown(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-xs text-left transition-colors ${
+                    basemap === 'street' ? 'bg-green-50 text-green-800 font-bold' : 'text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <span>Streets</span>
+                  {basemap === 'street' && <CheckCircle2 size={13} className="text-green-700" />}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Active Layer Chip */}
+          <div className="flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-xs border border-gray-200 text-xs font-semibold text-gray-800">
+            <span className="w-2.5 h-2.5 rounded-full bg-green-600 animate-pulse shrink-0" />
+            <span className="text-gray-500">Active Layer:</span>
+            <span className="font-bold text-green-900">{activeExplanation.label}</span>
+            <span className="text-[10px] font-mono text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded-md">
+              30m Pixels
+            </span>
+          </div>
         </div>
 
-        {/* ── TOP-RIGHT TOGGLE BUTTON (Matches Main Dashboard) ── */}
+        {/* ── TOP-RIGHT TOGGLE BUTTON (Matches Main Dashboard CropHealthMapPage) ── */}
         <button
           type="button"
           onClick={() => setShowRightLegend(!showRightLegend)}
           aria-pressed={showRightLegend}
-          className={`absolute top-4 right-4 z-[400] flex items-center gap-2 px-3 py-2 rounded-xl border bg-white/95 backdrop-blur-xs text-xs font-semibold shadow-sm transition-all ${
+          className={`absolute top-4 right-4 z-[400] flex items-center gap-2 px-3 py-2 rounded-xl border bg-white text-xs font-semibold shadow-xs transition-all ${
             showRightLegend
               ? 'border-green-600 text-green-800 ring-2 ring-green-100'
               : 'border-gray-200 text-gray-700 hover:bg-gray-50'
           }`}
         >
-          <Layers size={15} className="text-green-700" />
-          <span>Map Legend ({legendGroups.reduce((acc, g) => acc + g.entries.length, 0)})</span>
+          <Layers size={16} className="text-green-700" />
+          <span>Map layers</span>
         </button>
       </div>
 
       {/* ── RIGHT-SIDE LEGEND & LAYERS PANEL (Matches Main Dashboard MapLayersPanel Layout) ── */}
       {showRightLegend && (
-        <aside className="w-[330px] lg:w-[360px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-20 shadow-sm animate-in slide-in-from-right duration-150">
+        <aside className="w-[330px] lg:w-[360px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-20 shadow-xs animate-in slide-in-from-right duration-150">
           {/* Header */}
           <div className="px-4 py-3.5 border-b border-gray-100 flex items-center justify-between bg-white shrink-0 sticky top-0 z-30">
-            <div>
-              <span className="flex items-center gap-2 text-sm font-bold text-gray-900">
-                <Layers size={17} className="text-green-700" />
-                <span>Map Layers & Legend</span>
-              </span>
-              <p className="text-[11px] text-gray-500 mt-0.5">
-                All 30m factor layers used in generating evaluation
-              </p>
-            </div>
+            <span className="flex items-center gap-2 text-sm font-bold text-gray-900">
+              <Layers size={18} className="text-green-700" />
+              <span>Map layers</span>
+            </span>
             <button
               type="button"
               onClick={() => setShowRightLegend(false)}
-              aria-label="Close map legend"
+              aria-label="Close map layers"
               className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
             >
               <X size={17} />

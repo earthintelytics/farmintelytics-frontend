@@ -153,19 +153,10 @@ export default function RunResult({ runId, companyId, onBack }) {
       <div className="flex-1 flex overflow-hidden relative">
         {activeTopTab === 'assessment' ? (
           <>
-            {/* Left Sidebar (Views & 30m Layers) */}
+            {/* Left Sidebar (Views) */}
             <SuitabilitySidebar
               activeView={activeView}
               onSelectView={setActiveView}
-              availableLayers={availableLayers}
-              selectedLayer={selectedLayer}
-              onSelectLayer={setSelectedLayer}
-              layerOpacity={layerOpacity}
-              onChangeOpacity={setLayerOpacity}
-              basemap={basemap}
-              onChangeBasemap={setBasemap}
-              showOverlay={showOverlay}
-              onToggleOverlay={() => setShowOverlay(!showOverlay)}
             />
 
             {/* View Content (Map Studio or Analytics Hub) */}
@@ -179,6 +170,7 @@ export default function RunResult({ runId, companyId, onBack }) {
                   layerOpacity={layerOpacity}
                   onChangeOpacity={setLayerOpacity}
                   basemap={basemap}
+                  onChangeBasemap={setBasemap}
                   showOverlay={showOverlay}
                   onToggleOverlay={() => setShowOverlay(!showOverlay)}
                   onAskAiAboutLayer={handleAskAiAboutLayer}

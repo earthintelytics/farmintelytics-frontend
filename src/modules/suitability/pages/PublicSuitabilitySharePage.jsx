@@ -204,19 +204,10 @@ export const PublicSuitabilitySharePage = () => {
       <div className="flex-1 flex overflow-hidden relative">
         {activeTopTab === 'assessment' ? (
           <>
-            {/* Left Sidebar */}
+            {/* Left Sidebar (Views) */}
             <SuitabilitySidebar
               activeView={activeView}
               onSelectView={setActiveView}
-              availableLayers={availableLayers}
-              selectedLayer={selectedLayer}
-              onSelectLayer={setSelectedLayer}
-              layerOpacity={layerOpacity}
-              onChangeOpacity={setLayerOpacity}
-              basemap={basemap}
-              onChangeBasemap={setBasemap}
-              showOverlay={showOverlay}
-              onToggleOverlay={() => setShowOverlay(!showOverlay)}
             />
 
             {/* View Content (Map Studio or Analytics Hub) */}
@@ -230,6 +221,7 @@ export const PublicSuitabilitySharePage = () => {
                   layerOpacity={layerOpacity}
                   onChangeOpacity={setLayerOpacity}
                   basemap={basemap}
+                  onChangeBasemap={setBasemap}
                   showOverlay={showOverlay}
                   onToggleOverlay={() => setShowOverlay(!showOverlay)}
                   onAskAiAboutLayer={handleAskAiAboutLayer}
