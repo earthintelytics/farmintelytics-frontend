@@ -13,7 +13,12 @@ function Fit({ geometry }) {
     try {
       const b = L.geoJSON(geometry).getBounds();
       if (b.isValid()) {
-        map.fitBounds(b, { padding: [32, 32], maxZoom: 16 });
+        map.fitBounds(b, { padding: [12, 12], maxZoom: 18 });
+        // Raise default zoom level so the map opens close to the parcels
+        const z = map.getZoom();
+        if (z < 14) {
+          map.setZoom(Math.min(15, z + 2));
+        }
       }
     } catch {
       // ignore
@@ -93,29 +98,13 @@ export default function SuitabilityMapView({
             />
           )}
 
-          {/* White Boundary Outlines */}
-          {run?.fields_geojson && (
-            <GeoJSON
-              key={`fields-${run?.run_id}`}
-              data={run.fields_geojson}
-              style={{
-                color: '#ffffff',
-                weight: 2.5,
-                fillColor: '#ffffff',
-                fillOpacity: 0.05,
-                dashArray: '',
-              }}
-              onEachFeature={onEachField}
-            />
-          )}
-
           {/* Camera Auto-Fit */}
           {run?.fields_geojson && <Fit geometry={run.fields_geojson} />}
         </MapContainer>
 
         {/* ── TOP FLOATING CHIPS BAR ── */}
         <div className="absolute top-4 left-4 right-4 z-[400] pointer-events-none flex items-center justify-between">
-          <div className="pointer-events-auto flex items-center gap-2 bg-white/95 backdrop-blur-md px-3.5 py-2 rounded-2xl shadow-md border border-gray-100 text-xs font-semibold text-gray-800">
+          <div className="pointer-events-auto flex items-center gap-2 bg-white px-3.5 py-2 rounded-xl shadow-sm border border-gray-200 text-xs font-semibold text-gray-800">
             <span className="w-2.5 h-2.5 rounded-full bg-green-600 animate-pulse" />
             <span>Active Layer:</span>
             <span className="font-bold text-green-800">{explanation.label}</span>
@@ -127,16 +116,16 @@ export default function SuitabilityMapView({
           <button
             type="button"
             onClick={() => setPanelOpen(!panelOpen)}
-            className="pointer-events-auto flex items-center gap-2 bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-md border border-gray-100 text-xs font-semibold text-gray-700 hover:text-gray-900"
+            className="pointer-events-auto flex items-center gap-2 bg-white px-3 py-1.5 rounded-xl shadow-sm border border-gray-200 text-xs font-semibold text-gray-700 hover:text-gray-900"
           >
             <span>Farmer Interpretation & Legend</span>
             {panelOpen ? <ChevronDown size={14} /> : <ChevronUp size={14} />}
           </button>
         </div>
 
-        {/* ── BOTTOM DOCKED PANEL: FARMER INTERPRETATION & DYNAMIC LEGEND ── */}
+        {/* ── BOTTOM DOCKED PANEL: FARMER INTERPRETATION & DYNAMIC LEGEND (AT LOWER SIDE) ── */}
         {panelOpen && (
-          <div className="absolute bottom-4 left-4 right-4 z-[400] max-w-4xl mx-auto bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden transition-all">
+          <div className="absolute bottom-0 left-0 right-0 z-[400] bg-white border-t border-gray-200 shadow-xl overflow-hidden transition-all">
             {/* Header of Drawer */}
             <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between bg-white">
               <div className="flex items-center gap-2.5">

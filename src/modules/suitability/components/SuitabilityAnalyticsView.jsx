@@ -66,41 +66,6 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">
-      {/* ── TOP KPI CARDS: FAO SUITABILITY CLASSES ── */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-            FAO Planting Suitability Breakdown
-          </h3>
-          <span className="text-xs font-mono text-gray-400 font-semibold">
-            {run?.resolution_m || 30} m Pixel Evaluation
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {CLASSES.map((c) => {
-            const v = Number(run?.classes_area_ha?.[c.key] || 0);
-            const share = totalArea > 0 ? Math.round((v / totalArea) * 100) : 0;
-
-            return (
-              <Card key={c.key} className="p-5">
-                <div className="flex items-center justify-between">
-                  <StatusPill tone={c.tone}>{c.label}</StatusPill>
-                  <span className="text-xs font-bold font-mono text-gray-400">{c.key}</span>
-                </div>
-                <p className="font-mono text-2xl font-bold text-gray-900 mt-3">{ha(v)}</p>
-                <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
-                  <span>{share}% of total area</span>
-                  <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className={`h-full ${c.bar}`} style={{ width: `${share}%` }} />
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-      </div>
-
       {/* ── EXECUTIVE FARMER BRIEFING (Plain English) ── */}
       <Card className="p-6 bg-white border border-gray-100 shadow-sm">
         <div className="flex items-start gap-4">
@@ -241,6 +206,41 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
             </div>
           )}
         </Card>
+      </div>
+
+      {/* ── KPI CARDS: FAO SUITABILITY CLASSES (AT LOWER SIDE) ── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
+            FAO Planting Suitability Breakdown
+          </h3>
+          <span className="text-xs font-mono text-gray-400 font-semibold">
+            {run?.resolution_m || 30} m Pixel Evaluation
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {CLASSES.map((c) => {
+            const v = Number(run?.classes_area_ha?.[c.key] || 0);
+            const share = totalArea > 0 ? Math.round((v / totalArea) * 100) : 0;
+
+            return (
+              <Card key={c.key} className="p-5">
+                <div className="flex items-center justify-between">
+                  <StatusPill tone={c.tone}>{c.label}</StatusPill>
+                  <span className="text-xs font-bold font-mono text-gray-400">{c.key}</span>
+                </div>
+                <p className="font-mono text-2xl font-bold text-gray-900 mt-3">{ha(v)}</p>
+                <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                  <span>{share}% of total area</span>
+                  <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div className={`h-full ${c.bar}`} style={{ width: `${share}%` }} />
+                  </div>
+                </div>
+              </Card>
+            );
+          })}
+        </div>
       </div>
 
       {/* ── PER-FIELD EVALUATION TABLE ── */}

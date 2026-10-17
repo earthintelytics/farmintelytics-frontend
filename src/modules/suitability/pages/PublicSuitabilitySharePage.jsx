@@ -19,8 +19,8 @@ export const PublicSuitabilitySharePage = () => {
   // Top Tabs: 'assessment' | 'report' | 'ai-assistant'
   const [activeTopTab, setActiveTopTab] = useState('assessment');
 
-  // Left Sub-pages: 'map-view' | 'analytics'
-  const [activeView, setActiveView] = useState('map-view');
+  // Left Sub-pages: 'analytics' | 'map-view'
+  const [activeView, setActiveView] = useState('analytics');
 
   // Map settings
   const [selectedLayer, setSelectedLayer] = useState('final_class');

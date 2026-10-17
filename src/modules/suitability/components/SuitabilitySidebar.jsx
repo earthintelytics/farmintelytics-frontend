@@ -38,19 +38,6 @@ export default function SuitabilitySidebar({
         </div>
 
         <button
-          onClick={() => onSelectView('map-view')}
-          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-            activeView === 'map-view'
-              ? 'text-white shadow-sm'
-              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-          }`}
-          style={{ backgroundColor: activeView === 'map-view' ? '#3F8432' : undefined }}
-        >
-          <MapIcon size={17} className={activeView === 'map-view' ? 'text-white' : 'text-gray-500'} />
-          <span className="flex-1 text-left">Map view</span>
-        </button>
-
-        <button
           onClick={() => onSelectView('analytics')}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
             activeView === 'analytics'
@@ -61,6 +48,19 @@ export default function SuitabilitySidebar({
         >
           <BarChart3 size={17} className={activeView === 'analytics' ? 'text-white' : 'text-gray-500'} />
           <span className="flex-1 text-left">Analytics</span>
+        </button>
+
+        <button
+          onClick={() => onSelectView('map-view')}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+            activeView === 'map-view'
+              ? 'text-white shadow-sm'
+              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+          }`}
+          style={{ backgroundColor: activeView === 'map-view' ? '#3F8432' : undefined }}
+        >
+          <MapIcon size={17} className={activeView === 'map-view' ? 'text-white' : 'text-gray-500'} />
+          <span className="flex-1 text-left">Map view</span>
         </button>
       </div>
 

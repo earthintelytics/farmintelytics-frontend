@@ -23,8 +23,8 @@ export default function RunResult({ runId, companyId, onBack }) {
   // Top Tabs: 'assessment' | 'report' | 'ai-assistant'
   const [activeTopTab, setActiveTopTab] = useState('assessment');
 
-  // Left Sub-pages: 'map-view' | 'analytics'
-  const [activeView, setActiveView] = useState('map-view');
+  // Left Sub-pages: 'analytics' | 'map-view'
+  const [activeView, setActiveView] = useState('analytics');
 
   // Map state
   const [selectedLayer, setSelectedLayer] = useState('final_class');
