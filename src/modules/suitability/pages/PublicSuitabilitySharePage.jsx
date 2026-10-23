@@ -256,3 +256,5 @@ export const PublicSuitabilitySharePage = () => {
     </div>
   );
 };
+
+export default PublicSuitabilitySharePage;
