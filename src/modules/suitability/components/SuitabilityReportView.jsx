@@ -240,7 +240,7 @@ export default function SuitabilityReportView({
                   Copernicus DEM 30m
                 </span>
                 <span className="px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 font-medium">
-                  CHIRPS Rain
+                  NASA POWER Climate
                 </span>
                 <span className="px-3 py-1.5 rounded-lg border border-gray-200 bg-gray-50 font-medium">
                   ISRIC Soil
@@ -415,8 +415,8 @@ export default function SuitabilityReportView({
                   </div>
                   <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-1">
                     <span className="font-semibold text-gray-500 block text-[11px]">Climate History</span>
-                    <span className="text-sm font-bold text-gray-900">CHIRPS 30-Year Reanalysis</span>
-                    <span className="text-[10px] text-gray-500 block">Rainfall deficit & dry season</span>
+                    <span className="text-sm font-bold text-gray-900">NASA POWER long-term means</span>
+                    <span className="text-[10px] text-gray-500 block">Annual rainfall, dry months, temperature</span>
                   </div>
                   <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 space-y-1">
                     <span className="font-semibold text-gray-500 block text-[11px]">Deforestation Cut-off</span>
@@ -453,8 +453,8 @@ export default function SuitabilityReportView({
                 <ul className="text-xs text-gray-600 space-y-1.5 list-disc pl-5">
                   <li>Evaluation resolution is calibrated to 30 m pixels based on Copernicus GLO-30 DEM.</li>
                   <li>EUDR deforestation screening utilizes Hansen Global Forest Change dataset post-31 Dec 2020.</li>
-                  <li>Soil characteristics reflect ISRIC SoilGrids v2.0 modeled data at 0–30 cm topsoil layer.</li>
-                  <li>Weather and precipitation baselines incorporate CHIRPS 0.05° gridded satellite climatology.</li>
+                  <li>Soil pH reflects ISRIC SoilGrids 250 m maps for the 0–30 cm topsoil, or the client's soil samples where uploaded.</li>
+                  <li>Rainfall, dry months and temperature are NASA POWER long-term monthly means (about 50 km grid).</li>
                 </ul>
               </Card>
             </div>

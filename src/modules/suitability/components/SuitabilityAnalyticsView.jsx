@@ -45,7 +45,7 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
 
     let lead = `Out of ${Math.round(totalArea).toLocaleString()} hectares evaluated, ${Math.round(primeTotal).toLocaleString()} ha (${primePct}%) is commercially suitable for ${crop}.`;
     if (s1 > 0) {
-      lead += ` You have ${Math.round(s1).toLocaleString()} ha of prime, top-tier land (S1) ready for immediate nursery transplanting with standard management.`;
+      lead += ` ${Math.round(s1).toLocaleString()} ha is well suited (S1) with standard management.`;
     }
 
     let obstacles = '';
@@ -56,11 +56,15 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
 
     let exclusions = '';
     if (n > 0) {
-      exclusions = ` Approximately ${Math.round(n).toLocaleString()} ha (${totalArea > 0 ? Math.round((n / totalArea) * 100) : 0}%) is unsuitable (N) due to severe slope, standing floodwater, or statutory environmental/EUDR protection.`;
+      // The real reasons: what the run excluded (largest first) and the top limiting factors, never a generic list.
+      const excluded = Object.entries(run?.excluded_area_ha || {}).filter(([, ha]) => Number(ha) > 0)
+        .sort((a, b) => Number(b[1]) - Number(a[1])).map(([why, ha]) => `${why} (${Math.round(Number(ha)).toLocaleString()} ha)`);
+      const reasons = excluded.length ? excluded.join(', ') : limitingStats.slice(0, 2).map(([name]) => name.toLowerCase()).join(' and ');
+      exclusions = ` About ${Math.round(n).toLocaleString()} ha (${totalArea > 0 ? Math.round((n / totalArea) * 100) : 0}%) is not suited (N)${reasons ? `, mainly because of ${reasons}` : ''}.`;
     }
 
     return { lead, obstacles, exclusions };
-  }, [run?.classes_area_ha, totalArea, crop, limitingStats]);
+  }, [run?.classes_area_ha, run?.excluded_area_ha, totalArea, crop, limitingStats]);
 
   return (
     <div className="p-6 lg:p-8 max-w-7xl mx-auto space-y-8">

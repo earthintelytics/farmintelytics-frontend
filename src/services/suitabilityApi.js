@@ -94,6 +94,10 @@ export const fetchPublicSuitability = async (token) => {
   return res.json();
 };
 
+/** The team asks the AI about a result; answers come from the result only. */
+export const askSuitabilityRun = (runId, question, companyId) =>
+  call(`/runs/${encodeURIComponent(runId)}/ask${companyId ? `?company_id=${encodeURIComponent(companyId)}` : ''}`, { method: 'POST', body: JSON.stringify({ question }) });
+
 export const askPublicSuitabilityAi = async (token, question) => {
   const res = await fetch(`${API_BASE}/public/suitability/${encodeURIComponent(token)}/ask`, {
     method: 'POST',

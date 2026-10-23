@@ -111,7 +111,9 @@ export default function SuitabilityMapView({
         };
       }
 
-      const legend = run?.factor_legends?.[key] || run?.layer_legends?.[key];
+      // The pipeline's own legend first: it knows when a layer is a height ramp or land cover categories, not suitability classes.
+      const own = run?.layer_legends?.[key];
+      const legend = (own && own.kind !== 'class') ? own : (run?.factor_legends?.[key] || own);
 
       groups[catKey].entries.push({
         key,
@@ -374,7 +376,7 @@ export default function SuitabilityMapView({
                 <div key={group.id} className="space-y-2">
                   {/* Group Header Accordion */}
                   <div
-                    onClick={() => toggleGroup(group.id)}
+                    role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleGroup(group.id); } }} onClick={() => toggleGroup(group.id)}
                     className="flex items-center justify-between py-1 text-[11px] font-bold text-gray-600 hover:text-gray-900 cursor-pointer select-none border-b border-gray-100"
                   >
                     <div className="flex items-center gap-1.5">
@@ -409,7 +411,7 @@ export default function SuitabilityMapView({
                             {/* Card Header & Controls */}
                             <div className="flex items-start justify-between gap-2">
                               <div
-                                onClick={() => toggleLayerCard(entry.key)}
+                                role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleLayerCard(entry.key); } }} onClick={() => toggleLayerCard(entry.key)}
                                 className="flex-1 cursor-pointer select-none space-y-0.5"
                               >
                                 <div className="flex items-center gap-1.5 flex-wrap">
@@ -592,7 +594,7 @@ export default function SuitabilityMapView({
 
           {/* Panel Footer */}
           <div className="p-3 bg-gray-50 border-t border-gray-200 text-[10px] text-gray-400 text-center font-mono shrink-0">
-            Copernicus DEM 30m · CHIRPS · ISRIC SoilGrids · Hansen GFC
+            {(run?.sources || []).map((x) => x?.name).filter(Boolean).join(' · ') || 'Sources not recorded for this run'}
           </div>
         </aside>
       )}

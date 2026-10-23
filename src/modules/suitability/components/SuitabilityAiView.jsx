@@ -1,14 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, ArrowRight, Plus, SlidersHorizontal, Sliders } from 'lucide-react';
 import { cropName } from '../suitabilityLabels';
-import { askPublicSuitabilityAi } from '../../../services/suitabilityApi';
+import { askPublicSuitabilityAi, askSuitabilityRun } from '../../../services/suitabilityApi';
 
 const SCENARIOS = [
   {
     id: 'dry-spell',
     title: 'Dry spell and the harvest',
     desc: 'What less rain does to the crop and to bunches in the months after.',
-    requiredData: 'Rainfall deficit, CHIRPS consecutive dry months',
+    requiredData: 'Annual rainfall and dry months (NASA POWER)',
     question: 'How does the dry season length and rainfall deficit in our area affect our monthly harvest yield and planting suitability?',
     whatIfType: 'climate',
   },
@@ -16,7 +16,7 @@ const SCENARIOS = [
     id: 'fertiliser',
     title: 'Delay the fertiliser round',
     desc: 'What putting off fertiliser does to leaf colour and the harvest.',
-    requiredData: 'Soil test results, ISRIC SoilGrids pH, Basal nutrition',
+    requiredData: 'Soil pH (ISRIC SoilGrids) and any soil samples uploaded',
     question: 'What happens if we delay the fertiliser round by 3 months, and what soil treatments or agricultural lime do we need for acidic blocks?',
     whatIfType: 'soil',
   },
@@ -24,7 +24,7 @@ const SCENARIOS = [
     id: 'replant',
     title: 'Replant the oldest blocks',
     desc: "Production over the next 5 years and the estate's carbon.",
-    requiredData: 'Planting year per block, Slope gradient, Copernicus DEM',
+    requiredData: 'Slope (Copernicus DEM)',
     question: 'If we replant the oldest blocks and build contour terraces on slopes over 8°, what will our 5-year yield and soil retention look like?',
     whatIfType: 'terrain',
   },
@@ -32,7 +32,7 @@ const SCENARIOS = [
     id: 'eudr-check',
     title: 'EUDR deforestation and legal compliance',
     desc: 'Verifying land parcels against the 31 December 2020 EUDR cut-off date.',
-    requiredData: 'Hansen GFC post-2020, WDPA protected reserves',
+    requiredData: 'Forest loss after 2020 (Global Forest Change), tree cover in 2020, protected areas',
     question: 'Are our land parcels compliant with the 31 December 2020 EUDR deforestation cutoff date and protected nature reserves? What is the certified plantable area?',
     whatIfType: 'compliance',
   },
@@ -44,11 +44,6 @@ const SCENARIOS = [
 export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
   const crop = cropName(run?.crop);
   const total = Number(run?.total_area_ha) || 0;
-  const s1 = Number(run?.classes_area_ha?.S1 || 0);
-  const s2 = Number(run?.classes_area_ha?.S2 || 0);
-  const s3 = Number(run?.classes_area_ha?.S3 || 0);
-  const n = Number(run?.classes_area_ha?.N || 0);
-  const clientOrEstate = run?.company_name || run?.company_id || 'Estate';
 
   const initialGreeting = `Ask about your ${crop} suitability assessment, terrain slopes, soil, or rainfall. Answers use your verified evaluation data (${Math.round(total).toLocaleString()} ha evaluated).`;
 
@@ -71,50 +66,6 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatMessages, chatLoading]);
 
-  const generateSmartWhatIfAnswer = (query) => {
-    const ql = query.toLowerCase();
-
-    if (ql.includes('dry') || ql.includes('rain') || ql.includes('water') || ql.includes('harvest') || ql.includes('bunch')) {
-      const dryHa = Math.round(s3 * 0.75 + n * 0.25);
-      const recoverable = Math.round(dryHa * 0.85);
-      return {
-        answer: `WHAT-IF ANALYSIS: DRY SPELL & HARVEST YIELD PROJECTION\n\n• Verified Baseline (CHIRPS & ERA5-Land):\n  - Average annual precipitation: 1,840 mm/year with 3 to 4 consecutive dry months (< 100 mm/month).\n  - Rainfall Deficit Impact: Currently ${dryHa.toLocaleString()} ha are restricted to FAO S3 (Marginally Suitable) due to moisture stress during the January–March dry season.\n\n• What Less Rain Does to the Crop & Harvest:\n  1. Frond & Inflorescence Abortion: Severe dry spells cause abortion of floral primordia, reducing harvestable bunches 9 to 12 months later.\n  2. Bunch Weight Loss: Without supplementary irrigation, individual bunch weight declines by 18% to 24%.\n\n• WHAT-IF INTERVENTION: Drip / Furrow Irrigation Setup\n  - If drip irrigation is installed across moisture-stressed parcels, it removes the rainfall deficit penalty.\n  - Suitability Shift: Upgrades ~${recoverable.toLocaleString()} ha from S3 directly to S1 / S2.\n  - Projected Output: Stabilizes bunch production year-round, preventing the 30% seasonal yield trough.`,
-        sources: ['CHIRPS Monthly Rainfall', 'Copernicus Global Land', 'ERA5-Land Evapotranspiration'],
-      };
-    }
-
-    if (ql.includes('fertil') || ql.includes('lime') || ql.includes('ph') || ql.includes('acid') || ql.includes('colour') || ql.includes('leaf')) {
-      const acidHa = Math.round(s2 * 0.4 + s3 * 0.6);
-      return {
-        answer: `WHAT-IF ANALYSIS: DELAYING FERTILISER & SOIL LIMING\n\n• Soil Chemistry Baseline (ISRIC SoilGrids 30m):\n  - Topsoil pH in root zone (0–30 cm) averages 4.4 to 4.9 across ${acidHa.toLocaleString()} ha of low-lying parcels.\n  - High acidity causes aluminum toxicity, locking up phosphorus and reducing cation exchange capacity (CEC).\n\n• What Delaying Fertiliser Does (3-Month Delay):\n  1. Leaf Colour: Severe deficiency symptoms appear—interveinal chlorosis (yellow-orange speckling) on fronds 9 to 17 from magnesium and potassium deficit.\n  2. Crown Vigor: Shoot elongation drops by 28%, delaying new bunch setting.\n  3. Economic Penalty: Yield declines by ~1.8 tonnes FFB/ha over the following 6 months.\n\n• WHAT-IF INTERVENTION: Agricultural Liming Program\n  - Apply 2.0 t/ha of agricultural limestone or dolomite during land preparation.\n  - Result: Raises soil pH to 5.5 within 90 days, unlocking fixed phosphorus and upgrading ~${acidHa.toLocaleString()} ha to prime S1 suitability.`,
-        sources: ['ISRIC SoilGrids pH 30m', 'Soil Organic Carbon', 'Cation Exchange Capacity'],
-      };
-    }
-
-    if (ql.includes('replant') || ql.includes('slope') || ql.includes('hill') || ql.includes('carbon') || ql.includes('terrace')) {
-      const steepHa = Math.round(s3 * 0.65 + n * 0.35);
-      return {
-        answer: `WHAT-IF ANALYSIS: REPLANTING OLDEST BLOCKS & CONTOUR TERRACING\n\n• Topography Baseline (Copernicus DEM 30m):\n  - Evaluated area has ${steepHa.toLocaleString()} ha with slopes ranging from 8° to 18°.\n  - Without soil conservation, topsoil erosion exceeds 45 tonnes/ha/year on bare ground.\n\n• 5-Year Production Outlook:\n  - Year 1–2: Establishment phase with leguminous cover crops (Mucuna bracteata). Canopy closure by Month 18 arrests soil wash-off.\n  - Year 3: First commercial harvesting begins at ~8–10 t/ha.\n  - Year 4–5: Prime yield ramps to 22–26 t/ha with high-yielding clonal seedlings.\n\n• Estate Carbon Sequestration:\n  - Replanting sequesters an estimated 16.5 t CO2e/ha/year in woody biomass and root mass.\n  - Net 5-year carbon balance: +74,000 t CO2e sequestered across the replanted estate.\n\n• WHAT-IF INTERVENTION: Mechanical Contour Terraces\n  - Constructing back-sloping terraces every 4 rows converts ~${Math.round(steepHa * 0.75).toLocaleString()} ha of erosion-prone land into stable, machine-accessible S2 suitability.`,
-        sources: ['Copernicus GLO-30 DEM', 'Slope & Aspect Analysis', 'IPCC Tier 1 Biomass Factors'],
-      };
-    }
-
-    if (ql.includes('eudr') || ql.includes('deforest') || ql.includes('legal') || ql.includes('protect') || ql.includes('reserve')) {
-      const compliantHa = (total * 0.985).toFixed(1);
-      const bufferHa = (total * 0.015).toFixed(1);
-      return {
-        answer: `WHAT-IF ANALYSIS: EUDR DEFORESTATION & LEGAL COMPLIANCE AUDIT\n\n• EU Regulation 2023/1115 (EUDR) Verification:\n  - Mandatory Cut-off Date: 31 December 2020.\n  - Audited Datasets: Hansen Global Forest Change (GFC) v1.10 (tree loss 2020–present) & WDPA Protected Reserves.\n\n• Compliance Audit Findings:\n  1. Deforestation Status: Zero primary or high-carbon stock forest loss detected after 31 Dec 2020 across 98.5% of the estate.\n  2. Certified Plantable Area: ${Number(compliantHa).toLocaleString()} ha is 100% EUDR compliant and eligible for certified export to the European Union.\n  3. Protected Areas: The property is located outside World Database on Protected Areas (WDPA) gazetted reserves.\n\n• WHAT-IF INTERVENTION: 50m Riparian Buffer Enforcement\n  - Setting aside ${bufferHa} ha along natural streams as permanent conservation corridors ensures zero environmental compliance risk under European due diligence audits.`,
-        sources: ['Hansen Global Forest Change post-2020', 'WDPA Protected Reserves', 'OpenStreetMap Hydrography'],
-      };
-    }
-
-    // Default smart suitability response
-    return {
-      answer: `LAND SUITABILITY AGRONOMIC EVALUATION (${clientOrEstate})\n\n• Total Evaluated Area: ${Math.round(total).toLocaleString()} ha\n• Commercial Viability:\n  - Prime Ground (S1): ${Math.round(s1).toLocaleString()} ha\n  - Moderate Potential (S2): ${Math.round(s2).toLocaleString()} ha\n  - Marginal Ground (S3): ${Math.round(s3).toLocaleString()} ha\n  - Non-Suitable / Exclusions (N): ${Math.round(n).toLocaleString()} ha\n\n• Key Recommendation: Concentrate capital expenditure on S1 and S2 parcels. For marginal S3 parcels, apply soil liming or contour terracing before planting.`,
-      sources: ['Copernicus DEM 30m', 'NASA POWER & CHIRPS', 'ISRIC SoilGrids 30m'],
-    };
-  };
-
   const handleChatSubmit = async (textToSend) => {
     const q = (textToSend || chatInput).trim();
     if (!q || chatLoading) return;
@@ -124,35 +75,19 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
     setChatLoading(true);
 
     try {
-      let answerText = '';
-      let sources = ['Copernicus DEM GLO-30', 'NASA POWER', 'ISRIC SoilGrids 30m'];
-
-      if (run?.share_token) {
-        try {
-          const res = await askPublicSuitabilityAi(run.share_token, q);
-          if (res?.answer || res?.response) {
-            answerText = res.answer || res.response;
-            if (res.sources?.length) sources = res.sources;
-          }
-        } catch {
-          // Fall back to local smart synthesis
-        }
-      }
-
-      if (!answerText) {
-        const smart = generateSmartWhatIfAnswer(q);
-        answerText = smart.answer;
-        sources = smart.sources;
-      }
-
+      // Real AI only, answering from this result; never a made-up answer (the old local "synthesis" invented figures).
+      const res = run?.share_token
+        ? await askPublicSuitabilityAi(run.share_token, q)
+        : await askSuitabilityRun(run?.run_id, q, run?.company_id);
+      const sources = (res?.sources?.length ? res.sources : (run?.sources || []).map((x) => x?.name).filter(Boolean));
       setChatMessages((prev) => [
         ...prev,
-        { sender: 'assistant', text: answerText, sources },
+        { sender: 'assistant', text: res?.answer || res?.response || 'No answer came back. Try again.', sources },
       ]);
     } catch (err) {
       setChatMessages((prev) => [
         ...prev,
-        { sender: 'assistant', text: `Error generating response: ${err.message}. Please try again.` },
+        { sender: 'assistant', text: err.message || 'The AI could not answer just now. Try again in a moment.' },
       ]);
     } finally {
       setChatLoading(false);
