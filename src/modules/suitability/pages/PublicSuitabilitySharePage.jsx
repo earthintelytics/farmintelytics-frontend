@@ -29,6 +29,7 @@ export const PublicSuitabilitySharePage = () => {
   const [showOverlay, setShowOverlay] = useState(true);
 
   const [aiQuestion, setAiQuestion] = useState('');
+  const [pdfBusy, setPdfBusy] = useState(false); // with the other hooks: hooks never come after an early return
 
   useEffect(() => {
     let live = true;
@@ -52,7 +53,7 @@ export const PublicSuitabilitySharePage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-gray-800 font-sans">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-gray-800 font-sans">
         <div className="w-12 h-12 border-4 border-green-700/20 border-t-green-700 rounded-full animate-spin mb-4" />
         <h2 className="text-base font-bold tracking-tight">Loading Land Suitability Evaluation…</h2>
         <p className="text-gray-500 text-xs mt-1">Retrieving 30 m earth observation layers and telemetry</p>
@@ -62,7 +63,7 @@ export const PublicSuitabilitySharePage = () => {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6 text-center font-sans">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center p-6 text-center font-sans">
         <div className="max-w-md w-full bg-white border border-gray-200 rounded-3xl p-8 shadow-xl space-y-4">
           <div className="w-14 h-14 bg-red-50 border border-red-200 rounded-2xl flex items-center justify-center mx-auto text-red-600">
             <AlertTriangle size={28} />
@@ -98,7 +99,6 @@ export const PublicSuitabilitySharePage = () => {
     return ['final_class', ...list];
   })();
 
-  const [pdfBusy, setPdfBusy] = useState(false);
 
   const handleDownloadPdf = async () => {
     setPdfBusy(true);
@@ -128,7 +128,7 @@ export const PublicSuitabilitySharePage = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-50 flex flex-col overflow-hidden font-sans">
+    <div className="fixed inset-0 z-50 bg-white flex flex-col overflow-hidden font-sans">
       {/* ── TOP HEADER (Dashboard Chrome) ── */}
       <header className="h-[72px] bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-8 z-[100] shadow-sm shrink-0">
         <div className="flex items-center gap-3.5">
@@ -238,7 +238,7 @@ export const PublicSuitabilitySharePage = () => {
             </main>
           </>
         ) : activeTopTab === 'report' ? (
-          <main className="flex-1 overflow-y-auto bg-gray-50">
+          <main className="flex-1 overflow-y-auto bg-white">
             <SuitabilityReportView
               run={runWithToken}
               onDownloadPdf={handleDownloadPdf}
@@ -248,7 +248,7 @@ export const PublicSuitabilitySharePage = () => {
             />
           </main>
         ) : (
-          <main className="flex-1 overflow-y-auto bg-gray-50">
+          <main className="flex-1 overflow-y-auto bg-white">
             <SuitabilityAiView run={runWithToken} preloadedQuestion={aiQuestion} />
           </main>
         )}

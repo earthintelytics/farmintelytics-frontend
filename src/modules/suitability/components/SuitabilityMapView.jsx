@@ -15,7 +15,6 @@ import {
   Waves,
   Trees,
   Sliders,
-  Check,
   CheckCircle2,
   Search,
 } from 'lucide-react';
@@ -91,8 +90,6 @@ export default function SuitabilityMapView({
       ? run?.tiles?.result || run?.tiles?.factors?.final_class || null
       : run?.tiles?.factors?.[selectedLayer] || null;
 
-  // Active layer explanation
-  const activeExplanation = getFarmerLayerExplanation(selectedLayer, crop);
 
   // Group all available layers used to generate the analysis
   const legendGroups = useMemo(() => {

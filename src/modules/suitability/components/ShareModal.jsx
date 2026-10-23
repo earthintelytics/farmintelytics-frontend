@@ -37,12 +37,12 @@ export const ShareModal = ({ runId, isOpen = true, onClose, cropName = 'Crop', c
 
   useEffect(() => {
     if (isOpen) {
-      loadShares();
+      loadShares(); // eslint-disable-line react-hooks/set-state-in-effect -- load the links when the window opens
     }
   }, [isOpen, runId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const activeShare = shares.find((s) => s.state === 'active') || null;
-  const currentShareUrl = newlyCreatedUrl || activeShare?.url || (typeof window !== 'undefined' ? `${window.location.origin}/suitability/share/${runId}` : '');
+  const currentShareUrl = newlyCreatedUrl || activeShare?.url || '';
 
   const shareSubject = `${cropName} Land Suitability Analysis - ${companyName}`;
   const shareMessage = `Hello,
@@ -73,10 +73,12 @@ You can explore high-resolution 30m terrain, climate, and soil maps, inspect pla
       setNewlyCreatedUrl(res.url);
       setSuccessMsg(
         res.email === 'sent'
-          ? `Link created and emailed directly to ${res.client_email}!`
+          ? `Link created and emailed to ${res.client_email}.`
           : res.email === 'not_configured'
-          ? 'Link created! (SMTP not configured on server, copy the link below to share with your client)'
-          : 'Link created successfully!'
+          ? 'Link created. Email is not set up yet (Admin, Integrations, Email), so copy the link below and send it yourself.'
+          : String(res.email || '').startsWith('failed')
+          ? 'Link created, but the email could not be sent. Copy the link below and send it yourself.'
+          : 'Link created. Copy it below to send to your client.'
       );
       setClientEmail('');
       setClientName('');
@@ -140,8 +142,10 @@ You can explore high-resolution 30m terrain, climate, and soil maps, inspect pla
         </p>
 
         {error && <ErrorNote message={error} onRetry={loadShares} />}
+        {successMsg && <p role="status" className="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900">{successMsg}</p>}
 
-        {/* ── 1-CLICK INSTANT SHARING ACTIONS ── */}
+        {/* ── Share the link (only a real link: none exists until one is created) ── */}
+        {currentShareUrl ? (
         <div className="p-5 rounded-2xl border border-green-200 bg-green-50/60 space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-bold text-gray-900 flex items-center gap-2">
@@ -202,6 +206,9 @@ You can explore high-resolution 30m terrain, climate, and soil maps, inspect pla
             </button>
           </div>
         </div>
+        ) : (
+          <p className="rounded-xl border border-dashed border-gray-300 px-4 py-3 text-sm text-gray-600">No link yet. Create one below: each link is for one client and stops working after the days you set.</p>
+        )}
 
         {/* ── CREATE CUSTOM LINK FORM ── */}
         <form onSubmit={handleCreate} className="p-5 bg-gray-50/80 rounded-2xl border border-gray-200 space-y-4">

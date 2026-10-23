@@ -1,10 +1,9 @@
 import { useMemo } from 'react';
 import { Card, StatusPill, EmptyState } from '../../../components/page/PageKit';
 import { CLASSES, classLabel, cropName, adviceFor } from '../suitabilityLabels';
-import { Sparkles, Mountain, Compass, ShieldCheck, AlertTriangle, Layers, Sprout } from 'lucide-react';
+import { Sparkles, ShieldCheck, Sprout } from 'lucide-react';
 
 const ha = (v) => (v != null ? `${Number(v).toLocaleString(undefined, { maximumFractionDigits: 1 })} ha` : '—');
-const pct = (v) => { const n = Number(v) || 0; return Math.round(n <= 1 ? n * 100 : n); };
 
 export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
   const crop = cropName(run?.crop);
@@ -40,7 +39,6 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
   const farmerBriefing = useMemo(() => {
     const s1 = Number(run?.classes_area_ha?.S1 || 0);
     const s2 = Number(run?.classes_area_ha?.S2 || 0);
-    const s3 = Number(run?.classes_area_ha?.S3 || 0);
     const n = Number(run?.classes_area_ha?.N || 0);
     const primeTotal = s1 + s2;
     const primePct = totalArea > 0 ? Math.round((primeTotal / totalArea) * 100) : 0;

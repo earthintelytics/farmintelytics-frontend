@@ -3,18 +3,13 @@ import {
   FileText,
   FileDown,
   CalendarDays,
-  MapPin,
   Mountain,
   Sprout,
   ShieldCheck,
   Sparkles,
   Layers,
-  CheckCircle2,
-  AlertTriangle,
   RefreshCw,
-  Printer,
-  ChevronRight,
-} from 'lucide-react';
+  } from 'lucide-react';
 import { Card } from '../../../components/page/PageKit';
 import { CLASSES, cropName } from '../suitabilityLabels';
 
@@ -62,11 +57,10 @@ export default function SuitabilityReportView({
   onDownloadPdf,
   pdfBusy,
   pdfMsg,
-  onAskAi,
 }) {
   const [selectedType, setSelectedType] = useState('dossier');
   const [selectedArea, setSelectedArea] = useState('whole');
-  const [showFullDossier, setShowFullDossier] = useState(true);
+  const [showFullDossier] = useState(true);
 
   const crop = cropName(run?.crop);
   const totalArea =
@@ -76,7 +70,6 @@ export default function SuitabilityReportView({
 
   const s1 = Number(run?.classes_area_ha?.S1 || 0);
   const s2 = Number(run?.classes_area_ha?.S2 || 0);
-  const s3 = Number(run?.classes_area_ha?.S3 || 0);
   const n = Number(run?.classes_area_ha?.N || 0);
   const primeTotal = s1 + s2;
   const primePct = totalArea > 0 ? Math.round((primeTotal / totalArea) * 100) : 0;
@@ -275,6 +268,7 @@ export default function SuitabilityReportView({
                   </>
                 )}
               </button>
+              {pdfMsg && <p role="status" className="text-sm text-center text-gray-700">{pdfMsg}</p>}
 
               <div className="flex items-center justify-center gap-1.5 text-xs text-gray-500">
                 <Sparkles size={14} className="text-green-700" />

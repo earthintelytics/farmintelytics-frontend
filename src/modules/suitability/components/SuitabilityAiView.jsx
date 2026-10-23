@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, ArrowRight, Plus, SlidersHorizontal, Sliders, CheckCircle2 } from 'lucide-react';
+import { Send, Sparkles, ArrowRight, Plus, SlidersHorizontal, Sliders } from 'lucide-react';
 import { cropName } from '../suitabilityLabels';
 import { askPublicSuitabilityAi } from '../../../services/suitabilityApi';
 
