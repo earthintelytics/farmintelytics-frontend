@@ -47,3 +47,6 @@ export function adviceFor(factor, actions = {}) {
   if (/distance to water|water body|riparian/.test(f)) return actions.water_access;
   return null;
 }
+
+/** '1 day', '3 days', or 'today' for the last day of a share link. */
+export const daysLeftText = (n) => { const d = Number(n); return !Number.isFinite(d) ? '' : d <= 0 ? 'today' : d === 1 ? '1 day' : `${d} days`; };

@@ -1,3 +1,4 @@
+import { daysLeftText } from '../suitabilityLabels';
 import { useState, useEffect } from 'react';
 import { Copy, Check, Trash2, Globe, Clock, MessageSquare, Share2, Sparkles, ExternalLink, Mail, MessageCircle } from 'lucide-react';
 import { Modal, PrimaryButton, SecondaryButton, StatusPill, ErrorNote, Field } from '../../../components/page/PageKit';
@@ -154,7 +155,7 @@ You can explore high-resolution 30m terrain, climate, and soil maps, inspect pla
             </h4>
             {activeShare && (
               <span className="text-[11px] font-mono text-green-800 bg-green-100 px-2 py-0.5 rounded-full font-semibold">
-                Valid for {activeShare.days_left} more days
+                {activeShare.days_left > 0 ? `Valid for ${daysLeftText(activeShare.days_left)} more` : 'Last day'}
               </span>
             )}
           </div>
@@ -319,7 +320,7 @@ You can explore high-resolution 30m terrain, climate, and soil maps, inspect pla
                           <span className="text-xs text-gray-500 font-mono">({s.client_email})</span>
                         )}
                         <StatusPill tone={tone}>
-                          {s.state === 'active' ? `${s.days_left} days left` : s.state}
+                          {s.state === 'active' ? (s.days_left > 0 ? `${daysLeftText(s.days_left)} left` : 'last day') : s.state}
                         </StatusPill>
                       </div>
 

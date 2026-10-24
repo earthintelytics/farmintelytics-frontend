@@ -1,3 +1,4 @@
+import { daysLeftText } from '../suitabilityLabels';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AlertTriangle, Compass, Layers, FileText, Sparkles, FileDown } from 'lucide-react';
@@ -148,7 +149,7 @@ export const PublicSuitabilitySharePage = () => {
               {[
                 share?.client_name ? `Prepared for ${share.client_name}` : 'Client Dossier',
                 result?.total_area_ha ? `${Number(result.total_area_ha).toLocaleString()} ha` : null,
-                `Access expires in ${share?.days_left ?? 14} days`,
+                share?.days_left == null ? null : share.days_left > 0 ? `Access expires in ${daysLeftText(share.days_left)}` : 'Access ends today',
                 '30 m pixels',
               ]
                 .filter(Boolean)
