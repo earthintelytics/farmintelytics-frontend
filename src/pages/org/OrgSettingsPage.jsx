@@ -45,7 +45,7 @@ const OrgSettingsPage = ({ profile, onProfile }) => {
         </nav>
         <div className="flex-1 min-w-0 w-full space-y-6">
           {current.id === 'account' && <PasswordCard profile={profile} services={services} />}
-          {current.id === 'organisation' && <OrganisationCard profile={profile} services={services} canEdit={isAdmin} onLogo={(logoUrl) => onProfile({ ...profile, logoUrl })} />}
+          {current.id === 'organisation' && <OrganisationCard profile={profile} services={services} canEdit={isAdmin} onLogo={(logoVersion) => onProfile({ ...profile, logoVersion })} />}
           {current.id === 'team' && isAdmin && <TeamCard profile={profile} services={services} canEdit />}
           {current.id === 'roles' && <RolesCard profile={profile} isAdmin={isAdmin} />}
         </div>

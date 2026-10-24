@@ -20,7 +20,7 @@ export function readOrgProfile() {
     email: get('fi_email'),
     fullName: get('fi_full_name'),
     role: (get('fi_role') || 'admin').toLowerCase(),
-    logoUrl: get('fi_logo_url'),
+    logoVersion: get('fi_logo_version'),  // the logo itself is at /branding/<tenant>/logo (OrgLogo)
     modules: readJson('fi_allowed_modules'),
     crops: readJson('fi_allowed_crops'),
     maxAccounts: Number.isFinite(max) && max > 0 ? max : null,

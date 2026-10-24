@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { Building2, ImagePlus } from 'lucide-react';
 import { Card, CardHeader, Button, Note } from '../../../farmintelytics-admin/components/ui';
 import { uploadOrganizationLogo } from '../../../services/adminApi';
+import OrgLogo from '../../../components/OrgLogo';
 import { CROP_LABELS } from '../../../farmintelytics-admin/components/orgConstants';
 
 /** Name, logo and what the licence covers. The logo shows in the header and on reports. */
@@ -18,8 +19,10 @@ const OrganisationCard = ({ profile, services, canEdit, onLogo }) => {
     try {
       const res = await uploadOrganizationLogo(profile.tenant, file);
       if (!res?.logo_url) throw new Error('The logo was not saved.');
-      localStorage.setItem('fi_logo_url', res.logo_url);
-      onLogo(res.logo_url);
+      // A new version makes every logo on the page load the new file at once.
+      const version = String(Date.now());
+      try { localStorage.setItem('fi_logo_version', version); } catch { /* the logo still shows after the cache expires */ }
+      onLogo(version);
     } catch (err) {
       setError(`Logo not saved: ${err.message}`);
     } finally {
@@ -32,16 +35,18 @@ const OrganisationCard = ({ profile, services, canEdit, onLogo }) => {
       <CardHeader title="Organisation" text="Your logo appears in the header and on reports." />
       <div className="p-6 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-          <div className="w-20 h-20 rounded-2xl border border-gray-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
-            {profile.logoUrl ? <img src={profile.logoUrl} alt="" className="w-full h-full object-contain" /> : <Building2 size={32} className="text-gray-400" />}
-          </div>
+          <OrgLogo tenant={profile.tenant} version={profile.logoVersion} className="w-20 h-20 rounded-2xl shrink-0" fallback={(
+            <div className="w-20 h-20 rounded-2xl border border-gray-200 bg-white flex items-center justify-center shrink-0">
+              <Building2 size={32} className="text-gray-400" />
+            </div>
+          )} />
           <div className="flex-1 min-w-0">
             <p className="font-display text-xl font-semibold text-gray-900">{profile.name}</p>
             <p className="text-sm text-gray-500 mt-0.5">Sign-in page: {window.location.host}/org/{profile.tenant}/login</p>
           </div>
           {canEdit && (
             <>
-              <Button variant="secondary" onClick={() => input.current?.click()} disabled={busy}><ImagePlus size={15} />{busy ? 'Uploading…' : profile.logoUrl ? 'Change logo' : 'Upload logo'}</Button>
+              <Button variant="secondary" onClick={() => input.current?.click()} disabled={busy}><ImagePlus size={15} />{busy ? 'Uploading…' : profile.logoVersion ? 'Change logo' : 'Upload logo'}</Button>
               <input ref={input} type="file" accept="image/png,image/jpeg,image/svg+xml,image/webp" onChange={upload} className="hidden" />
             </>
           )}

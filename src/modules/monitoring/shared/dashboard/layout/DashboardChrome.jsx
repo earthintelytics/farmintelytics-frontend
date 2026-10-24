@@ -8,6 +8,7 @@ import { Upload as UploadIcon, MapPin as EstateIcon } from 'lucide-react';
 import { ShieldCheck as CheckIcon, Lightbulb as AdviceIcon } from 'lucide-react';
 import { Table2 as RegisterIcon, Users as MembersIcon, FileText as FormsIcon, Inbox as AnswersIcon, Leaf as CarbonIcon, BadgeCheck as PassportIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import OrgLogo from '../../../../../components/OrgLogo';
 import { paths } from '../../../../../routes/paths';
 
 export function renderDashboardHeader(ctx) {
@@ -21,9 +22,12 @@ export function renderDashboardHeader(ctx) {
             <ArrowLeft size={17} />
           </button>
           <div className="flex items-center gap-3.5">
-            <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-green-700">
-              <Satellite className="text-white" size={21} />
-            </div>
+            {/* The organisation's logo once uploaded; the default icon until then. */}
+            <OrgLogo tenant={tenant} version={localStorage.getItem('fi_logo_version') || ''} className="w-11 h-11 rounded-xl" fallback={(
+              <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-green-700">
+                <Satellite className="text-white" size={21} />
+              </div>
+            )} />
             <div>
               <h1 className="text-base font-bold tracking-tight text-gray-900 leading-none flex items-center gap-1.5">
                 {service ? service.title : `${cropLabel} monitoring`}

@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { Building2, LayoutGrid, Settings, LogOut, MapPin } from 'lucide-react';
 import InstallAppButton from '../../components/InstallAppButton';
+import OrgLogo from '../../components/OrgLogo';
 import { licensedServices } from './orgProfile';
 import { paths } from '../../routes/paths';
 
@@ -17,9 +18,11 @@ const OrgShell = ({ profile, onSignOut, children }) => {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl border border-gray-200 bg-white flex items-center justify-center overflow-hidden shrink-0">
-              {profile.logoUrl ? <img src={profile.logoUrl} alt="" className="w-full h-full object-contain" /> : <Building2 size={20} className="text-gray-500" />}
-            </div>
+            <OrgLogo tenant={profile.tenant} version={profile.logoVersion} className="w-10 h-10 rounded-xl shrink-0" fallback={(
+              <div className="w-10 h-10 rounded-xl border border-gray-200 bg-white flex items-center justify-center shrink-0">
+                <Building2 size={20} className="text-gray-500" />
+              </div>
+            )} />
             <div className="min-w-0">
               <p className="font-display text-base font-semibold text-gray-900 truncate">{profile.name}</p>
               <p className="text-xs text-gray-500 truncate">FarmIntelytics</p>
