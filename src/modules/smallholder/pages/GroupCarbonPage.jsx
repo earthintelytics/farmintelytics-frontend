@@ -27,17 +27,17 @@ const GroupCarbonPage = () => {
   };
 
   return (
-    <div className="p-10 space-y-8">
+    <div className="p-4 sm:p-10 space-y-8">
       <PageHeader
         title="Group carbon"
-        text="Estimated carbon held in member farms, per group and per member. Figures are ranges from published factors for each crop and age; they are an estimate for planning, not a certified result."
+        text="Estimated carbon held in the crops on member farms, per group and per member: parcel area times a carbon range for each crop, set in the admin. Biomass only (not soil), not calibrated in the field and not certified: an estimate for planning."
         actions={<SecondaryButton onClick={exportCsv} disabled={!groups.length}><Download size={15} />Export</SecondaryButton>}
       />
 
       {state === 'not_connected' && <NotConnectedNote what="Group carbon" />}
       {state === 'error' && <ErrorNote message={error} onRetry={reload} />}
       {state === 'ready' && groups.length === 0 && (
-        <EmptyState title="No estimate yet" text="Estimates appear once members have parcel boundaries with a crop and planting year." />
+        <EmptyState title="No estimate yet" text="Estimates appear once members have parcels with an area and a crop." />
       )}
 
       {groups.length > 0 && (
@@ -48,7 +48,7 @@ const GroupCarbonPage = () => {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {groups.map((g) => (
-                <GroupRows key={g.id} group={g} open={!!open[g.id]} onToggle={() => setOpen((o) => ({ ...o, [g.id]: !o[g.id] }))} />
+                <GroupRows key={g.id ?? 'no-group'} group={g} open={!!open[g.id ?? 'no-group']} onToggle={() => setOpen((o) => ({ ...o, [g.id ?? 'no-group']: !o[g.id ?? 'no-group'] }))} />
               ))}
             </tbody>
           </table>
@@ -68,20 +68,23 @@ const GroupCarbonPage = () => {
 
 const GroupRows = ({ group, open, onToggle }) => (
   <>
-    <tr className="cursor-pointer hover:bg-gray-50" onClick={onToggle}>
+    <tr className="cursor-pointer hover:bg-[var(--bg-subtle)]" onClick={onToggle} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }} tabIndex={0} role="button" aria-expanded={open}>
       <td className="px-5 py-3 font-semibold text-gray-900">
         <span className="inline-flex items-center gap-2">{open ? <ChevronDown size={15} /> : <ChevronRight size={15} />}{group.name}</span>
       </td>
       <td className="px-5 py-3 font-mono text-gray-700">{ha(group.area_ha)}</td>
-      <td className="px-5 py-3 font-mono text-gray-900">{range(group.carbon_t)}</td>
+      <td className="px-5 py-3 font-mono text-gray-900">
+        {group.carbon_t ? range(group.carbon_t) : 'Not enough data'}
+        {group.note && <span className="block font-sans text-xs font-normal text-gray-500">{group.note}</span>}
+      </td>
     </tr>
     {open && (group.members || []).map((m) => (
       <tr key={m.id} className="bg-white">
         <td className="pl-12 pr-5 py-2.5 text-gray-700">{m.name}</td>
         <td className="px-5 py-2.5 font-mono text-gray-600">{ha(m.area_ha)}</td>
         <td className="px-5 py-2.5 font-mono text-gray-700">
-          {range(m.carbon_t)}
-          {!m.carbon_t && m.note && <span className="block font-sans text-xs text-gray-500">{m.note}</span>}
+          {m.carbon_t ? range(m.carbon_t) : 'Not enough data'}
+          {m.note && <span className="block font-sans text-xs text-gray-500">{m.note}</span>}
         </td>
       </tr>
     ))}
