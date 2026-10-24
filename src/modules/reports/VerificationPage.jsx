@@ -16,7 +16,7 @@ const STATUS = {
 };
 const KINDS = {
   boundary: 'Boundaries and geolocation',
-  eudr: 'EUDR deforestation-free supply',
+  eudr: 'EUDR deforestation check',
   carbon: 'Carbon estimate evidence',
   restoration: 'Restoration progress evidence',
 };

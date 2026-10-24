@@ -38,14 +38,17 @@ export function CheckPage({ page, plots, onOpenData }) {
     getJson('/eudr/plots').then(r => { if (active) setResults(Array.isArray(r) ? r : []); }).catch(() => { if (active) { setConnected(false); setResults([]); } });
     return () => { active = false; };
   }, []);
-  const rows = useMemo(() => (plots || []).map(p => ({ plot: p, r: (results || []).find(x => String(x.plot_id) === String(p.id)) || { status: 'not_checked' } })), [plots, results]);
+  const rows = useMemo(() => {
+    const byId = new Map((results || []).map(x => [String(x.plot_id), x]));
+    return (plots || []).map(p => ({ plot: p, r: byId.get(String(p.id)) || byId.get(String(p.plot_id)) || byId.get(String(p.name)) || { status: 'not_checked' } }));
+  }, [plots, results]);
   const counts = rows.reduce((c, x) => ({ ...c, [x.r.status]: (c[x.r.status] || 0) + 1 }), {});
   const sel = rows.find(x => x.plot.id === picked) || rows[0];
 
   return (
-    <div className="p-10 space-y-8">
+    <div className="p-4 sm:p-10 space-y-8">
       <Header title={page.title} text={page.text} icon={<ShieldCheck size={20} />} />
-      {!connected && <Note>The check is being rebuilt on the EU reference forest map (JRC GFC2020), yearly tree-cover loss and radar alerts. Until it runs, every plot shows <strong>Not checked</strong>; nothing is marked deforestation-free without a real check.</Note>}
+      {!connected && <Note>The check results could not be loaded. Every plot shows <strong>Not checked</strong> until they can; nothing is marked as passed without a real check.</Note>}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {Object.entries(CHECK).map(([k, [label]]) => (
           <Card key={k} className="px-5 py-4"><div className="text-xs font-semibold text-gray-600">{label}</div><div className="text-2xl font-bold text-gray-900 mt-1">{counts[k] || 0}</div></Card>
@@ -73,10 +76,11 @@ export function CheckPage({ page, plots, onOpenData }) {
             <Card className="p-6 space-y-4">
               <div className="text-sm font-semibold text-gray-900">Evidence: {sel.plot.name || sel.plot.id}</div>
               <dl className="grid grid-cols-2 gap-3 text-sm">
-                {[['Forest on 31 Dec 2020', sel.r.forest_2020_pct != null ? `${sel.r.forest_2020_pct}%` : '—'], ['Loss after cut-off', sel.r.loss_after_cutoff_ha != null ? `${sel.r.loss_after_cutoff_ha} ha${sel.r.loss_year ? ` (${sel.r.loss_year})` : ''}` : '—'], ['Protected area overlap', sel.r.protected_overlap != null ? String(sel.r.protected_overlap) : '—'], ['Geolocation', sel.r.geolocation || (sel.plot.coords?.length > 2 ? 'polygon' : 'point')], ['Checked on', sel.r.checked_at ? new Date(sel.r.checked_at).toLocaleDateString() : '—']].map(([k, v]) => (
+                {[['Forest on 31 Dec 2020', sel.r.forest_2020_pct != null ? `${sel.r.forest_2020_pct}%` : '—'], ['Loss after cut-off', sel.r.loss_after_cutoff_ha != null ? `${sel.r.loss_after_cutoff_ha} ha${sel.r.loss_year ? ` (${sel.r.loss_year})` : ''}` : '—'], ['Protected area overlap', sel.r.protected_overlap === true ? 'Yes' : sel.r.protected_overlap === false ? 'None' : 'Not checked'], ['Geolocation', sel.r.geolocation || (sel.plot.coords?.length > 2 ? 'polygon' : 'point')], ['Checked on', sel.r.checked_at ? new Date(sel.r.checked_at).toLocaleDateString() : '—']].map(([k, v]) => (
                   <div key={k}><dt className="text-xs text-gray-500">{k}</dt><dd className="font-semibold text-gray-900">{v}</dd></div>
                 ))}
               </dl>
+              {sel.r.reason && <p className="text-sm text-gray-700">{sel.r.reason}</p>}
               <div className="text-xs text-gray-500">Sources: {(sel.r.sources || []).join(', ') || 'shown here once the check has run'}.</div>
             </Card>
           )}
