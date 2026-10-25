@@ -244,7 +244,11 @@ const PortalPage = () => {
   const { tenant, moduleId: moduleFromUrl } = useParams();
   const moduleId = canonicalModuleId(moduleFromUrl);
   const isToolRoute = !tenant;
-  useEffect(() => { if (moduleId) sessionStorage.setItem('fi_module', moduleId); }, [moduleId]);
+  // Saved while rendering, before the pages below fetch: an effect here runs after theirs, so they
+  // fetched with the service opened before (the same page showed different numbers by route).
+  if (moduleId) {
+    try { if (sessionStorage.getItem('fi_module') !== moduleId) sessionStorage.setItem('fi_module', moduleId); } catch { /* storage blocked: requests go without a service */ }
+  }
 
   const handleSignOut = () => {
     if (isToolRoute) { clearTeamSession(); navigate('/admin-engine'); return; }

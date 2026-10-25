@@ -107,6 +107,16 @@ export async function fetchDashboardStats(tenant) {
 // The service being viewed: estates whose boundary is set for other services only are left out.
 const serviceParam = () => { try { const m = sessionStorage.getItem('fi_module'); return m ? `module=${encodeURIComponent(m)}` : ''; } catch { return ''; } };
 
+/**
+ * GET /carbon/estate-summary
+ * Carbon held in the crops per estate: block area x the admin's carbon range per crop (t C, a range).
+ * { method, factors_source, total: { area_ha, area_with_estimate_ha, carbon_t: {low, high} | null, note }, estates: [...] }
+ */
+export async function fetchEstateCarbon() {
+  const q = serviceParam();
+  return apiFetch(`/carbon/estate-summary${q ? `?${q}` : ''}`);
+}
+
 export async function fetchPlotsIntelligence(tenant) {
   const q = [tenant ? `tenant=${tenant}` : '', serviceParam()].filter(Boolean).join('&');
   return apiFetch(`/plots/intelligence${q ? `?${q}` : ''}`);

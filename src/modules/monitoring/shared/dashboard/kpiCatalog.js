@@ -6,7 +6,7 @@
  * (Crop thresholds), never from a fixed table.
  *
  * compute(ctx) → { value, sub } | { missing: 'why' }
- * ctx = { plots, stats, alerts, unitLabel, classify(plot, key), primaryKey, waterKey, latestPass }
+ * ctx = { plots, stats, carbon, alerts, unitLabel, classify(plot, key), primaryKey, waterKey, latestPass }
  */
 
 const n = (v) => (v == null || Number.isNaN(Number(v)) ? null : Number(v));
@@ -63,13 +63,16 @@ export const KPI_DEFS = {
       return { value: String(open.length), sub: urgent ? `${urgent} to act on now` : open.length ? 'None urgent' : 'Nothing open' };
     },
   },
+  // Carbon held in the crops: area x the admin's carbon range per crop (backend, services/crop_carbon.py).
   carbon: {
-    label: 'Carbon (estimate)',
+    label: 'Carbon in the crops (estimate)',
     compute: (ctx) => {
-      const d = n(ctx.stats?.average_carbon_density_tco2e_ha);
-      const a = totalArea(ctx);
-      if (d == null) return { missing: 'Estimate not produced yet' };
-      return { value: a != null ? `${Math.round(d * a).toLocaleString()} t` : `${d.toFixed(1)} t/ha`, sub: `${d.toFixed(1)} t CO₂e per ha, before calibration` };
+      const c = ctx.carbon;
+      if (!c) return { missing: 'No estimate yet: blocks need a boundary and a crop' };
+      if (!c.carbon_t) return { missing: c.note || 'Not enough data for an estimate' };
+      const t = (v) => Math.round(v).toLocaleString();
+      const part = c.area_with_estimate_ha < c.area_ha - 0.01 ? `covers ${fmtHa(c.area_with_estimate_ha)} of ${fmtHa(c.area_ha)} · ` : '';
+      return { value: `${t(c.carbon_t.low)} – ${t(c.carbon_t.high)} t C`, sub: `${part}biomass only, not calibrated or certified` };
     },
   },
   eudr: {

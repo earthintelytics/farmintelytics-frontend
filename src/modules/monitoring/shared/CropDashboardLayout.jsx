@@ -35,13 +35,13 @@ import { cropPagesFor } from '../cropCatalog';
 
 
 import NewResultsBanner from './dashboard/NewResultsBanner';
-import { UNIT_LABEL, CROP_UNIT } from './dashboard/kpiCatalog';
+import { UNIT_LABEL, CROP_UNIT, SERVICE_KPIS } from './dashboard/kpiCatalog';
 
 
 
 
 import { useLayerLegends } from './dashboard/legends/layerLegends';
-import { fetchParcels } from '../../../services/smallholderApi';
+import { fetchParcels, fetchCarbonSummary } from '../../../services/smallholderApi';
 import { SMALLHOLDER_SERVICES } from '../../registry';
 
 // A member parcel in the shape the maps and KPIs use for a block.
@@ -93,6 +93,20 @@ ChartJS.register(
   ChartLegend,
   Filler
 );
+
+// Smallholder groups as one carbon figure for the Overview card (the same shape as an estate total).
+function smallholderCarbonTotal(res) {
+  const groups = res?.groups || [];
+  const est = groups.filter(g => g.carbon_t);
+  const area = groups.reduce((a, g) => a + (g.area_ha || 0), 0);
+  const covered = groups.reduce((a, g) => a + (g.area_with_estimate_ha || 0), 0);
+  return {
+    area_ha: area,
+    area_with_estimate_ha: covered,
+    carbon_t: est.length ? { low: est.reduce((a, g) => a + g.carbon_t.low, 0), high: est.reduce((a, g) => a + g.carbon_t.high, 0) } : null,
+    note: est.length ? null : 'Not enough data for an estimate',
+  };
+}
 
 const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndices, mapCenter, onBack, onSignOut }) => {
   useLayerLegends(); // map colours follow the admin's classes once loaded
@@ -228,6 +242,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   }, [activeSidebarItem, activeTab, activeAnalyticsSubpage, tenant, cropType]);
 
   const [stats, setStats] = useState(null);
+  const [carbon, setCarbon] = useState(null);  // carbon held in the crops: area x the admin's range per crop
   const [plots, setPlots] = useState([]);
   const [restorationZones, setRestorationZones] = useState([]);
   const isSmallholderService = SMALLHOLDER_SERVICES.includes(service?.id) || service?.id === 'smallholder-hub';
@@ -271,6 +286,14 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       if (plotsVal) setPlots(plotsVal);
       setRestorationZones(ok(zonesRes, 'restoration zones', true) || []);
       const alertsVal = ok(alertsRes, 'alerts');
+      if ((SERVICE_KPIS[service?.id] || []).includes('carbon')) {
+        try {
+          const c = isSmallholderService ? smallholderCarbonTotal(await fetchCarbonSummary()) : (await api.fetchEstateCarbon())?.total;
+          if (active) setCarbon(c || null);
+        } catch (e) {
+          noteLoadIssue('carbon estimate', e);
+        }
+      }
       if (!isSmallholderService) try {
         const boundary = await api.fetchFarmBoundary();
         if (active && boundary && boundary.geometry) setFarmBoundary(boundary);
@@ -1620,6 +1643,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     return {
       plots: plotsData,
       stats,
+      carbon,
       alerts,
       classify,
       primaryKey: cropPrimaryIndex || keys[0] || null,
@@ -1627,7 +1651,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       unitLabel: UNIT_LABEL[service?.id] || (service ? null : CROP_UNIT[cropType]) || 'blocks',
       latestPass: currentTimeline?.label || null,
     };
-  }, [plotsData, stats, alerts, cropProfileEntries, cropPrimaryIndex, service, cropType, currentTimeline]);
+  }, [plotsData, stats, carbon, alerts, cropProfileEntries, cropPrimaryIndex, service, cropType, currentTimeline]);
 
 
 
