@@ -423,13 +423,6 @@ export const TOOLTIP_DESCRIPTIONS = {
     formula: 'Nutrient_Score = f(SoilTest, FertilizerApplied)',
     references: 'Havlin, J. L., et al. (2013). "Soil Fertility and Fertilizers." Pearson.'
   },
-  'Detailed Soil Chemistry Diagnostics': {
-    category: 'farmer-inputs',
-    desc: 'Detailed macronutrient and chemical recommendation guide based on plot soil testing.',
-    done: 'Agronomic diagnostic engine analyzing macronutrient levels and suggesting topdressing rates.',
-    formula: 'Recommendation = Target_N_P_K - Soil_N_P_K',
-    references: 'Sparks, D. L. (2003). "Environmental Soil Chemistry." Academic Press.'
-  },
   'Geospatial Mismatch Audits': {
     category: 'farmer-inputs',
     desc: 'Discrepancy logs matching farm coordinate claims against official forest registers.',

@@ -43,7 +43,7 @@ export const KPI_DEFS = {
     label: 'In good condition',
     compute: (ctx) => {
       const s = classShares(ctx, ctx.primaryKey);
-      if (!s) return { missing: ctx.primaryKey ? 'Waiting for the first satellite results' : 'Map classes not set by the admin yet' };
+      if (!s) return { missing: ctx.primaryKey ? 'Waiting for the first satellite results' : 'Condition classes for this crop are not set up yet' };
       return { value: `${s.best} of ${s.total}`, sub: s.worst ? `${s.worst} need attention${s.worstLabel ? ` (${s.worstLabel.toLowerCase()})` : ''}` : 'None need attention' };
     },
   },

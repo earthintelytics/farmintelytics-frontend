@@ -4,7 +4,7 @@
  * layout's state and helpers it uses as `ctx`.
  */
 import BlockSummaryPage from '../pages/BlockSummaryPage';
-import { Activity, Droplets, Sun, TrendingUp, LayoutDashboard, Search, X, RefreshCw, Clock, SlidersHorizontal, Waves, Send } from 'lucide-react';
+import { Droplets, Sun, TrendingUp, LayoutDashboard, Search, X, RefreshCw, Clock, SlidersHorizontal, Waves, Send } from 'lucide-react';
 import { Radar } from 'react-chartjs-2';
 import FarmDataPage from '../../../../data/FarmDataPage';
 import RegisterPage from '../../../../services/RegisterPage';
@@ -52,10 +52,10 @@ export function renderDashboardPages(ctx) {
             const ANALYTICS_SUBPAGES = pick([
               { id: 'overview', label: 'Overview', icon: <LayoutDashboard size={15} /> },
               { id: 'vigor-health', label: 'Vigor & phenology', icon: <TrendingUp size={15} /> },
-              { id: 'moisture-et', label: 'Moisture & ET', icon: <Droplets size={15} /> },
-              { id: 'et-log', label: 'ET Historical Log', icon: <Clock size={15} /> },
+              { id: 'moisture-et', label: 'Moisture and water use', icon: <Droplets size={15} /> },
+              { id: 'et-log', label: 'Water use by date', icon: <Clock size={15} /> },
               { id: 'water-management', label: 'Water management', icon: <Waves size={15} /> },
-              { id: 'soil-nutrients', label: 'Soil & nutrients', icon: <Sun size={15} /> },
+              { id: 'soil-nutrients', label: 'Canopy signals', icon: <Sun size={15} /> },
             ], pageSet?.analytics);
             return (
               <div className="p-10 space-y-10">
@@ -332,9 +332,9 @@ export function renderDashboardPages(ctx) {
 
                 {activeAnalyticsSubpage === 'soil-nutrients' && (
                   <div className="space-y-10">
-                    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-                      {/* Nutrient Profiling (Radar) */}
-                      <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm space-y-5 xl:col-span-1">
+                    <div className="grid grid-cols-1 gap-8">
+                      {/* Canopy signals (radar chart) */}
+                      <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm space-y-5 max-w-3xl">
                         <h3 className="text-base font-bold text-gray-900 flex items-center gap-2.5">
                           <Sun size={18} className="text-green-600" />
                           Canopy signals {renderInfoTooltip("Nutrient Profiling")}</h3>
@@ -350,41 +350,6 @@ export function renderDashboardPages(ctx) {
                         </div>
                       </div>
 
-                      {/* Detailed Soil Chemistry Diagnostics */}
-                      <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm space-y-5 xl:col-span-2">
-                        <h3 className="text-base font-bold text-gray-900 flex items-center gap-2.5">
-                          <Activity size={18} className="text-green-600" />
-                          Detailed Soil Chemistry Diagnostics {renderInfoTooltip("Detailed Soil Chemistry Diagnostics")}</h3>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                          {/* Parameters Table/List */}
-                          <div className="space-y-3">
-                            <h4 className="text-[11px] font-semibold text-gray-600">Diagnostic metrics</h4>
-                            {[
-                              { name: 'Soil pH', value: '—', status: '—', color: 'text-gray-500' },
-                              { name: 'Organic Carbon', value: '—', status: '—', color: 'text-gray-500' },
-                              { name: 'Total Nitrogen (N)', value: '—', status: '—', color: 'text-gray-500' },
-                              { name: 'Available Phosphorus (P)', value: '—', status: '—', color: 'text-gray-500' },
-                              { name: 'Exchangeable Potassium (K)', value: '—', status: '—', color: 'text-gray-500' }
-                            ].map((item, idx) => (
-                              <div key={idx} className="flex items-center justify-between p-3 bg-white rounded-xl border border-gray-100">
-                                <span className="text-xs font-bold text-gray-500">{item.name}</span>
-                                <span className={`text-xs font-bold ${item.color}`}>{item.value}</span>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Actionable Recommendations */}
-                          <div className="space-y-3">
-                            <h4 className="text-[11px] font-semibold text-gray-600">Agronomic recommendations</h4>
-                            <div className="bg-green-50/50 border border-green-100 p-4 rounded-xl space-y-3">
-                              <p className="text-xs text-gray-500 font-semibold leading-relaxed">
-                                Soil chemistry data not yet connected. Upload soil sample results to generate agronomic recommendations for this plot.
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
                     </div>
                   </div>
                 )}

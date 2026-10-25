@@ -42,7 +42,6 @@ export const SERVICE_CATALOG = {
     analytics: [
       { id: 'overview', label: 'Overview' },
       { id: 'vigor-health', label: 'Biomass and growth' },
-      { id: 'soil-nutrients', label: 'Soil' },
     ],
     topTabs: HEADER_TABS,
   },

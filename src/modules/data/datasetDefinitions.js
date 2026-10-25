@@ -153,8 +153,8 @@ export const DATASET_DEFINITIONS = [
   },
   {
     id: 'carbon-plot-inventory', name: 'Carbon plot inventory', applies_to: ['service:carbon-ffb', 'service:carbon-groups', 'service:carbon-estimator', 'service:forestry-intel'],
-    why: 'Tree measurements from sample plots calibrate the satellite carbon estimate.',
-    unlocks: ['Calibrated carbon estimate'], due: 'once', grain: 'per sample plot and date',
+    why: 'Tree measurements from sample plots, kept to check the carbon ranges per crop against your own trees.',
+    unlocks: ['Carbon ranges checked against field plots'], due: 'once', grain: 'per sample plot and date',
     columns: [FIELD_ID, ESTATE,
       { name: 'date', definition: 'Measurement date', type: 'date', required: true, aliases: ['date'], example: '2026-05-12' },
       { name: 'plot_size_m2', definition: 'Size of the sample plot', type: 'number', unit: 'm²', required: true, range: [1, 100000], aliases: ['plot size', 'area m2'], example: '400' },
