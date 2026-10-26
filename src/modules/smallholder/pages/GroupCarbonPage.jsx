@@ -30,7 +30,7 @@ const GroupCarbonPage = () => {
     <div className="p-4 sm:p-10 space-y-8">
       <PageHeader
         title="Group carbon"
-        text="Estimated carbon held in the crops on member farms, per group and per member: parcel area times a carbon range for each crop, set in the admin. Biomass only (not soil), not calibrated in the field and not certified: an estimate for planning."
+        text="Estimated carbon held in the crops on member farms, per group and per member: parcel area times a carbon range for each crop, set in the admin. Crops and their roots (roots added for tree crops); soil, dead wood and litter are not counted here. Not calibrated in the field and not certified: an estimate for planning."
         actions={<SecondaryButton onClick={exportCsv} disabled={!groups.length}><Download size={15} />Export</SecondaryButton>}
       />
 

@@ -72,8 +72,11 @@ export const KPI_DEFS = {
       if (!c) return { missing: 'No estimate yet: blocks need a boundary and a crop' };
       if (!c.carbon_t) return { missing: c.note || 'Not enough data for an estimate' };
       const t = (v) => Math.round(v).toLocaleString();
+      // Crops = above-ground plus roots (tree crops); soil 0-30 cm is shown apart; dead wood and litter not counted.
+      const crops = c.biomass_t || c.carbon_t;
       const part = c.area_with_estimate_ha < c.area_ha - 0.01 ? `covers ${fmtHa(c.area_with_estimate_ha)} of ${fmtHa(c.area_ha)} · ` : '';
-      return { value: `${t(c.carbon_t.low)} – ${t(c.carbon_t.high)} t C`, sub: `${part}biomass only, not calibrated or certified` };
+      const soil = c.soil?.total_t ? `plus about ${t(c.soil.total_t)} t in the soil (0–30 cm) · ` : '';
+      return { value: `${t(crops.low)} – ${t(crops.high)} t C`, sub: `${part}crops and their roots; ${soil}not calibrated or certified` };
     },
   },
   eudr: {
