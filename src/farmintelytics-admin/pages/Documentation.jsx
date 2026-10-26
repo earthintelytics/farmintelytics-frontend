@@ -27,6 +27,8 @@ const md = (open) => ({
   pre: (p) => <pre className="text-[13px] bg-gray-50 border border-gray-200 rounded-xl p-4 overflow-x-auto my-4" {...p} />,
   blockquote: (p) => <blockquote className="border-l-4 border-green-200 pl-4 text-sm text-gray-600 my-4" {...p} />,
   hr: () => <hr className="my-8 border-gray-200" />,
+  // Photos are the portal's own service pictures (/crops/*.webp).
+  img: ({ src, alt }) => <img src={src} alt={alt || ''} loading="lazy" className="w-full h-56 object-cover rounded-xl border border-gray-200 my-4" />,
   table: (p) => <div className="overflow-x-auto my-4 border border-gray-200 rounded-xl"><table className="w-full text-sm" {...p} /></div>,
   thead: (p) => <thead className="bg-gray-50 text-left text-xs font-semibold text-gray-600" {...p} />,
   th: (p) => <th className="px-4 py-2.5 align-top" {...p} />,
