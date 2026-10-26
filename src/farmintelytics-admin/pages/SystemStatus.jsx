@@ -24,13 +24,13 @@ import { Tabs } from '../components/ui';
 import StorageUsage from './system/StorageUsage';
 
 const SERVICE_META = {
-  backend:         { name: 'Backend API',        icon: Server,    desc: 'Core Django & Ninja REST API services' },
-  database:        { name: 'PostgreSQL Database', icon: Database,  desc: 'Relational & PostGIS geospatial tables' },
-  redis:           { name: 'Redis Broker',       icon: Layers,    desc: 'Celery queue and memory cache layer' },
-  celery:          { name: 'Celery Workers',     icon: Cpu,       desc: 'Scheduled tasks and report workers' },
-  pipeline_worker: { name: 'Pipeline Worker',    icon: Activity,  desc: 'Geospatial imagery analytics processor' },
-  minio:           { name: 'Object Storage',     icon: HardDrive, desc: 'MinIO imagery rasters and run artifacts' },
-  disk:            { name: 'Storage Disk Space', icon: HardDrive, desc: 'Server filesystem capacity (<85% threshold)' },
+  backend:         { name: 'Backend',            icon: Server,    desc: 'Answers the portal and the admin console' },
+  database:        { name: 'Database',           icon: Database,  desc: 'Organisations, estates, results and settings' },
+  redis:           { name: 'Job queue',          icon: Layers,    desc: 'Queues runs and keeps short-lived copies of results' },
+  celery:          { name: 'Background tasks',   icon: Cpu,       desc: 'Schedules, reports and emails' },
+  pipeline_worker: { name: 'Satellite processing', icon: Activity, desc: 'Runs monitoring, EUDR and suitability jobs' },
+  minio:           { name: 'File storage',       icon: HardDrive, desc: 'Maps, run outputs and uploads' },
+  disk:            { name: 'Disk space',         icon: HardDrive, desc: 'Server disk; a warning above 85% full' },
 };
 
 export default function SystemStatus() {
@@ -211,7 +211,7 @@ export default function SystemStatus() {
             )}
           </div>
           <div>
-            <h2 className="font-display text-lg font-semibold capitalize">
+            <h2 className="font-display text-lg font-semibold ">
               {overallStatus === 'checking'
                 ? 'Checking services…'
                 : overallStatus === 'healthy'
@@ -359,7 +359,7 @@ export default function SystemStatus() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span
-                      className={`px-2 py-0.5 rounded text-[11px] font-semibold uppercase tracking-wider ${
+                      className={`px-2 py-0.5 rounded text-[11px] font-semibold ${
                         alert.severity === 'critical'
                           ? 'bg-red-100 text-red-800'
                           : 'bg-amber-100 text-amber-800'

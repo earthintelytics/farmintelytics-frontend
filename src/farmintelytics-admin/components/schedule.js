@@ -7,6 +7,12 @@ export const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday',
 // startDay: first day of the month for 'every N days' (organisations start on different days so runs are spread out)
 export const DEFAULT_SCHEDULE = { mode: 'days', every: 5, startDay: 1, weekday: 1, monthday: 1, hour: 3, minute: 0 };
 
+/**
+ * Last run day of the month for 'every N days': the last day of the sequence on or before the 28th, so the
+ * gap into next month is never shorter than N (a plain 1-31/5 ran on the 31st and again on the 1st).
+ */
+export const lastRunDay = (start, every) => (start >= 28 ? start : 28 - ((28 - start) % every));
+
 /** Picker state → cron. offsetMin staggers several jobs (e.g. estates 15 min apart). */
 export function cronFor(s, offsetMin = 0) {
   if (s.mode === 'custom') return String(s.custom || '').trim();
@@ -16,7 +22,7 @@ export function cronFor(s, offsetMin = 0) {
   if (s.mode === 'monthly') return `${m} ${h} ${s.monthday} * *`;
   if (s.mode === 'days' && Number(s.every) === 1) return `${m} ${h} * * *`;
   const start = Number(s.startDay) || 1;
-  return start > 1 ? `${m} ${h} ${start}-31/${s.every} * *` : `${m} ${h} */${s.every} * *`;
+  return `${m} ${h} ${start}-${lastRunDay(start, Number(s.every))}/${s.every} * *`;
 }
 
 /** Cron → picker state, for the rules this app writes; null for anything else (custom). */
@@ -26,9 +32,9 @@ export function parseCron(expr) {
   if (p.length !== 5 || !/^\d+$/.test(p[0]) || !/^\d+$/.test(p[1]) || p[3] !== '*') return null;
   const base = { minute: +p[0], hour: +p[1] };
   if (p[2] === '*' && p[4] === '*') return { ...DEFAULT_SCHEDULE, ...base, mode: 'days', every: 1 };
-  if (/^\*\/\d+$/.test(p[2]) && p[4] === '*') return { ...DEFAULT_SCHEDULE, ...base, mode: 'days', every: +p[2].slice(2), startDay: 1 };
-  const range = p[2].match(/^(\d+)-31\/(\d+)$/); // e.g. 2-31/5: every 5 days from day 2
-  if (range && p[4] === '*') return { ...DEFAULT_SCHEDULE, ...base, mode: 'days', every: +range[2], startDay: +range[1] };
+  if (/^\*\/\d+$/.test(p[2]) && p[4] === '*') return { ...DEFAULT_SCHEDULE, ...base, mode: 'days', every: +p[2].slice(2), startDay: 1, endDay: 31 };
+  const range = p[2].match(/^(\d+)-(\d+)\/(\d+)$/); // e.g. 2-27/5: every 5 days from day 2 (older rules end at 31)
+  if (range && p[4] === '*') return { ...DEFAULT_SCHEDULE, ...base, mode: 'days', every: +range[3], startDay: +range[1], endDay: +range[2] };
   if (p[2] === '*' && /^[0-6]$/.test(p[4])) return { ...DEFAULT_SCHEDULE, ...base, mode: 'weekly', weekday: +p[4] };
   if (/^\d+$/.test(p[2]) && p[4] === '*') return { ...DEFAULT_SCHEDULE, ...base, mode: 'monthly', monthday: +p[2] };
   return null;
@@ -60,7 +66,8 @@ export function nextRun(expr, from = new Date()) {
     if (s.mode === 'weekly' && dow !== s.weekday) continue;
     if (s.mode === 'monthly' && dom !== s.monthday) continue;
     const start = Number(s.startDay) || 1;
-    if (s.mode === 'days' && s.every > 1 && (dom < start || (dom - start) % s.every !== 0)) continue;
+    const end = s.endDay || lastRunDay(start, s.every);
+    if (s.mode === 'days' && s.every > 1 && (dom < start || dom > end || (dom - start) % s.every !== 0)) continue;
     return t;
   }
   return null;

@@ -224,7 +224,7 @@ export default function Activity() {
         ) : (
           <div className="overflow-x-auto">
             <Table
-              headers={['When', 'Who', 'Organisation', 'Action', 'Target', 'Summary', 'Diff']}
+              columns={['When', 'Who', 'Organisation', 'Action', 'Target', 'Summary', 'Changes'].map((label) => ({ label }))}
             >
               {logs.map((log) => {
                 const [pillLabel, pillKind] = ACTION_PILL_MAP[log.action] || [log.action, 'neutral'];
@@ -245,7 +245,7 @@ export default function Activity() {
                       </span>
                     </Td>
                     <Td>
-                      <Pill kind={pillKind}>{pillLabel}</Pill>
+                      <Pill tone={pillKind}>{pillLabel}</Pill>
                     </Td>
                     <Td>
                       <div className="flex flex-col">
@@ -311,7 +311,7 @@ export default function Activity() {
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
               <div>
                 <h3 className="font-display font-semibold text-gray-900 text-base">
-                  Change Diff: {inspectLog.target_type} ({inspectLog.target_id || inspectLog.id})
+                  What changed: {inspectLog.target_type} ({inspectLog.target_id || inspectLog.id})
                 </h3>
                 <p className="text-xs text-gray-500 mt-0.5">
                   Action performed by {inspectLog.user_email} on {fmtDate(inspectLog.created_at)}

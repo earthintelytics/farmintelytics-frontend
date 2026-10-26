@@ -349,7 +349,7 @@ const Scheduler = () => {
       <ErrorBanner message={error} onDismiss={() => setError('')} onRetry={load} />
 
       <Note tone="info">
-        Each active schedule runs automatically via the backend scheduler service. Live executions and progress are tracked under Pipeline runs. Pausing a schedule preserves its settings without deleting the rule.
+        Each active schedule starts its runs on its own. Follow them under Pipeline runs. Pausing a schedule keeps its settings.
       </Note>
 
       {loading ? <div className="text-center py-16 text-sm text-gray-500">Loading schedules…</div> : groups.list.length === 0 && rows.length === 0 ? (

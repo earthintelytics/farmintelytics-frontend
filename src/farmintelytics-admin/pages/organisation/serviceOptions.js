@@ -9,6 +9,12 @@ export function runnableServiceOptions(org) {
   return licensedServiceOptions(org).filter((o) => (o.id.startsWith('rs-') && o.id !== 'rs-drone') || RUN_SERVICES.has(o.id));
 }
 
+// Services a boundary can be for: licensed services with a plain name (old internal module ids
+// such as activity-ffb or management-cashew are left out).
+export function boundaryServiceOptions(org) {
+  return licensedServiceOptions(org).filter((o) => o.label !== o.id);
+}
+
 // The organisation's licensed services, with plain names.
 export function licensedServiceOptions(org) {
   const named = Object.fromEntries(SERVICE_GROUPS.flatMap((g) => g.services.map((s) => [s.id, s.label])));

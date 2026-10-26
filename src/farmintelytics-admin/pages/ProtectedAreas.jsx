@@ -155,7 +155,7 @@ export default function ProtectedAreas() {
           <h1 className="font-display text-3xl font-semibold text-gray-900">Protected areas</h1>
           <p className="text-sm text-gray-500 mt-1 max-w-3xl">
             Official World Database on Protected Areas (WDPA) and manual statutory reserves kept in-house.
-            Active areas are exported directly to storage and excluded from commercial agriculture suitability and EUDR clearance.
+            Active areas are cut out of suitability analyses and checked for overlap in the EUDR check.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-3 shrink-0">
@@ -206,7 +206,7 @@ export default function ProtectedAreas() {
             <h2 className="text-base font-semibold text-gray-900">Active protected boundaries map</h2>
           </div>
           <span className="text-xs text-gray-500">
-            {geojson?.features?.length || 0} active boundaries loaded in local layer
+            {geojson?.features?.length || 0} active areas in use
           </span>
         </div>
         <div className="h-80 w-full relative isolate bg-white">
@@ -289,7 +289,7 @@ export default function ProtectedAreas() {
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-white border-b border-gray-200 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+            <thead className="bg-white border-b border-gray-200 text-xs font-semibold text-gray-600">
               <tr>
                 <th className="px-6 py-3.5">Protected area name</th>
                 <th className="px-6 py-3.5">Source</th>
@@ -389,7 +389,7 @@ export default function ProtectedAreas() {
         </div>
         <div className="px-6 py-3 border-t border-gray-200 bg-white flex items-center justify-between text-xs text-gray-500">
           <span>Showing {areas.length} of {total} registered boundaries</span>
-          <span>Layer export: shared/protected_areas/active.geojson</span>
+          <span>Every change is used by the next analysis.</span>
         </div>
       </div>
 

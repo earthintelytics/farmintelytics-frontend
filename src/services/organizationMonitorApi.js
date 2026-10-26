@@ -80,7 +80,7 @@ export async function verifyToken(token) {
 /**
  * GET /api/dashboard/stats
  * Returns executive KPI cards:
- *   total_area_ha, active_imagery_source, average_carbon_density_tco2e_ha,
+ *   total_area_ha, active_imagery_source,
  *   active_alerts_count, audit_status
  */
 export async function fetchDashboardStats(tenant) {
@@ -115,6 +115,11 @@ const serviceParam = () => { try { const m = sessionStorage.getItem('fi_module')
 export async function fetchEstateCarbon() {
   const q = serviceParam();
   return apiFetch(`/carbon/estate-summary${q ? `?${q}` : ''}`);
+}
+
+/** GET /eudr/plots: the EUDR check result per plot ({ plot_id, status, reason, sources, ... }). */
+export async function fetchEudrPlots() {
+  return apiFetch('/eudr/plots');
 }
 
 export async function fetchPlotsIntelligence(tenant) {

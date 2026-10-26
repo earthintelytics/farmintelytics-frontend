@@ -231,7 +231,7 @@ const EmailLog = () => {
           >
             <div className="flex items-start justify-between gap-4 px-7 pt-6 border-b border-gray-100 pb-4">
               <div>
-                <span className="text-xs font-semibold uppercase tracking-wider text-green-700">
+                <span className="text-xs font-semibold text-green-700">
                   Email transmission #{inspectLog.id}
                 </span>
                 <h3 className="font-display text-lg font-semibold text-gray-900 mt-1">

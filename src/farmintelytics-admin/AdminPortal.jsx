@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import {
   Building2,
@@ -20,6 +20,7 @@ import {
   Mail,
   Shield,
   FileText,
+  BookOpen,
 } from 'lucide-react';
 
 import Onboarding from './pages/Onboarding';
@@ -38,6 +39,8 @@ import EmailLog from './pages/EmailLog';
 import ProtectedAreas from './pages/ProtectedAreas';
 import SystemStatus from './pages/SystemStatus';
 import ActivityLog from './pages/Activity';
+// Loaded on demand: the markdown renderer is only needed on this page.
+const Documentation = lazy(() => import('./pages/Documentation'));
 import { fetchSystemStatus } from '../services/adminApi';
 import { hasValidTeamToken, redirectToTeamSignIn, teamRole, TEAM_ROLES } from '../services/session';
 import { ConfirmProvider } from './components/ConfirmProvider';
@@ -67,6 +70,9 @@ const NAV_GROUPS = [
     { id: 'protected-areas', label: 'Protected areas', icon: Shield,            path: '/admin/protected-areas' },
     { id: 'ai',              label: 'AI settings',     icon: Sparkles,          path: '/admin/ai', owner: true },
     { id: 'integrations',    label: 'Integrations',    icon: Radio,             path: '/admin/integrations', owner: true },
+  ]},
+  { label: 'Help', items: [
+    { id: 'docs', label: 'Documentation', icon: BookOpen, path: '/admin/docs' },
   ]},
 ];
 const NAV_ITEMS = NAV_GROUPS.flatMap(g => g.items);
@@ -236,6 +242,7 @@ const AdminPortal = () => {
             <Route path="integrations"    element={ownerOnly(<Integrations />)} />
             <Route path="logs"            element={<Logs />} />
             <Route path="reports"         element={<ProblemReports />} />
+            <Route path="docs"            element={<Suspense fallback={<div className="py-16 text-center text-sm text-gray-500">Loading…</div>}><Documentation /></Suspense>} />
           </Routes>
         </main>
       </div>

@@ -35,6 +35,7 @@ const GROUPS = [
   { id: 'email', label: 'Email', members: ['smtp', 'alerts'] },
   { id: 'data', label: 'Data', members: ['cdse', 'earthdata', 'stac'] },
   { id: 'maps', label: 'Maps', members: ['maps'] },
+  { id: 'checks', label: 'EUDR and carbon', members: ['eudr', 'gfw', 'group_carbon'] },
 ];
 const groupOf = (id) => (GROUPS.find((g) => g.members.includes(id)) || { id: 'other' }).id;
 
@@ -192,7 +193,7 @@ export default function Integrations() {
           Integrations
         </h1>
         <p className="text-sm text-gray-500 mt-2 max-w-3xl">
-          Configure external service connections including email notifications, Copernicus satellite data access, and map layers. Settings take effect immediately without server restarts.
+          Connections and settings the platform uses: email, satellite data sign-ins and sources, maps, the EUDR check areas, the Global Forest Watch key and the carbon range per crop. Changes apply straight away.
         </p>
       </div>
 
@@ -282,8 +283,8 @@ export default function Integrations() {
                           {field.label}
                         </label>
                         {field.source && field.source !== 'not_set' && (
-                          <span className="text-[11px] text-gray-400 capitalize">
-                            From {field.source}
+                          <span className="text-[11px] text-gray-400">
+                            {{ default: 'Default value', environment: 'From the server settings', database: 'Saved here' }[field.source] || ''}
                           </span>
                         )}
                       </div>
@@ -319,7 +320,7 @@ export default function Integrations() {
                             id={`${integ.integration}-${fieldKey}`}
                             type={isSecret ? 'password' : 'text'}
                             autoComplete="off"
-                            placeholder={field.hint || `Enter ${field.label.toLowerCase()}`}
+                            placeholder={field.is_secret ? '' : 'Not set'}
                             value={formData[integ.integration]?.[fieldKey] || ''}
                             onChange={(e) =>
                               handleFieldChange(

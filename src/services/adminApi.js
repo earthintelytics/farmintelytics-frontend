@@ -513,6 +513,12 @@ export async function testCdseConnection() {
   });
 }
 
+// ── Documentation (team only) ───────────────────────────────────────────────
+/** GET /admin/documentation (team only): { built, groups: [{label, ids}], docs: {id: {title, path, markdown}} } */
+export async function fetchAdminDocs() {
+  return adminFetch('/documentation');
+}
+
 // ── System status & health diagnostics (T38) ────────────────────────────────
 /** GET /admin/system-status — health per service, active alerts, team emails */
 export async function fetchSystemStatus() {

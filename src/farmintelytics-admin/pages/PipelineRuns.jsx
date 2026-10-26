@@ -8,6 +8,9 @@ import ErrorBox from './runlogs/ErrorBox';
 import { copyText } from '../../utils/copyText';
 
 import { MODAL_HELP } from '../../components/page/modalHelpText';
+// Who started a run, in words (internal names from the backend).
+const STARTED_BY = { admin: 'The team (admin console)', admin_org_run_now: 'The team (Run now)', admin_retry: 'The team (retry)', admin_test: 'The team (test)' };
+
 const KINDS = {
   monitoring_run: 'Satellite monitoring',
   suitability_run: 'Suitability analysis',
@@ -85,10 +88,10 @@ function JobDetailModal({ job, orgName, onClose, onRetry }) {
       <dl className="grid grid-cols-2 sm:grid-cols-5 gap-4 bg-white border border-gray-200 rounded-xl p-4">
         {[
           ['Organisation', orgName(job.company_id)],
-          ['Service / Farm', job.service || job.farm_id || 'All licensed'],
-          ['Priority', job.priority || 'normal'],
+          ['Estate', job.farm_id || 'All estates'],
+          ['Queue', job.priority === 'high' ? 'Started by hand (first in line)' : 'Scheduled'],
           ['Duration', took(job.started_at, job.finished_at)],
-          ['Started by', job.created_by || 'Schedule'],
+          ['Started by', STARTED_BY[job.created_by] || (job.created_by && job.created_by.includes('@') ? job.created_by : 'Schedule')],
         ].map(([k, v]) => (
           <div key={k}>
             <dt className="text-xs text-gray-500">{k}</dt>
@@ -99,13 +102,13 @@ function JobDetailModal({ job, orgName, onClose, onRetry }) {
 
       {job.step && (
         <div className="bg-white border border-gray-200 rounded-xl p-3 text-xs text-gray-700">
-          <span className="font-semibold text-gray-900 mr-2">Current step:</span>
-          {job.step}
+          <span className="font-semibold text-gray-900 mr-2">{['done', 'completed', 'failed'].includes(job.status) ? 'Last step:' : 'Now:'}</span>
+          {String(job.step).replace(/_/g, ' ')}
         </div>
       )}
 
       <div>
-        <p className="text-xs font-semibold text-gray-700 uppercase tracking-wider mb-2">Stored output files</p>
+        <p className="text-xs font-semibold text-gray-700 mb-2">Files the run saved</p>
         {(job.outputs || []).length > 0 ? (
           <div className="bg-white border border-gray-200 rounded-xl p-3 max-h-40 overflow-y-auto space-y-1">
             {job.outputs.map((o) => (

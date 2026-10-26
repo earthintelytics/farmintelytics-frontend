@@ -243,6 +243,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
 
   const [stats, setStats] = useState(null);
   const [carbon, setCarbon] = useState(null);  // carbon held in the crops: area x the admin's range per crop
+  const [eudrResults, setEudrResults] = useState(null);  // the EUDR check per plot, for the KPI card and the register
   const [plots, setPlots] = useState([]);
   const [restorationZones, setRestorationZones] = useState([]);
   const isSmallholderService = SMALLHOLDER_SERVICES.includes(service?.id) || service?.id === 'smallholder-hub';
@@ -286,6 +287,14 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       if (plotsVal) setPlots(plotsVal);
       setRestorationZones(ok(zonesRes, 'restoration zones', true) || []);
       const alertsVal = ok(alertsRes, 'alerts');
+      if (service?.id === 'eudr-check') {
+        try {
+          const r = await api.fetchEudrPlots();
+          if (active) setEudrResults(Array.isArray(r) ? r : []);
+        } catch (e) {
+          noteLoadIssue('deforestation check results', e);
+        }
+      }
       if ((SERVICE_KPIS[service?.id] || []).includes('carbon')) {
         try {
           const c = isSmallholderService ? smallholderCarbonTotal(await fetchCarbonSummary()) : (await api.fetchEstateCarbon())?.total;
@@ -767,10 +776,17 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   // Every page reads plotsData, so scoping it to the chosen estate scopes the
   // maps, charts and tables together.
   const plotsData = useMemo(() => {
-    if (!filterEstate || filterEstate === 'All') return plotsDataA;
     const est = estates.find(e => e.name === filterEstate);
-    return plotsDataA.filter(p => p.subfarm === filterEstate || (est && p.farmId === est.farm_id));
-  }, [plotsDataA, filterEstate, estates]);
+    const scoped = (!filterEstate || filterEstate === 'All') ? plotsDataA
+      : plotsDataA.filter(p => p.subfarm === filterEstate || (est && p.farmId === est.farm_id));
+    if (!eudrResults?.length) return scoped;
+    // The stored EUDR result for each plot (matched as on the Deforestation check page).
+    const byId = new Map(eudrResults.map(r => [String(r.plot_id), r]));
+    return scoped.map(p => {
+      const r = byId.get(String(p.id)) || byId.get(String(p.plot_id)) || byId.get(String(p.name));
+      return r ? { ...p, eudrStatus: r.status, eudrReason: r.reason } : p;
+    });
+  }, [plotsDataA, filterEstate, estates, eudrResults]);
   // The raw plots of the chosen estate: every section's map, chart and table (health, moisture,
   // yield, climate, restoration) is built from this, so the estate dropdown scopes them all.
   const estatePlots = useMemo(() => {
