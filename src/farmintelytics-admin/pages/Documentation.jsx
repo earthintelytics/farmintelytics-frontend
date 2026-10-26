@@ -106,7 +106,6 @@ export default function Documentation() {
           <Card className="p-6 sm:p-8 min-w-0">
             {doc ? (
               <article id="doc-body">
-                <p className="text-xs text-gray-400 mb-2">{doc.path}</p>
                 <ReactMarkdown remarkPlugins={[remarkGfm]} components={md(open)}>{doc.markdown}</ReactMarkdown>
               </article>
             ) : <Empty>No documentation has been generated yet. Run python docs/build_admin_docs.py.</Empty>}
