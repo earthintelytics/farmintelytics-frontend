@@ -108,6 +108,15 @@ function smallholderCarbonTotal(res) {
   };
 }
 
+// Whether a block belongs to the chosen estate: by the registered estate id, else by name (the estate list
+// says "Okomu - main" while a block's estate column says "main").
+function inEstate(blockEstate, blockFarmId, chosen, est) {
+  if (est && blockFarmId) return blockFarmId === est.farm_id;
+  const b = String(blockEstate || '').trim().toLowerCase();
+  const c = String(chosen || '').trim().toLowerCase();
+  return !!b && (b === c || c.endsWith(` - ${b}`) || c.endsWith(` ${b}`));
+}
+
 const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndices, mapCenter, onBack, onSignOut }) => {
   useLayerLegends(); // map colours follow the admin's classes once loaded
   const isOrg = mode === 'organization' || Boolean(service);
@@ -244,6 +253,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const [stats, setStats] = useState(null);
   const [carbon, setCarbon] = useState(null);  // carbon held in the crops: area x the admin's range per crop
   const [eudrResults, setEudrResults] = useState(null);  // the EUDR check per plot, for the KPI card and the register
+  const [dataLoading, setDataLoading] = useState(true);  // cards say Loading until the first answers arrive
   const [plots, setPlots] = useState([]);
   const [restorationZones, setRestorationZones] = useState([]);
   const isSmallholderService = SMALLHOLDER_SERVICES.includes(service?.id) || service?.id === 'smallholder-hub';
@@ -333,7 +343,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
         })));
       }
     }
-    loadBackendData();
+    loadBackendData().finally(() => { if (active) setDataLoading(false); });
     return () => { active = false; };
   }, [tenant, noteLoadIssue]);
   const [selectedBasemap, setSelectedBasemap] = useState('esri-imagery'); // satellite by default
@@ -785,7 +795,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const plotsData = useMemo(() => {
     const est = estates.find(e => e.name === filterEstate);
     const scoped = (!filterEstate || filterEstate === 'All') ? plotsDataA
-      : plotsDataA.filter(p => p.subfarm === filterEstate || (est && p.farmId === est.farm_id));
+      : plotsDataA.filter(p => inEstate(p.subfarm, p.farmId, filterEstate, est));
     if (!eudrResults?.length) return scoped;
     // The stored EUDR result for each plot (matched as on the Deforestation check page).
     const byId = new Map(eudrResults.map(r => [String(r.plot_id), r]));
@@ -799,7 +809,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const estatePlots = useMemo(() => {
     if (!plots || !filterEstate || filterEstate === 'All') return plots || [];
     const est = estates.find(e => e.name === filterEstate);
-    return plots.filter(p => (p.subfarm || p.division) === filterEstate || (est && p.farm_id === est.farm_id));
+    return plots.filter(p => inEstate(p.subfarm || p.division, p.farm_id, filterEstate, est));
   }, [plots, filterEstate, estates]);
 
   // Admin-configured dashboard filters (Super Admin onboarding) narrowed to
@@ -1668,13 +1678,14 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       stats,
       carbon,
       alerts,
+      loading: dataLoading,
       classify,
       primaryKey: cropPrimaryIndex || keys[0] || null,
       waterKey: ['ndmi', 'lswi', 'smi'].find(k => keys.includes(k)) || null,
       unitLabel: UNIT_LABEL[service?.id] || (service ? null : CROP_UNIT[cropType]) || 'blocks',
       latestPass: currentTimeline?.label || null,
     };
-  }, [plotsData, stats, carbon, alerts, cropProfileEntries, cropPrimaryIndex, service, cropType, currentTimeline]);
+  }, [plotsData, stats, carbon, alerts, dataLoading, cropProfileEntries, cropPrimaryIndex, service, cropType, currentTimeline]);
 
 
 

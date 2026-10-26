@@ -127,7 +127,7 @@ export function renderDashboardPages(ctx) {
                         className="bg-transparent text-xs font-bold text-gray-700 outline-none cursor-pointer pr-1"
                       >
                         <option value="All">All plots</option>
-                        {plotsData.slice(0, 50).map(p => (
+                        {plotsData.map(p => (
                           <option key={p.id} value={p.id}>{p.name && p.name !== p.id ? `${p.name}${p.subfarm ? ` (${p.subfarm})` : ""}` : p.id}</option>
                         ))}
                       </select>

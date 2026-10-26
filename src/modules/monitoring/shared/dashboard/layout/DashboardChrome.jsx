@@ -38,7 +38,7 @@ export function renderDashboardHeader(ctx) {
             </div>
           </div>
           {estateOptions.length >= 2 && (
-            <label className="flex items-center gap-2 pl-4 ml-1 border-l border-gray-200">
+            <label className="hidden md:flex items-center gap-2 pl-4 ml-1 border-l border-gray-200">
               <EstateIcon size={16} className="text-green-600" />
               <span className="sr-only">Estate</span>
               <select

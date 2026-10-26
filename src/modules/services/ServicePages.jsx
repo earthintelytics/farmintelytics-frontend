@@ -58,7 +58,7 @@ export function CheckPage({ page, plots, onOpenData }) {
         <Card className="p-10 text-center text-sm text-gray-600">No registered plots yet. Plots appear once their boundaries are uploaded, and the commodity per plot comes from the EUDR plot register (<button onClick={onOpenData} className="font-semibold text-green-700 hover:underline">Farm data</button>).</Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6 items-start">
-          <Card className="overflow-hidden">
+          <Card className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-white text-left text-xs font-semibold text-gray-600"><tr><th className="px-5 py-3">Plot</th><th className="px-5 py-3">Estate</th><th className="px-5 py-3">Result</th></tr></thead>
               <tbody className="divide-y divide-gray-100">
@@ -73,7 +73,7 @@ export function CheckPage({ page, plots, onOpenData }) {
             </table>
           </Card>
           {sel && (
-            <Card className="p-6 space-y-4">
+            <Card className="p-6 space-y-4 lg:sticky lg:top-4">
               <div className="text-sm font-semibold text-gray-900">Evidence: {sel.plot.name || sel.plot.id}</div>
               <dl className="grid grid-cols-2 gap-3 text-sm">
                 {[['Forest on 31 Dec 2020', sel.r.forest_2020_pct != null ? `${sel.r.forest_2020_pct}%` : '—'], ['Loss after cut-off', sel.r.loss_after_cutoff_ha != null ? `${sel.r.loss_after_cutoff_ha} ha${sel.r.loss_year ? ` (${sel.r.loss_year})` : ''}` : '—'], ['Protected area overlap', sel.r.protected_overlap === true ? 'Yes' : sel.r.protected_overlap === false ? 'None' : 'Not checked'], ['Geolocation', (sel.r.geolocation || (sel.plot.coords?.length > 2 ? 'polygon' : 'point')) === 'point' ? 'Point' : 'Polygon'], ['Checked on', sel.r.checked_at ? new Date(sel.r.checked_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—']].map(([k, v]) => (

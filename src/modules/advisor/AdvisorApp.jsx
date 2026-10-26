@@ -3,7 +3,6 @@ import { ArrowLeft, ArrowUp, Bell, FileText, MessageSquare, Plus, Download, LogO
 import { serviceCall } from '../../services/serviceClient';
 import { API_BASE } from '../../services/apiBase';
 import { tenantKey } from '../../services/session';
-import { sessionTenant } from '../../routes/paths';
 
 /**
  * Farm advisor: a phone-first expert for this one farm. Ask questions (answers come only from this
@@ -36,7 +35,6 @@ const TABS = [
 export default function AdvisorApp({ onBack, onSignOut }) {
   const [tab, setTab] = useState('ask');
   const [prefill, setPrefill] = useState('');
-  const org = sessionTenant();
   return (
     <div className="h-[100dvh] flex flex-col bg-white text-gray-900">
       <header className="shrink-0 border-b border-gray-200">
@@ -44,7 +42,7 @@ export default function AdvisorApp({ onBack, onSignOut }) {
           <button type="button" onClick={onBack} aria-label="Back to your services" className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100"><ArrowLeft size={20} /></button>
           <div className="min-w-0 flex-1">
             <h1 className="font-display text-base font-semibold leading-tight">Farm advisor</h1>
-            <p className="text-xs text-gray-500 truncate">Answers from {org ? `${org}'s` : 'your'} farm data only</p>
+            <p className="text-xs text-gray-500 truncate">Answers from {localStorage.getItem('fi_display_name') || 'your'}{localStorage.getItem('fi_display_name') ? '’s' : ''} farm data only</p>
           </div>
           <nav className="hidden sm:flex gap-1" aria-label="Advisor sections">
             {TABS.map((t) => (

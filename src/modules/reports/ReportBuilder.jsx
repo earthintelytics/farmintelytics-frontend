@@ -286,7 +286,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
             onClick={() => setHistoryTab(!historyTab)}
             className="text-sm font-semibold text-gray-600 hover:text-gray-900 px-3 py-2 rounded-xl border border-gray-200 bg-white"
           >
-            {historyTab ? 'Back to Generator' : `Past Reports (${history.length})`}
+            {historyTab ? 'Back to the report builder' : `Past reports (${history.length})`}
           </button>
         </div>
       </div>

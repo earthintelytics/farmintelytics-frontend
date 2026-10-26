@@ -46,7 +46,7 @@ const RegisterPage = ({ register, plots }) => {
   };
 
   return (
-    <div className="p-10 space-y-8">
+    <div className="p-4 sm:p-10 space-y-8">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <h2 className="text-3xl font-bold text-gray-900 tracking-tight">{register.title}</h2>
@@ -58,7 +58,7 @@ const RegisterPage = ({ register, plots }) => {
         </div>
       </div>
       {register.note && <div className="rounded-2xl border border-sky-200 bg-sky-50/60 px-5 py-4 text-sm text-sky-900">{register.note}</div>}
-      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-x-auto">
         {rows.length === 0 ? (
           <div className="p-10 text-center text-sm text-gray-600">No registered plots yet. Plots appear here once their boundaries are uploaded at onboarding.</div>
         ) : (

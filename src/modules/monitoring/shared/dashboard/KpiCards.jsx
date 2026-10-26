@@ -7,7 +7,8 @@ const KpiCards = ({ serviceId, cropType, ctx }) => {
     <div className={`grid grid-cols-1 sm:grid-cols-2 ${kpis.length >= 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
       {kpis.map(({ id, label }) => {
         const def = KPI_DEFS[id];
-        const r = def.compute(ctx);
+        // Until the data has arrived a card shows Loading, never a result such as "0 of 0" or "not checked".
+        const r = ctx.loading ? { missing: 'Loading…' } : def.compute(ctx);
         return (
           <div key={id} className="bg-white p-6 rounded-2xl border border-gray-200">
             <p className="text-sm font-medium text-gray-600">{label || def.label}</p>

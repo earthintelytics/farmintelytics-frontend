@@ -75,7 +75,7 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
   const one = unitLabel === 'blocks' ? 'block' : unitLabel.replace(/s$/, '');
 
   if (!measures.length) {
-    return <div className="p-10 text-sm text-gray-500">No measures with classes for this service yet. The admin sets them under Map classes.</div>;
+    return <div className="p-4 sm:p-10 text-sm text-gray-500">Block colours for this service are not set up yet. Your FarmIntelytics team adds them.</div>;
   }
 
   return (
@@ -154,7 +154,7 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-display text-xl font-semibold text-gray-900">Block summary</h2>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200 text-gray-600">{plotsData.length} {unitLabel}</span>
+              <span className="text-xs font-medium px-2 py-0.5 rounded-full border border-gray-200 text-gray-600">{plotsData.length} {plotsData.length === 1 && unitLabel.endsWith('s') ? unitLabel.slice(0, -1) : unitLabel}</span>
               <button type="button" onClick={() => setPanelOpen(false)} aria-label="Hide the summary" title="Hide the summary"
                 className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900"><X size={16} /></button>
             </div>

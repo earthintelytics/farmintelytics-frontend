@@ -147,7 +147,7 @@ export default function SuitabilityReportView({
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs font-semibold text-gray-400">Past Reports (0)</span>
+          <span className="text-xs font-semibold text-gray-400">Past reports (0)</span>
         </div>
       </div>
 

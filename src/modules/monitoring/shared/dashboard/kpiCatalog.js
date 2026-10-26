@@ -18,6 +18,8 @@ const fmtHa = (v) => `${v < 10 ? v.toFixed(2) : Math.round(v).toLocaleString()} 
 function totalArea(ctx) {
   const areas = ctx.plots.map((p) => parseFloat(p.area)).filter((v) => !Number.isNaN(v));
   if (areas.length && areas.length === ctx.plots.length) return areas.reduce((a, b) => a + b, 0);
+  // No blocks for this service: no figure (the organisation-wide total belongs to other services).
+  if (!ctx.plots.length) return null;
   return n(ctx.stats?.total_area_ha);
 }
 
@@ -71,7 +73,8 @@ export const KPI_DEFS = {
       const c = ctx.carbon;
       if (!c) return { missing: 'No estimate yet: blocks need a boundary and a crop' };
       if (!c.carbon_t) return { missing: c.note || 'Not enough data for an estimate' };
-      const t = (v) => Math.round(v).toLocaleString();
+      // Two significant figures: an uncalibrated range cannot claim more.
+      const t = (v) => { const d = 10 ** Math.max(0, Math.floor(Math.log10(Math.abs(v) || 1)) - 1); return (Math.round(v / d) * d).toLocaleString(); };
       // Crops = above-ground plus roots (tree crops); soil 0-30 cm is shown apart; dead wood and litter not counted.
       const crops = c.biomass_t || c.carbon_t;
       const part = c.area_with_estimate_ha < c.area_ha - 0.01 ? `covers ${fmtHa(c.area_with_estimate_ha)} of ${fmtHa(c.area_ha)} · ` : '';

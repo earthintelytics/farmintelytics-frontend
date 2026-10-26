@@ -54,7 +54,7 @@ export const DATASET_DEFINITIONS = [
   },
   {
     id: 'planting-dates', name: 'Planting dates and irrigation', applies_to: ['crop:maize', 'crop:rice', 'crop:cassava', 'service:group-monitoring'],
-    why: 'Planting dates tell each field’s stage, so alerts fire at the right time (top-dressing, tasselling, early flooding).',
+    why: 'Planting dates tell each field’s stage, so alerts fire at the right growth stage for each crop.',
     unlocks: ['Stage tracker', 'Stage-aware alerts', 'Irrigation page for irrigated fields'], due: 'season', grain: 'per field and season',
     columns: [FIELD_ID, ESTATE,
       { name: 'season', definition: 'Season name or year', type: 'text', required: true, aliases: ['season', 'campaign', 'year'], example: '2026 main' },

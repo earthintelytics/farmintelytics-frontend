@@ -48,6 +48,13 @@ const Row = ({ label, hint, text, on, onChange, children }) => (
  * colourBy: { value, onChange, options: [{ id, label, layer, text }], empty }
  * children: anything only this page has (index legends, land cover change).
  */
+// Water and moisture layers read dry to wet, whatever the page passed (a soil moisture layer showed the
+// plant-health caption and scale before).
+const WATER_INDEX = /ndmi|ndwi|lswi|smi|msi|moist|water/i;
+const satelliteScale = (sat) => (WATER_INDEX.test(String(sat.index || '')) ? 'water' : sat.scale);
+const satelliteText = (sat) => (WATER_INDEX.test(String(sat.index || ''))
+  ? 'Water on the chosen date: blue is wet, brown is dry.' : sat.text);
+
 const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit = 'blocks', children }) => (
   <aside className="w-[300px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-10">
     <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -56,12 +63,12 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
     </div>
     <div className="p-4 space-y-3">
       {satellite && satellite.available && (
-        <Row label={indexName(satellite.index).name} hint={indexName(satellite.index).science} text={satellite.text} on={satellite.on} onChange={satellite.onChange}>
+        <Row label={indexName(satellite.index).name} text={satelliteText(satellite)} on={satellite.on} onChange={satellite.onChange}>
           <Opacity value={satellite.opacity} onChange={satellite.setOpacity} />
           {satellite.legend || (
             <div className="pt-1 space-y-1">
-              <div className="h-2.5 rounded-full" style={{ background: satellite.scale === 'water' ? 'linear-gradient(90deg,#B45309,#FDE68A,#93C5FD,#1D4ED8)' : 'linear-gradient(90deg,#B91C1C,#FDE68A,#86EFAC,#15803D)' }} />
-              <div className="flex justify-between text-xs text-gray-500"><span>{satellite.scale === 'water' ? 'Dry' : 'Bare or stressed'}</span><span>{satellite.scale === 'water' ? 'Wet' : 'Healthy'}</span></div>
+              <div className="h-2.5 rounded-full" style={{ background: satelliteScale(satellite) === 'water' ? 'linear-gradient(90deg,#B45309,#FDE68A,#93C5FD,#1D4ED8)' : 'linear-gradient(90deg,#B91C1C,#FDE68A,#86EFAC,#15803D)' }} />
+              <div className="flex justify-between text-xs text-gray-500"><span>{satelliteScale(satellite) === 'water' ? 'Dry' : 'Bare or stressed'}</span><span>{satelliteScale(satellite) === 'water' ? 'Wet' : 'Healthy'}</span></div>
             </div>
           )}
         </Row>
