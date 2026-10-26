@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import DataWarnings from '../../components/DataWarnings';
 import { UploadCloud } from 'lucide-react';
 import { createFarm, uploadBoundary } from '../../../services/adminApi';
 import { boundaryCheck } from '../../components/validation';
@@ -56,21 +57,24 @@ const AddEstateForm = ({ org, farms, onClose, onSaved }) => {
         start_date: startDate, end_date: null,
       });
       const uploadRes = await uploadBoundary(created.farm_id, file, (prog) => setProgress({ pct: Math.max(20, Math.min(95, 20 + Math.round(prog.percent * 0.75))), text: `Uploading the boundary (${prog.percent}%)…` }));
-      if (uploadRes?.stray_shapes?.length) {
-        const strayNotes = uploadRes.stray_shapes.map((s) => `${s.plot_id} (${Math.round(s.distance_km)} km away)`).join(', ');
-        setProgress({ pct: 100, text: `Estate added. Excluded stray shape(s): ${strayNotes}` });
-      } else {
-        setProgress({ pct: 100, text: 'Estate added.' });
+      if (uploadRes?.warnings?.length) {
+        // Keep the window open so the points to check are read before going on.
+        setWarnings(uploadRes.warnings);
+        setProgress({ pct: 100, text: 'Estate added. Check the points below.' });
+        return;
       }
+      setProgress({ pct: 100, text: 'Estate added.' });
       setTimeout(() => onSaved(), 800);
     } catch (e) { setError(e.message); setProgress(null); }
   };
 
+  const [warnings, setWarnings] = useState(null);
   const busy = Boolean(progress);
   return (
     <Modal help={MODAL_HELP.addEstate} title="Add an estate" text={org.display_name} onClose={busy ? undefined : onClose}
-      footer={<><Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button><Button onClick={save} disabled={busy || !name.trim() || !startDate || !file}>{busy ? `Adding (${progress.pct}%)…` : 'Add estate'}</Button></>}>
+      footer={warnings ? <Button onClick={() => onSaved()}>Done</Button> : <><Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button><Button onClick={save} disabled={busy || !name.trim() || !startDate || !file}>{busy ? `Adding (${progress.pct}%)…` : 'Add estate'}</Button></>}>
       {error && <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
+      {warnings && <><p className="text-sm text-gray-700">{progress?.text}</p><DataWarnings warnings={warnings} /></>}
       <Field label="Estate name"><input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} disabled={busy} placeholder="e.g. North estate" /></Field>
       <Field label="Monitoring start date" hint="Date monitoring begins (earliest 23 June 2015). The first run covers up to 12 months before today from this date.">
         <input

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import DataWarnings from '../components/DataWarnings';
 import { Plus, Trash2, X, Building2, UploadCloud, RefreshCw, Settings, Eye, Layers, AlertTriangle } from 'lucide-react';
 import { fetchFarms, deleteFarm, uploadBoundary, getBoundaryInfo } from '../../services/adminApi';
 import { useConfirm } from '../components/ConfirmProvider';
@@ -107,6 +108,7 @@ function EstateRow({ org, farm, onDelete, onReplace, onSaved }) {
   const [fileError, setFileError] = useState('');
   const [boundaryData, setBoundaryData] = useState(null);
   const [strayUploads, setStrayUploads] = useState(null);
+  const [uploadWarnings, setUploadWarnings] = useState(null);  // what the boundary check found
 
   useEffect(() => {
     if (!farm.boundary_uploaded) return;
@@ -130,6 +132,7 @@ function EstateRow({ org, farm, onDelete, onReplace, onSaved }) {
       if (res?.stray_shapes?.length) {
         setStrayUploads(res.stray_shapes);
       }
+      setUploadWarnings(res?.warnings?.length ? res.warnings : null);
     } finally { setUploading(false); }
   };
 
@@ -174,11 +177,11 @@ function EstateRow({ org, farm, onDelete, onReplace, onSaved }) {
           </p>
           {details && <p className="text-xs text-gray-600 mt-0.5">{details}</p>}
           <p className="text-xs text-gray-600 mt-0.5">{serviceNames.length ? `For: ${serviceNames.join(', ')}` : 'For: all services'}</p>
-          {strayList.length > 0 && (
+          {uploadWarnings ? <DataWarnings warnings={uploadWarnings} /> : strayList.length > 0 && (
             <div className="mt-2 text-xs text-amber-900 bg-amber-50 border border-amber-200 rounded-lg px-2.5 py-1.5 flex items-center gap-1.5">
               <AlertTriangle size={13} className="shrink-0 text-amber-700" />
               <span>
-                {strayList.map((s) => `left out: ${s.plot_id || s.name || 'shape'}, ${Math.round(s.distance_km || 767)} km from the estate`).join(' · ')}
+                {strayList.map((s) => `left out: ${s.plot_id || s.name || 'shape'}${s.distance_km != null ? `, ${Math.round(s.distance_km)} km from the estate` : ''}`).join(' · ')}
               </span>
             </div>
           )}

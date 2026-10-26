@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
+import DataWarnings from '../components/DataWarnings';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -279,8 +280,8 @@ const Onboarding = () => {
         crop: e.crop || (crops.length === 1 ? crops[0] : ''), is_irrigated: e.is_irrigated, // stored once the backend has the fields (G7)
       });
       const boundary = await uploadBoundary(farm.farm_id, e.boundaryFile);
-      if (boundary?.stray_shapes?.length) {
-        setEstate(e.key, { strayShapes: boundary.stray_shapes });
+      if (boundary?.stray_shapes?.length || boundary?.warnings?.length) {
+        setEstate(e.key, { strayShapes: boundary.stray_shapes || null, dataWarnings: boundary.warnings || null });
       }
       created.push(farm); boundaries.push(boundary);
       setDone(d => ({ ...d, org, farms: [...created], boundaries: [...boundaries] })); // keep progress if a later estate fails
@@ -535,7 +536,7 @@ const Onboarding = () => {
                   </div>
                   {e.boundaryError && <div className="text-sm text-red-700">{e.boundaryError}</div>}
                   {e.boundaryInfo && !e.boundaryError && <div className="text-xs text-gray-600">Boundary read: {e.boundaryInfo}</div>}
-                  {e.strayShapes?.length > 0 && (
+                  {e.dataWarnings?.length > 0 ? <DataWarnings warnings={e.dataWarnings} /> : e.strayShapes?.length > 0 && (
                     <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-3">
                       Left out: {e.strayShapes.map(s => `${s.plot_id}, ${Math.round(s.distance_km)} km from the estate`).join(' · ')}
                     </div>
