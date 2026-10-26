@@ -14,10 +14,10 @@ import { paths } from '../../../../../routes/paths';
 export function renderDashboardHeader(ctx) {
   const { activeTab, alerts, cropLabel, estateOptions, filterEstate, handleEstateChange, handleTopNavTabClick, onBack, onSignOut, pick, profileEmail, profileInitials, profileName, profileRole, service, setShowNotifications, setShowUserMenu, showNotifications, showUserMenu, tenant, tenantDisplayName, userMenuRef } = ctx;
   return (
-<header className="h-[72px] bg-white border-b border-gray-100 flex items-center justify-between px-8 z-[100] shadow-sm shrink-0">
+<header className="h-[72px] bg-white border-b border-gray-100 flex items-center justify-between gap-2 px-3 md:px-8 z-[100] shadow-sm shrink-0">
 
         {/* Brand */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-2 md:gap-6 min-w-0">
           <button onClick={onBack} className="p-2 hover:bg-gray-100 rounded-xl transition-all border border-gray-200 text-gray-500 hover:text-gray-800">
             <ArrowLeft size={17} />
           </button>
@@ -28,7 +28,7 @@ export function renderDashboardHeader(ctx) {
                 <Satellite className="text-white" size={21} />
               </div>
             )} />
-            <div>
+            <div className="hidden sm:block min-w-0">
               <h1 className="text-base font-bold tracking-tight text-gray-900 leading-none flex items-center gap-1.5">
                 {service ? service.title : `${cropLabel} monitoring`}
               </h1>
@@ -55,7 +55,7 @@ export function renderDashboardHeader(ctx) {
         </div>
 
         {/* ── TOP TABS ── */}
-        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
+        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto max-w-full shrink-0">
           {pick([
             { id: 'monitor',      label: 'Monitor',      icon: <Activity size={15} /> },
             { id: 'reports',      label: 'Reports',      icon: <FileText size={15} /> },
@@ -65,20 +65,21 @@ export function renderDashboardHeader(ctx) {
             <button
               key={tab.id}
               onClick={() => handleTopNavTabClick(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+              title={tab.label}
+              className={`flex items-center gap-2 px-3 md:px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shrink-0 ${
                 activeTab === tab.id
                   ? 'bg-white text-green-600 shadow-sm'
                   : 'text-gray-500 hover:text-gray-800 hover:bg-white/50'
               }`}
             >
               {tab.icon}
-              {tab.label}
+              <span className="hidden md:inline">{tab.label}</span>
             </button>
           ))}
         </div>
 
         {/* User area */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4 shrink-0">
           <div className="relative">
             <button 
               onClick={() => { setShowNotifications(n => !n); setShowUserMenu(false); }}
@@ -176,17 +177,17 @@ export function renderDashboardHeader(ctx) {
 export function renderDashboardSidebar(ctx) {
   const { TIMELINE_DATA, activeDateSlot, activeSidebarItem, alerts, compareTimelineIndex, handleSidebarClick, isCompareMode, pageSet, pick, selectedTimelineIndex, service, setActiveDateSlot, setCompareTimelineIndex, setIsCompareMode, setShowCalendarTool, setShowTimeSliderTool, showCalendarTool, showTimeSliderTool, sidebarWidth, startSidebarResize } = ctx;
   return (
-<aside style={{ width: `${sidebarWidth}px` }} className="bg-white border-r border-gray-100 flex flex-col z-50 shadow-sm shrink-0 relative">
+<aside style={{ '--sidebar-w': `${sidebarWidth}px` }} className="w-16 md:w-[var(--sidebar-w)] bg-white border-r border-gray-100 flex flex-col z-50 shadow-sm shrink-0 relative">
             {/* Draggable vertical divider */}
             <div 
               onMouseDown={startSidebarResize} 
-              className="absolute right-[-4px] top-0 bottom-0 w-2 cursor-col-resize hover:bg-green-500/50 active:bg-green-500 transition-colors z-50"
+              className="hidden md:block absolute right-[-4px] top-0 bottom-0 w-2 cursor-col-resize hover:bg-green-500/50 active:bg-green-500 transition-colors z-50"
             />
-            <div className="flex-1 overflow-y-auto py-6 px-4 space-y-8">
+            <div className="flex-1 overflow-y-auto py-6 px-2 md:px-4 space-y-8">
 
               {/* MAIN */}
               <div className="space-y-1">
-                <div className="text-[11px] font-bold text-gray-600 px-3 mb-3">Main</div>
+                <div className="hidden md:block text-[11px] font-bold text-gray-600 px-3 mb-3">Main</div>
                 {pick([
                   { id: 'analytics',           label: 'Analytics hub',       icon: <LayoutDashboard size={17} /> },
                   { id: 'intelligence-layers', label: 'Map',                 icon: <MapIcon size={17} /> },
@@ -209,7 +210,8 @@ export function renderDashboardSidebar(ctx) {
                   <button
                     key={item.id}
                     onClick={() => handleSidebarClick(item.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
+                    title={item.label}
+                    className={`w-full flex items-center justify-center md:justify-start gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
                       activeSidebarItem === item.id
                         ? 'text-white shadow-sm'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -219,7 +221,7 @@ export function renderDashboardSidebar(ctx) {
                     <span className={activeSidebarItem === item.id ? 'text-white' : 'text-gray-600'}>
                       {item.icon}
                     </span>
-                    <span className="flex-1 text-left">{item.label}</span>
+                    <span className="hidden md:inline flex-1 text-left">{item.label}</span>
                     {item.badge > 0 && (
                       <span className={`text-[11px] font-semibold px-1.5 py-0.5 rounded-full min-w-[18px] text-center ${activeSidebarItem === item.id ? 'bg-white/25 text-white' : 'bg-green-100 text-green-700'}`}>
                         {item.badge}
@@ -231,7 +233,7 @@ export function renderDashboardSidebar(ctx) {
 
               {/* TOOLS */}
               <div className="space-y-1">
-                <div className="text-[11px] font-bold text-gray-600 px-3 mb-3">Tools</div>
+                <div className="hidden md:block text-[11px] font-bold text-gray-600 px-3 mb-3">Tools</div>
                 {[
                   { id: 'calendar-tool', label: 'Calendar',     icon: <CalendarIcon size={17} />, active: showCalendarTool, toggle: () => setShowCalendarTool(!showCalendarTool) },
                   { id: 'slider-tool',   label: 'Time slider',  icon: <SlidersHorizontal size={17} />, active: showTimeSliderTool, toggle: () => setShowTimeSliderTool(!showTimeSliderTool) },
@@ -251,7 +253,8 @@ export function renderDashboardSidebar(ctx) {
                   <button
                     key={item.id}
                     onClick={item.toggle}
-                    className={`w-full flex items-center justify-between px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
+                    title={item.label}
+                    className={`w-full flex items-center justify-center md:justify-between px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
                       item.active
                         ? 'bg-green-50 text-green-700'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -261,7 +264,7 @@ export function renderDashboardSidebar(ctx) {
                       <span className={item.active ? 'text-green-600' : 'text-gray-600'}>
                         {item.icon}
                       </span>
-                      {item.label}
+                      <span className="hidden md:inline">{item.label}</span>
                     </div>
                     {item.active && (
                       <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
@@ -300,7 +303,7 @@ export function renderDashboardSidebar(ctx) {
 
               {/* SETTINGS */}
               <div className="space-y-1">
-                <div className="text-[11px] font-bold text-gray-600 px-3 mb-3">Settings</div>
+                <div className="hidden md:block text-[11px] font-bold text-gray-600 px-3 mb-3">Settings</div>
                 {[
                   { id: 'farm-data', label: 'Farm data',        icon: <UploadIcon size={17} /> },
                   { id: 'help',      label: 'Glossary',         icon: <Info size={17} /> }
@@ -308,7 +311,8 @@ export function renderDashboardSidebar(ctx) {
                   <button
                     key={item.id}
                     onClick={() => handleSidebarClick(item.id)}
-                    className={`w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
+                    title={item.label}
+                    className={`w-full flex items-center justify-center md:justify-start gap-3 px-3 py-3 rounded-xl text-sm font-semibold transition-all ${
                       activeSidebarItem === item.id
                         ? 'text-white shadow-sm'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -318,7 +322,7 @@ export function renderDashboardSidebar(ctx) {
                     <span className={activeSidebarItem === item.id ? 'text-white' : 'text-gray-600'}>
                       {item.icon}
                     </span>
-                    {item.label}
+                    <span className="hidden md:inline">{item.label}</span>
                   </button>
                 ))}
               </div>

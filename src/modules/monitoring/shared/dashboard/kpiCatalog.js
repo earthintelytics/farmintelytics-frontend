@@ -36,7 +36,8 @@ export const KPI_DEFS = {
     compute: (ctx) => {
       const a = totalArea(ctx);
       if (!ctx.plots.length && a == null) return { missing: 'No boundaries registered yet' };
-      return { value: a != null ? fmtHa(a) : '—', sub: `${ctx.plots.length} ${ctx.unitLabel}` };
+      const unit = ctx.plots.length === 1 && ctx.unitLabel.endsWith('s') ? ctx.unitLabel.slice(0, -1) : ctx.unitLabel;
+      return { value: a != null ? fmtHa(a) : '—', sub: `${ctx.plots.length} ${unit}` };
     },
   },
   condition: {

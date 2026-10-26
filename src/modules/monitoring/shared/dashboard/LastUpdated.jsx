@@ -6,8 +6,8 @@ const CHECK_MS = 5 * 60 * 1000;
 const fmt = (d) => new Date(d).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 
 /**
- * When this organisation's results were last updated: the latest finished
- * run (GET /data/latest), checked every 5 minutes so it changes by itself
+ * When this service's results were last updated: its latest finished
+ * run (GET /data/latest?module=), checked every 5 minutes so it changes by itself
  * after a scheduled run. Falls back to the newest satellite date on the time
  * slider; says "No results yet" when there is neither.
  */
@@ -16,7 +16,9 @@ const LastUpdated = ({ newestImageDate }) => {
   useEffect(() => {
     let live = true;
     let t = null;
-    const check = () => serviceCall('/data/latest')
+    // This service's runs only (the service open in this page).
+    const module = (() => { try { return sessionStorage.getItem('fi_module') || ''; } catch { return ''; } })();
+    const check = () => serviceCall(`/data/latest${module ? `?module=${encodeURIComponent(module)}` : ''}`)
       .then((d) => { if (live && d?.updated_at) setUpdatedAt(d.updated_at); })
       .catch((e) => { if (e?.name === 'NotConnectedError' && t) { clearInterval(t); t = null; } });
     t = setInterval(check, CHECK_MS);

@@ -33,10 +33,10 @@ function localChecks(kind, plots) {
       why: plots.length === 0 ? 'No individual plots are registered yet.' : big.length ? `${big.length} plots over 4 ha have no polygon.` : 'All plots over 4 ha are polygons.', evidence: { sources: ['EUDR Article 9 geolocation rule'] } },
   ];
   if (kind === 'eudr') checks.push(
-    { id: 'forest2020', name: 'No forest cleared after 31 December 2020', status: 'not_checked', why: 'The check is being rebuilt on the EU reference forest map and yearly loss data.', evidence: { sources: ['JRC GFC2020', 'Hansen Global Forest Change', 'RADD alerts'] } },
-    { id: 'protected', name: 'No overlap with protected areas', status: 'not_checked', why: 'Protected-area data (WDPA) is being connected.', evidence: { sources: ['WDPA'] } },
+    { id: 'forest2020', name: 'No forest cleared after 31 December 2020', status: 'not_checked', why: 'The check results could not be loaded; nothing is shown as passed without them.', evidence: { sources: ['JRC GFC2020', 'Global Forest Change (Hansen/UMD)'] } },
+    { id: 'protected', name: 'No overlap with protected areas', status: 'not_checked', why: 'The check results could not be loaded.', evidence: { sources: ['Protected areas (WDPA and team uploads)'] } },
   );
-  if (kind === 'carbon') checks.push({ id: 'method', name: 'Method, factors and calibration recorded', status: 'not_checked', why: 'Carbon figures are uncalibrated estimates until plot inventory data is uploaded.', evidence: { sources: ['IPCC Tier 1 factors'] } });
+  if (kind === 'carbon') checks.push({ id: 'method', name: 'Method, factors and calibration recorded', status: 'not_checked', why: 'Carbon is area x a published carbon range per crop: indicative, not calibrated in the field and not certified.', evidence: { sources: ['Crop carbon factors set by FarmIntelytics'] } });
   if (kind === 'restoration') checks.push({ id: 'survival', name: 'Survival backed by field surveys', status: 'not_checked', why: 'Survival comes from the client’s survey uploads (Farm data).', evidence: { sources: ['Survival surveys'] } });
   return checks;
 }
@@ -44,6 +44,8 @@ function localChecks(kind, plots) {
 export default function VerificationPage({ plots, serviceId, onOpenData }) {
   const defaultKind = serviceId === 'eudr-check' ? 'eudr' : ['carbon-ffb', 'carbon-groups', 'carbon-estimator'].includes(serviceId) ? 'carbon' : serviceId === 'land-restoration' ? 'restoration' : 'boundary';
   const [kind, setKind] = useState(defaultKind);
+  // Boundaries for every service, plus the service's own evidence: never another service's tab.
+  const kinds = [...new Set(['boundary', defaultKind])];
   const [remote, setRemote] = useState(null);
   const [open, setOpen] = useState(null);
   useEffect(() => {
@@ -65,7 +67,7 @@ export default function VerificationPage({ plots, serviceId, onOpenData }) {
   const counts = checks.reduce((m, c) => ({ ...m, [c.status]: (m[c.status] || 0) + 1 }), {});
 
   return (
-    <div className="p-10 space-y-8">
+    <div className="p-4 sm:p-10 space-y-8">
       <div className="flex items-start gap-4">
         <span className="w-11 h-11 rounded-xl bg-green-50 border border-green-100 flex items-center justify-center text-green-700 shrink-0"><ShieldCheck size={20} /></span>
         <div>
@@ -74,7 +76,7 @@ export default function VerificationPage({ plots, serviceId, onOpenData }) {
         </div>
       </div>
       <div className="flex flex-wrap gap-2">
-        {Object.entries(KINDS).map(([k, label]) => <button key={k} onClick={() => setKind(k)} className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${kind === k ? 'bg-green-50 border-green-600 text-green-800' : 'bg-white border-gray-300 text-gray-600'}`}>{label}</button>)}
+        {kinds.length > 1 && kinds.map(k => [k, KINDS[k]]).map(([k, label]) => <button key={k} onClick={() => setKind(k)} className={`px-3 py-1.5 rounded-lg text-xs font-semibold border ${kind === k ? 'bg-green-50 border-green-600 text-green-800' : 'bg-white border-gray-300 text-gray-600'}`}>{label}</button>)}
       </div>
       {!remote && <div className="flex gap-3 rounded-2xl border border-sky-200 bg-sky-50/60 px-5 py-4 text-sm text-sky-900"><Info size={18} className="shrink-0 mt-0.5" /><div>Boundary and geolocation checks run here on your registered plots. Checks that need the verification service show <strong>Not checked</strong> until it is connected; nothing is marked passed without a real check.</div></div>}
 

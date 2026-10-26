@@ -278,7 +278,8 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       const ok = (r, what, optional = false) => {
         if (r.status === 'fulfilled') return r.value;
         // A service this organisation does not have is not a failure to report.
-        if (!(optional && /\b403\b/.test(String(r.reason?.message)))) noteLoadIssue(what, r.reason);
+        // The status is on the error (its message is already plain words, without the number).
+        if (!(optional && (r.reason?.status === 403 || /\b403\b/.test(String(r.reason?.message))))) noteLoadIssue(what, r.reason);
         return null;
       };
       const statsVal = ok(statsRes, 'summary figures');
@@ -297,7 +298,13 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       }
       if ((SERVICE_KPIS[service?.id] || []).includes('carbon')) {
         try {
-          const c = isSmallholderService ? smallholderCarbonTotal(await fetchCarbonSummary()) : (await api.fetchEstateCarbon())?.total;
+          let c;
+          if (isSmallholderService) c = smallholderCarbonTotal(await fetchCarbonSummary());
+          else {
+            const res = await api.fetchEstateCarbon();
+            // No estate for this service: say that, not a generic "not enough data".
+            c = res?.estates?.length ? res.total : (res ? { ...res.total, carbon_t: null, note: res.note || res.total?.note } : null);
+          }
           if (active) setCarbon(c || null);
         } catch (e) {
           noteLoadIssue('carbon estimate', e);
@@ -1095,11 +1102,11 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     
     // Ground Moisture: Soil moisture, SAR SMI, thermal soil moisture, NDTI
     if (k === 'smi' || k === 'smi_landsat' || k === 'ndti' || t.some(x => ['soil-water', 'soil-moisture', 'ground-moisture', 'thermal-moisture'].includes(x))) {
-      return 'Ground Moisture';
+      return 'Ground moisture';
     }
     // Vegetation Moisture: Optical canopy moisture & water status (NDMI, NDWI, LSWI, MSI, WDI)
     if (k === 'ndmi' || k === 'ndwi' || k === 'lswi' || k === 'msi' || k === 'wdi' || t.some(x => ['water', 'moisture', 'water-stress', 'canopy-water', 'flood', 'paddy', 'irrigation', 'drought', 'evapotranspiration', 'canopy-moisture'].includes(x))) {
-      return 'Vegetation Moisture';
+      return 'Vegetation moisture';
     }
     if (t.some(x => ['chlorophyll', 'nitrogen', 'nutrient', 'phenology'].includes(x))) {
       return 'Nutrient & Chlorophyll';

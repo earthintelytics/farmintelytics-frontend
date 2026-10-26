@@ -76,7 +76,7 @@ export function CheckPage({ page, plots, onOpenData }) {
             <Card className="p-6 space-y-4">
               <div className="text-sm font-semibold text-gray-900">Evidence: {sel.plot.name || sel.plot.id}</div>
               <dl className="grid grid-cols-2 gap-3 text-sm">
-                {[['Forest on 31 Dec 2020', sel.r.forest_2020_pct != null ? `${sel.r.forest_2020_pct}%` : '—'], ['Loss after cut-off', sel.r.loss_after_cutoff_ha != null ? `${sel.r.loss_after_cutoff_ha} ha${sel.r.loss_year ? ` (${sel.r.loss_year})` : ''}` : '—'], ['Protected area overlap', sel.r.protected_overlap === true ? 'Yes' : sel.r.protected_overlap === false ? 'None' : 'Not checked'], ['Geolocation', sel.r.geolocation || (sel.plot.coords?.length > 2 ? 'polygon' : 'point')], ['Checked on', sel.r.checked_at ? new Date(sel.r.checked_at).toLocaleDateString() : '—']].map(([k, v]) => (
+                {[['Forest on 31 Dec 2020', sel.r.forest_2020_pct != null ? `${sel.r.forest_2020_pct}%` : '—'], ['Loss after cut-off', sel.r.loss_after_cutoff_ha != null ? `${sel.r.loss_after_cutoff_ha} ha${sel.r.loss_year ? ` (${sel.r.loss_year})` : ''}` : '—'], ['Protected area overlap', sel.r.protected_overlap === true ? 'Yes' : sel.r.protected_overlap === false ? 'None' : 'Not checked'], ['Geolocation', (sel.r.geolocation || (sel.plot.coords?.length > 2 ? 'polygon' : 'point')) === 'point' ? 'Point' : 'Polygon'], ['Checked on', sel.r.checked_at ? new Date(sel.r.checked_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—']].map(([k, v]) => (
                   <div key={k}><dt className="text-xs text-gray-500">{k}</dt><dd className="font-semibold text-gray-900">{v}</dd></div>
                 ))}
               </dl>

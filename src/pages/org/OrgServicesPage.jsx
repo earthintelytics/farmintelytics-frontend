@@ -50,9 +50,9 @@ const OrgServicesPage = ({ profile }) => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {shown.map((s) => (
             <button key={s.id} type="button" onClick={() => open(s.id)}
-              className="group text-left flex flex-col bg-white border border-gray-200 hover:border-gray-400 rounded-2xl overflow-hidden">
-              <div className="h-40 bg-gray-100 overflow-hidden">
-                {s.photo && <img src={s.photo} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />}
+              className="group w-full text-left flex flex-col items-stretch bg-white border border-gray-200 hover:border-gray-400 rounded-2xl overflow-hidden">
+              <div className="w-full h-40 bg-gray-100 overflow-hidden">
+                {s.photo && <img src={s.photo} alt="" loading="lazy" className="block w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />}
               </div>
               <div className="flex-1 flex flex-col p-5">
                 <h3 className="font-display text-base font-semibold text-gray-900">{s.title}</h3>

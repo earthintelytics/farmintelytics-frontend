@@ -24,7 +24,11 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
   const [heroLoaded, setHeroLoaded] = useState(false);
   const [forgotModalOpen, setForgotModalOpen] = useState(false);
 
-  const currentDesign = signInDesignFor(moduleId);
+  const design = signInDesignFor(moduleId);
+  // On /org/<tenant>/login, name the organisation (from the address) rather than "Your organisation".
+  const currentDesign = tenant && design.name === 'Your organisation'
+    ? { ...design, name: tenant.charAt(0).toUpperCase() + tenant.slice(1).replace(/[-_]/g, ' ') }
+    : design;
   const demos = demoAccounts('tenant');
 
   const [prevDefaults, setPrevDefaults] = useState({ defaultEmail, defaultCode });

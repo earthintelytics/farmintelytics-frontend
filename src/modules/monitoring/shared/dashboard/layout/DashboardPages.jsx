@@ -94,7 +94,7 @@ export function renderDashboardPages(ctx) {
                     <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-600" />
                     <input
                       type="text"
-                      placeholder="Search blocks, parameters, anomalies..."
+                      placeholder="Search blocks"
                       className="w-full bg-white border border-gray-200 rounded-xl py-2.5 pl-11 pr-4 text-sm font-medium outline-none focus:border-green-500 focus:bg-white transition-all text-gray-700"
                     />
                   </div>
@@ -128,7 +128,7 @@ export function renderDashboardPages(ctx) {
                       >
                         <option value="All">All plots</option>
                         {plotsData.slice(0, 50).map(p => (
-                          <option key={p.id} value={p.id}>{p.id}</option>
+                          <option key={p.id} value={p.id}>{p.name && p.name !== p.id ? `${p.name}${p.subfarm ? ` (${p.subfarm})` : ""}` : p.id}</option>
                         ))}
                       </select>
                     </div>
@@ -217,7 +217,7 @@ export function renderDashboardPages(ctx) {
                     <div className="bg-white p-8 rounded-2xl border border-gray-100 shadow-sm space-y-5">
                       <h3 className="text-base font-bold text-gray-900 flex items-center gap-2.5">
                         <Clock size={18} className="text-gray-600" />
-                        7-Day Evapotranspiration Historical Log {renderInfoTooltip("7-Day Evapotranspiration Historical Log")}</h3>
+                        Water the crop used, last 7 days {renderInfoTooltip("7-Day Evapotranspiration Historical Log")}</h3>
                       {waterDemandData && waterDemandData.length > 0 ? (
                         <div className="overflow-x-auto">
                           <table className="w-full text-left text-xs border-collapse">
@@ -225,7 +225,7 @@ export function renderDashboardPages(ctx) {
                               <tr className="border-b border-gray-200 text-gray-600 font-semibold text-[11px]">
                                 <th className="py-3 px-4">Plot</th>
                                 <th className="py-3 px-4">Area (ha)</th>
-                                <th className="py-3 px-4">Demand ETc (mm/day)</th>
+                                <th className="py-3 px-4">Crop water use (mm per day)</th>
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100 font-medium text-gray-700">
@@ -244,7 +244,7 @@ export function renderDashboardPages(ctx) {
                         </div>
                       ) : (
                         <div className="border border-gray-100 rounded-xl p-6 text-sm text-gray-600 text-center">
-                          No water demand data available yet — run the pipeline with ETc enabled to populate this panel.
+                          No crop water use measured yet. It appears after the next satellite monitoring run.
                         </div>
                       )}
                     </div>
@@ -261,7 +261,7 @@ export function renderDashboardPages(ctx) {
 
                     {!waterDemandLoading && (!waterDemandData || waterDemandData.length === 0) && (
                       <div className="border border-gray-100 rounded-xl p-6 bg-white text-sm text-gray-600 text-center">
-                        No water demand data available yet — run the pipeline with ETc enabled to populate this panel.
+                        No crop water use measured yet. It appears after the next satellite monitoring run.
                       </div>
                     )}
 
@@ -276,7 +276,7 @@ export function renderDashboardPages(ctx) {
                           {/* KPI cards */}
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                             <div className="border border-gray-100 rounded-xl p-4 bg-white shadow-sm">
-                              <div className="text-[11px] font-bold text-gray-600 mb-1">Avg. Crop Water Demand</div>
+                              <div className="text-[11px] font-bold text-gray-600 mb-1">Average crop water use</div>
                               <div className="text-2xl font-bold text-gray-800">
                                 {avgEtc != null ? `${avgEtc.toFixed(2)}` : '—'} <span className="text-xs font-semibold text-gray-600">mm/day</span>
                               </div>
@@ -298,14 +298,14 @@ export function renderDashboardPages(ctx) {
 
                           {/* Per-plot ETc table */}
                           <div className="border border-gray-100 rounded-xl bg-white shadow-sm overflow-hidden">
-                            <div className="px-4 py-3 border-b border-gray-100 text-xs font-bold text-gray-700">Per-Plot Crop Water Demand</div>
+                            <div className="px-4 py-3 border-b border-gray-100 text-xs font-bold text-gray-700">Crop water use per block</div>
                             <div className="max-h-80 overflow-y-auto">
                               <table className="w-full text-xs">
                                 <thead className="bg-white text-gray-600 text-[11px]">
                                   <tr>
                                     <th className="text-left px-4 py-2">Plot</th>
                                     <th className="text-left px-4 py-2">Area (ha)</th>
-                                    <th className="text-left px-4 py-2">ETc (mm/day)</th>
+                                    <th className="text-left px-4 py-2">Water use (mm per day)</th>
                                   </tr>
                                 </thead>
                                 <tbody>
@@ -322,7 +322,7 @@ export function renderDashboardPages(ctx) {
                           </div>
 
                           <div className="text-[11px] text-gray-600 px-1">
-                            ETc is also available as a map layer — select "ETc" from the index picker on Intelligence Layers to view it with the time slider.
+                            Crop water use is also a map layer: open the Map page and choose it in the layer list.
                           </div>
                         </>
                       );
