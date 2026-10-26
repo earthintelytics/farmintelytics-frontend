@@ -66,6 +66,7 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
           if (Array.isArray(config?.modules)) localStorage.setItem('fi_allowed_modules', JSON.stringify(config.modules));
           if (Array.isArray(config?.allowed_crops)) localStorage.setItem('fi_allowed_crops', JSON.stringify(config.allowed_crops));
           if (Array.isArray(config?.map_center)) localStorage.setItem('fi_map_center', JSON.stringify(config.map_center));
+          localStorage.setItem('fi_has_logo', config?.has_logo ? '1' : '0');
           if (config?.max_accounts != null) localStorage.setItem('fi_max_accounts', String(config.max_accounts));
           else localStorage.removeItem('fi_max_accounts');
         } catch {

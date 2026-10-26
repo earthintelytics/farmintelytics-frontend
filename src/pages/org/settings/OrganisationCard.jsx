@@ -21,7 +21,7 @@ const OrganisationCard = ({ profile, services, canEdit, onLogo }) => {
       if (!res?.logo_url) throw new Error('The logo was not saved.');
       // A new version makes every logo on the page load the new file at once.
       const version = String(Date.now());
-      try { localStorage.setItem('fi_logo_version', version); } catch { /* the logo still shows after the cache expires */ }
+      try { localStorage.setItem('fi_logo_version', version); localStorage.setItem('fi_has_logo', '1'); } catch { /* the logo still shows after the cache expires */ }
       onLogo(version);
     } catch (err) {
       setError(`Logo not saved: ${err.message}`);

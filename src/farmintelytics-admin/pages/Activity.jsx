@@ -23,6 +23,9 @@ const TARGET_TYPES = [
   { id: 'integration', label: 'Integrations & AI' },
   { id: 'user', label: 'Users & roles' },
   { id: 'boundary', label: 'Boundaries' },
+  { id: 'estate', label: 'Estates' },
+  { id: 'run', label: 'Runs started by the team' },
+  { id: 'suitability_share', label: 'Shared suitability results' },
   { id: 'protected_area', label: 'Protected areas' },
   { id: 'activity_log', label: 'Activity & exports' },
 ];

@@ -22,7 +22,7 @@ const OrgServicesPage = ({ profile }) => {
   return (
     <>
       {/* A light welcome band: who you are, what you have, today's date. */}
-      <div className="rounded-2xl border border-green-100 bg-gradient-to-r from-green-50 via-white to-white px-6 py-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
+      <div className="rounded-2xl border border-gray-200 bg-white px-6 py-6 flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
           <p className="text-sm font-medium text-green-800">{profile.name}</p>
           <h1 className="font-display text-3xl font-semibold text-gray-900 tracking-tight mt-1">{first ? `Welcome, ${first}` : 'Your services'}</h1>

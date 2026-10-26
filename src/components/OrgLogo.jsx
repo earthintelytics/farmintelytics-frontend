@@ -9,8 +9,13 @@ import { API_BASE } from '../services/apiBase';
 const orgLogoSrc = (tenant, version) =>
   tenant ? `${API_BASE}/branding/${encodeURIComponent(tenant)}/logo${version ? `?v=${encodeURIComponent(version)}` : ''}` : '';
 
+// Known to have no logo (set at sign-in): don't ask for one, so no 404 is logged on every page.
+const knownNoLogo = (tenant) => {
+  try { return localStorage.getItem('fi_tenant') === tenant && localStorage.getItem('fi_has_logo') === '0'; } catch { return false; }
+};
+
 export default function OrgLogo({ tenant, version, className = '', fallback = null }) {
-  const src = orgLogoSrc(tenant, version);
+  const src = version || !knownNoLogo(tenant) ? orgLogoSrc(tenant, version) : '';
   // Remembers which address failed, so a new upload (new version) is tried again.
   const [failedSrc, setFailedSrc] = useState('');
   if (!src || failedSrc === src) return fallback;

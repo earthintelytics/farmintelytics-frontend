@@ -4,7 +4,7 @@
  */
 export const TENANT_KEYS = [
   'fi_token', 'fi_email', 'fi_user', 'fi_tenant', 'fi_role', 'fi_full_name',
-  'fi_display_name', 'fi_allowed_modules', 'fi_allowed_crops', 'fi_map_center', 'fi_logo_url', 'fi_logo_version', 'fi_max_accounts',
+  'fi_display_name', 'fi_allowed_modules', 'fi_allowed_crops', 'fi_map_center', 'fi_logo_url', 'fi_logo_version', 'fi_has_logo', 'fi_max_accounts',
 ];
 export const TEAM_KEYS = ['fi_admin_token', 'fi_admin_email'];
 

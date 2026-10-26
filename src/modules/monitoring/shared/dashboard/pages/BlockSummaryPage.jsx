@@ -13,6 +13,9 @@ const PLAIN = {
   ndwi: ['Water', Waves], reci: ['Leaf colour', Palette], ndre: ['Nitrogen', FlaskConical], cvi: ['Leaf colour', Palette],
   gndvi: ['Greenness', Leaf], rvi: ['Radar', Radar], lai: ['Leaf cover', Leaf], msavi2: ['Ground cover', Sprout],
   lst: ['Heat', Thermometer], rainfall: ['Rain', CloudRain],
+  vci: ['Compared with normal', Activity], etc: ['Water use', Droplets], et: ['Water use', Droplets],
+  smi: ['Soil moisture', Droplets], dprvi: ['Radar', Radar], msi: ['Moisture stress', Droplets],
+  savi: ['Ground cover', Sprout], nbr: ['Burn and clearing', Activity], ndsi: ['Water', Waves],
 };
 const plainOf = (x) => {
   const [label, Icon] = PLAIN[String(x.key).toLowerCase()] || [x.label, Activity];
@@ -193,7 +196,7 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
                   {m.classes.map((c) => (
                     <li key={c.label} className="flex items-center justify-between gap-2 text-sm">
                       <span className="flex items-center gap-2 text-gray-800"><span className="w-3 h-3 rounded-sm border border-black/20 shrink-0" style={{ background: c.hex }} />{c.label}</span>
-                      <span className="text-xs text-gray-400 tabular-nums">{c.range[0]} to {c.range[1]}</span>
+                      {m.unit && <span className="text-xs text-gray-400 tabular-nums">{c.range[0]} to {c.range[1]} {m.unit}</span>}
                     </li>
                   ))}
                 </ul>
@@ -213,7 +216,7 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
               <h3 className="text-sm font-semibold text-gray-900">How the {unitLabel} spread</h3>
               {perClass.map((c) => (
                 <div key={c.label} className="space-y-1">
-                  <div className="flex justify-between text-xs"><span className="text-gray-700">{c.label} <span className="text-gray-400">{c.range[0]}–{c.range[1]}</span></span><span className="font-semibold text-gray-900">{c.count}</span></div>
+                  <div className="flex justify-between text-xs"><span className="text-gray-700">{c.label}{m.unit && <span className="text-gray-400"> {c.range[0]}–{c.range[1]} {m.unit}</span>}</span><span className="font-semibold text-gray-900">{c.count}</span></div>
                   <div className="h-2 rounded-full bg-gray-100"><div className="h-2 rounded-full" style={{ width: `${(c.count / maxCount) * 100}%`, background: c.hex }} /></div>
                 </div>
               ))}

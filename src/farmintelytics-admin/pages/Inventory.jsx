@@ -28,12 +28,13 @@ const Inventory = () => {
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [viewing, setViewing] = useState(null);
+  const [truncated, setTruncated] = useState(false);  // the listing stops at 5,000 files
 
   const load = async () => {
     setLoading(true); setError('');
     try {
       const [o, f, m] = await Promise.all([fetchOrganizations(), fetchFarms(), fetchMinioInventory(org, farm)]);
-      setOrgs(Array.isArray(o) ? o : o?.items || []); setFarms(f); setFiles(m.items || []);
+      setOrgs(Array.isArray(o) ? o : o?.items || []); setFarms(f); setFiles(m.items || []); setTruncated(!!m.truncated);
     } catch (e) { setError(e.message); } finally { setLoading(false); }
   };
   useEffect(() => { load(); }, [org, farm]); // eslint-disable-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
@@ -71,10 +72,11 @@ const Inventory = () => {
       {notice && <Note tone="good">{notice}</Note>}
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Stat label="Files in storage" value={files.length.toLocaleString()} />
-        <Stat label="Space used" value={formatSize(shares.total)} />
-        <Stat label="Estates in the registry" value={farms.length} sub={problems ? `${problems} not in step with storage` : 'All in step'} />
-        <Stat label="Organisations" value={orgs.length} />
+        {/* Dashes until the first answer: zeros would read as an empty store. */}
+        <Stat label="Files in storage" value={loading && !files.length ? '—' : `${files.length.toLocaleString()}${truncated ? '+' : ''}`} sub={truncated ? 'Only the first 5,000 are listed' : undefined} />
+        <Stat label="Space used" value={loading && !files.length ? '—' : `${formatSize(shares.total)}${truncated ? '+' : ''}`} />
+        <Stat label="Estates in the registry" value={loading && !farms.length ? '—' : farms.length} sub={loading && !farms.length ? undefined : problems ? `${problems} not in step with storage` : 'All in step'} />
+        <Stat label="Organisations" value={loading && !orgs.length ? '—' : orgs.length} />
       </div>
 
       {files.length > 0 && (

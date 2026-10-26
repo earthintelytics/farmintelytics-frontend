@@ -507,7 +507,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
           </div>
 
           {/* SECTION 1: AI Executive Intelligence & Summary */}
-          <Card className="p-7 border-green-200 bg-gradient-to-br from-green-50/50 via-white to-white space-y-4">
+          <Card className="p-7 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-base font-bold text-gray-900">
                 <Sparkles size={18} className="text-green-700" />
