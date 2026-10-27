@@ -289,6 +289,18 @@ export const FARMER_LAYER_EXPLANATIONS = {
 
 /** Get the explanation object for any layer key, with fallback */
 export function getFarmerLayerExplanation(layerKey, cropName = 'your crop') {
+  // "<factor>_value": the measured value behind a factor's class (rainfall in mm, slope in degrees...).
+  if (String(layerKey).endsWith('_value')) {
+    const base = getFarmerLayerExplanation(layerKey.slice(0, -'_value'.length), cropName);
+    return {
+      ...base,
+      label: `${base.label}: measured`,
+      plainTitle: `${base.plainTitle}: what was measured`,
+      measured: true,
+      whatItMeans: `The value measured on each part of the land, before it is scored. Light is low, dark is high; the colour says how much, not how good. ${base.whatItMeans || ''}`,
+      classesGuide: null,
+    };
+  }
   const info = FARMER_LAYER_EXPLANATIONS[layerKey] || FARMER_LAYER_EXPLANATIONS.final_class;
   return {
     ...info,

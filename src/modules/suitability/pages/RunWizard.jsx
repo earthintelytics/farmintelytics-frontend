@@ -80,6 +80,23 @@ const parsePointSamples = async (file) => {
   return points;
 };
 
+/** A yes/no question with what each answer means for the analysis. */
+const Question = ({ label, value, onChange, yes, no, children }) => (
+  <div className="space-y-2">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+      <p className="text-sm text-gray-900">{label}</p>
+      <div className="flex gap-1.5 shrink-0">
+        {[[true, 'Yes'], [false, 'No']].map(([v, l]) => (
+          <button key={l} type="button" onClick={() => onChange(v)}
+            className={`px-3 py-1.5 rounded-lg border text-sm ${value === v ? 'border-green-600 bg-green-50 text-green-900 font-semibold' : 'border-gray-300 bg-white text-gray-700'}`}>{l}</button>
+        ))}
+      </div>
+    </div>
+    <p className="text-xs text-gray-500">{value ? yes : no}</p>
+    {children}
+  </div>
+);
+
 const downloadSampleTemplate = () => {
   const csv = [
     'latitude,longitude,soil_ph,soil_depth_cm,nitrogen_mg_kg,clay_pct',
@@ -109,8 +126,9 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
   const [geojson, setGeojson] = useState(null);
   const [fileNote, setFileNote] = useState('');
   const [fileError, setFileError] = useState('');
+  const [hasSamples, setHasSamples] = useState(false);
   const [pointSamples, setPointSamples] = useState([]);
-  const [samplesNote, setSamplesNote] = useState('');
+  const [, setSamplesNote] = useState('');
   const [samplesError, setSamplesError] = useState('');
   const [detectedKeys, setDetectedKeys] = useState([]);
   const [busy, setBusy] = useState(false);
@@ -249,91 +267,91 @@ const RunWizard = ({ orgs, initialCrop, onClose, onStarted }) => {
         )}
       </Field>
 
-      {/* Optional Ground Sample Points / Soil & Weather Observations with IDW interpolation */}
-      <Field
-        label={
-          <div className="flex items-center justify-between w-full">
-            <span className="font-semibold text-gray-900">Field sample points</span>
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">Optional</span>
-          </div>
-        }
-        hint="Have GPS soil lab test points (pH, depth, nitrogen) or weather stations? Upload a CSV or GeoJSON here. Our engine automatically applies IDW spatial interpolation across your farm to generate continuous raster surfaces. If omitted, global satellite and SoilGrids baselines are used automatically."
-      >
-        <div className="border border-gray-200 rounded-xl p-3 bg-gray-50/70 space-y-2">
-          {!pointSamples.length ? (
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <input
-                type="file"
-                accept=".csv,.geojson,.json"
-                onChange={pickSamples}
-                className="block w-full text-xs text-gray-700 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border file:border-gray-300 file:bg-white file:text-xs file:font-medium hover:file:bg-gray-50"
-              />
-              <button
-                type="button"
-                onClick={downloadSampleTemplate}
-                className="shrink-0 inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 font-semibold py-1 px-2 rounded-lg hover:bg-green-100/50"
-                title="Download a CSV template with standard column names"
-              >
-                <Download size={13} />
-                <span>Download CSV template</span>
-              </button>
-            </div>
-          ) : (
-            <div className="flex items-center justify-between bg-white border border-green-200 rounded-lg p-2.5 shadow-sm">
-              <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-green-600 shrink-0" />
-                <div>
-                  <p className="text-xs font-medium text-gray-900">
-                    <span className="font-bold text-green-800">{pointSamples.length} point samples</span> loaded for IDW interpolation
-                  </p>
-                  <p className="text-[11px] text-gray-500">
-                    {detectedKeys.length ? `Detected parameters: ${detectedKeys.join(', ')}` : 'Spatial coordinates verified'}
-                  </p>
+      {/* What the client already knows: each answer changes the analysis. */}
+      <div className="space-y-4 border-t border-gray-100 pt-5">
+        <div>
+          <p className="text-sm font-semibold text-gray-900">What do you already know about this land?</p>
+          <p className="text-xs text-gray-500 mt-0.5">Your own measurements replace global estimates where they exist, so answer what you can.</p>
+        </div>
+
+        <Question label="Do you have soil test results (with GPS points)?" value={hasSamples} onChange={setHasSamples}
+          yes="Your values replace the global soil map near each sample point" no="Soil pH comes from the global soil map (250 m)">
+          {hasSamples && (
+            <div className="border border-gray-200 rounded-xl p-3 bg-gray-50/70 space-y-2">
+              {!pointSamples.length ? (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <input type="file" accept=".csv,.geojson,.json" onChange={pickSamples}
+                    className="block w-full text-xs text-gray-700 file:mr-3 file:px-3 file:py-1.5 file:rounded-lg file:border file:border-gray-300 file:bg-white file:text-xs file:font-medium" />
+                  <button type="button" onClick={downloadSampleTemplate} className="shrink-0 inline-flex items-center gap-1 text-xs text-green-700 hover:text-green-800 font-semibold py-1 px-2 rounded-lg">
+                    <Download size={13} /><span>CSV template</span>
+                  </button>
                 </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => { setPointSamples([]); setSamplesNote(''); setSamplesError(''); setDetectedKeys([]); }}
-                className="text-gray-400 hover:text-red-600 p-1 rounded-lg hover:bg-gray-100"
-                title="Remove uploaded samples"
-              >
-                <X size={15} />
-              </button>
+              ) : (
+                <div className="flex items-center justify-between bg-white border border-green-200 rounded-lg p-2.5">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 size={16} className="text-green-600 shrink-0" />
+                    <div>
+                      <p className="text-xs font-medium text-gray-900">{pointSamples.length} sample point{pointSamples.length > 1 ? 's' : ''} read</p>
+                      <p className="text-xs text-gray-500">{detectedKeys.length ? `Values: ${detectedKeys.join(', ')}` : 'Locations only'}</p>
+                    </div>
+                  </div>
+                  <button type="button" onClick={() => { setPointSamples([]); setSamplesNote(''); setSamplesError(''); setDetectedKeys([]); }}
+                    className="text-gray-400 hover:text-red-600 p-1 rounded-lg hover:bg-gray-100" title="Remove the samples"><X size={15} /></button>
+                </div>
+              )}
+              {samplesError && <p className="text-xs text-red-600">{samplesError}</p>}
+              <p className="text-xs text-gray-500">CSV or GeoJSON with latitude, longitude and values such as soil_ph or soil_depth_cm. Values between points are interpolated.</p>
             </div>
           )}
+        </Question>
 
-          {samplesError && <p className="text-xs text-red-600">{samplesError}</p>}
-          {samplesNote && !samplesError && !pointSamples.length && <p className="text-xs text-gray-600">{samplesNote}</p>}
+        {registered && (
+          <Question label="Use data the organisation has already uploaded?" value={form.use_soil_samples} onChange={(v) => set('use_soil_samples', v)}
+            yes={dataForCrop(crop).map((d) => DATASET_DEFINITIONS.find((x) => x.id === d.dataset)?.name).filter(Boolean).join(', ') || 'Its uploaded datasets'}
+            no="Only the global sources below are used" />
+        )}
+
+        <Question label="Can the land be irrigated?" value={form.irrigated} onChange={(v) => set('irrigated', v)}
+          yes="Rainfall and dry months stop counting against the land" no="The crop must live on rainfall alone" />
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Field label="Variety or system" hint={variants.length ? null : 'No variants set for this crop in the admin.'}>
+            <select className={inputCls} value={form.variant} onChange={(e) => set('variant', e.target.value)} disabled={!variants.length}>
+              <option value="">Standard</option>
+              {variants.map((v) => <option key={v} value={v}>{v}</option>)}
+            </select>
+          </Field>
         </div>
-      </Field>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Variety or system" hint={variants.length ? null : 'No variants set for this crop in the admin.'}>
-          <select className={inputCls} value={form.variant} onChange={(e) => set('variant', e.target.value)} disabled={!variants.length}>
-            <option value="">Standard</option>
-            {variants.map((v) => <option key={v} value={v}>{v}</option>)}
-          </select>
+        <Field label="Who will farm it">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {STRICTNESS.map((st) => (
+              <button key={st.id} type="button" onClick={() => set('strictness', st.id)} className={`text-left px-3 py-2.5 rounded-xl border ${form.strictness === st.id ? 'border-green-600 bg-green-50' : 'border-gray-300 bg-white hover:border-gray-400'}`}>
+                <span className="block text-sm font-semibold text-gray-900">{st.label}</span>
+                <span className="block text-xs text-gray-500">{st.text}</span>
+              </button>
+            ))}
+          </div>
         </Field>
-        <div className="space-y-2 pt-7">
-          <label className="flex items-center gap-2 text-sm text-gray-800"><input type="checkbox" checked={form.irrigated} onChange={(e) => set('irrigated', e.target.checked)} />Irrigated (rainfall limits are relaxed)</label>
-          {registered && <label className="flex items-start gap-2 text-sm text-gray-800"><input type="checkbox" className="mt-0.5" checked={form.use_soil_samples} onChange={(e) => set('use_soil_samples', e.target.checked)} />
-            <span>Use the organisation's own data where uploaded
-              <span className="block text-xs text-gray-500">{dataForCrop(crop).map((d) => DATASET_DEFINITIONS.find((x) => x.id === d.dataset)?.name).filter(Boolean).join(', ')}</span>
-            </span>
-          </label>}
-        </div>
       </div>
 
-      <Field label="How strict">
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-          {STRICTNESS.map((s) => (
-            <button key={s.id} type="button" onClick={() => set('strictness', s.id)} className={`text-left px-3 py-2.5 rounded-xl border ${form.strictness === s.id ? 'border-green-600 bg-green-50' : 'border-gray-300 bg-white hover:border-gray-400'}`}>
-              <span className="block text-sm font-semibold text-gray-900">{s.label}</span>
-              <span className="block text-xs text-gray-500">{s.text}</span>
-            </button>
+      {/* What the analysis will use, so nothing is a surprise in the result. */}
+      <div className="border-t border-gray-100 pt-5 space-y-2">
+        <p className="text-sm font-semibold text-gray-900">What the analysis will use</p>
+        <ul className="text-xs text-gray-600 space-y-1">
+          {[
+            ['Slope and height', 'Copernicus DEM, 30 m'],
+            ['Rainfall, dry months, temperature', form.irrigated ? 'NASA POWER long-term means (not limiting: irrigated)' : 'NASA POWER long-term means'],
+            ['Soil pH', pointSamples.length ? `Your ${pointSamples.length} sample points, then SoilGrids 250 m between them` : 'ISRIC SoilGrids, 250 m'],
+            ['Flooding and distance to water', 'JRC Global Surface Water, 30 m'],
+            ['Land cover and forest in 2020', 'ESA WorldCover 2020 and 2021, 10 m'],
+            ['Forest lost since 2021', 'Global Forest Change (Hansen), 30 m'],
+            ['Protected areas', 'The protected areas loaded in Admin, Protected areas'],
+          ].map(([what, src]) => (
+            <li key={what} className="flex justify-between gap-3"><span className="text-gray-900">{what}</span><span className="text-right">{src}</span></li>
           ))}
-        </div>
-      </Field>
+        </ul>
+      </div>
     </Modal>
   );
 };

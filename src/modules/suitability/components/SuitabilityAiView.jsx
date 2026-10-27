@@ -3,40 +3,31 @@ import { Send, Sparkles, ArrowRight, Plus, SlidersHorizontal, Sliders } from 'lu
 import { cropName } from '../suitabilityLabels';
 import { askPublicSuitabilityAi, askSuitabilityRun } from '../../../services/suitabilityApi';
 
-const SCENARIOS = [
-  {
-    id: 'dry-spell',
-    title: 'Dry spell and the harvest',
-    desc: 'What less rain does to the crop and to bunches in the months after.',
-    requiredData: 'Annual rainfall and dry months (NASA POWER)',
-    question: 'How does the dry season length and rainfall deficit in our area affect our monthly harvest yield and planting suitability?',
-    whatIfType: 'climate',
-  },
-  {
-    id: 'fertiliser',
-    title: 'Delay the fertiliser round',
-    desc: 'What putting off fertiliser does to leaf colour and the harvest.',
-    requiredData: 'Soil pH (ISRIC SoilGrids) and any soil samples uploaded',
-    question: 'What happens if we delay the fertiliser round by 3 months, and what soil treatments or agricultural lime do we need for acidic blocks?',
-    whatIfType: 'soil',
-  },
-  {
-    id: 'replant',
-    title: 'Replant the oldest blocks',
-    desc: "Production over the next 5 years and the estate's carbon.",
-    requiredData: 'Slope (Copernicus DEM)',
-    question: 'If we replant the oldest blocks and build contour terraces on slopes over 8°, what will our 5-year yield and soil retention look like?',
-    whatIfType: 'terrain',
-  },
-  {
-    id: 'eudr-check',
-    title: 'EUDR deforestation and legal compliance',
-    desc: 'Verifying land parcels against the 31 December 2020 EUDR cut-off date.',
-    requiredData: 'Forest loss after 2020 (Global Forest Change), tree cover in 2020, protected areas',
-    question: 'Are our land parcels compliant with the 31 December 2020 EUDR deforestation cutoff date and protected nature reserves? What is the certified plantable area?',
-    whatIfType: 'compliance',
-  },
-];
+/**
+ * Questions for land that is not planted yet, built from this analysis: the crop, what limits the land,
+ * what was left out, and how sure the result is. Each answer comes from the analysis alone.
+ */
+const questionsFor = (run, crop) => {
+  const c = crop.toLowerCase();
+  const excluded = Object.keys(run?.excluded_area_ha || {});
+  const layers = run?.layers || [];
+  return [
+    { id: 'limits', title: 'What limits this land most', desc: `Which factor holds back ${c} on each part of the land, and where.`,
+      requiredData: 'Every factor scored in this analysis', question: `Which factors limit ${c} on this land the most, where are those areas, and how many hectares does each factor hold back?` },
+    { id: 'best', title: 'Where to plant first', desc: 'The best-suited fields and how many hectares are ready to plant.',
+      requiredData: 'Final suitability per field', question: `Which fields are best suited to ${c}, how many hectares are well suited or suited, and which fields should be planted first?` },
+    ...(layers.includes('rainfall') || layers.includes('dry_season') ? [{ id: 'irrigation', title: 'What irrigation would change',
+      desc: 'If water were added in the dry months, how much more land would be suited.',
+      requiredData: 'Rainfall and dry months', question: `Where rainfall or the dry season limits ${c}, how many hectares would move to a better class with irrigation, and how much water would that need?` }] : []),
+    ...(layers.includes('soil_ph') ? [{ id: 'lime', title: 'Would liming fix the soil',
+      desc: 'Where soil acidity limits the crop, and what correcting it would gain.',
+      requiredData: 'Soil pH (and any soil samples uploaded)', question: `Where does soil pH limit ${c}, would liming correct it, and how many hectares would improve if it did?` }] : []),
+    ...(excluded.length ? [{ id: 'excluded', title: 'Land left out, and why', desc: `${excluded.join(', ')}: which areas, how large, and what that means for planting.`,
+      requiredData: 'Forest in 2020, forest loss, protected areas, water', question: 'Which land was left out of this analysis, for what reason, how many hectares in each case, and what does that mean for the EUDR rules?' }] : []),
+    { id: 'confidence', title: 'How sure is this result', desc: 'Which values were measured on site and which come from global maps.',
+      requiredData: 'Data sources and gaps of this analysis', question: 'How reliable is this result? Which values come from global maps and which from our own data, what is missing, and what field checks would make it surer?' },
+  ];
+};
 
 /**
  * AI Assistant page for Suitability matching Screenshot 3 & dynamic What-If simulation.
@@ -45,7 +36,8 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
   const crop = cropName(run?.crop);
   const total = Number(run?.total_area_ha) || 0;
 
-  const initialGreeting = `Ask about your ${crop} suitability assessment, terrain slopes, soil, or rainfall. Answers use your verified evaluation data (${Math.round(total).toLocaleString()} ha evaluated).`;
+  const initialGreeting = `Ask about this ${crop.toLowerCase()} analysis: what limits the land, where to plant, what would change with irrigation or lime. Answers use this analysis only (${Math.round(total).toLocaleString()} ha analysed).`;
+  const scenarios = questionsFor(run, crop);
 
   const [chatMessages, setChatMessages] = useState([
     { sender: 'assistant', text: initialGreeting },
@@ -100,8 +92,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
       {chatMessages.length > 1 && (
         <div className="px-6 py-3 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs font-semibold text-gray-700">Suitability AI Advisor Active</span>
+            <span className="text-xs font-semibold text-gray-700">Questions about this analysis</span>
           </div>
           <button
             type="button"
@@ -126,7 +117,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
                   Ask, or try a what-if
                 </h2>
                 <p className="text-xs text-gray-500 mt-1 max-w-2xl font-medium">
-                  Type a question below, or pick a what-if. Answers use your monitoring results and the weather.
+                  Type a question below, or pick one. Answers use this analysis only: its maps, scores and sources.
                 </p>
               </div>
 
@@ -142,7 +133,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
 
             {/* 2-Column Grid of What-If Cards (Matches Screenshot 3) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-              {SCENARIOS.map((s) => (
+              {scenarios.map((s) => (
                 <div
                   key={s.id}
                   className="min-w-0 text-left p-5 bg-white border border-gray-200 hover:border-green-600 rounded-2xl flex flex-col gap-3 group transition-all shadow-2xs hover:shadow-xs"
@@ -225,7 +216,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
                       className="inline-block w-2 h-2 bg-green-600 rounded-full animate-bounce"
                       style={{ animationDelay: '300ms' }}
                     />
-                    <span className="text-gray-500 font-medium ml-1">Analyzing suitability rasters & climate…</span>
+                    <span className="text-gray-500 font-medium ml-1">Reading this analysis…</span>
                   </div>
                 </div>
               )}
@@ -255,7 +246,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
                   handleChatSubmit();
                 }
               }}
-              placeholder="Ask about your farm, e.g. Which blocks are short of water this month?"
+              placeholder="Ask about this land, e.g. Which fields are best for planting, and what limits the rest?"
               rows={3}
               aria-label="Your question"
               className="w-full bg-white border border-gray-300 focus:border-green-700 rounded-2xl py-3.5 pl-4 pr-16 text-xs sm:text-sm outline-none text-gray-900 placeholder-gray-400 resize-none disabled:opacity-50"
@@ -279,7 +270,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-gray-900 flex items-center gap-2">
                 <Sliders size={18} className="text-green-700" />
-                <span>Describe Your What-If Scenario</span>
+                <span>Describe your own what-if</span>
               </h3>
               <button
                 type="button"
@@ -290,8 +281,8 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
               </button>
             </div>
             <p className="text-xs text-gray-600 leading-relaxed">
-              Describe an operational change or farm intervention. The AI will synthesize your 30 m spatial data,
-              topography, soil chemistry, and climate models to project suitability impacts.
+              Describe a change to the land or how it would be farmed. The answer uses this analysis (30 m maps of
+              terrain, soil, rainfall and flooding) to say which areas would change class.
             </p>
             <textarea
               rows={4}

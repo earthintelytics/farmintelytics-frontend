@@ -127,6 +127,9 @@ export default function SuitabilityMapView({
       });
     });
 
+    // Within each theme, what was measured comes just before the class it was given.
+    const rank = (k) => (k.endsWith('_value') ? `${k.slice(0, -6)}0` : `${k}1`);
+    Object.values(groups).forEach((g) => g.entries.sort((a, b) => rank(a.key).localeCompare(rank(b.key))));
     return Object.values(groups).sort((a, b) => a.order - b.order);
   }, [availableLayers, crop, run?.factor_legends, run?.layer_legends, run?.tiles]);
 
@@ -464,10 +467,9 @@ export default function SuitabilityMapView({
                                   {/* 1. Continuous Ramp */}
                                   {legend?.kind === 'ramp' ? (
                                     <div className="space-y-1">
-                                      <div className="flex items-center justify-between text-[10px] font-mono font-medium text-gray-700">
-                                        <span>{legend.edges?.[0] != null ? `${legend.edges[0]} m` : 'Low'}</span>
-                                        <span className="text-gray-400 font-sans text-[10px]">Elevation (DEM)</span>
-                                        <span>{legend.edges?.[legend.edges.length - 1] != null ? `${legend.edges[legend.edges.length - 1]} m` : 'High'}</span>
+                                      <div className="flex items-center justify-between text-xs font-medium text-gray-700">
+                                        <span>{legend.edges?.[0] != null ? `${legend.edges[0]} ${legend.unit || 'm'}` : 'Low'}</span>
+                                        <span>{legend.edges?.[legend.edges.length - 1] != null ? `${legend.edges[legend.edges.length - 1]} ${legend.unit || 'm'}` : 'High'}</span>
                                       </div>
                                       <div
                                         className="h-2.5 w-full rounded-full shadow-inner"
