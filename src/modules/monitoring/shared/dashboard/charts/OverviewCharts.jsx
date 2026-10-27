@@ -127,6 +127,11 @@ const OverviewCharts = ({ charts, trends, plots, classify, valueOf, primaryKey, 
             <Table head={['Estate', 'Greenness Score', 'Greenest class', 'Area']}
               rows={g.by_estate.map((e) => [e.estate, `${e.greenness_score.toFixed(2)}${e.reference ? ` (was ${e.reference.greenness_score.toFixed(2)})` : ''}`, pct(e.top_class_pct), ha(e.area_ha)])} />
           )}
+          {ref && ref.area_ha < g.area_ha * 0.95 && (
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              Clear images a year before covered {ha(ref.area_ha)} of {ha(g.area_ha)} (clouds hid the rest), so compare the hectares that changed rather than the shares.
+            </p>
+          )}
           {g && <p className="text-xs text-gray-500">{g.note} Method: {g.source}.</p>}
         </DataCard>
       );
