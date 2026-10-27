@@ -207,6 +207,14 @@ export async function fetchGreenness(module) {
   return apiFetch(`/greenness${moduleQuery(module)}`);
 }
 
+/**
+ * GET /land-history: land cover year by year inside the blocks, one series per record, {} before a run.
+ * { area_ha, glc: { source, years: { 2000: [{ name, pct, area_ha }] } }, tmf: {...}, esri: {...}, missing: [] }
+ */
+export async function fetchLandHistory(module) {
+  return apiFetch(`/land-history${moduleQuery(module)}`);
+}
+
 // ─── Alerts Command Center ──────────────────────────────────────────────────
 
 /**

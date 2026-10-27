@@ -36,7 +36,7 @@ const GROUPS = [
   { id: 'data', label: 'Data', members: ['cdse', 'earthdata', 'stac'] },
   { id: 'maps', label: 'Maps', members: ['maps'] },
   { id: 'checks', label: 'EUDR and carbon', members: ['eudr', 'gfw', 'group_carbon'] },
-  { id: 'landcover', label: 'Land cover', members: ['greenness'] },
+  { id: 'landcover', label: 'Land cover', members: ['greenness', 'land_history'] },
 ];
 const groupOf = (id) => (GROUPS.find((g) => g.members.includes(id)) || { id: 'other' }).id;
 

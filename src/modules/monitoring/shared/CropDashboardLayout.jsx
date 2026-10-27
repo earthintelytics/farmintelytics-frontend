@@ -464,13 +464,13 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     let active = true;
     async function loadLandCover() {
       setLandCoverLoading(true);
-      const [cover, green] = await Promise.allSettled([api.fetchLandCover(service?.id), api.fetchGreenness(service?.id)]);
+      const [cover, green, history] = await Promise.allSettled([api.fetchLandCover(service?.id), api.fetchGreenness(service?.id), api.fetchLandHistory(service?.id)]);
       const val = (r, what) => {
         if (r.status === 'rejected') { noteLoadIssue(what, r.reason); return null; }
         return r.value && Object.keys(r.value).length ? r.value : null;
       };
       if (active) {
-        setLandCover({ cover: val(cover, 'land cover'), greenness: val(green, 'land cover now') });
+        setLandCover({ cover: val(cover, 'land cover'), greenness: val(green, 'land cover now'), history: val(history, 'land cover since 2000') });
         setLandCoverLoading(false);
       }
     }

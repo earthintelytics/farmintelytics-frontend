@@ -11,6 +11,7 @@
  *   weakest         the blocks with the lowest main index today
  *   greenness       land cover now: greenness classes of the latest run, change since a year before
  *   landcover       land cover in 2021 (ESA WorldCover map) inside the boundaries
+ *   history         land cover year by year since 2000 (GLC_FCS30D, JRC forest, Esri 10 m), records compared
  *   eudr            deforestation check results and the plots that lost forest
  *   carbon          carbon by pool (above ground, roots, soil) with a row per estate
  */
@@ -33,6 +34,7 @@ const weakest = (title, text) => ({ id: 'weakest', ...(title && { title }), ...(
 const card = (id, title, text) => ({ id, ...(title && { title }), ...(text && { text }) });
 const greenness = (title, text) => card('greenness', title, text);
 const landcover = (title, text) => card('landcover', title, text);
+const history = (title, text) => card('history', title, text);
 
 export const CHART_CATALOG = {
   oil_palm: [t('evi', 'Crop condition over time'), t('ndmi'), classes(), weakest('Blocks to inspect first')],
@@ -43,17 +45,17 @@ export const CHART_CATALOG = {
   rice: [t('ndvi', 'Crop condition over time'), t('rvi', 'Flooding and growth seen by radar', 'Radar shows standing water and growth even under cloud.'), t('ndmi'), classes('Fields by condition')],
   cassava: [t('ndvi', 'Crop condition over time'), t('ndmi'), classes('Fields by condition'), weakest('Fields to visit first')],
   sugarcane: [t('ndvi', 'Crop condition over time'), t('ndmi'), t('lst'), classes('Fields by condition')],
-  'carbon-ffb': [card('carbon'), greenness('Vegetation cover now', 'Dense vegetation holds most of the above-ground carbon; a fall in the greenest classes means carbon lost.'), landcover(), t('evi', 'Biomass over time', 'Vigour of the estate’s vegetation; carbon stock follows it.'), t('ndmi', 'Peat and canopy moisture', 'Drying canopies in peat areas point to falling water tables.'), classes('Blocks by biomass'), weakest('Blocks losing biomass')],
-  'forestry-intel': [greenness('Forest and vegetation cover now', 'Hectares of dense canopy and how they changed since the same weeks last year.'), landcover(), t('ndvi', 'Forest canopy over time'), t('ndmi', 'Canopy dryness (fire risk)', 'Very dry canopy in the dry season means high fire risk.'), t('rvi', 'Canopy seen by radar', 'Clearing shows up here even when it is cloudy.'), classes('Compartments by condition')],
-  'land-restoration': [greenness('Cover in the zones now', 'Restoration is working when hectares move into the greener classes year on year.'), landcover(), t('ndvi', 'Greening of the zones', 'Should rise as planting takes hold; flat after a year means poor survival.'), t('ndmi'), classes('Zones by recovery'), weakest('Zones not recovering')],
-  'eudr-check': [card('eudr'), greenness('Tree and vegetation cover now', 'A loss of dense cover since last year is worth checking before it shows in the deforestation data.'), t('ndvi', 'Tree cover on your plots', 'A sudden fall can mean clearing; it raises a deforestation alert to review.'), t('rvi', 'Tree cover seen by radar', 'Confirms clearing under cloud.')],
+  'carbon-ffb': [card('carbon'), greenness('Vegetation cover now', 'Dense vegetation holds most of the above-ground carbon; a fall in the greenest classes means carbon lost.'), landcover(), history(), t('evi', 'Biomass over time', 'Vigour of the estate’s vegetation; carbon stock follows it.'), t('ndmi', 'Peat and canopy moisture', 'Drying canopies in peat areas point to falling water tables.'), classes('Blocks by biomass'), weakest('Blocks losing biomass')],
+  'forestry-intel': [greenness('Forest and vegetation cover now', 'Hectares of dense canopy and how they changed since the same weeks last year.'), landcover(), history(), t('ndvi', 'Forest canopy over time'), t('ndmi', 'Canopy dryness (fire risk)', 'Very dry canopy in the dry season means high fire risk.'), t('rvi', 'Canopy seen by radar', 'Clearing shows up here even when it is cloudy.'), classes('Compartments by condition')],
+  'land-restoration': [greenness('Cover in the zones now', 'Restoration is working when hectares move into the greener classes year on year.'), landcover(), history(), t('ndvi', 'Greening of the zones', 'Should rise as planting takes hold; flat after a year means poor survival.'), t('ndmi'), classes('Zones by recovery'), weakest('Zones not recovering')],
+  'eudr-check': [card('eudr'), greenness('Tree and vegetation cover now', 'A loss of dense cover since last year is worth checking before it shows in the deforestation data.'), history('Land cover since 2000', 'What the plots were each year since 2000, from published records, next to the EUDR cut-off of 31 December 2020.'), t('ndvi', 'Tree cover on your plots', 'A sudden fall can mean clearing; it raises a deforestation alert to review.'), t('rvi', 'Tree cover seen by radar', 'Confirms clearing under cloud.')],
   advisor: [t('ndvi', 'Crop condition over time'), t('ndmi'), t('lst'), classes('Fields by condition')],
   'group-monitoring': [classes('Member farms by condition'), weakest('Farms to visit first', 'The weakest member farms today.'), t('ndvi', 'All member farms over time'), t('ndmi')],
   'carbon-groups': [greenness('Vegetation cover on member farms now'), t('ndvi', 'Tree cover on member farms'), classes('Member farms by tree cover')],
   'smallholder-members': [classes('Parcels by condition'), t('ndvi', 'All parcels over time')],
   'smallholder-eudr': [card('eudr', 'Parcels by check result'), t('ndvi', 'Tree cover on member parcels', 'A sudden fall can mean clearing after 2020.')],
   'rs-drone': [classes(), t('ndvi', 'Crop condition over time')],
-  'carbon-estimator': [card('carbon'), greenness(), landcover()],
+  'carbon-estimator': [card('carbon'), greenness(), landcover(), history()],
 };
 CHART_CATALOG.ffb = CHART_CATALOG.oil_palm;
 

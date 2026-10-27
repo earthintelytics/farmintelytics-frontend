@@ -60,6 +60,12 @@ const GREEN_RAMP = ['#9A6B4B', '#C9A27E', '#E3C567', '#9CC069', '#3F8432', '#1F5
 const rampFor = (n) => Array.from({ length: n }, (_, i) => GREEN_RAMP[Math.round((i * (GREEN_RAMP.length - 2)) / Math.max(1, n - 1))]);
 // ESA WorldCover legend colours (the map product's own).
 const WORLDCOVER_COLOUR = { 10: '#006400', 20: '#FFBB22', 30: '#FFFF4C', 40: '#F096FF', 50: '#FA0000', 60: '#B4B4B4', 70: '#F0F0F0', 80: '#0064C8', 90: '#0096A0', 95: '#00CF75', 100: '#FAE6A0' };
+// Land cover since 2000 (GLC_FCS30D groups), colours after the product's own legend.
+const HISTORY_COLOUR = {
+  'Closed forest': '#006400', 'Open forest': '#4C7300', 'Tree crops and orchards': '#C9A400', Cropland: '#F2D16B',
+  Shrubland: '#966400', Grassland: '#FFB432', 'Sparse vegetation': '#E8D9A8', Wetland: '#00A884',
+  'Built-up': '#C31400', 'Bare land': '#BDBDBD', Water: '#0046C8', 'Snow and ice': '#E5E7EB',
+};
 const EUDR = [['pass', 'No deforestation', '#3F8432'], ['review', 'To review', '#D97706'], ['fail', 'Deforestation found', '#DC2626'], ['not_checked', 'Not checked', '#9CA3AF']];
 
 const hBar = (labels, values, colours, unitText = '%') => ({
@@ -133,6 +139,82 @@ const OverviewCharts = ({ charts, trends, plots, classify, valueOf, primaryKey, 
             </p>
           )}
           {g && <p className="text-xs text-gray-500">{g.note} Method: {g.source}.</p>}
+        </DataCard>
+      );
+    }
+
+    if (c.id === 'history') {
+      const h = landCover?.history;
+      const glc = h?.glc?.years || {};
+      const years = Object.keys(glc).sort();
+      const names = [...new Set(years.flatMap((y) => glc[y].map((r) => r.name)))]
+        .sort((a, b) => Object.keys(HISTORY_COLOUR).indexOf(a) - Object.keys(HISTORY_COLOUR).indexOf(b));
+      const val = (y, n) => glc[y]?.find((r) => r.name === n);
+      const data = {
+        labels: years,
+        datasets: names.map((n) => ({ label: n, data: years.map((y) => val(y, n)?.pct ?? 0), fill: true, backgroundColor: `${HISTORY_COLOUR[n] || '#9CA3AF'}CC`, borderColor: HISTORY_COLOUR[n] || '#9CA3AF', borderWidth: 1, pointRadius: 0, tension: 0.2 })),
+      };
+      const opts = { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: true, position: 'bottom', labels: { boxWidth: 10, font: { size: 11 } } }, tooltip: { ...CHART_DEFAULTS.plugins?.tooltip, mode: 'index', intersect: false, callbacks: { label: (t) => `${t.dataset.label}: ${t.formattedValue}%` } } },
+        scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales?.y, stacked: true, min: 0, max: 100, ticks: { callback: (v) => `${v}%` } }, x: { ...CHART_DEFAULTS.scales?.x, stacked: true } } };
+      const first = years[0];
+      const last = years[years.length - 1];
+      const tmf = h?.tmf?.years || {};
+      const tmfYears = Object.keys(tmf).sort().filter((y) => Number(y) >= 2000);
+      const forestHa = (y) => (tmf[y] || []).filter((r) => /forest/i.test(r.name) && !/Deforested/.test(r.name)).reduce((a, r) => a + r.area_ha, 0);
+      const cut = (y) => (tmf[y] || []).find((r) => r.name === 'Deforested land')?.area_ha || 0;
+      const esri = h?.esri?.years || {};
+      const esriYears = Object.keys(esri).sort();
+      return (
+        <DataCard key={c.id} wide title={c.title || 'Land cover since 2000'} chartHeight={280}
+          empty={years.length || tmfYears.length ? null : 'Land cover history appears after the next monitoring run.'}
+          text={c.text || 'What the land inside your boundaries was, year by year, from published 30 m land cover records. Each record is shown on its own: their classes differ, so they are not joined into one line.'}
+          chart={years.length > 0 && <Line data={data} options={opts} />}>
+          {years.length > 0 && (
+            <Table head={['Land cover', first, last, 'Change']}
+              rows={names.map((n) => { const a = val(first, n)?.area_ha || 0; const b = val(last, n)?.area_ha || 0; const d = b - a;
+                return [n, ha(a), ha(b), <span key="d" className={Math.abs(d) < 1 ? 'text-gray-500' : d > 0 ? 'text-green-800' : 'text-red-800'}>{d > 0 ? '+' : ''}{ha(d)}</span>]; })} />
+          )}
+          {tmfYears.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-900">Tropical forest, year by year</p>
+              <Table head={['Year', 'Forest (undisturbed, degraded, regrowth)', 'Deforested land']}
+                rows={tmfYears.filter((y, i) => i % 5 === 0 || y === tmfYears[tmfYears.length - 1]).map((y) => [y, ha(forestHa(y)), ha(cut(y))])} />
+              <p className="text-xs text-gray-500">{h.tmf.source}. Deforested land is counted from the year the forest was cleared.</p>
+            </div>
+          )}
+          {esriYears.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-sm font-semibold text-gray-900">Recent years at 10 m</p>
+              <Table head={['Year', ...[...new Set(esriYears.flatMap((y) => esri[y].map((r) => r.name)))].slice(0, 5)]}
+                rows={esriYears.map((y) => [y, ...[...new Set(esriYears.flatMap((yy) => esri[yy].map((r) => r.name)))].slice(0, 5).map((n) => pct(esri[y].find((r) => r.name === n)?.pct))])} />
+              <p className="text-xs text-gray-500">{h.esri.source}.</p>
+            </div>
+          )}
+          {(() => {
+            // The records for one year side by side: cropland and tree cover shares that differ by more than 25
+            // points mean at least one record misreads this land, so no single record is shown as fact.
+            const y = '2021';
+            const share = (rows, names) => (rows ? rows.filter((r) => names.includes(r.name)).reduce((a, r) => a + r.pct, 0) : null);
+            const recs = [
+              ['GLC_FCS30D', share(glc[y], ['Cropland', 'Tree crops and orchards']), share(glc[y], ['Closed forest', 'Open forest'])],
+              ['Esri 10 m', share(esri[y], ['Crops']), share(esri[y], ['Trees'])],
+              ['ESA WorldCover', share(landCover?.cover?.classes, ['Cropland']), share(landCover?.cover?.classes, ['Tree cover'])],
+            ].filter(([, cr]) => cr != null);
+            if (recs.length < 2) return null;
+            const spread = (i) => Math.max(...recs.map((r) => r[i])) - Math.min(...recs.map((r) => r[i]));
+            if (spread(1) <= 25 && spread(2) <= 25) {
+              return <p className="text-xs text-green-800">The records agree for {y}: {recs.map(([n, cr, tr]) => `${n} ${Math.round(cr)}% cropland, ${Math.round(tr)}% trees`).join('; ')}.</p>;
+            }
+            return (
+              <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 space-y-1">
+                <p className="font-semibold">The records disagree for this land in {y}, so treat the history with care:</p>
+                <p>{recs.map(([n, cr, tr]) => `${n}: ${Math.round(cr)}% cropland, ${Math.round(tr)}% trees`).join('; ')}.</p>
+                <p>Trust the record that matches what is on the ground (for example, the crop you farm). Global maps can misread irrigated fields, young plantations and mixed farms.</p>
+              </div>
+            );
+          })()}
+          {years.length > 0 && <p className="text-xs text-gray-500">{h.glc.source}; about 81% of pixels are classed correctly in the published check. Land cover after {last} comes from this season&apos;s greenness classes and the forest record above.</p>}
+          {h?.missing?.length > 0 && <p className="text-xs text-amber-800">Not available this time: {h.missing.join('; ')}.</p>}
         </DataCard>
       );
     }
