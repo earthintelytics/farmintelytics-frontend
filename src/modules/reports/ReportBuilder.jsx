@@ -89,7 +89,7 @@ const Card = ({ className = '', children }) => (
 
 const selectCls = 'px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-600';
 
-export default function ReportBuilder({ plots, estates, tenant, orgName, subject, cropType }) {
+export default function ReportBuilder({ plots, estates, tenant, orgName, subject, cropType, loading }) {
   const [typesList] = useState(DEFAULT_TYPES);
   const [type, setType] = useState('monthly');
   const [level, setLevel] = useState('organisation');
@@ -149,7 +149,15 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
   }, [tenant]);
 
   const period = periodKind === 'month' ? monthRange(month) : range;
-  const blockList = useMemo(() => (plots || []).filter(p => !blockQuery || `${p.name} ${p.id} ${p.subfarm || ''}`.toLowerCase().includes(blockQuery.toLowerCase())).slice(0, 200), [plots, blockQuery]);
+  // Search matches a block's name or code, or its estate; an estate found this way picks all its blocks at once.
+  const q = blockQuery.trim().toLowerCase();
+  const blockList = useMemo(() => (plots || []).filter(p => !q || `${p.name} ${p.id} ${p.subfarm || ''}`.toLowerCase().includes(q)).slice(0, 200), [plots, q]);
+  const estateHits = useMemo(() => {
+    if (!q) return [];
+    const by = {};
+    (plots || []).forEach(p => { const e = p.subfarm || p.division; if (e && String(e).toLowerCase().includes(q)) (by[e] = by[e] || []).push(p.id); });
+    return Object.entries(by);
+  }, [plots, q]);
   const where = level === 'organisation' ? `all of ${orgName}` : level === 'estate' ? estate : `${blocks.length} block${blocks.length === 1 ? '' : 's'}`;
   const canCreate = level !== 'blocks' || blocks.length > 0;
 
@@ -219,7 +227,8 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
       setHistory(prev => [reportObj, ...prev.filter(r => r.report_id !== reportObj.report_id).slice(0, 19)]);
       setHistoryTab(false);
     } catch (err) {
-      setErrorMsg(`Could not generate report: ${err.message || 'Server error'}`);
+      // 422: the period has no satellite data, so the server made no report and says why.
+      setErrorMsg(err.status === 422 ? err.message : `Could not generate report: ${err.message || 'Server error'}`);
     } finally {
       setBusy(false);
     }
@@ -355,13 +364,26 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
                 <input
                   value={blockQuery}
                   onChange={e => setBlockQuery(e.target.value)}
-                  placeholder="Search blocks by name or code"
+                  placeholder="Search blocks or estates by name or code"
                   className="w-full px-3 py-2 rounded-lg border border-gray-200 bg-white text-sm"
                 />
-                {(plots || []).length === 0 ? (
+                {loading && !(plots || []).length ? (
+                  <div className="text-xs text-gray-500">Loading the blocks…</div>
+                ) : (plots || []).length === 0 ? (
                   <div className="text-xs text-gray-500">No individual blocks registered yet; select whole organisation.</div>
+                ) : !blockList.length && !estateHits.length ? (
+                  <div className="text-xs text-gray-500">No block or estate matches “{blockQuery}”.</div>
                 ) : (
                   <div className="flex flex-wrap gap-1.5 max-h-36 overflow-y-auto">
+                    {estateHits.map(([name, ids]) => {
+                      const all = ids.every(id => blocks.includes(id));
+                      return (
+                        <Chip key={`estate-${name}`} on={all}
+                          onClick={() => setBlocks(b => all ? b.filter(x => !ids.includes(x)) : [...new Set([...b, ...ids])])}>
+                          All of {name} ({ids.length})
+                        </Chip>
+                      );
+                    })}
                     {blockList.map(p => (
                       <Chip
                         key={p.id}

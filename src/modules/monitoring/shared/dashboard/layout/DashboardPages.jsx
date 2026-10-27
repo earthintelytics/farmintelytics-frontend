@@ -422,7 +422,8 @@ export function renderDashboardPages(ctx) {
 
           {((isAiOnly && activeTab === 'reports') || (activeSidebarItem === 'analytics' && activeTab === 'reports')) && (
             <ReportBuilder
-              plots={plotsData}
+              plots={plotsDataA?.length ? plotsDataA : plotsData}
+              loading={kpiContext?.loading}
               alerts={alerts}
               estates={estateOptions}
               tenant={tenant}

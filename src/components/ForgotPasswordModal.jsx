@@ -142,7 +142,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, initialEmail = '', onSuccess }) 
                 type="text"
                 required
                 autoComplete="one-time-code"
-                placeholder="6-character code"
+                placeholder="8-character code"
                 value={resetCode}
                 onChange={(e) => setResetCode(e.target.value.toUpperCase())}
                 className="w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm font-mono outline-none focus:border-emerald-600 focus:ring-1 focus:ring-emerald-600"
