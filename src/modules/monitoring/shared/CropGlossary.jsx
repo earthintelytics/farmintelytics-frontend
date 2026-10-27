@@ -28,6 +28,7 @@ export default function CropGlossary({ entries, extra, cropName, focusKey }) {
         plain: e.crop_label || e.label || e.title || e.key,
         technical: `${String(e.key).toUpperCase()}${tech.full ? ` (${tech.full})` : ''}`,
         meaning: e.notes || tech.desc || tech.description || '',
+        detail: e.technical_note || '',
         classes: (e.legend || []).map(l => ({ label: l.label, color: l.color })),
       };
     });
@@ -70,6 +71,7 @@ export default function CropGlossary({ entries, extra, cropName, focusKey }) {
               </div>
             )}
             <div className="text-xs text-gray-500 pt-1">Technical name: {i.technical || '—'}</div>
+            {i.detail && <div className="text-xs text-gray-500">For agronomists: {i.detail}</div>}
           </div>
         ))}
         {shown.length === 0 && <div className="text-sm text-gray-500">No terms match your search.</div>}

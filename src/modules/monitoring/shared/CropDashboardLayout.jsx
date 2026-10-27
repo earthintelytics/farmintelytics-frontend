@@ -1083,7 +1083,8 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
 
   // The signed-in person, read-only here; it is changed at /org/<tenant>/settings.
   const profileEmail = localStorage.getItem('fi_email') || '';
-  const profileName = localStorage.getItem('fi_full_name') || profileEmail.split('@')[0] || 'Account';
+  // Without a holder name on the account, the organisation's name reads better than the mailbox part ("olam").
+  const profileName = localStorage.getItem('fi_full_name') || tenantDisplayName || profileEmail || 'Account';
   const profileRole = roleLabel(localStorage.getItem('fi_role') || 'admin');
   const profileInitials = profileName.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
   const [showNotifications, setShowNotifications] = useState(false);

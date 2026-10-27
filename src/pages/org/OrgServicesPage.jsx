@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { Chip, Empty } from '../../farmintelytics-admin/components/ui';
 import { paths } from '../../routes/paths';
 import { licensedServices, SERVICE_TABS } from './orgProfile';
+import { fetchCropMonitoringConfig } from '../../services/organizationMonitorApi';
 
 /** /org/<tenant>: the services this organisation was given at onboarding. */
 const OrgServicesPage = ({ profile }) => {
@@ -14,6 +15,14 @@ const OrgServicesPage = ({ profile }) => {
     .filter((t) => t.id === 'all' || t.count > 0);
   const shown = tab === 'all' ? services : services.filter((s) => s.group === tab);
   const first = (profile.fullName || '').split(' ')[0];
+  // Licensed crops with no estate blocks yet are marked, so nobody opens an empty dashboard expecting data.
+  const [withBlocks, setWithBlocks] = useState(null);
+  useEffect(() => {
+    let live = true;
+    fetchCropMonitoringConfig().then((c) => { if (live && Array.isArray(c?.services_with_blocks)) setWithBlocks(new Set(c.services_with_blocks)); }).catch(() => {});
+    return () => { live = false; };
+  }, []);
+  const noBlocks = (s) => s.group === 'crops' && withBlocks && !withBlocks.has(s.id);
 
   const open = (id) => {
     navigate(paths.service(id, profile.tenant));
@@ -55,8 +64,11 @@ const OrgServicesPage = ({ profile }) => {
                 {s.photo && <img src={s.photo} alt="" loading="lazy" className="block w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" />}
               </div>
               <div className="flex-1 flex flex-col p-5">
-                <h3 className="font-display text-base font-semibold text-gray-900">{s.title}</h3>
-                <p className="mt-1.5 text-sm text-gray-500 leading-relaxed flex-1">{s.text}</p>
+                <div className="flex items-start justify-between gap-2">
+                  <h3 className="font-display text-base font-semibold text-gray-900">{s.title}</h3>
+                  {noBlocks(s) && <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">No blocks yet</span>}
+                </div>
+                <p className="mt-1.5 text-sm text-gray-500 leading-relaxed flex-1">{noBlocks(s) ? 'Licensed, but no estate has blocks for this crop yet. Results appear once its boundaries are uploaded.' : s.text}</p>
                 <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-green-700">
                   Open <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
                 </span>
