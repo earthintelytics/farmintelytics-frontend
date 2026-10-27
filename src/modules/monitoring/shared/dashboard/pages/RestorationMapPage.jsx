@@ -6,7 +6,7 @@ import { FitBoundsToPlots, FitToZarrBounds, MapPaneClipSetter, ResizeMap, SwipeS
 import { MapContainer, Pane, TileLayer, ZoomControl } from 'react-leaflet';
 
 /** The restoration zones map page of the crop and service dashboard (moved out of CropDashboardLayout). */
-export default function RestorationMapPage({ cropType, basemapAttribution, basemapMaxNativeZoom, basemapUrl, currentTileUrl, currentTileUrlB, currentTimelineA, currentTimelineB, defaultMapCenter, farmBoundary, filterEstate, handleSplitDragStart, isCompareMode, landUseChange, landUseChangeLoading, mapOpacity, plotsData, rasterOverlayBounds, renderFloatingBasemapSelector, renderMapBottomPanel, renderRestorePolygons, restorationPlotsData, restorationPlotsDataA, restorationPlotsDataB, restoreBoundariesOpacity, restoreShowBoundaries, restoreShowLayers, selectedIndex, setMapOpacity, setRestoreBoundariesOpacity, setRestoreShowBoundaries, setRestoreShowLayers, setShowRasterLayer, showRasterLayer, splitPosition, tileRefreshing, zarrBounds }) {
+export default function RestorationMapPage({ cropType, basemapAttribution, basemapMaxNativeZoom, basemapUrl, currentTileUrl, currentTileUrlB, currentTimelineA, currentTimelineB, defaultMapCenter, farmBoundary, filterEstate, handleSplitDragStart, isCompareMode, landCover, landCoverLoading, mapOpacity, plotsData, rasterOverlayBounds, renderFloatingBasemapSelector, renderMapBottomPanel, renderRestorePolygons, restorationPlotsData, restorationPlotsDataA, restorationPlotsDataB, restoreBoundariesOpacity, restoreShowBoundaries, restoreShowLayers, selectedIndex, setMapOpacity, setRestoreBoundariesOpacity, setRestoreShowBoundaries, setRestoreShowLayers, setShowRasterLayer, showRasterLayer, splitPosition, tileRefreshing, zarrBounds }) {
   const [found, setFound] = useState(null); // block picked in the map search
   const [colourBy, setColourBy] = useState(null);
   // Only results that exist for at least one of the zones are offered.
@@ -112,14 +112,16 @@ export default function RestorationMapPage({ cropType, basemapAttribution, basem
               colourBy={{ value: colourBy, onChange: setColourBy, options: colourOptions, empty: 'No restoration results for these zones yet. Add zone records in Farm data to colour the zones.' }}
             >
               <div className="border border-gray-200 rounded-xl p-3.5 space-y-2">
-                <p className="text-sm font-semibold text-gray-900">Land cover change</p>
-                {landUseChangeLoading ? <p className="text-xs text-gray-500">Loading…</p>
-                  : !landUseChange ? <p className="text-xs text-gray-500">No land cover comparison for this farm yet.</p>
+                <p className="text-sm font-semibold text-gray-900">Land cover now</p>
+                {landCoverLoading ? <p className="text-xs text-gray-500">Loading…</p>
+                  : !landCover?.greenness ? <p className="text-xs text-gray-500">Appears after the next monitoring run.</p>
                   : (
                     <>
-                      <p className="text-xs text-gray-600">{landUseChange.compared_years?.[0]} to {landUseChange.compared_years?.[1]}: <span className="font-semibold text-gray-900">{landUseChange.changed_pct}% changed</span></p>
-                      {(landUseChange.top_transitions || []).slice(0, 5).map((t, i) => (
-                        <p key={i} className="text-xs text-gray-600">{t.from} to {t.to} · {t.pct ?? t.percent}%</p>
+                      {landCover.greenness.classes.map((k) => (
+                        <p key={k.name} className="text-xs text-gray-600 flex justify-between gap-2"><span>{k.name}</span><span className="tabular-nums">{k.pct}% · {Math.round(k.area_ha).toLocaleString()} ha</span></p>
+                      ))}
+                      {(landCover.greenness.change || []).slice(0, 3).map((t) => (
+                        <p key={`${t.from}-${t.to}`} className={`text-xs ${t.greener ? 'text-green-800' : 'text-red-800'}`}>{t.from} to {t.to.toLowerCase()}: {Math.round(t.area_ha).toLocaleString()} ha since a year before</p>
                       ))}
                     </>
                   )}

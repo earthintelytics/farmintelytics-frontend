@@ -187,17 +187,24 @@ export async function fetchRestorationZones(tenant) {
   return apiFetch(`/restoration/zones${params}`);
 }
 
+const moduleQuery = (module) => (module ? `?module=${encodeURIComponent(module)}` : '');
+
 /**
- * GET /restoration/land-use-change
- * ESA WorldCover year-over-year land-cover classification change for this
- * tenant (tenant resolved server-side from the Bearer token). Returns {}
- * when WorldCover doesn't cover this farm or only one year is available —
- * that's a valid "no data yet" state, not an error.
- * { compared_years: [2020, 2021], land_cover_by_year: { [year]: { [className]: pct } },
- *   changed_pct: number, top_transitions: [{ transition, area_pct }] }
+ * GET /land-cover: land cover in 2021 inside the blocks (ESA WorldCover), {} before the first run.
+ * { source, year, area_ha, classes: [{ name, code, pct, area_ha }], by_estate: [{ estate, area_ha, classes }], note }
  */
-export async function fetchLandUseChange() {
-  return apiFetch('/restoration/land-use-change');
+export async function fetchLandCover(module) {
+  return apiFetch(`/land-cover${moduleQuery(module)}`);
+}
+
+/**
+ * GET /greenness: land cover now, greenness classes of the latest run (Ajeyomi & Abiala 2026), {} before a run.
+ * { source, period, reference_period, area_ha, classes: [{ name, from, to, pct, area_ha }], greenness_score,
+ *   greenness_score_0_1, top_class_pct, top10_mean, mean, reference: {...}, change: [{ from, to, area_ha, greener }],
+ *   by_estate: [...] }
+ */
+export async function fetchGreenness(module) {
+  return apiFetch(`/greenness${moduleQuery(module)}`);
 }
 
 // ─── Alerts Command Center ──────────────────────────────────────────────────

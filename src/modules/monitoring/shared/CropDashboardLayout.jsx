@@ -264,8 +264,8 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     setLoadIssues((l) => (l.includes(what) ? l : [...l, what]));
   }, []);
   const [alerts, setAlerts] = useState([]);
-  const [landUseChange, setLandUseChange] = useState(null);
-  const [landUseChangeLoading, setLandUseChangeLoading] = useState(false);
+  const [landCover, setLandCover] = useState(null);
+  const [landCoverLoading, setLandCoverLoading] = useState(false);
 
   // Same live backend data as the organization view — the crop pages must render
   // the identical experience (map, splits, calendar, charts, alerts, boundary).
@@ -313,7 +313,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
           else {
             const res = await api.fetchEstateCarbon();
             // No estate for this service: say that, not a generic "not enough data".
-            c = res?.estates?.length ? res.total : (res ? { ...res.total, carbon_t: null, note: res.note || res.total?.note } : null);
+            // Per-estate pools (without their block lists) for the carbon chart on the overview.
+            const estates = (res?.estates || []).map((e) => ({ ...e, blocks: undefined }));
+            c = res?.estates?.length ? { ...res.total, estates } : (res ? { ...res.total, carbon_t: null, note: res.note || res.total?.note } : null);
           }
           if (active) setCarbon(c || null);
         } catch (e) {
@@ -457,25 +459,24 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     return () => { active = false; };
   }, [activeSidebarItem, tenant, noteLoadIssue]);
 
-  // ── ESA WorldCover land-use-change (Land Restoration tab) ────────────────
+  // ── Land cover: the 2021 map inside the blocks, and land cover now (greenness classes of the latest run) ──
   useEffect(() => {
-    if (activeSidebarItem !== 'land-restoration') return;
     let active = true;
-    async function loadLandUseChange() {
-      setLandUseChangeLoading(true);
-      try {
-        const data = await api.fetchLandUseChange();
-        if (active) setLandUseChange(data && Object.keys(data).length ? data : null);
-      } catch (err) {
-        noteLoadIssue('land cover change', err);
-        if (active) setLandUseChange(null);
-      } finally {
-        if (active) setLandUseChangeLoading(false);
+    async function loadLandCover() {
+      setLandCoverLoading(true);
+      const [cover, green] = await Promise.allSettled([api.fetchLandCover(service?.id), api.fetchGreenness(service?.id)]);
+      const val = (r, what) => {
+        if (r.status === 'rejected') { noteLoadIssue(what, r.reason); return null; }
+        return r.value && Object.keys(r.value).length ? r.value : null;
+      };
+      if (active) {
+        setLandCover({ cover: val(cover, 'land cover'), greenness: val(green, 'land cover now') });
+        setLandCoverLoading(false);
       }
     }
-    loadLandUseChange();
+    loadLandCover();
     return () => { active = false; };
-  }, [activeSidebarItem, tenant, noteLoadIssue]);
+  }, [tenant, service?.id, noteLoadIssue]);
 
   // ── Crop-specific index profile (from /crop-monitoring/indices) ──────────
   // Ordered by agronomic priority, each entry carries the crop-specific label,
@@ -801,7 +802,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     const byId = new Map(eudrResults.map(r => [String(r.plot_id), r]));
     return scoped.map(p => {
       const r = byId.get(String(p.id)) || byId.get(String(p.plot_id)) || byId.get(String(p.name));
-      return r ? { ...p, eudrStatus: r.status, eudrReason: r.reason } : p;
+      return r ? { ...p, eudrStatus: r.status, eudrReason: r.reason, eudrLossHa: r.loss_after_cutoff_ha, eudrLossYear: r.loss_year, eudrForest2020: r.forest_2020_pct, eudrProtected: r.protected_overlap } : p;
     });
   }, [plotsDataA, filterEstate, estates, eudrResults]);
   // The raw plots of the chosen estate: every section's map, chart and table (health, moisture,
@@ -1930,7 +1931,7 @@ Context: ${context}.`;
         )}
 
         {/* ── WORKSPACE CONTENT ── */}
-        {renderDashboardPages({ blockMeasures, TIMELINE_DATA, activeAnalyticsSubpage, activeSidebarItem, activeTab, alerts, answersForm, basemapAttribution, basemapMaxNativeZoom, basemapUrl, blockValue, chatEndRef, chatInput, chatLoading, chatMessages, climateBoundariesOpacity, climatePlotsData, climatePlotsDataA, climatePlotsDataB, climateShowBoundaries, climateShowLayers, cropLabel, cropProfileEntries, cropType, currentTileUrl, currentTileUrlB, currentTimelineA, currentTimelineB, dashboardFilterKeys, dataFocus, defaultMapCenter, dynamicFilterValues, estateOptions, farmBoundary, filterDate, filterEstate, filterPlot, filteredPlotsData, glossaryFocus, handleAcknowledgeAlert, handleChatSubmit, handleEstateChange, handlePlotClick, handlePlotFilterChange, handleSidebarClick, handleSplitDragStart, healthBoundariesOpacity, healthPlotsData, healthPlotsDataA, healthPlotsDataB, healthShowBoundaries, healthShowLayers, intelBoundariesOpacity, intelShowBoundaries, intelShowLayers, isAiOnly, isCompareMode, isOrg, kpiContext, landUseChange, landUseChangeLoading, loadIssues, mapOpacity, moistureBoundariesOpacity, moisturePlotsData, moisturePlotsDataA, moisturePlotsDataB, moistureShowBoundaries, moistureShowLayers, nutrientData, overviewTrends, pageSet, pick, pixelTimeseries, plots, plotsData, plotsDataA, plotsDataB, rasterOverlayBounds, renderClimatePolygons, renderFloatingBasemapSelector, renderHealthPolygons, renderInfoTooltip, renderIntelPolygons, renderLegendCards, renderMapBottomPanel, renderMoisturePolygons, renderRestorePolygons, renderYieldPolygons, restorationPlotsData, restorationPlotsDataA, restorationPlotsDataB, restoreBoundariesOpacity, restoreShowBoundaries, restoreShowLayers, scenarioFormOpen, selectedIndex, selectedPlot, service, setActiveAnalyticsSubpage, setActiveSidebarItem, setActiveTab, setAnswersForm, setChatInput, setChatMessages, setClimateBoundariesOpacity, setClimateShowBoundaries, setClimateShowLayers, setDataFocus, setDynamicFilterValues, setFilterDate, setFilterEstate, setFilterPlot, setHealthBoundariesOpacity, setHealthShowBoundaries, setHealthShowLayers, setIntelBoundariesOpacity, setIntelShowBoundaries, setIntelShowLayers, setLoadIssues, setMapOpacity, setMoistureBoundariesOpacity, setMoistureShowBoundaries, setMoistureShowLayers, setRestoreBoundariesOpacity, setRestoreShowBoundaries, setRestoreShowLayers, setScenarioFormOpen, setSelectedPlot, setShowRasterLayer, setYieldBoundariesOpacity, setYieldShowBoundaries, setYieldShowLayers, showRasterLayer, splitPosition, tenant, tenantDisplayName, tileRefreshing, waterDemandData, waterDemandLoading, yieldBoundariesOpacity, yieldPlotsData, yieldPlotsDataA, yieldPlotsDataB, yieldShowBoundaries, yieldShowLayers, zarrBounds })}
+        {renderDashboardPages({ blockMeasures, TIMELINE_DATA, activeAnalyticsSubpage, activeSidebarItem, activeTab, alerts, answersForm, basemapAttribution, basemapMaxNativeZoom, basemapUrl, blockValue, chatEndRef, chatInput, chatLoading, chatMessages, climateBoundariesOpacity, climatePlotsData, climatePlotsDataA, climatePlotsDataB, climateShowBoundaries, climateShowLayers, cropLabel, cropProfileEntries, cropType, currentTileUrl, currentTileUrlB, currentTimelineA, currentTimelineB, dashboardFilterKeys, dataFocus, defaultMapCenter, dynamicFilterValues, estateOptions, farmBoundary, filterDate, filterEstate, filterPlot, filteredPlotsData, glossaryFocus, handleAcknowledgeAlert, handleChatSubmit, handleEstateChange, handlePlotClick, handlePlotFilterChange, handleSidebarClick, handleSplitDragStart, healthBoundariesOpacity, healthPlotsData, healthPlotsDataA, healthPlotsDataB, healthShowBoundaries, healthShowLayers, intelBoundariesOpacity, intelShowBoundaries, intelShowLayers, isAiOnly, isCompareMode, isOrg, kpiContext, landCover, landCoverLoading, loadIssues, mapOpacity, moistureBoundariesOpacity, moisturePlotsData, moisturePlotsDataA, moisturePlotsDataB, moistureShowBoundaries, moistureShowLayers, nutrientData, overviewTrends, pageSet, pick, pixelTimeseries, plots, plotsData, plotsDataA, plotsDataB, rasterOverlayBounds, renderClimatePolygons, renderFloatingBasemapSelector, renderHealthPolygons, renderInfoTooltip, renderIntelPolygons, renderLegendCards, renderMapBottomPanel, renderMoisturePolygons, renderRestorePolygons, renderYieldPolygons, restorationPlotsData, restorationPlotsDataA, restorationPlotsDataB, restoreBoundariesOpacity, restoreShowBoundaries, restoreShowLayers, scenarioFormOpen, selectedIndex, selectedPlot, service, setActiveAnalyticsSubpage, setActiveSidebarItem, setActiveTab, setAnswersForm, setChatInput, setChatMessages, setClimateBoundariesOpacity, setClimateShowBoundaries, setClimateShowLayers, setDataFocus, setDynamicFilterValues, setFilterDate, setFilterEstate, setFilterPlot, setHealthBoundariesOpacity, setHealthShowBoundaries, setHealthShowLayers, setIntelBoundariesOpacity, setIntelShowBoundaries, setIntelShowLayers, setLoadIssues, setMapOpacity, setMoistureBoundariesOpacity, setMoistureShowBoundaries, setMoistureShowLayers, setRestoreBoundariesOpacity, setRestoreShowBoundaries, setRestoreShowLayers, setScenarioFormOpen, setSelectedPlot, setShowRasterLayer, setYieldBoundariesOpacity, setYieldShowBoundaries, setYieldShowLayers, showRasterLayer, splitPosition, tenant, tenantDisplayName, tileRefreshing, waterDemandData, waterDemandLoading, yieldBoundariesOpacity, yieldPlotsData, yieldPlotsDataA, yieldPlotsDataB, yieldShowBoundaries, yieldShowLayers, zarrBounds })}
       </div>
 
       {/* Resizing and dragging overlay helper */}
