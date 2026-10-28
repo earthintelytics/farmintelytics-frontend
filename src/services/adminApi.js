@@ -513,6 +513,13 @@ export async function testCdseConnection() {
   });
 }
 
+/** POST /admin/integrations/gee/test */
+export async function testGeeConnection() {
+  return adminFetch('/integrations/gee/test', {
+    method: 'POST',
+  });
+}
+
 // ── Documentation (team only) ───────────────────────────────────────────────
 /** GET /admin/documentation (team only): { built, groups: [{label, ids}], docs: {id: {title, path, markdown}} } */
 export async function fetchAdminDocs() {

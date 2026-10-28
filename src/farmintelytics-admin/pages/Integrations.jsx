@@ -17,6 +17,7 @@ import {
   updateIntegrationSettings,
   testSmtpConnection,
   testCdseConnection,
+  testGeeConnection,
 } from '../../services/adminApi';
 import { Tabs } from '../components/ui';
 
@@ -33,7 +34,7 @@ const Card = ({ className = '', children }) => (
 // one added on the backend is never hidden.
 const GROUPS = [
   { id: 'email', label: 'Email', members: ['smtp', 'alerts'] },
-  { id: 'data', label: 'Data', members: ['cdse', 'earthdata', 'stac'] },
+  { id: 'data', label: 'Data', members: ['cdse', 'earthdata', 'stac', 'gee'] },
   { id: 'maps', label: 'Maps', members: ['maps'] },
   { id: 'checks', label: 'EUDR and carbon', members: ['eudr', 'gfw', 'group_carbon'] },
   { id: 'landcover', label: 'Land cover', members: ['greenness', 'land_history'] },
@@ -46,6 +47,7 @@ const INTEGRATION_ICONS = {
   earthdata: Satellite,
   alerts: Bell,
   maps: MapPin,
+  gee: Satellite,
 };
 
 export default function Integrations() {
@@ -177,6 +179,25 @@ export default function Integrations() {
     }
   };
 
+  const handleTestGee = async () => {
+    setBusy('test:gee');
+    setTestResult((prev) => ({ ...prev, gee: null }));
+    try {
+      const res = await testGeeConnection();
+      setTestResult((prev) => ({
+        ...prev,
+        gee: { type: 'success', message: res.message || 'Earth Engine key looks valid.' },
+      }));
+    } catch (err) {
+      setTestResult((prev) => ({
+        ...prev,
+        gee: { type: 'error', message: err.message || 'Earth Engine test failed.' },
+      }));
+    } finally {
+      setBusy('');
+    }
+  };
+
   if (loading) {
     return (
       <div className="max-w-5xl mx-auto px-6 py-12 flex flex-col items-center justify-center space-y-3">
@@ -275,7 +296,7 @@ export default function Integrations() {
                   const isReplacing = replacingSecret[replaceKey];
 
                   return (
-                    <div key={fieldKey} className="space-y-1.5">
+                    <div key={fieldKey} className={`space-y-1.5 ${field.multiline ? 'md:col-span-2' : ''}`}>
                       <div className="flex items-center justify-between">
                         <label
                           htmlFor={`${integ.integration}-${fieldKey}`}
@@ -317,6 +338,20 @@ export default function Integrations() {
                         </div>
                       ) : (
                         <div className="relative">
+                          {field.multiline ? (
+                            <textarea
+                              id={`${integ.integration}-${fieldKey}`}
+                              rows={8}
+                              autoComplete="off"
+                              spellCheck={false}
+                              placeholder={field.is_secret ? 'Paste the JSON key file here' : 'Not set'}
+                              value={formData[integ.integration]?.[fieldKey] || ''}
+                              onChange={(e) =>
+                                handleFieldChange(integ.integration, fieldKey, e.target.value)
+                              }
+                              className={`${inputCls} font-mono text-xs leading-relaxed resize-y`}
+                            />
+                          ) : (
                           <input
                             id={`${integ.integration}-${fieldKey}`}
                             type={isSecret ? 'password' : 'text'}
@@ -332,6 +367,7 @@ export default function Integrations() {
                             }
                             className={inputCls}
                           />
+                          )}
                           {isSecret && isReplacing && (
                             <button
                               type="button"
@@ -427,6 +463,22 @@ export default function Integrations() {
                         <Satellite className="w-3.5 h-3.5 text-gray-500" />
                       )}
                       Test connection
+                    </button>
+                  )}
+
+                  {integ.integration === 'gee' && (
+                    <button
+                      type="button"
+                      disabled={isTesting || isSaving}
+                      onClick={handleTestGee}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-300 bg-white hover:bg-gray-50 text-xs font-semibold text-gray-700 disabled:opacity-50 transition-colors"
+                    >
+                      {isTesting ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-gray-500" />
+                      ) : (
+                        <Satellite className="w-3.5 h-3.5 text-gray-500" />
+                      )}
+                      Test key
                     </button>
                   )}
                 </div>

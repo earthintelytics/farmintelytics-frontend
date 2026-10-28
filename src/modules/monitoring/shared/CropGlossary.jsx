@@ -42,7 +42,7 @@ export default function CropGlossary({ entries, extra, cropName, focusKey }) {
   useEffect(() => {
     if (!focusKey) return;
     const el = document.getElementById(`glossary-${focusKey}`);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, [focusKey]);
 
   return (
@@ -62,7 +62,7 @@ export default function CropGlossary({ entries, extra, cropName, focusKey }) {
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {shown.map(i => (
-          <div key={i.key} id={`glossary-${i.key}`} className={`bg-white rounded-2xl border p-5 space-y-2 ${focusKey === i.key ? 'border-green-600 ring-1 ring-green-600' : 'border-gray-200'}`}>
+          <div key={i.key} id={`glossary-${i.key}`} className={`bg-white rounded-2xl border p-5 space-y-2 scroll-mt-6 ${focusKey === i.key ? 'border-green-600 ring-1 ring-green-600' : 'border-gray-200'}`}>
             <div className="text-base font-semibold text-gray-900">{i.plain}</div>
             {i.meaning && <p className="text-sm text-gray-700">{i.meaning}</p>}
             {i.classes?.length > 0 && (
