@@ -106,7 +106,8 @@ const OverviewCharts = ({ charts, trends, plots, classify, valueOf, primaryKey, 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {[['Greenness Score', `${g.greenness_score.toFixed(2)} of ${Math.max(...(g.weights || [5]))}`, ref ? `${ref.greenness_score.toFixed(2)} a year before` : `${g.greenness_score_0_1.toFixed(2)} on a 0–1 scale`],
             [`In the greenest class`, pct(g.top_class_pct), ref ? `${pct(ref.top_class_pct)} a year before` : cls[cls.length - 1]?.name],
-            ['Greenest tenth (NDVI)', g.top10_mean.toFixed(2), `average ${g.mean.toFixed(2)}`],
+            // Not rebuilt for several estates together (each estate's own is in the table below).
+            g.top10_mean != null ? ['Greenest tenth (NDVI)', g.top10_mean.toFixed(2), `average ${g.mean.toFixed(2)}`] : ['Average (NDVI)', g.mean != null ? g.mean.toFixed(2) : '—', 'all estates together'],
             ['Area measured', ha(g.area_ha), `${g.pixel_m} m pixels`]].map(([l, v, s]) => (
             <div key={l} className="rounded-xl border border-gray-100 bg-gray-50 p-3">
               <p className="text-xs text-gray-500">{l}</p>
@@ -228,6 +229,13 @@ const OverviewCharts = ({ charts, trends, plots, classify, valueOf, primaryKey, 
           text={c.text || 'What the land was in 2021 according to the ESA WorldCover map, inside your boundaries. For land cover now, see the greenness classes.'}
           chart={lc && <Bar data={bar.data} options={bar.options} />}>
           {lc && <Table head={['Class', 'Share', 'Area']} rows={cls.map((k) => [k.name, pct(k.pct), ha(k.area_ha)])} />}
+          {lc?.by_estate?.length > 1 && (
+            <Table head={['Estate', 'Area', 'Largest class']}
+              rows={lc.by_estate.map((e) => {
+                const top = [...(e.classes || [])].sort((a, b) => b.pct - a.pct)[0];
+                return [e.estate, ha(e.area_ha), top ? `${top.name} ${pct(top.pct)}` : '—'];
+              })} />
+          )}
           {lc && <p className="text-xs text-gray-500">{lc.source}. {lc.note}</p>}
         </DataCard>
       );
