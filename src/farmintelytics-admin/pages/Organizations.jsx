@@ -94,18 +94,20 @@ const Organizations = () => {
             const services = (org.allowed_modules || []).filter((m) => !m.startsWith('rs-'));
             const isExporting = exportingOrgId === org.id;
             return (
-              <Card key={org.id} className="flex flex-col hover:border-gray-300 transition-colors">
-                <button type="button" onClick={() => setDetail(org)} className="text-left p-6 flex-1 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <span className="w-12 h-12 rounded-xl bg-white border border-gray-200 flex items-center justify-center overflow-hidden shrink-0">
-                      {org.logo_url ? <img src={org.logo_url} alt="" className="w-full h-full object-contain p-1" /> : <Building2 size={20} className="text-gray-400" />}
-                    </span>
-                    <div className="min-w-0">
-                      <h3 className="font-display text-lg font-semibold text-gray-900 truncate">{org.display_name}</h3>
-                      <p className="text-xs font-mono text-gray-500">{org.schema_name}</p>
+              <Card key={org.id} className="flex flex-col overflow-hidden hover:border-green-300 transition-colors">
+                <button type="button" onClick={() => setDetail(org)} className="text-left flex-1 flex flex-col">
+                  <div className="bg-gradient-to-br from-green-700 to-emerald-600 px-6 py-5">
+                    <div className="flex items-center gap-3">
+                      <span className="w-12 h-12 rounded-xl bg-white ring-1 ring-white/40 flex items-center justify-center overflow-hidden shrink-0">
+                        {org.logo_url ? <img src={org.logo_url} alt="" className="w-full h-full object-contain p-1" /> : <Building2 size={22} className="text-green-700" />}
+                      </span>
+                      <div className="min-w-0">
+                        <h3 className="font-display text-lg font-semibold text-white truncate">{org.display_name}</h3>
+                        <p className="text-xs font-mono text-white/75 truncate">{org.schema_name}</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="px-6 pt-4 pb-5 flex flex-wrap gap-1.5">
                     {crops.slice(0, 4).map((c) => <Pill key={c} tone="good">{CROP_LABELS[c] || c}</Pill>)}
                     {crops.length > 4 && <Pill>+{crops.length - 4}</Pill>}
                     {services.length > 0 && <Pill tone="info">{services.length} service{services.length === 1 ? '' : 's'}</Pill>}
@@ -113,10 +115,10 @@ const Organizations = () => {
                   </div>
                 </button>
                 <div className="px-6 pb-3 flex items-center gap-2">
-                  <code className="flex-1 min-w-0 truncate text-xs text-gray-600 bg-white border border-gray-200 px-2.5 py-1.5 rounded-lg">/org/{org.schema_name}/login</code>
-                  <IconButton label="Copy sign-in link" onClick={() => copyLink(org.schema_name)}>{copied === org.schema_name ? <Check size={15} /> : <Copy size={15} />}</IconButton>
+                  <code className="flex-1 min-w-0 truncate text-xs text-gray-600 bg-gray-50 border border-gray-200 px-2.5 py-1.5 rounded-lg">/org/{org.schema_name}/login</code>
+                  <IconButton label="Copy sign-in link" onClick={() => copyLink(org.schema_name)}>{copied === org.schema_name ? <Check size={15} className="text-green-700" /> : <Copy size={15} />}</IconButton>
                 </div>
-                <div className="flex items-center justify-between gap-2 px-6 py-3 border-t border-gray-100">
+                <div className="flex items-center justify-between gap-2 px-6 py-3 border-t border-gray-100 bg-gray-50/50">
                   <button type="button" onClick={() => setDetail(org)} className="inline-flex items-center gap-1 text-sm font-medium text-green-700 hover:text-green-800">Estates and boundaries<ChevronRight size={15} /></button>
                   <div className="flex items-center gap-1">
                     <IconButton label="Export organisation data (ZIP)" onClick={() => handleExport(org)} disabled={isExporting}>
