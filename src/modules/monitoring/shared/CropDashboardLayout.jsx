@@ -275,14 +275,15 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     if (!hasSession) return; // no authenticated session — redirect effect handles it
     let active = true;
     async function loadBackendData() {
-      // Each part loads on its own: one refused or failed request (e.g. restoration
-      // zones for an organisation without that service) never blanks the others.
+      // Each part loads on its own: one refused or failed request never blanks the others.
       const [statsRes, plotsRes, zonesRes, alertsRes] = await Promise.allSettled([
         api.fetchDashboardStats(tenant),
         // Smallholder services show the members' parcels (forms, drawn or uploaded),
         // never the organisation's estate blocks.
         isSmallholderService ? fetchParcels().then(parcelsAsBlocks) : api.fetchPlotsIntelligence(tenant),
-        api.fetchRestorationZones(tenant),
+        // Restoration zones belong to land restoration (the only licence that opens them): other
+        // pages never ask, so no request is refused.
+        service?.id === 'land-restoration' ? api.fetchRestorationZones(tenant) : Promise.resolve([]),
         api.fetchAlerts(tenant),
       ]);
       if (!active) return;
@@ -348,7 +349,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     }
     loadBackendData().finally(() => { if (active) setDataLoading(false); });
     return () => { active = false; };
-  }, [tenant, noteLoadIssue]);
+  }, [tenant, service?.id, noteLoadIssue]);
   const [selectedBasemap, setSelectedBasemap] = useState('esri-imagery'); // satellite by default
   // Google's hybrid tile layer (lyrs=y) bakes place-name/road labels into the
   // imagery; lyrs=s is the same satellite imagery with no labels. Only
