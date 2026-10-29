@@ -35,6 +35,7 @@ const Card = ({ className = '', children }) => (
 const GROUPS = [
   { id: 'email', label: 'Email', members: ['smtp', 'alerts'] },
   { id: 'data', label: 'Data', members: ['cdse', 'earthdata', 'stac', 'gee'] },
+  { id: 'engine', label: 'Engine', members: ['engine'] },
   { id: 'maps', label: 'Maps', members: ['maps'] },
   { id: 'checks', label: 'EUDR and carbon', members: ['eudr', 'gfw', 'group_carbon'] },
   { id: 'landcover', label: 'Land cover', members: ['greenness', 'land_history'] },
