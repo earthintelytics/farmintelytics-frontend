@@ -227,7 +227,7 @@ export default function GroundScoutingModal({ alert, onClose, onAlertUpdated, vi
         )}
 
         {/* Steps */}
-        <div role="tablist" className="flex overflow-x-auto border-b border-gray-200 bg-white">
+        <div role="tablist" className="flex overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden border-b border-gray-200 bg-white">
           {!visitOnly && (
           <button type="button" onClick={() => setActiveTab('dispatch')} aria-selected={activeTab === 'dispatch'} role="tab"
             className={`flex-1 min-w-[120px] flex items-center justify-center gap-2 py-3 text-sm font-semibold border-b-2 ${activeTab === 'dispatch' ? 'border-green-700 text-green-800' : 'border-transparent text-gray-500 hover:text-gray-900'}`}>

@@ -80,7 +80,7 @@ export const Chip = ({ on, children, ...rest }) => (
 );
 
 export const Tabs = ({ tabs, value, onChange }) => (
-  <nav className="flex gap-8 border-b border-gray-200 overflow-x-auto">
+  <nav className="flex gap-8 border-b border-gray-200 overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
     {tabs.map((t) => (
       <button key={t.id} type="button" onClick={() => onChange(t.id)}
         className={`-mb-px pb-3 border-b-2 text-sm font-medium whitespace-nowrap inline-flex items-center gap-2 ${value === t.id ? 'border-green-600 text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
