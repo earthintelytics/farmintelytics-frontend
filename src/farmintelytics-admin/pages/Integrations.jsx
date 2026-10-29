@@ -216,7 +216,7 @@ export default function Integrations() {
           Integrations
         </h1>
         <p className="text-sm text-gray-500 mt-2 max-w-3xl">
-          Connections and settings the platform uses: email, satellite data sign-ins and sources, maps, the EUDR check areas, the Global Forest Watch key and the carbon range per crop. Changes apply straight away.
+          Connections and settings the platform uses: email, satellite data sign-ins and sources, the engine's limits on every run, maps, the EUDR check areas, the Global Forest Watch key and the carbon range per crop. Changes apply straight away (engine settings from the next run).
         </p>
       </div>
 
