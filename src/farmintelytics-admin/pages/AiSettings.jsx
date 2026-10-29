@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { KeyRound, BarChart3, Gauge, Check, Info, PlugZap } from 'lucide-react';
 import { fetchAiSettings, saveAiSettings, saveAiProvider, testAiProvider, saveAiPrices, deleteAiModel, fetchAiUsage, fetchAiLimits, saveAiLimits, AiNotConnected } from '../../services/aiAdminApi';
 import { fetchOrganizations, fetchCredentials } from '../../services/adminApi';
+import { Card } from '../components/ui';
 
 /**
  * AI settings (super admin): API keys and models, usage and cost, limits.
@@ -31,7 +32,6 @@ const FEATURES = [
   { id: 'advisor', label: 'Farm AI Advisor wording' },
 ];
 const inputCls = 'w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-sm text-gray-900 outline-none focus:border-green-600';
-const Card = ({ className = '', children }) => <div className={`bg-white rounded-2xl border border-gray-200 ${className}`}>{children}</div>;
 const money = (v, cur = 'USD') => (v == null ? '—' : new Intl.NumberFormat(undefined, { style: 'currency', currency: cur, maximumFractionDigits: 2 }).format(v));
 const num = (v) => (v == null ? '—' : new Intl.NumberFormat().format(v));
 const iso = (d) => d.toISOString().slice(0, 10);
