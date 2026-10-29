@@ -1,6 +1,7 @@
 import { Layers, X, Info } from 'lucide-react';
 import { indexName } from '../constants/indexNames';
 import LayerLegend from '../legends/LayerLegend';
+import { indexClassesFor, useIndexClasses } from '../legends/indexClasses';
 
 const Toggle = ({ on, onChange, label }) => (
   <button type="button" role="switch" aria-checked={on} aria-label={label} onClick={() => onChange(!on)}
@@ -55,7 +56,9 @@ const satelliteScale = (sat) => (WATER_INDEX.test(String(sat.index || '')) ? 'wa
 const satelliteText = (sat) => (WATER_INDEX.test(String(sat.index || ''))
   ? 'Water on the chosen date: blue is wet, brown is dry.' : sat.text);
 
-const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit = 'blocks', children }) => (
+const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit = 'blocks', children }) => {
+  useIndexClasses();
+  return (
   <aside className="w-[300px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-10">
     <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
       <span className="flex items-center gap-2 font-display text-base font-semibold text-gray-900"><Layers size={18} className="text-green-700" />Map layers</span>
@@ -65,12 +68,22 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
       {satellite && satellite.available && (
         <Row label={indexName(satellite.index).name} text={satelliteText(satellite)} on={satellite.on} onChange={satellite.onChange}>
           <Opacity value={satellite.opacity} onChange={satellite.setOpacity} />
-          {satellite.legend || (
+          {satellite.legend || (indexClassesFor(satellite.index) ? (
+            // The classes the map is painted with (admin thresholds), highest first.
+            <div className="space-y-1.5 pt-1">
+              {[...indexClassesFor(satellite.index)].sort((x, y) => (y.range?.[0] ?? 0) - (x.range?.[0] ?? 0)).map((c) => (
+                <div key={c.label} className="flex items-center gap-2">
+                  <span className="w-3 h-3 rounded-sm shrink-0" style={{ backgroundColor: c.color }} />
+                  <span className="text-xs text-gray-600"><span className="font-semibold text-gray-800">{c.label}</span> · {c.range?.[0]} to {c.range?.[1]}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
             <div className="pt-1 space-y-1">
               <div className="h-2.5 rounded-full" style={{ background: satelliteScale(satellite) === 'water' ? 'linear-gradient(90deg,#B45309,#FDE68A,#93C5FD,#1D4ED8)' : 'linear-gradient(90deg,#B91C1C,#FDE68A,#86EFAC,#15803D)' }} />
               <div className="flex justify-between text-xs text-gray-500"><span>{satelliteScale(satellite) === 'water' ? 'Dry' : 'Bare or stressed'}</span><span>{satelliteScale(satellite) === 'water' ? 'Wet' : 'Healthy'}</span></div>
             </div>
-          )}
+          ))}
         </Row>
       )}
       {satellite && !satellite.available && (
@@ -108,6 +121,7 @@ const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit
       </p>
     </div>
   </aside>
-);
+  );
+};
 
 export default MapLayersPanel;

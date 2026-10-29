@@ -41,6 +41,7 @@ import { UNIT_LABEL, CROP_UNIT, SERVICE_KPIS } from './dashboard/kpiCatalog';
 
 
 import { useLayerLegends } from './dashboard/legends/layerLegends';
+import { setIndexClasses } from './dashboard/legends/indexClasses';
 import { fetchParcels, fetchCarbonSummary } from '../../../services/smallholderApi';
 import { SMALLHOLDER_SERVICES } from '../../registry';
 
@@ -376,13 +377,13 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     async function loadIndices() {
       try {
         const data = await api.fetchRasterIndices();
-        if (data?.indices?.length) setAvailableIndices(data.indices);
+        setAvailableIndices(Array.isArray(data?.indices) ? data.indices : []);
       } catch (err) {
         noteLoadIssue('satellite layers', err);
       }
     }
     loadIndices();
-  }, [tenant, noteLoadIssue]);
+  }, [tenant, service?.id, noteLoadIssue]);
 
   useEffect(() => {
     async function loadFilterConfig() {
@@ -1157,6 +1158,11 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     }));
   }, [isOrg, availableIndices, cropProfileEntries]);
 
+  // The map layers panel shows each index's classes from here: the same classes the tiles are painted with.
+  useEffect(() => {
+    setIndexClasses(Object.fromEntries(legendEntries.filter(e => e.legend?.length).map(e => [e.key, e.legend])));
+  }, [legendEntries]);
+
   const legendGroups = useMemo(() => {
     const groups = {};
     legendEntries.forEach(entry => {
@@ -1311,16 +1317,22 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     // one, with that section's own legend panel not indicating anything as
     // A freshly opened section shows its index layer straight away when an image exists for the
     // date (the map draws it only then); selectedIndex gets the section's default.
+    const hasImage = (k) => availableIndices.some(i => String(i.index).toLowerCase() === k);
     if (item === 'analytics') {
       setActiveTab('monitor');
     } else if (item === 'moisture-content') {
-      setSelectedIndex('smi');
+      // The first water layer that has an image: radar soil moisture needs a dry reference built over
+      // many passes and is often missing, so fall back to the flood map or the optical water layers.
+      setSelectedIndex(['smi', 'flood_mask', 'lswi', 'ndmi', 'ndwi'].find(hasImage) || 'smi');
     } else if (item === 'crop-health' || item === 'crop-yield' || item === 'intelligence-layers') {
       setSelectedIndex('ndvi');
     } else if (item === 'land-restoration') {
       setSelectedIndex('ndwi');
+    } else if (item === 'climate') {
+      // Weather shows surface heat (Landsat thermal) when there is an image, never the last page's layer.
+      setSelectedIndex('lst');
     }
-    setShowRasterLayer(true);
+    setShowRasterLayer(item === 'climate' ? hasImage('lst') : true);
     // Each sub-page has its own calendar: forget the last page's month and date, so the calendar
     // opens on this layer's newest image once its timeline loads.
     calendarInitializedRef.current = false;

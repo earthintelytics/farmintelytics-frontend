@@ -84,8 +84,9 @@ export async function verifyToken(token) {
  *   active_alerts_count, audit_status
  */
 export async function fetchDashboardStats(tenant) {
-  const params = tenant ? `?tenant=${tenant}` : '';
-  return apiFetch(`/dashboard/stats${params}`);
+  // The open service's figures only (alerts and imagery of that service, not the whole organisation).
+  const q = [tenant ? `tenant=${tenant}` : '', serviceParam()].filter(Boolean).join('&');
+  return apiFetch(`/dashboard/stats${q ? `?${q}` : ''}`);
 }
 
 // ─── Intelligence Layers ────────────────────────────────────────────────────
@@ -226,8 +227,9 @@ export async function fetchLandHistory(module) {
  *              acknowledged, acknowledged_by, acknowledged_at }
  */
 export async function fetchAlerts(tenant) {
-  const params = tenant ? `?tenant=${tenant}` : '';
-  return apiFetch(`/alerts${params}`);
+  // The open service's alerts only, so a crop page never counts another service's alerts.
+  const q = [tenant ? `tenant=${tenant}` : '', serviceParam()].filter(Boolean).join('&');
+  return apiFetch(`/alerts${q ? `?${q}` : ''}`);
 }
 
 /**
@@ -424,7 +426,9 @@ export async function queryAiAgent(question) {
  * Returns { tenant, indices: [{ index, zarr_name, lo, hi, cmap }] }
  */
 export async function fetchRasterIndices() {
-  return apiFetch('/raster/indices');
+  // The open service's latest run decides which layers have an image.
+  const q = serviceParam();
+  return apiFetch(`/raster/indices${q ? `?${q}` : ''}`);
 }
 
 // ─── Specialized ESG & Sustainability Services ──────────────────────────────
