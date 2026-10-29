@@ -54,7 +54,7 @@ export default function MapBottomStrip({ ctx, centerContent, hideTimeline }) {
                       </span>
                     )}
                   </span>
-                ) : <span className="text-sm text-gray-500">No satellite imagery yet. It appears after the first monitoring run.</span>}
+                ) : <span className="text-sm text-gray-500">No {measure ? measure.toLowerCase() : 'satellite'} image yet for this farm.</span>}
             </div>
             <button type="button" className={iconBtn} disabled={!count || activeIdx >= count - 1} onClick={() => setActive(activeIdx + 1)} aria-label="Later image"><ChevronRight size={18} /></button>
           </>

@@ -1321,9 +1321,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     if (item === 'analytics') {
       setActiveTab('monitor');
     } else if (item === 'moisture-content') {
-      // The first water layer that has an image: radar soil moisture needs a dry reference built over
-      // many passes and is often missing, so fall back to the flood map or the optical water layers.
-      setSelectedIndex(['smi', 'flood_mask', 'lswi', 'ndmi', 'ndwi'].find(hasImage) || 'smi');
+      // The first water layer that has an image: standing water (radar), then the optical water layers.
+      // Radar soil moisture comes last: it needs a dry reference built over many passes and is rarely there.
+      setSelectedIndex(['flood_mask', 'lswi', 'ndmi', 'ndwi', 'smi'].find(hasImage) || 'flood_mask');
     } else if (item === 'crop-health' || item === 'crop-yield' || item === 'intelligence-layers') {
       setSelectedIndex('ndvi');
     } else if (item === 'land-restoration') {
