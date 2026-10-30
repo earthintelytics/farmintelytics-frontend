@@ -1,9 +1,6 @@
-import { useCallback, useState, useMemo, useEffect, useRef } from 'react';
-
-
+import { useState, useMemo, useEffect, useRef } from 'react';
 import * as api from '../../../services/organizationMonitorApi';
 import 'leaflet/dist/leaflet.css';
-
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -18,68 +15,28 @@ import {
   Legend as ChartLegend,
   Filler
 } from 'chart.js';
-
-
-
-import { fetchEstates } from '../../../services/estatesApi';
-
 import DataNeededDialog from '../../data/DataNeededDialog';
-
 import { cropPagesFor } from '../cropCatalog';
-
-
-
-
-
-
-
-
 import NewResultsBanner from './dashboard/NewResultsBanner';
-import { UNIT_LABEL, CROP_UNIT, SERVICE_KPIS } from './dashboard/kpiCatalog';
-
-
-
-
+import { UNIT_LABEL, CROP_UNIT } from './dashboard/kpiCatalog';
 import { useLayerLegends } from './dashboard/legends/layerLegends';
-import { setIndexClasses } from './dashboard/legends/indexClasses';
-import { fetchParcels, fetchCarbonSummary } from '../../../services/smallholderApi';
 import { SMALLHOLDER_SERVICES } from '../../registry';
-
-// A member parcel in the shape the maps and KPIs use for a block.
-const parcelsAsBlocks = (fc) => (fc?.features || []).map((f) => {
-  const pr = f.properties || {};
-  return {
-    plot_id: `P${pr.id}`, name: pr.member_name ? `${pr.member_name}'s farm` : `Parcel ${pr.id}`,
-    boundary: ['Polygon', 'MultiPolygon'].includes(f.geometry?.type) ? (f.geometry.type === 'Polygon' ? f.geometry : { type: 'Polygon', coordinates: f.geometry.coordinates[0] }) : null,
-    area_ha: pr.area_ha ?? null, subfarm: pr.group_name || null, indices: {},
-    filters: { crop: pr.crop || '', group: pr.group_name || '' },
-  };
-});
 import { useBlockMeasures } from './dashboard/pages/BlockSummaryPage';
-
-
-
-
-
-
-
-
-
 import { roleLabel } from '../../../pages/org/orgProfile';
-
-
-
-
-
-import { ANSWER_FORMAT } from '../../assistant/scenarioTemplates';
-
-
-
 import { CROP_CONFIG_KEYS } from './dashboard/constants/chartConfig';
 import { renderInfoTooltip as renderInfoTooltipImpl, renderFloatingBasemapSelector as renderFloatingBasemapSelectorImpl, renderLegendCard as renderLegendCardImpl, renderLegendCards as renderLegendCardsImpl, colouredPolygon as colouredPolygonImpl, renderIntelPolygons as renderIntelPolygonsImpl, renderHealthPolygons as renderHealthPolygonsImpl, renderMoisturePolygons as renderMoisturePolygonsImpl, renderYieldPolygons as renderYieldPolygonsImpl, renderRestorePolygons as renderRestorePolygonsImpl, renderClimatePolygons as renderClimatePolygonsImpl } from './dashboard/map/mapRenderers';
 import { renderMapBottomPanel as renderMapBottomPanelImpl } from './dashboard/map/MapBottomPanel';
 import { renderDashboardHeader, renderDashboardSidebar } from './dashboard/layout/DashboardChrome';
 import { renderDashboardPages } from './dashboard/layout/DashboardPages';
+import { inEstate, mapBlocks, healthRows, moistureRows, yieldRows, climateRows, restorationRows } from './dashboard/hooks/blockRows';
+import { useDashboardData } from './dashboard/hooks/useDashboardData';
+import { usePageData } from './dashboard/hooks/usePageData';
+import { useImageTimeline } from './dashboard/hooks/useImageTimeline';
+import { useBasemap } from './dashboard/hooks/useBasemap';
+import { useMapLayerToggles } from './dashboard/hooks/useMapLayerToggles';
+import { usePanelSizes } from './dashboard/hooks/usePanelSizes';
+import { useAdvisorChat } from './dashboard/hooks/useAdvisorChat';
+import { useLegendEntries } from './dashboard/hooks/useLegendEntries';
 
 ChartJS.register(
   CategoryScale,
@@ -95,29 +52,9 @@ ChartJS.register(
   Filler
 );
 
-// Smallholder groups as one carbon figure for the Overview card (the same shape as an estate total).
-function smallholderCarbonTotal(res) {
-  const groups = res?.groups || [];
-  const est = groups.filter(g => g.carbon_t);
-  const area = groups.reduce((a, g) => a + (g.area_ha || 0), 0);
-  const covered = groups.reduce((a, g) => a + (g.area_with_estimate_ha || 0), 0);
-  return {
-    area_ha: area,
-    area_with_estimate_ha: covered,
-    carbon_t: est.length ? { low: est.reduce((a, g) => a + g.carbon_t.low, 0), high: est.reduce((a, g) => a + g.carbon_t.high, 0) } : null,
-    note: est.length ? null : 'Not enough data for an estimate',
-  };
-}
-
-// Whether a block belongs to the chosen estate: by the registered estate id, else by name (the estate list
-// says "Okomu - main" while a block's estate column says "main").
-function inEstate(blockEstate, blockFarmId, chosen, est) {
-  if (est && blockFarmId) return blockFarmId === est.farm_id;
-  const b = String(blockEstate || '').trim().toLowerCase();
-  const c = String(chosen || '').trim().toLowerCase();
-  return !!b && (b === c || c.endsWith(` - ${b}`) || c.endsWith(` ${b}`));
-}
-
+// The one layout every crop and service portal uses: header, sidebar, map pages and the other tabs.
+// It composes the dashboard hooks (dashboard/hooks/): the organisation's data, page data, the image
+// timeline, the basemap, layer switches, panel sizes, the advisor chat and the legend cards.
 const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndices, mapCenter, onBack, onSignOut }) => {
   useLayerLegends(); // map colours follow the admin's classes once loaded
   const isOrg = mode === 'organization' || Boolean(service);
@@ -137,7 +74,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const hasSession = Boolean(tenant && localStorage.getItem('fi_token'));
   useEffect(() => {
     if (!hasSession && onSignOut) onSignOut();
-  }, [hasSession]);
+  }, [hasSession]); // eslint-disable-line react-hooks/exhaustive-deps
   // Display name comes from the organization's TenantConfig (stored at login)
   const tenantDisplayName = localStorage.getItem('fi_display_name')
     || (tenant ? tenant.charAt(0).toUpperCase() + tenant.slice(1) : '');
@@ -155,22 +92,11 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     return match ? match[0] : '1';
   };
 
-  const [sliderData, setSliderData] = useState(null);
-  const [pixelTimeseries, setPixelTimeseries] = useState(null);
-  const [farmBoundary, setFarmBoundary] = useState(null); // GeoJSON Feature for tenants with no plot polygons
-
-
   const [activeSidebarItem, setActiveSidebarItem] = useState(service?.sidebar?.[0]?.id || 'analytics');
   const [answersForm, setAnswersForm] = useState(null);
   // Estate selector (organisations with several estates): 'All' or an estate
   // name. Lives in the URL (?estate=) so a link or refresh keeps the choice.
   const [filterEstate, setFilterEstate] = useState(() => new URLSearchParams(window.location.search).get('estate') || 'All');
-  const [estates, setEstates] = useState([]); // from GET /estates when the backend has it
-  useEffect(() => {
-    let active = true;
-    fetchEstates().then(list => { if (active && Array.isArray(list)) setEstates(list); }).catch(() => {});
-    return () => { active = false; };
-  }, []);
   useEffect(() => {
     const url = new URL(window.location.href);
     if (filterEstate && filterEstate !== 'All') url.searchParams.set('estate', filterEstate); else url.searchParams.delete('estate');
@@ -182,14 +108,14 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const pageSet = service || cropPagesFor(cropType);
   // Glossary entry to open (links from farmer words on screen)
   const [glossaryFocus, setGlossaryFocus] = useState(null);
-  const openGlossary = (key) => { setGlossaryFocus(key); setActiveTab('monitor'); setActiveSidebarItem('help'); };
   const [activeTab, setActiveTab] = useState(() => isAiOnly ? 'ai-assistant' : 'monitor');
+  const openGlossary = (key) => { setGlossaryFocus(key); setActiveTab('monitor'); setActiveSidebarItem('help'); };
   const [activeAnalyticsSubpage, setActiveAnalyticsSubpage] = useState('overview');
 
   useEffect(() => {
     if (isAiOnly) {
-      setActiveTab('ai-assistant');
-      setActiveSidebarItem('analytics'); // eslint-disable-line react-hooks/set-state-in-effect
+      setActiveTab('ai-assistant'); // eslint-disable-line react-hooks/set-state-in-effect
+      setActiveSidebarItem('analytics');
     }
   }, [isAiOnly, service?.id]);
 
@@ -200,285 +126,20 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     setActiveTab(tabId);
   };
 
-  const [waterDemandData, setWaterDemandData] = useState(null);
-  const [waterDemandLoading, setWaterDemandLoading] = useState(false);
-
-  const [plotsTelemetry, setPlotsTelemetry] = useState(null);
-
-  // Real farm-average trend series for the Analytics Hub Overview charts —
-  // fetched independently of whichever index is on the map, since Overview
-  // shows NDVI/NDMI/EVI/LST all at once. Each entry's "mean" comes straight
-  // from /timeseries/slider (a true per-date average over the raster), not
-  // from /plots/intelligence's indices field — that field is a single
-  // latest-value scalar per plot, not a {date: value} map, so indexing it
-  // by date (as the old chart-building code did) was always undefined and
-  // every chart point silently rendered as 0.
-  const [overviewTrends, setOverviewTrends] = useState({ ndvi: [], ndmi: [], evi: [], lst: [], rvi: [] });
-  useEffect(() => {
-    const relevantSubpage = activeAnalyticsSubpage === 'overview' || activeAnalyticsSubpage === 'vigor-health' || activeAnalyticsSubpage === 'moisture-et';
-    if (!(activeSidebarItem === 'analytics' && activeTab === 'monitor' && relevantSubpage)) return;
-    let active = true;
-    const windowEnd = new Date();
-    const windowStart = new Date();
-    windowStart.setMonth(windowStart.getMonth() - 6);
-    const isoDate = (d) => d.toISOString().slice(0, 10);
-    async function loadOverviewTrends() {
-      const specs = [
-        { key: 'ndvi', sensor: undefined },
-        { key: 'ndmi', sensor: undefined },
-        { key: 'evi', sensor: undefined },
-        { key: 'lst', sensor: 'landsat' },
-        { key: 'rvi', sensor: 'sentinel-1' },
-      ];
-      const results = await Promise.all(specs.map(s =>
-        api.fetchTimeseriesSlider({
-          farm: tenant || 'farm_1', index: s.key, sensor: s.sensor,
-          start: isoDate(windowStart), end: isoDate(windowEnd), cropType,
-        }).catch(err => { console.error(`Failed to fetch ${s.key} trend:`, err); return null; })
-      ));
-      if (!active) return;
-      const next = {};
-      specs.forEach((s, i) => {
-        next[s.key] = (results[i]?.timeline || []).filter(t => t.mean != null).map(t => ({
-          ...t,
-          is_estimated: Boolean(t.is_estimated || t.source === 'radar_estimate'),
-          source: t.source || (t.is_estimated ? 'radar_estimate' : null),
-        }));
-      });
-      setOverviewTrends(next);
-    }
-    loadOverviewTrends();
-    return () => { active = false; };
-  }, [activeSidebarItem, activeTab, activeAnalyticsSubpage, tenant, cropType]);
-
-  const [stats, setStats] = useState(null);
-  const [carbon, setCarbon] = useState(null);  // carbon held in the crops: area x the admin's range per crop
-  const [eudrResults, setEudrResults] = useState(null);  // the EUDR check per plot, for the KPI card and the register
-  const [dataLoading, setDataLoading] = useState(true);  // cards say Loading until the first answers arrive
-  const [plots, setPlots] = useState([]);
-  const [restorationZones, setRestorationZones] = useState([]);
   const isSmallholderService = SMALLHOLDER_SERVICES.includes(service?.id) || service?.id === 'smallholder-hub';
-  // Data that could not be loaded, shown in one note instead of an empty page.
-  const [loadIssues, setLoadIssues] = useState([]);
-  const noteLoadIssue = useCallback((what, err) => {
-    console.warn(`Could not load ${what}:`, err);
-    setLoadIssues((l) => (l.includes(what) ? l : [...l, what]));
-  }, []);
-  const [alerts, setAlerts] = useState([]);
-  const [landCover, setLandCover] = useState(null);
-  const [landCoverLoading, setLandCoverLoading] = useState(false);
+  const {
+    estates, stats, carbon, eudrResults, dataLoading, plots, restorationZones, farmBoundary, alerts,
+    landCover, landCoverLoading, availableIndices, dashboardFilterKeys, loadIssues, setLoadIssues,
+    noteLoadIssue, handleAcknowledgeAlert,
+  } = useDashboardData({ tenant, hasSession, service, isSmallholderService });
+  const { overviewTrends, waterDemandData, waterDemandLoading, plotsTelemetry } = usePageData({ tenant, cropType, activeSidebarItem, activeTab, activeAnalyticsSubpage, noteLoadIssue });
 
-  // Same live backend data as the organization view — the crop pages must render
-  // the identical experience (map, splits, calendar, charts, alerts, boundary).
-  // Crop-specific narrowing (index profiles, legends) layers on top via cropType.
-  useEffect(() => {
-    if (!hasSession) return; // no authenticated session — redirect effect handles it
-    let active = true;
-    async function loadBackendData() {
-      // Each part loads on its own: one refused or failed request never blanks the others.
-      const [statsRes, plotsRes, zonesRes, alertsRes] = await Promise.allSettled([
-        api.fetchDashboardStats(tenant),
-        // Smallholder services show the members' parcels (forms, drawn or uploaded),
-        // never the organisation's estate blocks.
-        isSmallholderService ? fetchParcels().then(parcelsAsBlocks) : api.fetchPlotsIntelligence(tenant),
-        // Restoration zones belong to land restoration (the only licence that opens them): other
-        // pages never ask, so no request is refused.
-        service?.id === 'land-restoration' ? api.fetchRestorationZones(tenant) : Promise.resolve([]),
-        api.fetchAlerts(tenant),
-      ]);
-      if (!active) return;
-      const ok = (r, what, optional = false) => {
-        if (r.status === 'fulfilled') return r.value;
-        // A service this organisation does not have is not a failure to report.
-        // The status is on the error (its message is already plain words, without the number).
-        if (!(optional && (r.reason?.status === 403 || /\b403\b/.test(String(r.reason?.message))))) noteLoadIssue(what, r.reason);
-        return null;
-      };
-      const statsVal = ok(statsRes, 'summary figures');
-      if (statsVal) setStats(statsVal);
-      const plotsVal = ok(plotsRes, 'blocks');
-      if (plotsVal) setPlots(plotsVal);
-      setRestorationZones(ok(zonesRes, 'restoration zones', true) || []);
-      const alertsVal = ok(alertsRes, 'alerts');
-      if (service?.id === 'eudr-check') {
-        try {
-          const r = await api.fetchEudrPlots();
-          if (active) setEudrResults(Array.isArray(r) ? r : []);
-        } catch (e) {
-          noteLoadIssue('deforestation check results', e);
-        }
-      }
-      if ((SERVICE_KPIS[service?.id] || []).includes('carbon')) {
-        try {
-          let c;
-          if (isSmallholderService) c = smallholderCarbonTotal(await fetchCarbonSummary());
-          else {
-            const res = await api.fetchEstateCarbon();
-            // No estate for this service: say that, not a generic "not enough data".
-            // Per-estate pools (without their block lists) for the carbon chart on the overview.
-            const estates = (res?.estates || []).map((e) => ({ ...e, blocks: undefined }));
-            c = res?.estates?.length ? { ...res.total, estates } : (res ? { ...res.total, carbon_t: null, note: res.note || res.total?.note } : null);
-          }
-          if (active) setCarbon(c || null);
-        } catch (e) {
-          noteLoadIssue('carbon estimate', e);
-        }
-      }
-      if (!isSmallholderService) try {
-        const boundary = await api.fetchFarmBoundary();
-        if (active && boundary && boundary.geometry) setFarmBoundary(boundary);
-      } catch (e) {
-        noteLoadIssue('farm outline', e);
-      }
-      if (alertsVal) {
-        // Workflow status from the server: seen, scout sent, resolved or dismissed all count as handled.
-        const handled = (a) => a.acknowledged || ['scout_assigned', 'resolved', 'dismissed'].includes(a.status);
-        setAlerts((alertsVal.feed || []).map(a => ({
-          id: a.alert_id,
-          plot: a.plot_id,
-          category: a.type,
-          severity: a.severity,
-          desc: a.message,
-          date: (a.timestamp || '').split(' ')[0],
-          time: (a.timestamp || '').split(' ')[1] || '',
-          status: handled(a) ? 'Acknowledged' : 'Active',
-          workflow: a.status || 'open',
-          module: a.module || '',
-        })));
-      }
-    }
-    loadBackendData().finally(() => { if (active) setDataLoading(false); });
-    return () => { active = false; };
-  }, [tenant, service?.id, noteLoadIssue]);
-  const [selectedBasemap, setSelectedBasemap] = useState('esri-imagery'); // satellite by default
-  // Google's hybrid tile layer (lyrs=y) bakes place-name/road labels into the
-  // imagery; lyrs=s is the same satellite imagery with no labels. Only
-  // relevant when Google is the active basemap.
-  const [showGoogleLabels, setShowGoogleLabels] = useState(true);
-  // Basemap ids that are live composites rendered from the tenant's own
-  // archive (as opposed to static external imagery like Google/ESRI) — these
-  // change with the time slider, same as the NDVI/NDMI overlay.
-  const COMPOSITE_BASEMAP_IDS = { 'true-color': 'true_color', 'false-color': 'false_color', 'sar-rgb': 'sar_rgb' };
-  const activeComposite = COMPOSITE_BASEMAP_IDS[selectedBasemap] || null;
-  const [compositeSliderData, setCompositeSliderData] = useState(null);
   const [selectedIndex, setSelectedIndex] = useState('ndvi');
   const [mapOpacity, setMapOpacity] = useState(80);
   const [showRasterLayer, setShowRasterLayer] = useState(true);
   const [selectedPlot, setSelectedPlot] = useState(null);
-  const [availableIndices, setAvailableIndices] = useState([]);
-  // Boundary-property keys the admin picked at onboarding to show as
-  // dashboard filter dropdowns (empty = no extra filters). Values are
-  // filtered client-side from plotsData's own .filters, already populated
-  // by get_plots_intelligence — no separate fetch per filter value.
-  const [dashboardFilterKeys, setDashboardFilterKeys] = useState([]);
+  const [pixelTimeseries, setPixelTimeseries] = useState(null);
   const [dynamicFilterValues, setDynamicFilterValues] = useState({});
-
-  // Enumerate available zarr indices for the active tenant
-  useEffect(() => {
-    async function loadIndices() {
-      try {
-        const data = await api.fetchRasterIndices();
-        setAvailableIndices(Array.isArray(data?.indices) ? data.indices : []);
-      } catch (err) {
-        noteLoadIssue('satellite layers', err);
-      }
-    }
-    loadIndices();
-  }, [tenant, service?.id, noteLoadIssue]);
-
-  useEffect(() => {
-    async function loadFilterConfig() {
-      try {
-        const cfg = await api.fetchCropMonitoringConfig();
-        setDashboardFilterKeys(cfg?.dashboard_filter_keys || []);
-      } catch (err) {
-        noteLoadIssue('dashboard settings', err);
-      }
-    }
-    loadFilterConfig();
-  }, [tenant, noteLoadIssue]);
-
-  // Fetch the composite's own timeline + tile URLs (same {date: url} shape as
-  // the index slider) whenever a composite basemap is selected. Cleared when
-  // switching away so a stale composite tile never lingers under a static
-  // basemap.
-  useEffect(() => {
-    if (!activeComposite) { setCompositeSliderData(null); return; } // eslint-disable-line react-hooks/set-state-in-effect
-    let active = true;
-    async function loadCompositeSlider() {
-      try {
-        const data = await api.fetchCompositeSlider({ farm: tenant || 'farm_1', composite: activeComposite });
-        if (active) setCompositeSliderData(data);
-      } catch (err) {
-        noteLoadIssue('satellite imagery', err);
-        if (active) setCompositeSliderData(null);
-      }
-    }
-    loadCompositeSlider();
-    return () => { active = false; };
-  }, [activeComposite, tenant, noteLoadIssue]);
-
-  // ── Water Management (FAO-56 ETc + irrigation efficiency) ────────────────
-  // Fetched only while that sidebar section is open — same real-data-only
-  // contract as every other panel (nulls when the pipeline hasn't run yet).
-  useEffect(() => {
-    const onMonitorTab = activeSidebarItem === 'analytics' && activeTab === 'monitor';
-    const needsWaterDemand = onMonitorTab && (activeAnalyticsSubpage === 'et-log' || activeAnalyticsSubpage === 'water-management');
-    if (!needsWaterDemand) return;
-    let active = true;
-    async function loadWaterDemand() {
-      setWaterDemandLoading(true);
-      try {
-        const data = await api.fetchPlotsWaterDemand({});
-        if (active) setWaterDemandData(data);
-      } catch (err) {
-        noteLoadIssue('water figures', err);
-        if (active) setWaterDemandData(null);
-      } finally {
-        if (active) setWaterDemandLoading(false);
-      }
-    }
-    loadWaterDemand();
-    return () => { active = false; };
-  }, [activeSidebarItem, activeTab, activeAnalyticsSubpage, tenant, noteLoadIssue]);
-
-  // ── Climate telemetry (real per-plot LST from the Landsat thermal band;
-  // soil temp/rainfall/VPD have no real per-plot source and stay null —
-  // see get_plots_telemetry) — fetched only while Climate is open. ────────
-  useEffect(() => {
-    if (activeSidebarItem !== 'climate') return;
-    let active = true;
-    async function loadTelemetry() {
-      try {
-        const data = await api.fetchPlotsTelemetry({});
-        if (active) setPlotsTelemetry(data);
-      } catch (err) {
-        noteLoadIssue('weather per block', err);
-        if (active) setPlotsTelemetry(null);
-      }
-    }
-    loadTelemetry();
-    return () => { active = false; };
-  }, [activeSidebarItem, tenant, noteLoadIssue]);
-
-  // ── Land cover: the 2021 map inside the blocks, and land cover now (greenness classes of the latest run) ──
-  useEffect(() => {
-    let active = true;
-    async function loadLandCover() {
-      setLandCoverLoading(true);
-      const [cover, green, history] = await Promise.allSettled([api.fetchLandCover(service?.id), api.fetchGreenness(service?.id), api.fetchLandHistory(service?.id)]);
-      const val = (r, what) => {
-        if (r.status === 'rejected') { noteLoadIssue(what, r.reason); return null; }
-        return r.value && Object.keys(r.value).length ? r.value : null;
-      };
-      if (active) {
-        setLandCover({ cover: val(cover, 'land cover'), greenness: val(green, 'land cover now'), history: val(history, 'land cover since 2000') });
-        setLandCoverLoading(false);
-      }
-    }
-    loadLandCover();
-    return () => { active = false; };
-  }, [tenant, service?.id, noteLoadIssue]);
 
   // ── Crop-specific index profile (from /crop-monitoring/indices) ──────────
   // Ordered by agronomic priority, each entry carries the crop-specific label,
@@ -486,11 +147,8 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const cropProfileEntries = useMemo(() => cropIndices?.indices || [], [cropIndices]);
   const cropPrimaryIndex = cropIndices?.primary_index || null;
 
-  // Block colours follow the admin's interpretation: the block's real value for
-  // that index, classified with the legend classes the superadmin set for this
-  // crop (Crop thresholds, served with the crop's indices). The fixed table is
-  // only a fallback when no admin legend exists. No value -> no colour (never
-  // a value borrowed from another index).
+  // A block's own value for an index, classified with the admin's legend classes for this crop (Crop
+  // thresholds). No value -> no colour (never a value borrowed from another index).
   const blockValue = (plot, key) => {
     const v = plot.indices?.[key] ?? (key === 'ndvi' ? plot.ndvi : key === 'ndmi' ? plot.ndmi : key === 'lswi' ? (plot.indices?.lswi ?? plot.ndmi) : null);
     return v == null || Number.isNaN(Number(v)) ? null : Number(v);
@@ -505,287 +163,70 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     primaryAppliedRef.current = true;
   }, [cropPrimaryIndex, availableIndices]);
 
-  // Declared here (not near their other timeline/calendar state below) because
-  // the slider- and timeline-building effects that follow reference their
-  // setters — declaring them after those effects put the setters in the
-  // temporal dead zone at the point of use (only safe because effects run
-  // post-render, but fragile and flagged by react-hooks/immutability).
-  const [timelineLoading, setTimelineLoading] = useState(false);
-  const [zarrBounds, setZarrBounds] = useState(null);
-  const [calendarMonth, setCalendarMonth] = useState(new Date().getMonth());
-  const [calendarYear,  setCalendarYear]  = useState(new Date().getFullYear());
-  // Tracks whether the mini-calendar's month has been auto-positioned to the
-  // active pass at least once — after that, only an explicit date pick
-  // should move it; a background data refresh should not undo the user's
-  // own prev/next-month navigation.
-  const calendarInitializedRef = useRef(false);
-  const [selectedTimelineIndex, setSelectedTimelineIndex] = useState(2);
+  const {
+    TIMELINE_DATA, timelineLoading, zarrBounds, calendarDates, calendarMonth, calendarYear, setCalendarMonth,
+    setCalendarYear, calendarInitializedRef, pendingCalendarDateRef, selectedTimelineIndex, setSelectedTimelineIndex,
+    setRefreshSlider, effectiveSensor, satellitePicker, setSatellitePicker, selectDateWithSensor, isCompareMode,
+    setIsCompareMode, compareTimelineIndex, setCompareTimelineIndex, activeDateSlot, setActiveDateSlot, sliderPending,
+    currentTimeline, currentTimelineA, currentTimelineB, currentTileUrl, currentTileUrlB, tileRefreshing, isPlaying,
+    togglePlay, canPrevCal, canNextCal, prevCalMonth, nextCalMonth, latestCalDate, jumpToLatestMonth, calFirstDay,
+    calDaysInMonth, calTrailing, SENSOR_DOT_COLOR,
+  } = useImageTimeline({ tenant, cropType, selectedIndex, setSelectedIndex, plots, activeSidebarItem, noteLoadIssue });
 
-  const [refreshSlider, setRefreshSlider] = useState(0);
-  const [selectedSensor, setSelectedSensor] = useState('sentinel-2'); // 'sentinel-2' | 'landsat'
-  // Set right before a sensor/index switch triggered by picking a specific
-  // calendar date (see selectDateWithSensor below) — consumed once the
-  // resulting TIMELINE_DATA reload lands, so the slider jumps to that exact
-  // date instead of always defaulting to the most recent acquisition.
-  const pendingCalendarDateRef = useRef(null);
-  // { date, sensors } while a calendar day with imagery from more than one
-  // satellite is awaiting the user's choice of which one to view.
-  const [satellitePicker, setSatellitePicker] = useState(null);
+  const {
+    selectedBasemap, setSelectedBasemap, showGoogleLabels, setShowGoogleLabels, activeComposite, compositeTileUrl,
+    showBasemapDropdown, setShowBasemapDropdown, basemapDropdownRef, basemapUrl, basemapAttribution, basemapMaxNativeZoom,
+  } = useBasemap({ tenant, currentTimeline, noteLoadIssue });
 
-  const SAR_INDICES = new Set(['rvi', 'dprvi', 'smi', 'flood_mask', 'sar_rvi', 'sar_dprvi', 'sar_smi']);
-  const isSarIndex = SAR_INDICES.has((selectedIndex || '').toLowerCase());
-  // SAR indices are always Sentinel-1; optical defaults to user-chosen sensor
-  const effectiveSensor = isSarIndex ? 'sentinel-1' : selectedSensor;
+  const {
+    intelShowLayers, setIntelShowLayers, intelShowBoundaries, setIntelShowBoundaries, intelBoundariesOpacity, setIntelBoundariesOpacity, getIntelPlotStyleOutline,
+    healthShowLayers, setHealthShowLayers, healthShowBoundaries, setHealthShowBoundaries, healthBoundariesOpacity, setHealthBoundariesOpacity, getHealthPlotStyleOutline,
+    moistureShowLayers, setMoistureShowLayers, moistureShowBoundaries, setMoistureShowBoundaries, moistureBoundariesOpacity, setMoistureBoundariesOpacity,
+    yieldShowLayers, setYieldShowLayers, yieldShowBoundaries, setYieldShowBoundaries, yieldBoundariesOpacity, setYieldBoundariesOpacity, getYieldPlotStyleOutline,
+    climateShowLayers, setClimateShowLayers, climateShowBoundaries, setClimateShowBoundaries, climateBoundariesOpacity, setClimateBoundariesOpacity, getClimatePlotStyleOutline,
+    restoreShowLayers, setRestoreShowLayers, restoreShowBoundaries, setRestoreShowBoundaries, restoreBoundariesOpacity, setRestoreBoundariesOpacity, getRestorePlotStyleOutline,
+  } = useMapLayerToggles();
 
-  // Jumps the map to a specific calendar date on a specific satellite. If
-  // that satellite isn't already the active one, switches sensor/index first
-  // (via pendingCalendarDateRef, resolved once TIMELINE_DATA reloads);
-  // otherwise the date is already in the current timeline, so it applies
-  // immediately with no reload needed.
-  const selectDateWithSensor = (dateStr, sensor) => {
-    const alreadyActive = sensor === 'sentinel-1' ? isSarIndex : (!isSarIndex && sensor === selectedSensor);
-    if (alreadyActive) {
-      const idx = TIMELINE_DATA.findIndex(t => t.date === dateStr);
-      if (idx !== -1) setSelectedTimelineIndex(idx);
-      return;
-    }
-    pendingCalendarDateRef.current = dateStr;
-    if (sensor === 'sentinel-1') {
-      setSelectedIndex('rvi');
-    } else {
-      if (isSarIndex) setSelectedIndex('ndvi');
-      setSelectedSensor(sensor);
-    }
-  };
+  const {
+    sidebarWidth, bottomPanelHeight, isBottomPanelMinimized, setIsBottomPanelMinimized, activeResizeType,
+    startSidebarResize, startBottomPanelResize, splitPosition, isDraggingSplit, handleSplitDragStart,
+  } = usePanelSizes();
 
-  // Fetch timeseries slider and pre-rendered raster overlays.
-  // The previous tiles/timeline stay on screen while the new data loads —
-  // clearing them upfront caused the whole map to blink blank on every refetch.
-  useEffect(() => {
-    async function loadSliderData() {
-      setTimelineLoading(true);
-      try {
-        const indexName = (selectedIndex || 'ndvi').toLowerCase();
-        const sensorParam = isSarIndex ? 'sentinel-1' : selectedSensor;
-        // Rolling 6-month window ending today — a fixed Jan–Mar 2026 range
-        // stopped showing any new imagery the moment that quarter passed.
-        const windowEnd = new Date();
-        const windowStart = new Date();
-        windowStart.setMonth(windowStart.getMonth() - 6);
-        const isoDate = (d) => d.toISOString().slice(0, 10);
-        const data = await api.fetchTimeseriesSlider({
-          farm: tenant || 'farm_1',
-          index: indexName,
-          start: isoDate(windowStart),
-          end: isoDate(windowEnd),
-          sensor: sensorParam,
-          // Crop mode: tiles are coloured with this crop's legend classes.
-          // Org mode: cropType is undefined, so no crop_type is sent and the
-          // tile server falls back to the generic classes — matching the
-          // generic legends shown in this mode.
-          cropType,
-        });
-        setSliderData(data);
-        // Keep zarr bounds in sync when index changes (SAR vs optical extents may differ)
-        if (data?.zarr_bounds) setZarrBounds(data.zarr_bounds);
-      } catch (err) {
-        noteLoadIssue('satellite dates', err);
-      } finally {
-        setTimelineLoading(false);
-      }
-    }
-    loadSliderData();
-    // NOTE: selectedPlot is deliberately NOT a dependency — clicking a plot
-    // fetches its pixel timeseries separately and must not reload (and blink)
-    // the whole farm raster.
-  }, [selectedIndex, tenant, refreshSlider, selectedSensor, noteLoadIssue]);
+  const {
+    legendEntries, legendGroups, expandedLegendKeys, toggleLegendKey, expandedLegendGroups, toggleLegendGroup,
+    resetLegendExpansion, emptyLegendMessage,
+  } = useLegendEntries({ isOrg, availableIndices, cropProfileEntries });
 
-  // Click handler to fetch Zarr pixel timeseries
+  const chatContext = [
+    `Organisation: ${tenantDisplayName}`,
+    service ? `Service: ${service.title}` : (!isOrg && cropLabel ? `Crop: ${cropLabel}` : null),
+    filterEstate && filterEstate !== 'All' ? `Estate: ${filterEstate}` : null,
+  ].filter(Boolean).join('. ');
+  const {
+    scenarioFormOpen, setScenarioFormOpen, chatMessages, setChatMessages, chatInput, setChatInput, chatLoading,
+    chatEndRef, handleChatSubmit,
+  } = useAdvisorChat({ contextLine: chatContext });
+
+  // Click on a block: the pixel history of the layer on the map at that point
   const handlePlotClick = async (plot, lat, lng) => {
     setSelectedPlot(plot);
     try {
-      const farmId = getBackendFarmId(plot.id);
-      const indexName = (selectedIndex || 'ndvi').toLowerCase();
       const data = await api.fetchPixelTimeseries({
-        farm: `farm_${farmId}`,
-        index: indexName,
+        farm: `farm_${getBackendFarmId(plot.id)}`,
+        index: (selectedIndex || 'ndvi').toLowerCase(),
         lat,
         lon: lng
       });
-      if (data && data.series) {
-        setPixelTimeseries(data.series);
-      } else {
-        setPixelTimeseries(null);
-      }
+      setPixelTimeseries(data && data.series ? data.series : null);
     } catch (err) {
       noteLoadIssue("the block's history", err);
       setPixelTimeseries(null);
     }
   };
 
-  // Real timeline loaded from backend zarr/TIF data — no mock values
-  const [TIMELINE_DATA, setTIMELINE_DATA] = useState([]);
-  const [tileRefreshing, setTileRefreshing] = useState(false);
-  // Full imagery coverage across every sensor — independent of whichever
-  // single sensor+index is currently selected on the map, so the calendar
-  // shows everything the archive actually has, not just today's selection.
-  const [calendarDates, setCalendarDates] = useState([]);
-  useEffect(() => {
-    let active = true;
-    async function loadCalendarDates() {
-      try {
-        const data = await api.fetchTimeseriesCalendar({ farm: tenant || 'farm_1' });
-        if (active) setCalendarDates(data?.dates || []);
-      } catch (err) {
-        noteLoadIssue('the image calendar', err);
-      }
-    }
-    loadCalendarDates();
-    return () => { active = false; };
-  }, [tenant, noteLoadIssue]);
-  const SENSOR_DOT_COLOR = { 'sentinel-2': 'var(--brand-primary)', 'landsat': 'var(--status-warning)', 'sentinel-1': 'var(--status-info)' };
-  // (timelineLoading, zarrBounds, calendarMonth, calendarYear, selectedTimelineIndex
-  // are declared earlier — see note above the slider-fetching effect)
-
-  // Build TIMELINE_DATA from sliderData — single source of truth, no separate NDVI fetch.
-  // This guarantees currentTimeline.date always matches sliderData.tiles keys.
-  useEffect(() => {
-    if (!sliderData) return;
-    setTimelineLoading(false); // eslint-disable-line react-hooks/set-state-in-effect
-    if (!sliderData.timeline?.length) {
-      setTIMELINE_DATA([]);
-      return;
-    }
-    const entries = sliderData.timeline.map((t) => {
-      let sumNdvi = 0, countNdvi = 0;
-      let sumNdmi = 0, countNdmi = 0;
-      let sumEvi = 0, countEvi = 0;
-      let sumChl = 0, countChl = 0;
-      let sumNdwi = 0, countNdwi = 0;
-
-      if (plots && plots.length > 0) {
-        plots.forEach(p => {
-          if (p.indices) {
-            if (p.indices.ndvi && p.indices.ndvi[t.date] != null) { sumNdvi += p.indices.ndvi[t.date]; countNdvi++; }
-            if (p.indices.ndmi && p.indices.ndmi[t.date] != null) { sumNdmi += p.indices.ndmi[t.date]; countNdmi++; }
-            if (p.indices.evi && p.indices.evi[t.date] != null) { sumEvi += p.indices.evi[t.date]; countEvi++; }
-            if (p.indices.cvi && p.indices.cvi[t.date] != null) { sumChl += p.indices.cvi[t.date]; countChl++; }
-            if (p.indices.ndwi && p.indices.ndwi[t.date] != null) { sumNdwi += p.indices.ndwi[t.date]; countNdwi++; }
-          }
-        });
-      }
-
-      return {
-        date: t.date,
-        label: t.label,
-        satellite: t.satellite || null,
-        quality: '—',
-        source: t.source || (t.is_estimated ? 'radar_estimate' : null),
-        is_estimated: Boolean(t.is_estimated || t.source === 'radar_estimate'),
-        ndvi: countNdvi > 0 ? sumNdvi / countNdvi : (t.ndvi ?? 0),
-        ndmi: countNdmi > 0 ? sumNdmi / countNdmi : (t.ndmi ?? 0),
-        evi: countEvi > 0 ? sumEvi / countEvi : 0,
-        chlorophyll: countChl > 0 ? sumChl / countChl : 0,
-        ndwi: countNdwi > 0 ? sumNdwi / countNdwi : 0,
-        color: '#16A34A',
-        tileUrl: (sliderData.tiles || {})[t.date] || null,
-      };
-    });
-    setTIMELINE_DATA(entries);
-    if (entries.length > 0) {
-      // If the user just picked a specific date from the calendar (possibly
-      // triggering a sensor/index switch first), land on THAT date once this
-      // reload lands, instead of always jumping to the most recent one.
-      const pending = pendingCalendarDateRef.current;
-      pendingCalendarDateRef.current = null;
-      const pendingIdx = pending ? entries.findIndex(e => e.date === pending) : -1;
-      const targetIdx = pendingIdx !== -1 ? pendingIdx : entries.length - 1;
-      const target = entries[targetIdx].date;
-      setSelectedTimelineIndex(targetIdx);
-      // Only snap the mini-calendar's displayed month to the active pass on
-      // an explicit date pick or the very first load — this effect re-runs
-      // on every sliderData/plots refresh (index switch, tenant reload,
-      // periodic polling, ...), and unconditionally resetting
-      // calendarMonth/Year here undid the user's own prev/next-month
-      // navigation moments after they clicked it, making "Passes This
-      // Month" look permanently stuck on whatever month the active pass
-      // is in.
-      if (pendingIdx !== -1 || !calendarInitializedRef.current) {
-        const d = new Date(target);
-        setCalendarMonth(d.getMonth());
-        setCalendarYear(d.getFullYear());
-      }
-      calendarInitializedRef.current = true;
-    }
-  }, [sliderData, plots]);
-
-  const [isCompareMode, setIsCompareMode] = useState(false);
-  const [compareTimelineIndex, setCompareTimelineIndex] = useState(3);
-
-  // activeTimelineIndex drives map tile rendering — debounced briefly after
-  // slider/calendar stops moving, so dragging doesn't fire a tile request
-  // per frame. selectedTimelineIndex updates instantly for slider position feedback.
-  const [activeTimelineIndex, setActiveTimelineIndex] = useState(2);
-  const [activeCompareTimelineIndex, setActiveCompareTimelineIndex] = useState(3);
-  const [sliderPending, setSliderPending] = useState(false);
-  const sliderTimerA = useRef(null);
-  const sliderTimerB = useRef(null);
-
-  useEffect(() => {
-    setSliderPending(true); // eslint-disable-line react-hooks/set-state-in-effect
-    clearTimeout(sliderTimerA.current);
-    sliderTimerA.current = setTimeout(() => {
-      setActiveTimelineIndex(selectedTimelineIndex);
-      setSliderPending(false);
-    }, 400);
-    return () => clearTimeout(sliderTimerA.current);
-  }, [selectedTimelineIndex]);
-
-  useEffect(() => {
-    clearTimeout(sliderTimerB.current);
-    sliderTimerB.current = setTimeout(() => {
-      setActiveCompareTimelineIndex(compareTimelineIndex);
-    }, 400);
-    return () => clearTimeout(sliderTimerB.current);
-  }, [compareTimelineIndex]);
-
-  const clampedTimelineIndex = Math.min(activeTimelineIndex, TIMELINE_DATA.length - 1);
-  const currentTimelineA = TIMELINE_DATA[clampedTimelineIndex >= 0 ? clampedTimelineIndex : 0];
-  const clampedCompareTimelineIndex = Math.min(activeCompareTimelineIndex, TIMELINE_DATA.length - 1);
-  const currentTimelineB = TIMELINE_DATA[clampedCompareTimelineIndex >= 0 ? clampedCompareTimelineIndex : 0];
-  const currentTimeline = currentTimelineA;
-
-  const plotsDataA = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map(p => {
-        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
-          : [];
-        const ndviVal = p.indices?.ndvi ?? null; // null until the first satellite result: never counted as stressed
-        const ndmiVal = p.indices?.ndmi ?? null;
-        const healthVal = ndviVal == null ? 'No data' : ndviVal > 0.7 ? 'Optimal' : ndviVal > 0.55 ? 'Good' : 'Stressed';
-        const colorVal = healthVal === 'Optimal' ? '#15803d' : healthVal === 'Good' ? '#84cc16' : healthVal === 'Stressed' ? '#dc2626' : '#9CA3AF';
-        return { id: p.plot_id, name: p.name || p.plot_id, area: p.area_ha != null ? `${p.area_ha} HA` : null, health: healthVal, ndvi: ndviVal, ndmi: ndmiVal, color: colorVal, coords, indices: p.indices, subfarm: p.subfarm || p.division || null, division: p.division || null, blocId: p.bloc_id || null, filters: p.filters || {}, farmId: p.farm_id || null };
-      });
-    }
-    return [];
-  }, [plots, currentTimelineA]);
-
-  const plotsDataB = useMemo(() => {
-    if (plots && plots.length > 0) {
-      return plots.map(p => {
-        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
-          : [];
-        const ndviVal = p.indices?.ndvi ?? null; // null until the first satellite result: never counted as stressed
-        const ndmiVal = p.indices?.ndmi ?? null;
-        const healthVal = ndviVal == null ? 'No data' : ndviVal > 0.7 ? 'Optimal' : ndviVal > 0.55 ? 'Good' : 'Stressed';
-        const colorVal = healthVal === 'Optimal' ? '#15803d' : healthVal === 'Good' ? '#84cc16' : healthVal === 'Stressed' ? '#dc2626' : '#9CA3AF';
-        return { id: p.plot_id, name: p.name || p.plot_id, area: p.area_ha != null ? `${p.area_ha} HA` : null, health: healthVal, ndvi: ndviVal, ndmi: ndmiVal, color: colorVal, coords, indices: p.indices, subfarm: p.subfarm || p.division || null, division: p.division || null, blocId: p.bloc_id || null, filters: p.filters || {}, farmId: p.farm_id || null };
-      });
-    }
-    return [];
-  }, [plots, currentTimelineB]);
+  // Every block of the organisation (slots A and B of compare mode show the same blocks).
+  const plotsDataA = useMemo(() => mapBlocks(plots), [plots]);
+  const plotsDataB = plotsDataA;
 
   // Estates: registered estates from the backend, else the estate names the
   // plots carry (boundary property). The selector only shows with 2 or more.
@@ -815,52 +256,25 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     return plots.filter(p => inEstate(p.subfarm || p.division, p.farm_id, filterEstate, est));
   }, [plots, filterEstate, estates]);
 
-  // Admin-configured dashboard filters (Super Admin onboarding) narrowed to
-  // just the intelligence-layers map view — other tabs/charts keep reading
-  // the full plotsData so this doesn't risk breaking aggregate stats.
+  // Admin-configured dashboard filters (Super Admin onboarding) narrow the
+  // intelligence-layers map only; other pages keep the full plotsData.
   const filteredPlotsData = useMemo(() => {
     const activeFilters = Object.entries(dynamicFilterValues).filter(([, v]) => v && v !== 'All');
     if (activeFilters.length === 0) return plotsData;
     return plotsData.filter(p => activeFilters.every(([key, val]) => String(p.filters?.[key]) === val));
   }, [plotsData, dynamicFilterValues]);
 
-  const currentTileUrl = useMemo(() => {
-    if (!currentTimeline) return null;
-    // sliderData is loaded with selectedIndex — always use it first so index changes take effect
-    if (sliderData?.tiles?.[currentTimeline.date]) return sliderData.tiles[currentTimeline.date];
-    // fallback: NDVI tile baked into the timeline entry
-    if (currentTimeline.tileUrl) return currentTimeline.tileUrl;
-    return null;
-  }, [sliderData, currentTimeline]);
-
-  // Compare Mode's slot B raster — sliderData.tiles already holds every date
-  // in the timeline (not just the one currently selected), so slot B's tile
-  // just needs its own date looked up in the same map. Previously there was
-  // no second tile at all: the swipe divider and Left/Right date badges
-  // rendered, but both sides showed the exact same (or no) raster, since
-  // only slot A ever had a TileLayer.
-  const currentTileUrlB = useMemo(() => {
-    if (!currentTimelineB) return null;
-    if (sliderData?.tiles?.[currentTimelineB.date]) return sliderData.tiles[currentTimelineB.date];
-    if (currentTimelineB.tileUrl) return currentTimelineB.tileUrl;
-    return null;
-  }, [sliderData, currentTimelineB]);
-
-  // The composite basemap (true colour / false colour / SAR RGB) is keyed to
-  // the SAME acquisition date as the index overlay, so both move together
-  // under one time slider.
-  const compositeTileUrl = useMemo(() => {
-    if (!activeComposite || !currentTimeline || !compositeSliderData?.tiles) return null;
-    return compositeSliderData.tiles[currentTimeline.date] || null;
-  }, [activeComposite, compositeSliderData, currentTimeline]);
-
-  // Brief flash to signal tile refresh to user when tile URL changes
-  useEffect(() => {
-    if (!currentTileUrl) return;
-    setTileRefreshing(true); // eslint-disable-line react-hooks/set-state-in-effect
-    const t = setTimeout(() => setTileRefreshing(false), 1800);
-    return () => clearTimeout(t);
-  }, [currentTileUrl]);
+  // Each map page's block rows (compare slots A and B show the same blocks on different dates).
+  const healthPlotsData = useMemo(() => healthRows(estatePlots), [estatePlots]);
+  const moisturePlotsData = useMemo(() => moistureRows(estatePlots, selectedIndex), [estatePlots, selectedIndex]);
+  const yieldPlotsData = useMemo(() => yieldRows(estatePlots), [estatePlots]);
+  const climatePlotsData = useMemo(() => climateRows(estatePlots, plotsTelemetry), [estatePlots, plotsTelemetry]);
+  const restorationPlotsData = useMemo(() => restorationRows(restorationZones), [restorationZones]);
+  const [healthPlotsDataA, healthPlotsDataB] = [healthPlotsData, healthPlotsData];
+  const [moisturePlotsDataA, moisturePlotsDataB] = [moisturePlotsData, moisturePlotsData];
+  const [yieldPlotsDataA, yieldPlotsDataB] = [yieldPlotsData, yieldPlotsData];
+  const [climatePlotsDataA, climatePlotsDataB] = [climatePlotsData, climatePlotsData];
+  const [restorationPlotsDataA, restorationPlotsDataB] = [restorationPlotsData, restorationPlotsData];
 
   const activePlotBounds = useMemo(() => {
     // For the raster overlay we want full-farm coverage, not a single plot.
@@ -889,199 +303,37 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
 
   // Bounds used for the raster ImageOverlay: prefer zarr-derived bounds (exact pixel coverage)
   // over GeoJSON-derived bounds which may differ from the zarr spatial extent.
-  const rasterOverlayBounds = useMemo(() => {
-    if (zarrBounds) return zarrBounds;
-    return activePlotBounds;
-  }, [zarrBounds, activePlotBounds]);
+  const rasterOverlayBounds = zarrBounds || activePlotBounds;
 
-  const renderInfoTooltip = (...args) => renderInfoTooltipImpl({  }, ...args);
-
-
-  // Layout Resizing States
-  const [sidebarWidth, setSidebarWidth] = useState(240);
-  // Was 175 — too cramped for the calendar's satellite-coverage dots and the
-  // multi-satellite picker that can appear underneath it. Still user-resizable.
-  const [bottomPanelHeight, setBottomPanelHeight] = useState(260);
-  const [isBottomPanelMinimized, setIsBottomPanelMinimized] = useState(true); // collapsed until opened
-  const [activeResizeType, setActiveResizeType] = useState(null); // 'sidebar', 'bottom', or null
-
-  const startSidebarResize = (e) => {
-    e.preventDefault();
-    setActiveResizeType('sidebar');
-    const startX = e.clientX;
-    const startWidth = sidebarWidth;
-
-    const doDrag = (moveEvent) => {
-      const newWidth = Math.max(180, Math.min(360, startWidth + (moveEvent.clientX - startX)));
-      setSidebarWidth(newWidth);
-    };
-
-    const stopDrag = () => {
-      setActiveResizeType(null);
-      document.removeEventListener('mousemove', doDrag);
-      document.removeEventListener('mouseup', stopDrag);
-    };
-
-    document.addEventListener('mousemove', doDrag);
-    document.addEventListener('mouseup', stopDrag);
-  };
-
-  const startBottomPanelResize = (e) => {
-    e.preventDefault();
-    setActiveResizeType('bottom');
-    const startY = e.clientY;
-    const startHeight = bottomPanelHeight;
-
-    const doDrag = (moveEvent) => {
-      const newHeight = Math.max(120, Math.min(500, startHeight - (moveEvent.clientY - startY)));
-      setBottomPanelHeight(newHeight);
-    };
-
-    const stopDrag = () => {
-      setActiveResizeType(null);
-      document.removeEventListener('mousemove', doDrag);
-      document.removeEventListener('mouseup', stopDrag);
-    };
-
-    document.addEventListener('mousemove', doDrag);
-    document.addEventListener('mouseup', stopDrag);
-  };
-
-  const [activeDateSlot, setActiveDateSlot] = useState('A');
-  const [splitPosition, setSplitPosition] = useState(50);
-  const [isDraggingSplit, setIsDraggingSplit] = useState(false);
-
-  // Handle Split Dragging
-  const handleSplitDragStart = (e) => {
-    e.preventDefault();
-    setIsDraggingSplit(true);
-  };
-
-  useEffect(() => {
-    if (!isDraggingSplit) return;
-
-    const handleMove = (e) => {
-      const mapContainer = document.querySelector('.map-wrapper-pane');
-      if (!mapContainer) return;
-
-      const rect = mapContainer.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const relativeX = clientX - rect.left;
-      let percentage = (relativeX / rect.width) * 100;
-      
-      if (percentage < 0) percentage = 0;
-      if (percentage > 100) percentage = 100;
-      
-      setSplitPosition(percentage);
-    };
-
-    const handleDragEnd = () => {
-      setIsDraggingSplit(false);
-    };
-
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('mouseup', handleDragEnd);
-    window.addEventListener('touchmove', handleMove);
-    window.addEventListener('touchend', handleDragEnd);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMove);
-      window.removeEventListener('mouseup', handleDragEnd);
-      window.removeEventListener('touchmove', handleMove);
-      window.removeEventListener('touchend', handleDragEnd);
-    };
-  }, [isDraggingSplit]);
-
-
-  const [showBasemapDropdown, setShowBasemapDropdown] = useState(false);
-  const basemapDropdownRef = useRef(null);
-
-  // Close basemap dropdown on outside click
-  useEffect(() => {
-    const handler = e => {
-      if (basemapDropdownRef.current && !basemapDropdownRef.current.contains(e.target)) {
-        setShowBasemapDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
+  // Map pieces drawn by dashboard/map: each gets the state it reads.
+  const renderInfoTooltip = (...args) => renderInfoTooltipImpl({}, ...args);
   const renderFloatingBasemapSelector = (...args) => renderFloatingBasemapSelectorImpl({ activeComposite, basemapDropdownRef, compositeTileUrl, selectedBasemap, setSelectedBasemap, setShowBasemapDropdown, setShowGoogleLabels, showBasemapDropdown, showGoogleLabels }, ...args);
-
-  // Reports state
-
-  // Verification state
-
-
-  // Chat state
-  const [scenarioFormOpen, setScenarioFormOpen] = useState(false);
-  const [chatMessages, setChatMessages] = useState([
-    { sender: 'assistant', text: "Ask about your fields: crop condition, water, weather or alerts. Answers use your own monitoring data." }
-  ]);
-  const [chatInput, setChatInput] = useState('');
-  const chatEndRef = useRef(null);
+  // Each map page's layers panel: the switch puts that index's raster on the map, one at a time.
+  const renderLegendCard = (...args) => renderLegendCardImpl({ expandedLegendKeys, mapOpacity, openGlossary, renderInfoTooltip, selectedIndex, setMapOpacity, setSelectedIndex, setShowRasterLayer, showRasterLayer, toggleLegendKey }, ...args);
+  // groupFilter narrows which legend groups a page shows; Map Analytics omits it to show the whole archive.
+  const renderLegendCards = (...args) => renderLegendCardsImpl({ emptyLegendMessage, expandedLegendGroups, legendEntries, legendGroups, renderLegendCard, selectedIndex, showRasterLayer, toggleLegendGroup }, ...args);
+  const renderIntelPolygons = (...args) => renderIntelPolygonsImpl({ getIntelPlotStyleOutline, handlePlotClick, intelShowBoundaries }, ...args);
+  const renderHealthPolygons = (...args) => renderHealthPolygonsImpl({ getHealthPlotStyleOutline, handlePlotClick, healthShowBoundaries }, ...args);
+  const renderMoisturePolygons = (...args) => renderMoisturePolygonsImpl({ handlePlotClick, moistureBoundariesOpacity, moistureShowBoundaries, showRasterLayer }, ...args);
+  // A block or zone filled by the "Colour by" choice of its map page, with
+  // the same classes as the panel's legend (dashboard/legends/layerLegends.js).
+  const colouredPolygon = (...args) => colouredPolygonImpl({ cropType }, ...args);
+  const renderYieldPolygons = (...args) => renderYieldPolygonsImpl({ colouredPolygon, getYieldPlotStyleOutline, handlePlotClick, yieldShowBoundaries }, ...args);
+  const RESTORE_VALUE = { restoration_progress: 'progress', survival: 'survivalNum', carbon: 'carbonPerHa' };
+  const renderRestorePolygons = (...args) => renderRestorePolygonsImpl({ RESTORE_VALUE, colouredPolygon, getRestorePlotStyleOutline, restoreShowBoundaries }, ...args);
+  const CLIMATE_VALUE = { rain: 'rainfall', heat: 'lst' };
+  const renderClimatePolygons = (...args) => renderClimatePolygonsImpl({ CLIMATE_VALUE, climateShowBoundaries, colouredPolygon, getClimatePlotStyleOutline, handlePlotClick }, ...args);
 
   // Map play / calendar / user menu
-  const [isPlaying, setIsPlaying]       = useState(false);
-  const [showUserMenu,  setShowUserMenu]  = useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef(null);
-
+  const [showNotifications, setShowNotifications] = useState(false);
+  // Left sidebar tools
+  const [showCalendarTool, setShowCalendarTool] = useState(true);
+  const [showTimeSliderTool, setShowTimeSliderTool] = useState(true);
   // Dashboard filter states
   const [filterPlot, setFilterPlot] = useState('All');
   const [filterDate, setFilterDate] = useState('All');
-
-
-  // Land Restoration new layers states
-
-
-  // Alerts Command Center redesigned states
-
-  // Dropdown layout states
-
-  // Intelligence layers new states
-
-  // Crop Health missing layers states
-
-  // Climate missing layers states
-
-  // Land Restoration missing layers states
-
-  // Land Restoration states
-
-  // Crop Yield states
-
-  // Crop Health states
-
-  // Climate map states
-
-  // Intelligence Layers map layers states
-  const [intelShowLayers, setIntelShowLayers] = useState(true);
-  const [intelShowBoundaries, setIntelShowBoundaries] = useState(true);
-  const [intelBoundariesOpacity, setIntelBoundariesOpacity] = useState(100);
-
-  // Left sidebar Tools states
-  const [showCalendarTool, setShowCalendarTool] = useState(true);
-  const [showTimeSliderTool, setShowTimeSliderTool] = useState(true);
-
-  // Settings and User Management States — only the real logged-in account,
-  // no fabricated team roster. Additional members appear when invited.
-
-  // User Management Invite Form States
-
-  // Configuration API Keys States
-
-  // Help Topics States
-
-  // Crop Health map layers states
-  const [healthShowLayers, setHealthShowLayers] = useState(true);
-  const [healthShowBoundaries, setHealthShowBoundaries] = useState(true);
-  const [healthBoundariesOpacity, setHealthBoundariesOpacity] = useState(100);
-
-  // Moisture Content map layers states
-  const [moistureShowLayers, setMoistureShowLayers] = useState(true);
-  const [moistureShowBoundaries, setMoistureShowBoundaries] = useState(true);
-  const [moistureBoundariesOpacity, setMoistureBoundariesOpacity] = useState(100);
 
   // The signed-in person, read-only here; it is changed at /org/<tenant>/settings.
   const profileEmail = localStorage.getItem('fi_email') || '';
@@ -1089,239 +341,22 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const profileName = localStorage.getItem('fi_full_name') || tenantDisplayName || profileEmail || 'Account';
   const profileRole = roleLabel(localStorage.getItem('fi_role') || 'admin');
   const profileInitials = profileName.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join('').toUpperCase() || '?';
-  const [showNotifications, setShowNotifications] = useState(false);
-
-  // Collapsible sidebar section groups states (collapsed/false by default)
-
-  // Crop legend cards: which index legends are manually expanded
-  // (the index currently rendered on the map is always expanded)
-  const [expandedLegendKeys, setExpandedLegendKeys] = useState([]);
-  const toggleLegendKey = (key) => setExpandedLegendKeys(prev =>
-    prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
-
-  // ── Legend cards ────────────────────────────────────────────────────────
-  // Both modes render the same card; only the source of the entries differs:
-  //   crop mode — the crop's index profile, with crop-specific class
-  //               breakpoints and agronomic wording (indices absent from the
-  //               archive are shown disabled as "(No data)").
-  //   org  mode — every index actually present in the tenant's archive, with
-  //               the generic scientific classes.
-  // Normalising here means one card implementation, not two.
-  // Org mode has no crop context, so indices are grouped from their
-  // crop-agnostic INDEX_REGISTRY tags rather than the crop-specific
-  // crop_group the backend computes for crop mode (see below).
-  const groupFromTags = (tags = [], key = '') => {
-    const t = tags.map(x => String(x).toLowerCase());
-    const k = String(key).toLowerCase();
-    
-    // Ground Moisture: Soil moisture, SAR SMI, thermal soil moisture, NDTI
-    if (k === 'smi' || k === 'smi_landsat' || k === 'ndti' || t.some(x => ['soil-water', 'soil-moisture', 'ground-moisture', 'thermal-moisture'].includes(x))) {
-      return 'Ground moisture';
-    }
-    // Vegetation Moisture: Optical canopy moisture & water status (NDMI, NDWI, LSWI, MSI, WDI)
-    if (k === 'ndmi' || k === 'ndwi' || k === 'lswi' || k === 'msi' || k === 'wdi' || t.some(x => ['water', 'moisture', 'water-stress', 'canopy-water', 'flood', 'paddy', 'irrigation', 'drought', 'evapotranspiration', 'canopy-moisture'].includes(x))) {
-      return 'Vegetation moisture';
-    }
-    if (t.some(x => ['chlorophyll', 'nitrogen', 'nutrient', 'phenology'].includes(x))) {
-      return 'Nutrient & Chlorophyll';
-    }
-    return 'Vegetation Health';
-  };
-
-  const legendEntries = useMemo(() => {
-    if (isOrg) {
-      return availableIndices.map(ix => {
-        const key = String(ix.index).toLowerCase();
-        const title = ix.label || key.toUpperCase();
-        return {
-          key,
-          title,
-          tooltip: title,
-          subtitle: ix.full || title,
-          legend: ix.legend || [],
-          notes: '',
-          hasData: true,
-          ramp: [ix.lo, ix.hi],
-          group: groupFromTags(ix.tags, key),
-        };
-      });
-    }
-    return cropProfileEntries.map(entry => ({
-      key: entry.key,
-      title: entry.crop_label || entry.label,
-      tooltip: entry.label,
-      subtitle: entry.full || entry.label,
-      legend: entry.legend || [],
-      notes: entry.notes || '',
-      hasData: availableIndices.some(i => String(i.index).toLowerCase() === entry.key),
-      ramp: null,
-      group: groupFromTags(entry.tags || [], entry.key),
-    }));
-  }, [isOrg, availableIndices, cropProfileEntries]);
-
-  // The map layers panel shows each index's classes from here: the same classes the tiles are painted with.
-  useEffect(() => {
-    setIndexClasses(Object.fromEntries(legendEntries.filter(e => e.legend?.length).map(e => [e.key, e.legend])));
-  }, [legendEntries]);
-
-  const legendGroups = useMemo(() => {
-    const groups = {};
-    legendEntries.forEach(entry => {
-      const g = entry.group || 'General';
-      (groups[g] = groups[g] || []).push(entry);
-    });
-    return groups;
-  }, [legendEntries]);
-
-  // Group headers collapsed by default except the first, so the panel
-  // isn't a wall of text on first open.
-  const [expandedLegendGroups, setExpandedLegendGroups] = useState(null);
-  const toggleLegendGroup = (name) => setExpandedLegendGroups(prev => {
-    const current = prev || Object.keys(legendGroups).slice(0, 1);
-    return current.includes(name) ? current.filter(g => g !== name) : [...current, name];
-  });
-
-  // Plain empty state (docs/INFORMATION_PRESENTATION.md, section 5)
-  const emptyLegendMessage = "We're preparing your first satellite views. They usually appear within a few days of setup.";
-
-  // Reused by every map section's Map Layers sidebar. The switch puts that
-  // index's raster ON the map — one raster at a time. Cards are grouped
-  // under a named category (Vegetation Health, Water & Moisture, Nutrient &
-  // Chlorophyll, Structure & Moisture, ...) instead of one flat list — see
-  // legendGroups above, sourced from crop_group (crop mode) or INDEX_REGISTRY
-  // tags (org mode).
-  const renderLegendCard = (...args) => renderLegendCardImpl({ expandedLegendKeys, mapOpacity, openGlossary, renderInfoTooltip, selectedIndex, setMapOpacity, setSelectedIndex, setShowRasterLayer, showRasterLayer, toggleLegendKey }, ...args);
-
-  // groupFilter narrows which legend groups a page shows — e.g. Crop Health
-  // only needs vegetation-vigor indicators, not the whole catalog (SAR,
-  // water/moisture, etc). Omit it (as Map Analytics does) to show
-  // everything — that page is the one deliberate "see the full archive"
-  // view; every other page should show a distinct, non-overlapping slice
-  // rather than repeating the same full index list.
-  const renderLegendCards = (...args) => renderLegendCardsImpl({ emptyLegendMessage, expandedLegendGroups, legendEntries, legendGroups, renderLegendCard, selectedIndex, showRasterLayer, toggleLegendGroup }, ...args);
-
-
-
-
-
-
-
-
-  const getHealthPlotStyleOutline = () => {
-    const color = '#000000'; // block outlines are always black
-    
-    return {
-      color: healthShowBoundaries ? color : 'transparent',
-      weight: healthShowBoundaries ? 2.5 : 0,
-      opacity: healthBoundariesOpacity / 100,
-      // Outlines only: blocks are never filled (results show in charts and block details).
-      fillColor: 'transparent',
-      fillOpacity: 0
-    };
-  };
-
-
-  // Crop Yield map layers states
-  const [yieldShowLayers, setYieldShowLayers] = useState(true);
-  const [yieldShowBoundaries, setYieldShowBoundaries] = useState(true);
-  const [yieldBoundariesOpacity, setYieldBoundariesOpacity] = useState(100);
-
-  const getYieldPlotStyleOutline = () => ({
-    color: yieldShowBoundaries ? '#000000' : 'transparent',
-    weight: yieldShowBoundaries ? 2.5 : 0,
-    opacity: yieldBoundariesOpacity / 100,
-    fillColor: 'transparent',
-    fillOpacity: 0
-  });
-
-
-  // Climate map layers states
-  const [climateShowLayers, setClimateShowLayers] = useState(true);
-  const [climateShowBoundaries, setClimateShowBoundaries] = useState(true);
-  const [climateBoundariesOpacity, setClimateBoundariesOpacity] = useState(100);
-
-  const getClimatePlotStyleOutline = () => ({
-    color: climateShowBoundaries ? '#000000' : 'transparent',
-    weight: climateShowBoundaries ? 2.5 : 0,
-    opacity: climateBoundariesOpacity / 100,
-    fillColor: 'transparent',
-    fillOpacity: 0
-  });
-
-
-  // Land Restoration map layers states
-  const [restoreShowLayers, setRestoreShowLayers] = useState(true);
-  const [restoreShowBoundaries, setRestoreShowBoundaries] = useState(true);
-  const [restoreBoundariesOpacity, setRestoreBoundariesOpacity] = useState(100);
-
-  // Layer independent toggle handlers for each page (allowing concurrent layers)
-
-
-
-
-
-  const getRestorePlotStyleOutline = () => ({
-    color: restoreShowBoundaries ? '#000000' : 'transparent',
-    weight: restoreShowBoundaries ? 2.5 : 0,
-    opacity: restoreBoundariesOpacity / 100,
-    fillColor: 'transparent',
-    fillOpacity: 0
-  });
-
-
-  const getIntelPlotStyleOutline = () => ({
-    color: intelShowBoundaries ? '#000000' : 'transparent',
-    weight: intelShowBoundaries ? 2.5 : 0,
-    opacity: intelBoundariesOpacity / 100,
-    fillColor: 'transparent',
-    fillOpacity: 0
-  });
-
-
-
-  // Helper methods to render overlapping active layers
-
-  const renderIntelPolygons = (...args) => renderIntelPolygonsImpl({ getIntelPlotStyleOutline, handlePlotClick, intelShowBoundaries }, ...args);
-
-  const renderHealthPolygons = (...args) => renderHealthPolygonsImpl({ getHealthPlotStyleOutline, handlePlotClick, healthShowBoundaries }, ...args);
-
-  const renderMoisturePolygons = (...args) => renderMoisturePolygonsImpl({ handlePlotClick, moistureBoundariesOpacity, moistureShowBoundaries, showRasterLayer }, ...args);
-
-  // A block or zone filled by the "Colour by" choice of its map page, with
-  // the same classes as the panel's legend (dashboard/legends/layerLegends.js).
-  const colouredPolygon = (...args) => colouredPolygonImpl({ cropType }, ...args);
-
-  const renderYieldPolygons = (...args) => renderYieldPolygonsImpl({ colouredPolygon, getYieldPlotStyleOutline, handlePlotClick, yieldShowBoundaries }, ...args);
-
-  const RESTORE_VALUE = { restoration_progress: 'progress', survival: 'survivalNum', carbon: 'carbonPerHa' };
-  const renderRestorePolygons = (...args) => renderRestorePolygonsImpl({ RESTORE_VALUE, colouredPolygon, getRestorePlotStyleOutline, restoreShowBoundaries }, ...args);
-
-  const CLIMATE_VALUE = { rain: 'rainfall', heat: 'lst' };
-  const renderClimatePolygons = (...args) => renderClimatePolygonsImpl({ CLIMATE_VALUE, climateShowBoundaries, colouredPolygon, getClimatePlotStyleOutline, handlePlotClick }, ...args);
 
   const handleEstateChange = (val) => {
     setFilterEstate(val);
     setFilterPlot('All');
-    // Estate filter now uses real subfarm names from plotsData
   };
 
-  const handlePlotChange = (val) => {
-    setFilterPlot(val);
-  };
+  const handlePlotFilterChange = (plotId) => setFilterPlot(plotId);
 
   const handleSidebarClick = (item) => {
     setActiveSidebarItem(item);
     setActiveTab('monitor');
-    // selectedIndex/showRasterLayer are shared across every section's map —
-    // switching sections used to leave whatever raster the previous section
-    // had on (e.g. Moisture Content's SMI/SAR) still showing on the next
-    // one, with that section's own legend panel not indicating anything as
-    // A freshly opened section shows its index layer straight away when an image exists for the
-    // date (the map draws it only then); selectedIndex gets the section's default.
+    // selectedIndex and showRasterLayer are shared by every page's map: a freshly opened page shows
+    // its own index layer straight away when an image exists for the date (the map draws it only then),
+    // never the last page's layer.
     const hasImage = (k) => availableIndices.some(i => String(i.index).toLowerCase() === k);
-    if (item === 'analytics') {
-      setActiveTab('monitor');
-    } else if (item === 'moisture-content') {
+    if (item === 'moisture-content') {
       // The first water layer that has an image: standing water (radar), then the optical water layers.
       // Radar soil moisture comes last: it needs a dry reference built over many passes and is rarely there.
       setSelectedIndex(['flood_mask', 'lswi', 'ndmi', 'ndwi', 'smi'].find(hasImage) || 'flood_mask');
@@ -1330,7 +365,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     } else if (item === 'land-restoration') {
       setSelectedIndex('ndwi');
     } else if (item === 'climate') {
-      // Weather shows surface heat (Landsat thermal) when there is an image, never the last page's layer.
+      // Weather shows surface heat (Landsat thermal) when there is an image.
       setSelectedIndex('lst');
     }
     setShowRasterLayer(item === 'climate' ? hasImage('lst') : true);
@@ -1338,337 +373,10 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     // opens on this layer's newest image once its timeline loads.
     calendarInitializedRef.current = false;
     pendingCalendarDateRef.current = null;
-    // Which legend groups/cards were expanded is per-section UI state —
-    // left as component-wide state, it carried over between pages (e.g.
-    // Crop Health's "Vegetation Health" group left expanded would show as
-    // expanded on Moisture Content too, whose own groups are unrelated),
-    // making it look like group selection was "stuck" on whatever was last
-    // opened instead of responding to the section actually being viewed.
-    setExpandedLegendGroups(null);
-    setExpandedLegendKeys([]);
+    resetLegendExpansion();
   };
 
-
-  const handlePlotFilterChange = (plotId) => {
-    setFilterPlot(plotId);
-    handlePlotChange(plotId);
-  };
-
-  const handleAcknowledgeAlert = (alertId) => {
-    // Optimistic update, reverted if the backend call fails — previously
-    // this only mutated local state, so acknowledgements never persisted
-    // and reappeared as "Active" after a refresh.
-    setAlerts(prev => prev.map(a => a.id === alertId ? { ...a, status: 'Acknowledged' } : a));
-    api.acknowledgeAlert(alertId).catch(err => {
-      console.error('Failed to acknowledge alert:', err);
-      setAlerts(prev => prev.map(a => a.id === alertId ? { ...a, status: 'Active' } : a));
-    });
-  };
-
-
-
-
-
-  const healthPlotsDataA = useMemo(() => {
-    if (estatePlots.length > 0) {
-      return estatePlots.map(p => {
-        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
-          : [];
-        const ndviVal = p.indices?.ndvi ?? null; // null until the first satellite result: never counted as stressed
-        const healthVal = ndviVal == null ? 'No data' : ndviVal > 0.7 ? 'Optimal' : ndviVal > 0.55 ? 'Good' : 'Stressed';
-        return {
-          id: p.plot_id,
-          name: p.name || p.plot_id,
-          area: p.area_ha != null ? `${p.area_ha} ha` : null,
-          health: healthVal,
-          ndvi: ndviVal,
-          savi: p.indices?.savi ?? null,
-          ndwi: p.indices?.ndwi ?? null,
-          cumulative_rainfall_14d: p.indices?.cumulative_rainfall_14d ?? null,
-          chlorophyll: p.indices?.chlorophyll ?? null,
-          waterStress: p.indices?.ndmi ?? null,
-          pestRisk: p.indices?.uas_anomaly_score > 0.4 ? 'High Risk' : p.indices?.uas_anomaly_score > 0.15 ? 'Moderate Risk' : 'Low Risk',
-          coords
-        };
-      });
-    }
-    return [];
-  }, [estatePlots, currentTimelineA]);
-
-  const healthPlotsDataB = useMemo(() => {
-    if (estatePlots.length > 0) {
-      return estatePlots.map(p => {
-        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
-          : [];
-        const ndviVal = p.indices?.ndvi ?? null; // null until the first satellite result: never counted as stressed
-        const healthVal = ndviVal == null ? 'No data' : ndviVal > 0.7 ? 'Optimal' : ndviVal > 0.55 ? 'Good' : 'Stressed';
-        return {
-          id: p.plot_id,
-          name: p.name || p.plot_id,
-          area: p.area_ha != null ? `${p.area_ha} ha` : null,
-          health: healthVal,
-          ndvi: ndviVal,
-          savi: p.indices?.savi ?? null,
-          ndwi: p.indices?.ndwi ?? null,
-          cumulative_rainfall_14d: p.indices?.cumulative_rainfall_14d ?? null,
-          chlorophyll: p.indices?.chlorophyll ?? null,
-          waterStress: p.indices?.ndmi ?? null,
-          pestRisk: p.indices?.uas_anomaly_score > 0.4 ? 'High Risk' : p.indices?.uas_anomaly_score > 0.15 ? 'Moderate Risk' : 'Low Risk',
-          coords
-        };
-      });
-    }
-    return [];
-  }, [estatePlots, currentTimelineB]);
-
-  const healthPlotsData = healthPlotsDataA;
-
-  const moisturePlotsDataA = useMemo(() => {
-    if (estatePlots.length > 0) {
-      return estatePlots.map(p => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        }
-        const ndmiVal = p.indices?.ndmi ?? null;
-        const ndwiVal = p.indices?.ndwi ?? null;
-        const lswiVal = p.indices?.lswi ?? null;
-        const smiVal = p.indices?.smi ?? null;
-        const msiVal = p.indices?.msi ?? null;
-
-        let activeVal = ndmiVal;
-        if (selectedIndex === 'ndwi') activeVal = ndwiVal;
-        else if (selectedIndex === 'lswi') activeVal = lswiVal;
-        else if (selectedIndex === 'smi') activeVal = smiVal;
-        else if (selectedIndex === 'msi') activeVal = msiVal;
-
-        let status = 'Adequate';
-        let color = '#60a5fa';
-        if (activeVal != null) {
-          if (selectedIndex === 'smi') {
-            status = activeVal > 5 ? 'Wet Soil' : activeVal > 2 ? 'Adequate' : 'Dry Soil';
-            color = activeVal > 5 ? '#1d4ed8' : activeVal > 2 ? '#60a5fa' : '#dc2626';
-          } else {
-            status = activeVal > 0.35 ? 'Well-Hydrated' : activeVal > 0.15 ? 'Adequate' : activeVal > -0.05 ? 'Mild Deficit' : 'Severe Deficit';
-            color = activeVal > 0.35 ? '#1d4ed8' : activeVal > 0.15 ? '#60a5fa' : activeVal > -0.05 ? '#fbbf24' : '#dc2626';
-          }
-        }
-        return {
-          id: p.plot_id,
-          name: p.name || p.plot_id,
-          area: p.area_ha != null ? `${p.area_ha} ha` : null,
-          ndmi: ndmiVal,
-          ndwi: ndwiVal,
-          lswi: lswiVal,
-          smi: smiVal,
-          msi: msiVal,
-          activeVal,
-          moistureStatus: status,
-          color,
-          coords
-        };
-      });
-    }
-    return [];
-  }, [estatePlots, currentTimelineA, selectedIndex]);
-
-  const moisturePlotsDataB = useMemo(() => {
-    if (estatePlots.length > 0) {
-      return estatePlots.map(p => {
-        let coords = [];
-        if (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0]) {
-          coords = api.geoJsonToLeaflet(p.boundary.coordinates[0]);
-        }
-        const ndmiVal = p.indices?.ndmi ?? null;
-        const ndwiVal = p.indices?.ndwi ?? null;
-        const lswiVal = p.indices?.lswi ?? null;
-        const smiVal = p.indices?.smi ?? null;
-        const msiVal = p.indices?.msi ?? null;
-
-        let activeVal = ndmiVal;
-        if (selectedIndex === 'ndwi') activeVal = ndwiVal;
-        else if (selectedIndex === 'lswi') activeVal = lswiVal;
-        else if (selectedIndex === 'smi') activeVal = smiVal;
-        else if (selectedIndex === 'msi') activeVal = msiVal;
-
-        let status = 'Adequate';
-        let color = '#60a5fa';
-        if (activeVal != null) {
-          if (selectedIndex === 'smi') {
-            status = activeVal > 5 ? 'Wet Soil' : activeVal > 2 ? 'Adequate' : 'Dry Soil';
-            color = activeVal > 5 ? '#1d4ed8' : activeVal > 2 ? '#60a5fa' : '#dc2626';
-          } else {
-            status = activeVal > 0.35 ? 'Well-Hydrated' : activeVal > 0.15 ? 'Adequate' : activeVal > -0.05 ? 'Mild Deficit' : 'Severe Deficit';
-            color = activeVal > 0.35 ? '#1d4ed8' : activeVal > 0.15 ? '#60a5fa' : activeVal > -0.05 ? '#fbbf24' : '#dc2626';
-          }
-        }
-        return {
-          id: p.plot_id,
-          name: p.name || p.plot_id,
-          area: p.area_ha != null ? `${p.area_ha} ha` : null,
-          ndmi: ndmiVal,
-          ndwi: ndwiVal,
-          lswi: lswiVal,
-          smi: smiVal,
-          msi: msiVal,
-          activeVal,
-          moistureStatus: status,
-          color,
-          coords
-        };
-      });
-    }
-    return [];
-  }, [estatePlots, currentTimelineB, selectedIndex]);
-
-  const moisturePlotsData = moisturePlotsDataA;
-
-  const yieldPlotsDataA = useMemo(() => {
-    if (estatePlots.length > 0) {
-      return estatePlots.map(p => {
-        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
-          : [];
-        return {
-          id: p.plot_id,
-          name: p.name || p.plot_id,
-          area: p.area_ha != null ? `${p.area_ha} ha` : null,
-          // From harvest records (Farm data); empty until they are uploaded.
-          yieldValue: p.yield_t_ha ?? null,
-          coords
-        };
-      });
-    }
-    return [];
-  }, [estatePlots, currentTimelineA]);
-
-  const yieldPlotsDataB = useMemo(() => {
-    if (estatePlots.length > 0) {
-      return estatePlots.map(p => {
-        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
-          : [];
-        return {
-          id: p.plot_id,
-          name: p.name || p.plot_id,
-          area: p.area_ha != null ? `${p.area_ha} ha` : null,
-          // From harvest records (Farm data); empty until they are uploaded.
-          yieldValue: p.yield_t_ha ?? null,
-          coords
-        };
-      });
-    }
-    return [];
-  }, [estatePlots, currentTimelineB]);
-
-  const yieldPlotsData = yieldPlotsDataA;
-
-  const climatePlotsDataA = useMemo(() => {
-    if (estatePlots.length > 0) {
-      return estatePlots.map((p) => {
-        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
-          : [];
-        // Rain and surface heat per block from /plots/telemetry; null when
-        // the run had no reading, never invented.
-        const telemetry = (plotsTelemetry || []).find(t => t.plot_id === p.plot_id);
-        return {
-          id: p.plot_id,
-          name: p.name || p.plot_id,
-          area: p.area_ha != null ? `${p.area_ha} ha` : null,
-          rainfall: telemetry?.rainfall_mm ?? null,
-          lst: telemetry?.surface_lst_celsius ?? null,
-          coords
-        };
-      });
-    }
-    return [];
-  }, [estatePlots, currentTimelineA, selectedTimelineIndex, plotsTelemetry]);
-
-  const climatePlotsDataB = useMemo(() => {
-    if (estatePlots.length > 0) {
-      return estatePlots.map((p) => {
-        const coords = (p.boundary && p.boundary.coordinates && p.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(p.boundary.coordinates[0])
-          : [];
-        const telemetry = (plotsTelemetry || []).find(t => t.plot_id === p.plot_id);
-        return {
-          id: p.plot_id,
-          name: p.name || p.plot_id,
-          area: p.area_ha != null ? `${p.area_ha} ha` : null,
-          rainfall: telemetry?.rainfall_mm ?? null,
-          lst: telemetry?.surface_lst_celsius ?? null,
-          coords
-        };
-      });
-    }
-    return [];
-  }, [estatePlots, currentTimelineB, compareTimelineIndex, plotsTelemetry]);
-
-  const climatePlotsData = climatePlotsDataA;
-
-  const restorationPlotsDataA = useMemo(() => {
-    if (restorationZones && restorationZones.length > 0) {
-      return restorationZones.map(z => {
-        const coords = (z.boundary && z.boundary.coordinates && z.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(z.boundary.coordinates[0])
-          : [];
-        return {
-          id: z.zone_id,
-          name: z.name,
-          area: z.area_ha != null ? `${z.area_ha} ha` : null,
-          carbonPerHa: z.carbon_offset_tco2e != null && z.area_ha ? z.carbon_offset_tco2e / z.area_ha : null,
-          type: z.project_type ?? null,
-          progress: z.progress_pct ?? null,
-          survival: z.survival_rate_pct != null ? `${z.survival_rate_pct}%` : '—',
-          trees: z.tree_count != null ? z.tree_count.toLocaleString() : '—',
-          carbon: z.carbon_offset_tco2e != null ? `${z.carbon_offset_tco2e} tCO2e` : '—',
-          status: z.status ?? null,
-          coords,
-          manager: z.manager ?? null,
-          survivalNum: z.survival_rate_pct ?? null
-        };
-      });
-    }
-    return [];
-  }, [restorationZones, currentTimelineA]);
-
-  const restorationPlotsDataB = useMemo(() => {
-    if (restorationZones && restorationZones.length > 0) {
-      return restorationZones.map(z => {
-        const coords = (z.boundary && z.boundary.coordinates && z.boundary.coordinates[0])
-          ? api.geoJsonToLeaflet(z.boundary.coordinates[0])
-          : [];
-        return {
-          id: z.zone_id,
-          name: z.name,
-          area: z.area_ha != null ? `${z.area_ha} ha` : null,
-          carbonPerHa: z.carbon_offset_tco2e != null && z.area_ha ? z.carbon_offset_tco2e / z.area_ha : null,
-          type: z.project_type ?? null,
-          progress: z.progress_pct ?? null,
-          survival: z.survival_rate_pct != null ? `${z.survival_rate_pct}%` : '—',
-          trees: z.tree_count != null ? z.tree_count.toLocaleString() : '—',
-          carbon: z.carbon_offset_tco2e != null ? `${z.carbon_offset_tco2e} tCO2e` : '—',
-          status: z.status ?? null,
-          coords,
-          manager: z.manager ?? null,
-          survivalNum: z.survival_rate_pct ?? null
-        };
-      });
-    }
-    return [];
-  }, [restorationZones, currentTimelineB]);
-
-  const restorationPlotsData = restorationPlotsDataA;
-
-
-
-
-  const renderMapBottomPanel = (...args) => renderMapBottomPanelImpl({ setActiveDateSlot, latestCalDate, jumpToLatestMonth, setCalendarYear, setCalendarMonth,canPrevCal, canNextCal, SENSOR_DOT_COLOR, TIMELINE_DATA, activeDateSlot, bottomPanelHeight, calDaysInMonth, calFirstDay, calTrailing, calendarDates, calendarMonth, calendarYear, compareTimelineIndex, currentTimeline, currentTimelineA, currentTimelineB, effectiveSensor, isBottomPanelMinimized, isCompareMode, isPlaying, nextCalMonth, prevCalMonth, satellitePicker, selectDateWithSensor, selectedIndex, selectedTimelineIndex, setCompareTimelineIndex, setIsBottomPanelMinimized, setRefreshSlider, setSatellitePicker, setSelectedTimelineIndex, showCalendarTool, showTimeSliderTool, sliderPending, startBottomPanelResize, timelineLoading, togglePlay }, ...args);
-
-  // Dynamic Dashboard Calculations — real data only, no mock fallback
+  const renderMapBottomPanel = (...args) => renderMapBottomPanelImpl({ setActiveDateSlot, latestCalDate, jumpToLatestMonth, setCalendarYear, setCalendarMonth, canPrevCal, canNextCal, SENSOR_DOT_COLOR, TIMELINE_DATA, activeDateSlot, bottomPanelHeight, calDaysInMonth, calFirstDay, calTrailing, calendarDates, calendarMonth, calendarYear, compareTimelineIndex, currentTimeline, currentTimelineA, currentTimelineB, effectiveSensor, isBottomPanelMinimized, isCompareMode, isPlaying, nextCalMonth, prevCalMonth, satellitePicker, selectDateWithSensor, selectedIndex, selectedTimelineIndex, setCompareTimelineIndex, setIsBottomPanelMinimized, setRefreshSlider, setSatellitePicker, setSelectedTimelineIndex, showCalendarTool, showTimeSliderTool, sliderPending, startBottomPanelResize, timelineLoading, togglePlay }, ...args);
 
   // Measures for Block summary: the crop's index classes, plus rain and heat per block.
   const telemetryById = useMemo(() => Object.fromEntries((plotsTelemetry || []).map(t => [t.plot_id, t])), [plotsTelemetry]);
@@ -1702,16 +410,9 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     };
   }, [plotsData, stats, carbon, alerts, dataLoading, cropProfileEntries, cropPrimaryIndex, service, cropType, currentTimeline]);
 
-
-
-
-
-
-
-
   const nutrientData = useMemo(() => {
-    // Derive radar axes from real zarr index values via currentTimeline
-    // Missing values stay null (never drawn as 0); the card shows an empty state instead
+    // Radar axes from the farm's index values on the chosen date; missing values stay null
+    // (never drawn as 0) and the card shows an empty state instead.
     const ndvi  = currentTimeline?.ndvi  ?? null;
     const ndmi  = currentTimeline?.ndmi  ?? null;
     const evi   = currentTimeline?.evi   ?? null;
@@ -1741,128 +442,13 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     };
   }, [currentTimeline]);
 
-
-
-
-
-
-
-  // Static fallback (ESRI World Imagery) shown while a composite's own tiles
-  // are still loading, so the basemap never goes blank mid-fetch.
-  const STATIC_BASEMAP_FALLBACK = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-  // ESRI's World_Terrain_Base has real global satellite coverage but
-  // genuinely sparse terrain-relief coverage over much of Africa — at the
-  // farm's actual location and zoom level it returned a literal "Map data
-  // not yet available" placeholder tile instead of a 404, so it looked
-  // broken rather than missing. OpenTopoMap (OSM + SRTM-derived, no API
-  // key) has real, complete tiles at the same coordinates and zoom.
-  const TERRAIN_BASEMAP_URL = 'https://a.tile.opentopomap.org/{z}/{x}/{y}.png';
-  const basemapUrl = useMemo(() => {
-    if (activeComposite) return compositeTileUrl || STATIC_BASEMAP_FALLBACK;
-    if (selectedBasemap === 'terrain') return TERRAIN_BASEMAP_URL;
-    if (selectedBasemap === 'osm-streets') return 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-    if (selectedBasemap === 'esri-imagery') return STATIC_BASEMAP_FALLBACK;
-    if (selectedBasemap === 'google-hybrid') {
-      // lyrs=y = satellite + labels, lyrs=s = satellite only
-      return `https://mt1.google.com/vt/lyrs=${showGoogleLabels ? 'y' : 's'}&x={x}&y={y}&z={z}`;
-    }
-    return STATIC_BASEMAP_FALLBACK;
-  }, [selectedBasemap, activeComposite, compositeTileUrl, showGoogleLabels]);
-  // OpenTopoMap's real (non-upscaled) tiles top out at z17 — the shared
-  // maxNativeZoom={18} that worked fine for satellite sources requested
-  // tiles one level past what terrain actually has.
-  // Credit for whichever background is showing (docs/DATA_SOURCES.md, credits).
-  const basemapAttribution = activeComposite ? `Contains modified Copernicus Sentinel data ${new Date().getFullYear()}`
-    : selectedBasemap === 'google-hybrid' ? 'Imagery © Google'
-      : selectedBasemap === 'terrain' ? 'Map data © OpenStreetMap contributors, SRTM · Map style © OpenTopoMap (CC-BY-SA)'
-        : selectedBasemap === 'osm-streets' ? '© OpenStreetMap contributors'
-          : 'Imagery © Esri, Maxar, Earthstar Geographics';
-  const basemapMaxNativeZoom = (selectedBasemap === 'terrain' || selectedBasemap === 'osm-streets') && !activeComposite ? (selectedBasemap === 'terrain' ? 17 : 19) : 18;
-
-
-  // Reset timeline selection to middle index when changing month/year
-  useEffect(() => {
-    setSelectedTimelineIndex(2); // eslint-disable-line react-hooks/set-state-in-effect
-  }, [calendarMonth, calendarYear]);
-
-  const [chatLoading, setChatLoading] = useState(false);
-
-  // One AI agent endpoint for questions and what-if scenarios. The chat shows
-  // the readable question; the agent also gets the portal context and, for
-  // scenarios, the advisor answer layout.
-  const handleChatSubmit = async (textToSend, scenarioMeta = null) => {
-    const query = textToSend || chatInput;
-    if (!query.trim() || chatLoading) return;
-    setChatMessages(prev => [...prev, { sender: 'user', text: query, scenario: scenarioMeta?.scenario || null }]);
-    if (!textToSend) setChatInput('');
-    setChatLoading(true);
-    const context = [
-      `Organisation: ${tenantDisplayName}`,
-      service ? `Service: ${service.title}` : (!isOrg && cropLabel ? `Crop: ${cropLabel}` : null),
-      filterEstate && filterEstate !== 'All' ? `Estate: ${filterEstate}` : null,
-    ].filter(Boolean).join('. ');
-    const agentQuery = scenarioMeta
-      ? `[Scenario ${scenarioMeta.scenario}] ${query}
-
-Context: ${context}.
-${ANSWER_FORMAT}`
-      : `${query}
-
-Context: ${context}.`;
-    try {
-      const result = await api.queryAiAgent(agentQuery);
-      const reply = result?.response || "No response from AI agent.";
-      setChatMessages(prev => [...prev, { sender: 'assistant', text: reply, sources: result?.sources }]);
-    } catch {
-      setChatMessages(prev => [...prev, { sender: 'assistant', text: "Sorry, the AI assistant is unavailable right now. Please try again." }]);
-    } finally {
-      setChatLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages]);
-
+  // Keep the open block details in step with refreshed block data
   useEffect(() => {
     if (selectedPlot) {
       const updated = plotsData.find(p => p.id === selectedPlot.id);
       if (updated) setSelectedPlot(updated); // eslint-disable-line react-hooks/set-state-in-effect
     }
-  }, [plotsData]);
-
-  // Play auto-advance
-  useEffect(() => {
-    if (!isPlaying) return;
-    const id = setInterval(() => {
-      if (isCompareMode) {
-        if (activeDateSlot === 'A') {
-          setSelectedTimelineIndex(prev => {
-            if (prev >= TIMELINE_DATA.length - 1) { setIsPlaying(false); return prev; }
-            return prev + 1;
-          });
-        } else {
-          setCompareTimelineIndex(prev => {
-            if (prev >= TIMELINE_DATA.length - 1) { setIsPlaying(false); return prev; }
-            return prev + 1;
-          });
-        }
-      } else {
-        setSelectedTimelineIndex(prev => {
-          if (prev >= TIMELINE_DATA.length - 1) { setIsPlaying(false); return prev; }
-          return prev + 1;
-        });
-      }
-    }, 10000);
-    return () => clearInterval(id);
-  }, [isPlaying, isCompareMode, activeDateSlot, TIMELINE_DATA.length]);
-
-  // Stop playing when leaving map view
-  useEffect(() => {
-    if (!['crop-health', 'crop-yield', 'climate', 'land-restoration'].includes(activeSidebarItem)) {
-      setIsPlaying(false); // eslint-disable-line react-hooks/set-state-in-effect
-    }
-  }, [activeSidebarItem]);
+  }, [plotsData]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Close user menu on outside click
   useEffect(() => {
@@ -1872,56 +458,6 @@ Context: ${context}.`;
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
   }, []);
-
-  const togglePlay = () => setIsPlaying(p => !p);
-
-
-
-
-
-
-  // The calendar stays between the oldest image we hold and this month: no
-  // future months, and no empty months before the data starts.
-  const calMonthKey = calendarYear * 12 + calendarMonth;
-  const nowMonthKey = new Date().getFullYear() * 12 + new Date().getMonth();
-  // Dates of the layer on this page only (its own timeline), so the calendar matches the sub-page.
-  const oldestMonthKey = useMemo(() => {
-    const dates = (TIMELINE_DATA || []).map(t => t.date).filter(Boolean).sort();
-    if (!dates.length) return nowMonthKey;
-    const [y, m] = dates[0].split('-').map(Number);
-    return y * 12 + (m - 1);
-  }, [TIMELINE_DATA, nowMonthKey]);
-  const canPrevCal = calMonthKey > oldestMonthKey;
-  const canNextCal = calMonthKey < nowMonthKey;
-  const prevCalMonth = () => {
-    if (!canPrevCal) return;
-    if (calendarMonth === 0) { setCalendarMonth(11); setCalendarYear(y => y - 1); }
-    else setCalendarMonth(m => m - 1);
-  };
-  const nextCalMonth = () => {
-    if (!canNextCal) return;
-    if (calendarMonth === 11) { setCalendarMonth(0); setCalendarYear(y => y + 1); }
-    else setCalendarMonth(m => m + 1);
-  };
-
-  // Newest image we hold, so the calendar can jump straight to it.
-  const latestCalDate = useMemo(() => {
-    const dates = (TIMELINE_DATA || []).map(t => t.date).filter(Boolean).sort();
-    return dates.length ? dates[dates.length - 1] : null;
-  }, [TIMELINE_DATA]);
-  const jumpToLatestMonth = () => {
-    if (!latestCalDate) return;
-    const [y, m] = latestCalDate.split('-').map(Number);
-    setCalendarYear(y);
-    setCalendarMonth(m - 1);
-  };
-
-  // Calendar computed values
-  const calFirstDay    = new Date(calendarYear, calendarMonth, 1).getDay();
-  const calDaysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
-  const calTrailing    = 42 - calFirstDay - calDaysInMonth;
-
-  // ─── Health badge helper ────────────────────────────────────────────────
 
   return (
     <div className="h-screen flex flex-col bg-white text-gray-900 font-sans antialiased overflow-hidden">
