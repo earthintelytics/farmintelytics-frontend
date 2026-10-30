@@ -334,6 +334,7 @@ const Onboarding = () => {
           schedulers.push(await createSchedulerJob({
             name: `${t.id}_scheduled_monitoring`, description: `Satellite monitoring for ${t.name} (set up at onboarding)`,
             cron: cronFor(sched, i * 15), config_path: `configs/${res.filename}`, is_batch: true, enabled: true,
+            company_id: done.org.schema_name, // never guessed from the name (an organisation's own name can hold underscores)
           }));
         } catch (e) { setError(`Config created, but the schedule for ${t.name} failed: ${e.message}`); }
       }
@@ -388,7 +389,11 @@ const Onboarding = () => {
         </div>
         {hasDraft && step < 6 && (
           <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
-            <span>Your answers are kept as a draft on this computer{done.org ? `, and ${company.company_name || 'the organisation'} is already created` : ''}. Boundary files need to be picked again after a refresh.</span>
+            <div className="space-y-1 max-w-3xl">
+              <p>Everything you've filled in is saved in this browser. If the page refreshes or you close it, you continue where you left off. Another computer won't see it.</p>
+              {done.org && <p>{company.company_name || 'The organisation'} already exists in the system. Start over clears this form only: to remove the organisation too, delete it on the Organisations page first.</p>}
+              <p>A browser can't keep files: after a refresh, choose the boundary files again.</p>
+            </div>
             <button type="button" onClick={startOver} className="font-semibold text-red-700 hover:underline">Start over</button>
           </div>
         )}
