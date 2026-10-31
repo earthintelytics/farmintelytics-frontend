@@ -55,7 +55,10 @@ export const KPI_DEFS = {
     compute: (ctx) => {
       const s = classShares(ctx, ctx.waterKey);
       if (!s) return { missing: ctx.waterKey ? 'Waiting for the first satellite results' : 'No water layer for this crop' };
-      return { value: `${s.worst} of ${s.total}`, sub: s.worst ? 'Check irrigation, drainage or rainfall' : `None of your ${ctx.unitLabel} is short of water` };
+      // Whole fields can look fine while a patch inside one is dry: say so, pointing to where to walk.
+      const dry = ctx.dryPatches || 0;
+      const patchNote = dry ? `; ${dry} patch${dry === 1 ? '' : 'es'} inside ${dry === 1 ? 'a field' : 'fields'} may be short of water (Block summary)` : '';
+      return { value: `${s.worst} of ${s.total}`, sub: s.worst ? 'Check irrigation, drainage or rainfall' : `None of your ${ctx.unitLabel} is short of water${patchNote}` };
     },
   },
   alerts: {
@@ -63,7 +66,9 @@ export const KPI_DEFS = {
     compute: (ctx) => {
       const open = (ctx.alerts || []).filter((a) => !['Resolved', 'Dismissed', 'resolved', 'dismissed'].includes(a.status));
       const urgent = open.filter((a) => /critical/i.test(a.severity || a.level || '')).length;
-      return { value: String(open.length), sub: urgent ? `${urgent} to act on now` : open.length ? 'None urgent' : 'Nothing open' };
+      const weak = ctx.weakPatches || 0;
+      const walk = weak ? ` · ${weak} weak patch${weak === 1 ? '' : 'es'} to check (Block summary)` : '';
+      return { value: String(open.length), sub: (urgent ? `${urgent} to act on now` : open.length ? 'None urgent' : 'Nothing open') + walk };
     },
   },
   // Carbon held in the crops: area x the admin's carbon range per crop (backend, services/crop_carbon.py).

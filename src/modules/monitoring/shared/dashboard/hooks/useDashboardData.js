@@ -18,6 +18,7 @@ export function useDashboardData({ tenant, hasSession, service, isSmallholderSer
   const [restorationZones, setRestorationZones] = useState([]);
   const [farmBoundary, setFarmBoundary] = useState(null); // GeoJSON Feature for tenants with no plot polygons
   const [alerts, setAlerts] = useState([]);
+  const [scouting, setScouting] = useState(null); // where to walk: the weak patches inside blocks
   const [landCover, setLandCover] = useState(null);
   const [landCoverLoading, setLandCoverLoading] = useState(false);
   const [availableIndices, setAvailableIndices] = useState([]);
@@ -119,6 +120,16 @@ export function useDashboardData({ tenant, hasSession, service, isSmallholderSer
     return () => { active = false; };
   }, [tenant, service?.id, noteLoadIssue]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Where to walk, so the overview cards can point to weak patches inside fields that look fine overall.
+  useEffect(() => {
+    if (!hasSession || isSmallholderService) return;
+    let active = true;
+    api.fetchScoutingSpots()
+      .then((d) => { if (active) setScouting(d); })
+      .catch((err) => noteLoadIssue('where to walk', err));
+    return () => { active = false; };
+  }, [tenant, service?.id, noteLoadIssue]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Satellite layers held for the organisation
   useEffect(() => {
     api.fetchRasterIndices()
@@ -162,7 +173,7 @@ export function useDashboardData({ tenant, hasSession, service, isSmallholderSer
   };
 
   return {
-    estates, stats, carbon, eudrResults, dataLoading, plots, restorationZones, farmBoundary, alerts,
+    estates, stats, carbon, eudrResults, dataLoading, plots, restorationZones, farmBoundary, alerts, scouting,
     landCover, landCoverLoading, availableIndices, dashboardFilterKeys, loadIssues, setLoadIssues,
     noteLoadIssue, handleAcknowledgeAlert,
   };

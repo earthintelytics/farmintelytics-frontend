@@ -128,7 +128,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
 
   const isSmallholderService = SMALLHOLDER_SERVICES.includes(service?.id) || service?.id === 'smallholder-hub';
   const {
-    estates, stats, carbon, eudrResults, dataLoading, plots, restorationZones, farmBoundary, alerts,
+    estates, stats, carbon, eudrResults, dataLoading, plots, restorationZones, farmBoundary, alerts, scouting,
     landCover, landCoverLoading, availableIndices, dashboardFilterKeys, loadIssues, setLoadIssues,
     noteLoadIssue, handleAcknowledgeAlert,
   } = useDashboardData({ tenant, hasSession, service, isSmallholderService });
@@ -407,8 +407,11 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
       waterKey: ['ndmi', 'lswi', 'smi'].find(k => keys.includes(k)) || null,
       unitLabel: UNIT_LABEL[service?.id] || (service ? null : CROP_UNIT[cropType]) || 'blocks',
       latestPass: currentTimeline?.label || null,
+      // Weak patches inside fields (where to walk), and those whose likely cause is water.
+      weakPatches: scouting?.spots?.length || 0,
+      dryPatches: (scouting?.spots || []).filter((sp) => (sp.likely_causes || []).some((c) => c.cause === 'too_little_water')).length,
     };
-  }, [plotsData, stats, carbon, alerts, dataLoading, cropProfileEntries, cropPrimaryIndex, service, cropType, currentTimeline]);
+  }, [plotsData, stats, carbon, alerts, scouting, dataLoading, cropProfileEntries, cropPrimaryIndex, service, cropType, currentTimeline]);
 
   const nutrientData = useMemo(() => {
     // Radar axes from the farm's index values on the chosen date; missing values stay null
