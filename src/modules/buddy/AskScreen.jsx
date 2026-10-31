@@ -10,7 +10,7 @@ import { useListen } from './useListen';
 import { readAloudNote } from './useReadAloud';
 import { btnPrimary, inputBox, muted } from './ui';
 
-export default function AskScreen({ chat, language, voice }) {
+export default function AskScreen({ chat, language, voice, person, photo }) {
   const location = useLocation();
   const navigate = useNavigate();
   const prefill = location.state?.prefill || '';
@@ -44,8 +44,9 @@ export default function AskScreen({ chat, language, voice }) {
     <>
       <div className="flex-1 min-h-0 overflow-y-auto px-4 py-5 space-y-4" aria-live="polite">
         {chat.messages.length === 0 && (
-          <div className="space-y-2 pt-2">
-            <h2 className="font-display text-xl font-semibold">Ask about your farm</h2>
+          <div className="space-y-3 pt-1">
+            {photo && <img src={photo} alt="" className="w-full h-40 object-cover rounded-2xl border border-[var(--border-light)]" />}
+            <h2 className="font-display text-xl font-semibold">{person ? `Hello, ${person}. ` : ''}Ask about your farm</h2>
             <p className={`text-base ${muted}`}>
               Type your question{listen.supported ? ', or tap the button below and speak' : ''}. The answer is shown in {language.label}{note ? '' : ' and read aloud'}.
             </p>

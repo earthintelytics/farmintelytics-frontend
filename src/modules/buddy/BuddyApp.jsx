@@ -14,7 +14,8 @@ import { useBuddyChat } from './useBuddyChat';
 import { useReadAloud } from './useReadAloud';
 import { canListen } from './useListen';
 import { useBuddyManifest } from './useBuddyManifest';
-import { readOrgProfile } from '../../pages/org/orgProfile';
+import { readOrgProfile, personName } from '../../pages/org/orgProfile';
+import { CROP_PHOTOS, SERVICE_PHOTOS } from '../../constants/servicePhotos';
 import { clearTenantSession } from '../../services/session';
 
 
@@ -38,11 +39,14 @@ export default function BuddyApp() {
   const signOut = () => { voice.stop(); clearTenantSession(); navigate('/login?next=buddy', { replace: true }); };
 
   const screen = { language, voice };
+  const person = personName(profile);
+  // A picture of this farm's crop on the Ask screen (the organisation's first crop, else the advisor's).
+  const photo = CROP_PHOTOS[(profile.crops || [])[0]] || SERVICE_PHOTOS.advisor;
   return (
     <BuddyShell subtitle={profile.name} language={language}
       onLanguage={() => setSheet('language')} onMenu={() => setSheet('menu')}>
       <Routes>
-        <Route index element={<AskScreen chat={chat} {...screen} />} />
+        <Route index element={<AskScreen chat={chat} person={person} photo={photo} {...screen} />} />
         <Route path="alerts" element={<AlertsScreen tenant={profile.tenant} {...screen} />} />
         <Route path="*" element={<Navigate to="/buddy" replace />} />
       </Routes>
@@ -50,7 +54,7 @@ export default function BuddyApp() {
         <LanguageSheet current={langId} onPick={pickLanguage} onClose={closeSheet} availability={voice.availability} canSpeak={canListen()} />
       )}
       {sheet === 'menu' && (
-        <BuddyMenu orgName={profile.name} onSignOut={signOut} onClose={closeSheet} />
+        <BuddyMenu orgName={profile.name} person={person} onSignOut={signOut} onClose={closeSheet} />
       )}
     </BuddyShell>
   );

@@ -22,7 +22,7 @@ import { UNIT_LABEL, CROP_UNIT } from './dashboard/kpiCatalog';
 import { useLayerLegends } from './dashboard/legends/layerLegends';
 import { SMALLHOLDER_SERVICES } from '../../registry';
 import { useBlockMeasures } from './dashboard/pages/BlockSummaryPage';
-import { roleLabel } from '../../../pages/org/orgProfile';
+import { roleLabel, readableOrgName } from '../../../pages/org/orgProfile';
 import { CROP_CONFIG_KEYS } from './dashboard/constants/chartConfig';
 import { renderInfoTooltip as renderInfoTooltipImpl, renderFloatingBasemapSelector as renderFloatingBasemapSelectorImpl, renderLegendCard as renderLegendCardImpl, renderLegendCards as renderLegendCardsImpl, colouredPolygon as colouredPolygonImpl, renderIntelPolygons as renderIntelPolygonsImpl, renderHealthPolygons as renderHealthPolygonsImpl, renderMoisturePolygons as renderMoisturePolygonsImpl, renderYieldPolygons as renderYieldPolygonsImpl, renderRestorePolygons as renderRestorePolygonsImpl, renderClimatePolygons as renderClimatePolygonsImpl } from './dashboard/map/mapRenderers';
 import { renderMapBottomPanel as renderMapBottomPanelImpl } from './dashboard/map/MapBottomPanel';
@@ -76,8 +76,8 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
     if (!hasSession && onSignOut) onSignOut();
   }, [hasSession]); // eslint-disable-line react-hooks/exhaustive-deps
   // Display name comes from the organization's TenantConfig (stored at login)
-  const tenantDisplayName = localStorage.getItem('fi_display_name')
-    || (tenant ? tenant.charAt(0).toUpperCase() + tenant.slice(1) : '');
+  const tenantDisplayName = readableOrgName(localStorage.getItem('fi_display_name')
+    || (tenant ? tenant.charAt(0).toUpperCase() + tenant.slice(1) : ''));
   // Map center comes from TenantConfig: the mapCenter prop (fetched live) first,
   // then the copy stored at login, then a neutral default.
   let storedMapCenter;

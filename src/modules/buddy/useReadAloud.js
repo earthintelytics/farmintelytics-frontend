@@ -10,11 +10,12 @@ const norm = (l) => String(l || '').replace('_', '-').toLowerCase();
 
 // Farm Buddy speaks with a deep male voice, Nigerian English first: among the phone's voices for the
 // language, one named as male is preferred and those named as female are avoided (phones name voices
-// differently, so this is a preference, not a promise), and every voice is pitched a little lower.
+// differently, so this is a preference, not a promise). Pitch and speed stay natural: lowering them made
+// phone voices sound shaky and unsure (31 Oct 2026).
 const MALE = /\bmale\b|\bman\b|abeo|guy|baritone|deep/i;
 const FEMALE = /female|woman|girl|ezinne|zira|susan|samantha|karen|tessa|moira|fiona|victoria|hazel|libby|sonia|aria|jenny/i;
-const PITCH = 0.82;
-const RATE = 0.92;
+const PITCH = 1.0;
+const RATE = 1.0;
 const score = (v) => (MALE.test(v.name) ? 2 : 0) - (FEMALE.test(v.name) ? 2 : 0) + (v.localService ? 0.5 : 0);
 
 function pickVoice(voices, prefs) {

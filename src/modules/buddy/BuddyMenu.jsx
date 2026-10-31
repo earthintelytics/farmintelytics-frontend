@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Download, LogOut } from 'lucide-react';
 import Sheet from './Sheet';
-import { rowButton, main } from './ui';
+import { rowButton, muted, main } from './ui';
 
 function useInstallOffer() {
   const [offer, setOffer] = useState(() => (typeof window !== 'undefined' ? window.__fiInstallPrompt || null : null));
@@ -21,12 +21,13 @@ function useInstallOffer() {
   return { canInstall: !!offer, install };
 }
 
-export default function BuddyMenu({ orgName, onSignOut, onClose }) {
+export default function BuddyMenu({ orgName, person, onSignOut, onClose }) {
   const { canInstall, install } = useInstallOffer();
   return (
     <Sheet title="Menu" onClose={onClose}>
       <div className="mb-4">
         {orgName && <p className={`text-base font-semibold ${main}`}>{orgName}</p>}
+        {person && <p className={`text-[15px] ${muted} mt-0.5`}>Signed in as {person}</p>}
       </div>
       <ul className="space-y-2">
         {canInstall && (

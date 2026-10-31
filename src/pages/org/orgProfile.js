@@ -10,13 +10,25 @@ const readJson = (key) => {
   try { const v = JSON.parse(localStorage.getItem(key) || 'null'); return Array.isArray(v) ? v : []; } catch { return []; }
 };
 
+/** An organisation name for people: a short name typed at onboarding ("olam_smaller_plot") reads as
+ * "Olam smaller plot"; a name with spaces or capitals is kept exactly as written. */
+export function readableOrgName(name) {
+  const n = String(name || '').trim();
+  if (!/^[a-z0-9_-]+$/.test(n) || !/[_-]/.test(n)) return n;
+  const words = n.split(/[_-]+/).filter(Boolean).join(' ');
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+/** The signed-in person: their name on the account, else the part of their email before the @. */
+export const personName = (profile) => profile.fullName || String(profile.email || '').split('@')[0] || '';
+
 export function readOrgProfile() {
   const get = (k) => { try { return localStorage.getItem(k) || ''; } catch { return ''; } };
   const tenant = get('fi_tenant');
   const max = Number(get('fi_max_accounts'));
   return {
     tenant,
-    name: get('fi_display_name') || tenant,
+    name: readableOrgName(get('fi_display_name') || tenant),
     email: get('fi_email'),
     fullName: get('fi_full_name'),
     role: (get('fi_role') || 'admin').toLowerCase(),
