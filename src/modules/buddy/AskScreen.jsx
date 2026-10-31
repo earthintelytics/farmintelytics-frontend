@@ -1,5 +1,6 @@
-// Ask: the main screen. A chat with the farm advisor; type, or hold the microphone and speak. Each
-// answer is shown and read aloud where the phone has a voice for the language.
+// Ask: the main screen. A talk with the farm advisor; type, or tap the microphone and speak: the words
+// are typed into the box as they are heard, and the farmer checks them and presses send. Each answer is
+// shown and read aloud where the phone has a voice for the language.
 import { useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { SendHorizontal } from 'lucide-react';
@@ -16,7 +17,9 @@ export default function AskScreen({ chat, language, voice }) {
   const [text, setText] = useState(prefill);
   const endRef = useRef(null);
   const inputRef = useRef(null);
-  const listen = useListen({ language, onText: (heard) => chat.ask(heard) });
+  // What was said goes into the box (after anything already typed); it is sent only with the send button.
+  const listen = useListen({ language, onText: (heard) => setText((t) => (t.trim() ? `${t.trimEnd()} ` : '') + heard) });
+  const shown = listen.listening && listen.heard ? (text.trim() ? `${text.trimEnd()} ` : '') + listen.heard : text;
 
   // "Ask about this" from an alert opens here with the question written in; the farmer sends it.
   useEffect(() => {
@@ -44,7 +47,7 @@ export default function AskScreen({ chat, language, voice }) {
           <div className="space-y-2 pt-2">
             <h2 className="font-display text-xl font-semibold">Ask about your farm</h2>
             <p className={`text-base ${muted}`}>
-              Type your question{listen.supported ? ', or hold the button below and speak' : ''}. The answer is shown in {language.label}{note ? '' : ' and read aloud'}.
+              Type your question{listen.supported ? ', or tap the button below and speak' : ''}. The answer is shown in {language.label}{note ? '' : ' and read aloud'}.
             </p>
             {note && <p className={`text-[15px] ${muted}`}>{note}</p>}
           </div>
@@ -55,16 +58,16 @@ export default function AskScreen({ chat, language, voice }) {
       </div>
 
       <div className="shrink-0 border-t border-[var(--border-light)] bg-white px-4 pt-3 pb-3 space-y-3">
-        {listen.listening && <p className="text-base min-h-[24px]" role="status">{listen.heard || 'Speak now…'}</p>}
+        {listen.listening && !listen.heard && <p className="text-base min-h-[24px]" role="status">Speak now…</p>}
         {!listen.listening && listen.error && <p className="text-[15px] text-[var(--status-critical)]" role="alert">{listen.error}</p>}
         <form onSubmit={send} className="flex items-end gap-2">
           <label className="flex-1">
             <span className="sr-only">Your question</span>
-            <textarea ref={inputRef} rows={1} value={text} onChange={(e) => setText(e.target.value)}
+            <textarea ref={inputRef} rows={2} value={shown} readOnly={listen.listening} onChange={(e) => setText(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) send(e); }}
               placeholder="Type your question" className={`${inputBox} resize-none max-h-32`} />
           </label>
-          <button type="submit" disabled={!text.trim() || chat.busy} className={`${btnPrimary} px-4 shrink-0`} aria-label="Send">
+          <button type="submit" disabled={!text.trim() || chat.busy || listen.listening} className={`${btnPrimary} px-4 shrink-0`} aria-label="Send">
             <SendHorizontal size={22} aria-hidden="true" />
           </button>
         </form>
