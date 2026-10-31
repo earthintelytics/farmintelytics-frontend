@@ -71,7 +71,7 @@ export default function AlertsScreen({ tenant, language, voice }) {
             <>
               <p className={`text-[15px] ${muted}`}>Weak patches inside your {plural(unit)}. The causes are what to check on the ground, not a diagnosis.</p>
               <ul className="space-y-3">
-                {walk.map((s) => <WalkSpotCard key={`${s.plot_id}:${s.where}`} spot={s} language={ENGLISH} voice={voice} />)}
+                {walk.map((s, i) => <WalkSpotCard key={`${s.plot_id}:${s.where}`} spot={s} isFirst={i === 0} language={ENGLISH} voice={voice} />)}
               </ul>
             </>
           )}

@@ -1,25 +1,11 @@
 // One weak patch inside a block: where it is, the likely cause, what to look for and what to do, with
-// "Listen", "Open in maps" and "Copy GPS".
-import { useState } from 'react';
-import { Check, Copy, MapPin, Navigation, TrendingDown, Waves } from 'lucide-react';
+// "Listen" and "Get directions" (Google Maps, walking, from where the phone is).
+import { MapPin, Navigation, TrendingDown, Waves } from 'lucide-react';
 import ListenButton from './ListenButton';
-import { STRENGTH, cap, mapsLink, sentence, spotSpeech } from './farmText';
+import { STRENGTH, cap, directionsLink, sentence, spotSpeech } from './farmText';
 import { btnLine, muted } from './ui';
 
-function CopyGps({ gps }) {
-  const [done, setDone] = useState(false);
-  const copy = async () => {
-    try { await navigator.clipboard.writeText(gps); setDone(true); setTimeout(() => setDone(false), 2000); } catch { /* clipboard blocked */ }
-  };
-  return (
-    <button type="button" onClick={copy} className={btnLine} aria-label={`Copy GPS point ${gps}`}>
-      {done ? <Check size={18} className="text-[var(--brand-primary)]" aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />}
-      {done ? 'Copied' : 'Copy GPS'}
-    </button>
-  );
-}
-
-export default function WalkSpotCard({ spot, language, voice }) {
+export default function WalkSpotCard({ spot, language, voice, isFirst = true }) {
   const [first, ...rest] = spot.likely_causes || [];
   const hasPoint = Number.isFinite(Number(spot.worst_lat)) && Number.isFinite(Number(spot.worst_lon)) && spot.worst_lat !== null && spot.worst_lon !== null;
   return (
@@ -48,15 +34,13 @@ export default function WalkSpotCard({ spot, language, voice }) {
         </dl>
       )}
       <div className="flex flex-wrap gap-2">
-        <ListenButton id={`spot:${spot.plot_id}:${spot.where}`} text={spotSpeech(spot)} language={language} voice={voice} showNote={false} />
+        <ListenButton id={`spot:${spot.plot_id}:${spot.where}`} text={spotSpeech(spot, isFirst)} language={language} voice={voice} showNote={false} />
         {hasPoint && (
-          <a href={mapsLink(spot.worst_lat, spot.worst_lon)} target="_blank" rel="noreferrer" className={btnLine}>
-            <Navigation size={18} className="text-[var(--brand-primary)]" aria-hidden="true" />Open in maps
+          <a href={directionsLink(spot.worst_lat, spot.worst_lon)} target="_blank" rel="noreferrer" className={btnLine}>
+            <Navigation size={18} className="text-[var(--brand-primary)]" aria-hidden="true" />Get directions
           </a>
         )}
-        {spot.gps && <CopyGps gps={spot.gps} />}
       </div>
-      {spot.gps && <p className={`text-sm ${muted}`}>GPS <span className="font-mono">{spot.gps}</span></p>}
     </li>
   );
 }

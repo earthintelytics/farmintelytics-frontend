@@ -18,28 +18,49 @@ export function alertDate(ts) {
   return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
+// "Listen" is spoken like an adviser explaining to a farmer, not the card read out: full sentences,
+// block names said the way people say them, shares in words, and what to do last.
+const spokenName = (id) => String(id || '').replace(/[_-]+/g, ' ').replace(/\b0+(\d)/g, '$1').trim();
+const shareWords = (pct) => (pct == null ? 'part' : pct <= 7 ? 'a small part' : pct <= 15 ? 'about a tenth'
+  : pct <= 35 ? 'about a quarter' : pct <= 65 ? 'about half' : 'most');
+const SAY_CAUSE = {
+  too_much_water: 'there is too much water sitting in that part of the field',
+  too_little_water: 'the crop there is not getting enough water',
+  nutrient_shortage: 'the plants there are short of nitrogen or another nutrient',
+  heat: 'that part of the field is running hotter than the rest',
+  sudden_damage: 'something damaged the crop there recently, like pests, disease, animals, or plants falling over',
+  long_standing_weak_patch: 'that patch has been weak since the start, maybe from gaps in planting or poor soil',
+};
+const SAY_SEVERITY = { Critical: 'This one needs action now', Warning: 'Keep an eye on this one', Info: 'For your information' };
+const lower = (s) => (s ? s.charAt(0).toLowerCase() + s.slice(1) : s);
+const clause = (s) => lower(String(s || '').trim().replace(/[.!?]+$/, ''));
+
 export const alertSpeech = (a) => {
   const advice = adviceOf(a);
-  return [`${severityOf(a).label}.`, a.plot_id ? `${a.plot_id}.` : '', sentence(a.message), advice ? `What to do: ${sentence(advice)}` : ''].filter(Boolean).join(' ');
+  const where = a.plot_id ? ` on ${spokenName(a.plot_id)}` : '';
+  return [`${SAY_SEVERITY[a.severity] || 'For your information'}${where}.`, sentence(a.message),
+    advice ? `What I would do: ${sentence(clause(advice))}` : ''].filter(Boolean).join(' ');
 };
 
-export const spotSpeech = (s) => {
+export const spotSpeech = (s, first = true) => {
   const c = s.likely_causes?.[0];
-  return [
-    `${s.plot_id}${s.where ? `, ${s.where}` : ''}.`,
-    s.weak_pct != null ? `${s.weak_pct} percent of it is weak.` : '',
-    s.getting_worse ? 'It is getting worse.' : '',
-    s.standing_water ? 'There is standing water.' : '',
-    c ? `${STRENGTH[c.strength] || 'Possible cause'}: ${sentence(c.title)}` : '',
-    c?.check ? `Look for ${sentence(c.check)}` : '',
-    c?.do ? `What to do: ${sentence(c.do)}` : '',
-  ].filter(Boolean).join(' ');
+  const said = c && SAY_CAUSE[c.cause];
+  const lines = [
+    `${first ? "Let's start with" : 'Next,'} ${spokenName(s.plot_id)}.`,
+    `${s.where ? `In the ${s.where}, ` : ''}${shareWords(s.weak_pct)} of the field is weaker than the rest of it${s.getting_worse ? ', and it has been getting worse' : ''}.`,
+    s.standing_water ? 'The radar also saw standing water there.' : '',
+    said ? (c.strength === 'strong' ? `Most likely, ${said}.` : `It may be that ${said}.`) : "From the pictures I can't tell why.",
+    // A known cause: what to look for, then what to do. Unclear: look closely and record what you see.
+    said && c?.check ? `When you get there, look for ${clause(c.check)}.` : '',
+    said && c?.do ? `If that is what you find, ${clause(c.do)}.` : '',
+    !said ? `When you get there, look closely at ${clause(c?.check || 'the leaves, the soil and the water')}, and record what you see as a field visit, so the next advice can use it.` : '',
+  ];
+  return lines.filter(Boolean).join(' ');
 };
 
 /** The question "Ask about this" writes in for the farmer. */
 export const alertQuestion = (a) => `About ${a.plot_id || 'the farm'}: "${String(a.message || '').trim()}" What does this mean and what should I do?`;
 
-// Android opens geo: links in the phone's maps app; elsewhere Google Maps in the browser.
-export const mapsLink = (lat, lon) => (/Android/i.test(navigator.userAgent)
-  ? `geo:${lat},${lon}?q=${lat},${lon}`
-  : `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`);
+// Walking directions in Google Maps from where the phone is now to the point (the Maps app opens it on
+// phones that have it, the browser elsewhere).
+export const directionsLink = (lat, lon) => `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=walking`;
