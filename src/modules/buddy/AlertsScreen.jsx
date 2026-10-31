@@ -1,5 +1,5 @@
 // Alerts and updates: first "Where to walk" (the weak patches inside blocks), then the farm's open
-// alerts, most urgent and newest first. Everything comes from the API for the chosen service.
+// alerts, most urgent and newest first, for the whole organisation. Everything comes from the API.
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RotateCcw } from 'lucide-react';
@@ -45,9 +45,9 @@ function useLoad(load) {
   return { ...state, retry };
 }
 
-export default function AlertsScreen({ tenant, serviceId, language, voice }) {
+export default function AlertsScreen({ tenant, language, voice }) {
   const navigate = useNavigate();
-  const unit = alertCatalogFor(serviceId, String(serviceId || '').replace('rs-', '')).unit;
+  const unit = alertCatalogFor(null, '').unit; // the whole organisation: the general word for a block
   const alerts = useLoad(useCallback(() => fetchAlerts(tenant), [tenant]));
   const spots = useLoad(fetchScoutingSpots);
 

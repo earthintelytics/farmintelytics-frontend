@@ -432,11 +432,12 @@ export async function fetchFarmBoundary() {
  * Query the LangGraph AI assistant with a natural-language question.
  * Returns { response: string, sources: string[] }
  */
-export async function queryAiAgent(question) {
+// opts: { history: [{ role: 'user'|'assistant', content }], module, style: 'conversation' } (all optional)
+export async function queryAiAgent(question, opts = {}) {
   return apiFetch('/ai/query', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ question, ...opts }),
   });
 }
 

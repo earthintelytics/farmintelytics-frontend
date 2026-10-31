@@ -7,10 +7,19 @@ import { speechChunks } from './plainText';
 const synth = () => (typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function' ? window.speechSynthesis : null);
 const norm = (l) => String(l || '').replace('_', '-').toLowerCase();
 
+// Farm Buddy speaks with a deep male voice, Nigerian English first: among the phone's voices for the
+// language, one named as male is preferred and those named as female are avoided (phones name voices
+// differently, so this is a preference, not a promise), and every voice is pitched a little lower.
+const MALE = /\bmale\b|\bman\b|abeo|guy|baritone|deep/i;
+const FEMALE = /female|woman|girl|ezinne|zira|susan|samantha|karen|tessa|moira|fiona|victoria|hazel|libby|sonia|aria|jenny/i;
+const PITCH = 0.82;
+const RATE = 0.92;
+const score = (v) => (MALE.test(v.name) ? 2 : 0) - (FEMALE.test(v.name) ? 2 : 0) + (v.localService ? 0.5 : 0);
+
 function pickVoice(voices, prefs) {
   for (const p of prefs.map(norm)) {
     const hits = voices.filter((v) => (p.includes('-') ? norm(v.lang) === p : norm(v.lang) === p || norm(v.lang).startsWith(`${p}-`)));
-    if (hits.length) return hits.find((v) => v.localService) || hits[0];
+    if (hits.length) return [...hits].sort((a, b) => score(b) - score(a))[0];
   }
   return null;
 }
@@ -51,7 +60,8 @@ export function useReadAloud() {
       const u = new window.SpeechSynthesisUtterance(part);
       u.voice = voice;
       u.lang = voice.lang;
-      u.rate = 0.95;
+      u.rate = RATE;
+      u.pitch = PITCH;
       if (i === parts.length - 1) u.onend = () => { if (runRef.current === run) setSpeakingId(null); };
       u.onerror = () => { if (runRef.current === run) setSpeakingId(null); };
       s.speak(u);

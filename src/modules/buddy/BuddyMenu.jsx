@@ -1,8 +1,8 @@
-// The menu: which service Farm Buddy reads, installing it on the phone, and signing out. Nothing else.
+// The menu: installing Farm Buddy on the phone, and signing out. Nothing else.
 import { useEffect, useState } from 'react';
-import { Download, LogOut, Repeat } from 'lucide-react';
+import { Download, LogOut } from 'lucide-react';
 import Sheet from './Sheet';
-import { rowButton, muted, main } from './ui';
+import { rowButton, main } from './ui';
 
 function useInstallOffer() {
   const [offer, setOffer] = useState(() => (typeof window !== 'undefined' ? window.__fiInstallPrompt || null : null));
@@ -21,23 +21,14 @@ function useInstallOffer() {
   return { canInstall: !!offer, install };
 }
 
-export default function BuddyMenu({ orgName, serviceTitle, canChangeService, onChangeService, onSignOut, onClose }) {
+export default function BuddyMenu({ orgName, onSignOut, onClose }) {
   const { canInstall, install } = useInstallOffer();
   return (
     <Sheet title="Menu" onClose={onClose}>
       <div className="mb-4">
         {orgName && <p className={`text-base font-semibold ${main}`}>{orgName}</p>}
-        {serviceTitle && <p className={`text-[15px] ${muted} mt-0.5`}>{serviceTitle}</p>}
       </div>
       <ul className="space-y-2">
-        {canChangeService && (
-          <li>
-            <button type="button" className={rowButton} onClick={onChangeService}>
-              <Repeat size={22} className="shrink-0 text-[var(--brand-primary)]" aria-hidden="true" />
-              <span className={`text-base font-medium ${main}`}>Change service</span>
-            </button>
-          </li>
-        )}
         {canInstall && (
           <li>
             <button type="button" className={rowButton} onClick={install}>

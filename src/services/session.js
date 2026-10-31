@@ -16,7 +16,7 @@ export const tenantKey = (base) => `${base}:${localStorage.getItem('fi_tenant') 
 
 // Per-organisation copies kept on the device (the advisor chat); cleared on sign-out so a shared
 // phone does not show the last person's chat.
-// Farm Buddy's chosen service (fi_buddy_service:<tenant>) goes too.
+// Farm Buddy's service choice from its first version (fi_buddy_service:<tenant>) goes too.
 const clearDeviceCopies = () => Object.keys(localStorage).filter((k) => k.startsWith('fi_advisor_chat') || k.startsWith('fi_buddy_service')).forEach((k) => localStorage.removeItem(k));
 
 export function clearTenantSession() {
