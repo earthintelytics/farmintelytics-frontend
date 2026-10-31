@@ -355,7 +355,8 @@ const AppRoutes = () => {
   return (
     <React.Suspense fallback={<RouteLoading />}>
       <Routes>
-        <Route path="/"                         element={<RootPage />} />
+        {/* The Farm Buddy Android app opens on Farm Buddy itself. */}
+        <Route path="/"                         element={window.Capacitor?.isNativePlatform?.() ? <Navigate to="/buddy" replace /> : <RootPage />} />
         <Route path="/login"                    element={<LoginPage />} />
         <Route path="/policies"                 element={<PoliciesPage />} />
         <Route path="/privacy"                  element={<Navigate to="/policies?tab=privacy" replace />} />

@@ -12,11 +12,11 @@ import AlertsScreen from './AlertsScreen';
 import { languageById, readLanguage, saveLanguage } from './languages';
 import { useBuddyChat } from './useBuddyChat';
 import { useReadAloud } from './useReadAloud';
+import { canListen } from './useListen';
 import { useBuddyManifest } from './useBuddyManifest';
 import { readOrgProfile } from '../../pages/org/orgProfile';
 import { clearTenantSession } from '../../services/session';
 
-const canListen = () => typeof window !== 'undefined' && !!(window.SpeechRecognition || window.webkitSpeechRecognition);
 
 export default function BuddyApp() {
   useBuddyManifest();
