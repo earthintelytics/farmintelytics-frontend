@@ -128,6 +128,27 @@ export async function fetchPlotsIntelligence(tenant) {
   return apiFetch(`/plots/intelligence${q ? `?${q}` : ''}`);
 }
 
+// Where to walk: the weak patch inside each block (the pipeline's scouting spots for the latest run).
+export async function fetchScoutingSpots() {
+  const q = serviceParam();
+  return apiFetch(`/plots/scouting-spots${q ? `?${q}` : ''}`);
+}
+
+// The same spots as a GPS file (GPX) a phone or GPS unit opens; downloaded with the session's token.
+export async function downloadScoutingGpx(tenant) {
+  const q = serviceParam();
+  const res = await fetch(`${API_BASE}/plots/scouting-spots.gpx${q ? `?${q}` : ''}`, {
+    headers: { Authorization: `Bearer ${localStorage.getItem('fi_token') || ''}` },
+  });
+  if (!res.ok) throw await responseError(res, '/plots/scouting-spots.gpx');
+  const url = URL.createObjectURL(await res.blob());
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `${tenant || 'farm'}-where-to-walk.gpx`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 // ─── Crop Health Analytics ──────────────────────────────────────────────────
 
 // ─── Crop Yield Forecasting ─────────────────────────────────────────────────

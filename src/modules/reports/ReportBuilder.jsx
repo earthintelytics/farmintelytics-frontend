@@ -140,6 +140,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
             priority: b.priority,
             since: b.since,
           })),
+          walk: h.where_to_walk || [],
           summary: typeof h.summary === 'string' ? { text: h.summary } : (h.summary || { text: '' }),
           created: h.created_at || h.created || new Date(),
         })));
@@ -212,6 +213,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
           priority: b.priority,
           since: b.since,
         })),
+        walk: saved.where_to_walk || [],
         summary: typeof saved.summary === 'string' ? { text: saved.summary } : (saved.summary || { text: '' }),
         numbers: saved.numbers || {},
         recommendations: saved.recommendations || [],
@@ -708,6 +710,51 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
                   </tbody>
                 </table>
               </div>
+            )}
+          </Card>
+
+          {/* Where to walk: weak patches inside the blocks, with GPS points and what to check there */}
+          <Card className="p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
+                <MapPin size={16} className="text-amber-600" />
+                Where to walk
+              </div>
+              <span className="text-xs text-gray-500 font-medium">{(report.walk || []).length} {(report.walk || []).length === 1 ? 'patch' : 'patches'}</span>
+            </div>
+            {(report.walk || []).length === 0 ? (
+              <p className="text-sm text-gray-500 py-1">No weak patch inside these blocks on the latest pictures.</p>
+            ) : (
+              <>
+                <p className="text-xs text-gray-500">Found by comparing every satellite layer with the rest of each block on several pictures. The causes are what to check on the ground, not a diagnosis.</p>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="border-b border-gray-200 text-gray-500 font-semibold bg-white">
+                      <tr>
+                        <th className="py-2.5 px-3">Block</th>
+                        <th className="py-2.5 px-3">Where</th>
+                        <th className="py-2.5 px-3">Look for</th>
+                        <th className="py-2.5 px-3">What to do</th>
+                        <th className="py-2.5 px-3">GPS point</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-100">
+                      {report.walk.map((w) => {
+                        const c = (w.causes || [])[0] || {};
+                        return (
+                          <tr key={w.field_id} className="hover:bg-gray-50/60 align-top">
+                            <td className="py-2.5 px-3 font-bold text-gray-900">{w.field_id}</td>
+                            <td className="py-2.5 px-3 text-gray-700">{w.where}, {w.weak_pct}% weak{w.getting_worse ? ', getting worse' : ''}</td>
+                            <td className="py-2.5 px-3 text-gray-800"><span className="font-medium">{c.title}</span>{c.check ? `: ${c.check}` : ''}</td>
+                            <td className="py-2.5 px-3 text-green-800">{c.do}</td>
+                            <td className="py-2.5 px-3 text-gray-600 tabular-nums whitespace-nowrap">{w.gps}</td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </Card>
 

@@ -1,8 +1,18 @@
-import { useMemo, useState } from 'react';
-import { MapContainer, TileLayer, Polygon, ZoomControl } from 'react-leaflet';
+import { useEffect, useMemo, useState } from 'react';
+import { MapContainer, TileLayer, Polygon, ZoomControl, CircleMarker, Tooltip, useMap } from 'react-leaflet';
 import { PanelRightOpen, ChevronsRight, Layers, X, Sprout, Leaf, Droplets, Waves, Radar, Palette, FlaskConical, Thermometer, CloudRain, Activity } from 'lucide-react';
 import { FitBoundsToPlots, ResizeMap, ZoomToPlot } from '../map/MapHelpers';
 import { hexOf, legendFor, useLayerLegends } from '../legends/layerLegends';
+import WhereToWalk, { useScoutingSpots } from '../components/WhereToWalk';
+
+// Zooms the map to a chosen weak point (Where to walk).
+function FlyToPoint({ point }) {
+  const map = useMap();
+  useEffect(() => {
+    if (point) map.flyTo([point.worst_lat, point.worst_lon], Math.max(map.getZoom(), 17), { duration: 0.6 });
+  }, [map, point]);
+  return null;
+}
 
 // Plain names and icons for the measure rail; the index name stays in the hover text only.
 const PLAIN = {
@@ -38,6 +48,11 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
   const [panelOpen, setPanelOpen] = useState(true);
   const [railOpen, setRailOpen] = useState(true);
   const m = measures.find((x) => x.key === key) || measures[0];
+  const scouting = useScoutingSpots();
+  const [spot, setSpot] = useState(null);
+  const tenant = localStorage.getItem('fi_tenant') || '';
+  // Leaflet writes colours as SVG attributes, where a CSS variable does not resolve: read the token's value.
+  const warn = useMemo(() => getComputedStyle(document.documentElement).getPropertyValue('--status-warning').trim() || '#b45309', []);
 
   const rows = useMemo(() => (m ? plotsData.map((p) => ({ p, v: m.valueOf(p) })) : []), [plotsData, m]);
   const withValue = rows.filter((r) => r.v != null);
@@ -127,7 +142,15 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
                 pathOptions={{ color: '#000000', weight: 1.5, fillColor: c?.hex || 'transparent', fillOpacity: c ? 0.7 : 0 }} />
             ) : null;
           })}
+          {(scouting.data?.spots || []).map((sp) => (
+            <CircleMarker key={`spot-${sp.plot_id}`} center={[sp.worst_lat, sp.worst_lon]} radius={7}
+              eventHandlers={{ click: () => setSpot(sp) }}
+              pathOptions={{ color: '#ffffff', weight: 2, fillColor: warn, fillOpacity: 1 }}>
+              <Tooltip direction="top">{sp.plot_id} · {sp.where}: {(sp.likely_causes?.[0]?.title) || 'weak patch'}</Tooltip>
+            </CircleMarker>
+          ))}
           <FitBoundsToPlots plotsData={plotsData} farmBoundary={farmBoundary} refitKey={filterEstate} />
+          <FlyToPoint point={spot} />
           <ZoomToPlot plot={found} />
           <ZoomControl position="bottomright" />
           <ResizeMap trigger={`${key}-${panelOpen}`} />
@@ -161,6 +184,11 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
           </div>
           <p className="text-sm text-gray-500 mt-1">{plainOf(m).label}{m.unit ? ` (${m.unit})` : ''}: one value per {one}, from the latest result.</p>
         </div>
+
+        <section className="space-y-2">
+          <h3 className="text-sm font-semibold text-gray-900">Where to walk</h3>
+          <WhereToWalk data={scouting.data} error={scouting.error} onSelect={setSpot} tenant={tenant} unitLabel={unitLabel} />
+        </section>
 
         {!stats ? (
           <>
