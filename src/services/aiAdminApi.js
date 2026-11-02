@@ -32,6 +32,7 @@ export const fetchAiSettings = () => call('/ai/settings');
 export const saveAiSettings = (data) => call('/ai/settings', { method: 'PUT', body: JSON.stringify(data) });
 export const saveAiProvider = (id, data) => call(`/ai/providers/${id}`, { method: 'PUT', body: JSON.stringify(data) });
 export const testAiProvider = (id) => call(`/ai/providers/${id}/test`, { method: 'POST' });
+export const fetchAiModels = (id) => call(`/ai/providers/${id}/models`);
 export const saveAiPrices = (prices) => call('/ai/prices', { method: 'PUT', body: JSON.stringify({ prices }) });
 export const deleteAiModel = (provider, model) => call(`/ai/prices/${encodeURIComponent(provider)}/${encodeURIComponent(model)}`, { method: 'DELETE' });
 // from/to per the contract; from_date/to_date as the current backend reads them

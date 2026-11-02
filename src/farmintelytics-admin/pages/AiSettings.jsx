@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { KeyRound, BarChart3, Gauge, Check, Info, PlugZap } from 'lucide-react';
-import { fetchAiSettings, saveAiSettings, saveAiProvider, testAiProvider, saveAiPrices, deleteAiModel, fetchAiUsage, fetchAiLimits, saveAiLimits, AiNotConnected } from '../../services/aiAdminApi';
+import { fetchAiSettings, saveAiSettings, saveAiProvider, testAiProvider, fetchAiModels, saveAiPrices, deleteAiModel, fetchAiUsage, fetchAiLimits, saveAiLimits, AiNotConnected } from '../../services/aiAdminApi';
 import { fetchOrganizations, fetchCredentials } from '../../services/adminApi';
 import { Card } from '../components/ui';
+import SecretInput from '../components/SecretInput';
 
 /**
  * AI settings (super admin): API keys and models, usage and cost, limits.
@@ -15,14 +16,42 @@ const PROVIDERS = [
   { id: 'anthropic', label: 'Anthropic Claude', hint: 'Key from console.anthropic.com' },
 ];
 
-// The models of each provider come from the database (the price table below): add a model there
-// and it can be chosen as a provider's default. Nothing about models is fixed in the code.
-function ModelSelect({ value, models = [], onChange }) {
+// The models offered are the provider's own list for the saved key, so new models appear without a code
+// change and retired ones drop out. If the provider cannot be reached, the models saved in the price table.
+const TYPED = '__typed__';
+function ModelSelect({ provider, configured, value, models = [], onChange }) {
+  const [live, setLive] = useState(null);
+  const [note, setNote] = useState('');
+  const [typing, setTyping] = useState(false);
+  useEffect(() => {
+    if (!configured) return undefined;
+    let active = true;
+    fetchAiModels(provider).then((r) => { if (active) { setLive(r?.models?.length ? r.models : null); setNote(r?.message || ''); } })
+      .catch(() => { if (active) setNote('The model list could not be loaded. Showing the models in the price table.'); });
+    return () => { active = false; };
+  }, [provider, configured]);
+  const options = live || models.map((m) => ({ id: m, label: m, priced: true }));
+  const known = options.some((m) => m.id === value);
+  const chosen = options.find((m) => m.id === value);
   return (
-    <select className={inputCls} value={value || ''} onChange={(e) => onChange(e.target.value)}>
-      <option value="">{models.length ? 'Choose a model' : 'Add a model in the price table first'}</option>
-      {models.map((m) => <option key={m} value={m}>{m}</option>)}
-    </select>
+    <div className="space-y-1.5">
+      {typing ? (
+        <div className="flex gap-2">
+          <input className={inputCls} value={value || ''} onChange={(e) => onChange(e.target.value.trim())} placeholder="Model name, as the provider writes it" spellCheck={false} autoComplete="off" />
+          <button type="button" onClick={() => setTyping(false)} className="px-3 rounded-xl border border-gray-300 text-xs font-semibold text-gray-700">List</button>
+        </div>
+      ) : (
+        <select className={inputCls} value={known ? value : value ? TYPED : ''} onChange={(e) => (e.target.value === TYPED ? setTyping(true) : onChange(e.target.value))}>
+          <option value="">{options.length ? 'Choose a model' : configured ? 'Loading models…' : 'Save a key to see the models'}</option>
+          {value && !known && <option value={TYPED}>{value} (not offered to this key)</option>}
+          {options.map((m) => <option key={m.id} value={m.id}>{m.label && m.label !== m.id ? `${m.label} (${m.id})` : m.id}</option>)}
+          <option value={TYPED}>Type a model name…</option>
+        </select>
+      )}
+      {live && <div className="text-xs text-gray-500">{live.length} models offered by the provider for this key.</div>}
+      {chosen && chosen.priced === false && <div className="text-xs text-amber-800">No price is saved for this model, so its cost is not counted. Add it under Models and prices.</div>}
+      {note && <div className="text-xs text-gray-500">{note}</div>}
+    </div>
   );
 }
 
@@ -95,11 +124,11 @@ function ProvidersTab({ settings, setSettings, connected }) {
                 <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${s.configured ? 'bg-green-50 text-green-800 border-green-200' : 'bg-white text-gray-600 border-gray-200'}`}>{s.configured ? `Key set ···${s.key_last4 || ''}` : 'No key'}</span>
               </div>
               <label className="block space-y-1.5"><span className="text-xs font-semibold text-gray-700">{s.configured ? 'Replace key' : 'API key'}</span>
-                <input type="password" autoComplete="off" className={inputCls} value={keys[p.id] || ''} onChange={e => { setKeys(k => ({ ...k, [p.id]: e.target.value })); setDirty(d => ({ ...d, [p.id]: Boolean(e.target.value) || d[p.id] })); }} placeholder={p.hint} />
+                <SecretInput className={inputCls} value={keys[p.id] || ''} onChange={e => { setKeys(k => ({ ...k, [p.id]: e.target.value })); setDirty(d => ({ ...d, [p.id]: Boolean(e.target.value) || d[p.id] })); }} placeholder={p.hint} />
               </label>
-              <label className="block space-y-1.5"><span className="text-xs font-semibold text-gray-700">Default model</span>
-                <ModelSelect value={s.default_model || ''} models={s.models} onChange={val => updateProv(p.id, { default_model: val })} />
-              </label>
+              <div className="space-y-1.5"><span className="text-xs font-semibold text-gray-700">Default model</span>
+                <ModelSelect provider={p.id} configured={s.configured} value={s.default_model || ''} models={s.models} onChange={val => updateProv(p.id, { default_model: val })} />
+              </div>
               <label className="flex items-center gap-2 text-sm text-gray-800"><input type="checkbox" className="w-4 h-4 accent-green-700" checked={Boolean(s.enabled)} onChange={e => updateProv(p.id, { enabled: e.target.checked })} />Allowed</label>
               <div className="flex gap-2">
                 <button onClick={() => saveKey(p.id)} disabled={busy === p.id || !connected} className="px-4 py-2 rounded-xl bg-green-700 text-white text-sm font-semibold disabled:bg-gray-200 disabled:text-gray-500">{busy === p.id ? 'Saving…' : 'Save'}</button>

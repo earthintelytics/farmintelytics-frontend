@@ -20,6 +20,7 @@ import {
   testGeeConnection,
 } from '../../services/adminApi';
 import { Tabs } from '../components/ui';
+import SecretInput from '../components/SecretInput';
 
 const inputCls =
   'w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-sm text-gray-900 outline-none focus:border-green-600 transition-colors';
@@ -352,10 +353,18 @@ export default function Integrations() {
                               }
                               className={`${inputCls} font-mono text-xs leading-relaxed resize-y`}
                             />
+                          ) : isSecret ? (
+                            <SecretInput
+                              id={`${integ.integration}-${fieldKey}`}
+                              value={formData[integ.integration]?.[fieldKey] || ''}
+                              onChange={(e) => handleFieldChange(integ.integration, fieldKey, e.target.value)}
+                              className={`${inputCls} ${isReplacing ? 'pr-28' : ''}`}
+                              offset={isReplacing ? 'right-20' : ''}
+                            />
                           ) : (
                           <input
                             id={`${integ.integration}-${fieldKey}`}
-                            type={isSecret ? 'password' : 'text'}
+                            type="text"
                             autoComplete="off"
                             placeholder={field.is_secret ? '' : 'Not set'}
                             value={formData[integ.integration]?.[fieldKey] || ''}

@@ -25,6 +25,7 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.pathname.startsWith('/farmintelytics-engine/')) return; // organisation data: never cached here
+  if (url.pathname.startsWith('/downloads/')) return; // the app download goes straight to the server
 
   if (req.mode === 'navigate') {
     event.respondWith(
