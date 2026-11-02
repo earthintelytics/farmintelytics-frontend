@@ -26,22 +26,22 @@ export default function BuddyMenu({ orgName, person, onSignOut, onClose }) {
   return (
     <Sheet title="Menu" onClose={onClose}>
       <div className="mb-4">
-        {orgName && <p className={`text-base font-semibold ${main}`}>{orgName}</p>}
-        {person && <p className={`text-[15px] ${muted} mt-0.5`}>Signed in as {person}</p>}
+        {orgName && <p className={`text-[15px] font-semibold ${main}`}>{orgName}</p>}
+        {person && <p className={`text-sm ${muted} mt-0.5`}>Signed in as {person}</p>}
       </div>
       <ul className="space-y-2">
         {canInstall && (
           <li>
             <button type="button" className={rowButton} onClick={install}>
-              <Download size={22} className="shrink-0 text-[var(--brand-primary)]" aria-hidden="true" />
-              <span className={`text-base font-medium ${main}`}>Install on this phone</span>
+              <Download size={20} className="shrink-0 text-[var(--brand-primary)]" aria-hidden="true" />
+              <span className={`text-[15px] font-medium ${main}`}>Install on this phone</span>
             </button>
           </li>
         )}
         <li>
           <button type="button" className={rowButton} onClick={onSignOut}>
-            <LogOut size={22} className="shrink-0 text-[var(--status-critical)]" aria-hidden="true" />
-            <span className={`text-base font-medium ${main}`}>Sign out</span>
+            <LogOut size={20} className="shrink-0 text-[var(--status-critical)]" aria-hidden="true" />
+            <span className={`text-[15px] font-medium ${main}`}>Sign out</span>
           </button>
         </li>
       </ul>

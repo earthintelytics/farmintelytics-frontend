@@ -61,6 +61,33 @@ export const spotSpeech = (s, first = true) => {
 /** The question "Ask about this" writes in for the farmer. */
 export const alertQuestion = (a) => `About ${a.plot_id || 'the farm'}: "${String(a.message || '').trim()}" What does this mean and what should I do?`;
 
-// Walking directions in Google Maps from where the phone is now to the point (the Maps app opens it on
-// phones that have it, the browser elsewhere).
-export const directionsLink = (lat, lon) => `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}&travelmode=walking`;
+// Walking directions in Google Maps from where the phone is now (no starting point given) to the point,
+// on the satellite view (!3m1!1e3) so the farmer sees the fields (the Maps app opens it on phones that
+// have it, the browser elsewhere).
+export const directionsLink = (lat, lon) =>
+  `https://www.google.com/maps/dir//${lat},${lon}/@${lat},${lon},18z/data=!3m1!1e3!4m2!4m1!3e2`;
+
+// GPS points written in an answer ("GPS 7.883791, 8.330234"): at least four decimals, within the globe.
+const GPS = /(?:GPS\s*(?:point\s*)?[:(]?\s*)?(-?\d{1,2}\.\d{4,})\s*,\s*(-?\d{1,3}\.\d{4,})\)?/gi;
+
+/** The GPS points in an answer, each once, at most three. */
+export function gpsPoints(text) {
+  const seen = new Set();
+  const out = [];
+  for (const m of String(text || '').matchAll(GPS)) {
+    const lat = Number(m[1]);
+    const lon = Number(m[2]);
+    const key = `${m[1]},${m[2]}`;
+    if (Math.abs(lat) > 90 || Math.abs(lon) > 180 || seen.has(key)) continue;
+    seen.add(key);
+    out.push({ lat: m[1], lon: m[2] });
+  }
+  return out.slice(0, 3);
+}
+
+/** An answer as it is read aloud: GPS points and links are tapped, never spoken. */
+export const spokenAnswer = (text) => String(text || '')
+  .replace(/https?:\/\/\S+/g, '')
+  .replace(GPS, 'the map button')
+  .replace(/\s{2,}/g, ' ')
+  .trim();

@@ -16,8 +16,8 @@ export default function Sheet({ title, onClose, children }) {
       <button type="button" aria-label="Close" onClick={onClose} className="absolute inset-0 bg-white/80" />
       <div className="relative bg-white border-t border-[var(--border-light)] rounded-t-2xl max-h-[85dvh] overflow-y-auto px-4 pt-3 pb-[calc(16px+env(safe-area-inset-bottom))]">
         <div className="flex items-center justify-between gap-3 mb-3">
-          <h2 className="font-display text-lg font-semibold text-[var(--text-main)]">{title}</h2>
-          <button type="button" onClick={onClose} className={`${btnQuiet} px-3`} aria-label="Close"><X size={22} /></button>
+          <h2 className="font-display text-base font-semibold text-[var(--text-main)]">{title}</h2>
+          <button type="button" onClick={onClose} className={`${btnQuiet} px-3`} aria-label="Close"><X size={20} /></button>
         </div>
         {children}
       </div>

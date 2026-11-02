@@ -12,8 +12,8 @@ export default function MicButton({ listen, disabled, onBeforeStart }) {
   };
   return (
     <button type="button" disabled={disabled} onClick={tap} aria-pressed={on}
-      className={`${btn} w-full min-h-[64px] text-base ${on ? 'bg-[var(--status-critical)] text-white' : 'bg-[var(--brand-primary)] text-white active:bg-[var(--brand-primary-dark)]'}`}>
-      {on ? <Square size={22} aria-hidden="true" /> : <Mic size={26} aria-hidden="true" />}
+      className={`${btn} w-full min-h-[52px] text-[15px] ${on ? 'bg-[var(--status-critical)] text-white' : 'bg-[var(--brand-primary)] text-white active:bg-[var(--brand-primary-dark)]'}`}>
+      {on ? <Square size={20} aria-hidden="true" /> : <Mic size={20} aria-hidden="true" />}
       {on ? 'Listening… tap when you finish' : 'Tap to speak'}
     </button>
   );

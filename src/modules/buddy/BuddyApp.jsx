@@ -14,6 +14,7 @@ import { useBuddyChat } from './useBuddyChat';
 import { useReadAloud } from './useReadAloud';
 import { canListen } from './useListen';
 import { useBuddyManifest } from './useBuddyManifest';
+import { spokenAnswer } from './farmText';
 import { readOrgProfile, personName } from '../../pages/org/orgProfile';
 import { CROP_PHOTOS, SERVICE_PHOTOS } from '../../constants/servicePhotos';
 import { clearTenantSession } from '../../services/session';
@@ -31,7 +32,7 @@ export default function BuddyApp() {
 
   const voice = useReadAloud();
   const { speak } = voice;
-  const onAnswer = useCallback((m) => speak(m.id, m.text, languageById(m.lang)), [speak]);
+  const onAnswer = useCallback((m) => speak(m.id, spokenAnswer(m.text), languageById(m.lang)), [speak]);
   const chat = useBuddyChat({ language, onAnswer });
 
   const closeSheet = useCallback(() => setSheet(null), []);

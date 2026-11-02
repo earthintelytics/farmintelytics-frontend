@@ -1,6 +1,6 @@
 // One open alert: the block, what is wrong, what to do (when the alert says), the date, and
-// "Listen" / "Ask about this".
-import { AlertTriangle, Info, MessageCircle, AlertOctagon } from 'lucide-react';
+// "Listen" / "Ask about this" / "I'm here: check it".
+import { AlertTriangle, CheckCircle2, ClipboardCheck, Info, MessageCircle, AlertOctagon } from 'lucide-react';
 import ListenButton from './ListenButton';
 import { adviceOf, alertDate, alertSpeech, severityOf } from './farmText';
 import { btnLine, muted } from './ui';
@@ -11,7 +11,7 @@ const TONE = {
   info: { icon: Info, colour: 'text-[var(--status-info)]' },
 };
 
-export default function AlertCard({ alert, language, voice, onAsk }) {
+export default function AlertCard({ alert, language, voice, onAsk, onCheck, checked = false }) {
   const s = severityOf(alert);
   const tone = TONE[s.tone] || TONE.info;
   const Icon = tone.icon;
@@ -25,12 +25,12 @@ export default function AlertCard({ alert, language, voice, onAsk }) {
         </span>
         {date && <span className={`text-sm ${muted}`}>{date}</span>}
       </div>
-      <h3 className="font-display text-base font-semibold">{alert.plot_id || 'Whole farm'}</h3>
-      {alert.message && <p className="text-base leading-relaxed">{alert.message}</p>}
+      <h3 className="font-display text-[15px] font-semibold">{alert.plot_id || 'Whole farm'}</h3>
+      {alert.message && <p className="text-[15px] leading-relaxed">{alert.message}</p>}
       {advice && (
         <div>
           <p className={`text-sm ${muted}`}>What to do</p>
-          <p className="text-base leading-relaxed">{advice}</p>
+          <p className="text-[15px] leading-relaxed">{advice}</p>
         </div>
       )}
       <div className="flex flex-wrap gap-2">
@@ -38,6 +38,9 @@ export default function AlertCard({ alert, language, voice, onAsk }) {
         <button type="button" onClick={() => onAsk(alert)} className={btnLine}>
           <MessageCircle size={18} className="text-[var(--brand-primary)]" aria-hidden="true" />Ask about this
         </button>
+        {onCheck && (checked
+          ? <span className="inline-flex items-center gap-1.5 min-h-[44px] px-2 text-sm font-semibold text-[var(--brand-primary)]"><CheckCircle2 size={18} aria-hidden="true" />Checked</span>
+          : <button type="button" onClick={onCheck} className={btnLine}><ClipboardCheck size={18} className="text-[var(--brand-primary)]" aria-hidden="true" />I'm here: check it</button>)}
       </div>
     </li>
   );

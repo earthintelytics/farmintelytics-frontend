@@ -455,3 +455,21 @@ export async function fetchRasterIndices() {
 
 // ─── Specialized ESG & Sustainability Services ──────────────────────────────
 
+
+// ─── Field checks (FarmIntelytics Buddy) ───────────────────────────────────
+
+/** POST /field-checks/photo: a photo for a field check (multipart); returns { photo_path }. */
+export async function uploadFieldCheckPhoto(blob, name = 'photo.jpg') {
+  const body = new FormData();
+  body.append('file', blob, name);
+  const res = await fetch(`${API_BASE}/field-checks/photo`, {
+    method: 'POST', body, cache: 'no-store',
+    headers: { Authorization: `Bearer ${localStorage.getItem('fi_token') || ''}` },
+  });
+  if (res.status === 401) handleTenantAuthFailure();
+  if (!res.ok) throw await responseError(res, '/field-checks/photo');
+  return res.json();
+}
+
+/** POST /field-checks: what was seen at a spot; returns { observation_id, distance_m }. */
+export const createFieldCheck = (check) => apiFetch('/field-checks', { method: 'POST', body: JSON.stringify(check) });
