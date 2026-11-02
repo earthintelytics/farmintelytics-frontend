@@ -42,6 +42,7 @@ const CARD_PHOTOS = {
   'land-restoration': '/crops/restoration.webp', 'eudr-check': '/crops/eudr.webp',
   'suitability-tool': '/crops/suitability.webp',
   'advisor': '/crops/advisor.webp',
+  'ffb-counter': '/crops/oil_palm.webp',
 };
 const photoFor = (id) => CARD_PHOTOS[id] || (id?.startsWith('org:') ? '/crops/organization.webp' : null);
 
@@ -166,6 +167,14 @@ const PortalHub = ({ onSelectModule, onSignOut, onOpenAdmin }) => {
       ]),
     },
     {
+      id: 'management',
+      title: 'Management',
+      description: 'Estate operations: what is harvested, block by block.',
+      modules: filterModules([
+        { id: 'ffb-counter', title: 'FFB Counter', crop: 'Fresh fruit bunches', icon: <Activity /> },
+      ]),
+    },
+    {
       id: 'custom',
       title: 'Organisations',
       description: "Each client organisation's own hub, with the services it was given at onboarding.",
@@ -173,13 +182,13 @@ const PortalHub = ({ onSelectModule, onSignOut, onOpenAdmin }) => {
     },
   ];
 
-  // Organisations come last. Management and Finance & ledger are not in the
-  // current plan and have no tab.
+  // Organisations come last. Finance & ledger is not in the current plan and has no tab.
   const visibleTabs = [
     { id: 'monitoring', label: 'Crop monitoring' },
     { id: 'sustainability', label: 'Sustainability' },
     { id: 'field-advisory', label: 'Field advisory' },
     { id: 'engine', label: 'Engine' },
+    { id: 'management', label: 'Management' },
     { id: 'custom', label: 'Organisations' },
   ].filter(tab => (sections.find(s => s.id === tab.id)?.modules.length ?? 0) > 0);
   const currentTabId = visibleTabs.some(t => t.id === activeTab) ? activeTab : visibleTabs[0]?.id;

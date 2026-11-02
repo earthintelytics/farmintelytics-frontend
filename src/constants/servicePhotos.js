@@ -13,6 +13,7 @@ export const SERVICE_PHOTOS = {
   'smallholder-members': '/crops/smallholder.webp',
   'group-monitoring': '/crops/advisor.webp', 'smallholder-eudr': '/crops/eudr.webp',
   'rs-drone': '/crops/drone.webp',
+  'ffb-counter': '/crops/oil_palm.webp',
 };
 
 // Services an organisation can be given at onboarding, grouped as on the hub.
@@ -36,6 +37,9 @@ export const SERVICE_GROUPS = [
     { id: 'group-monitoring', label: 'Farm monitoring', desc: 'Each member farm from satellite' },
     { id: 'carbon-groups', label: 'Group carbon', desc: 'Carbon estimate per group and member' },
     { id: 'smallholder-eudr', label: 'EUDR passport', desc: 'Location and deforestation check per member' },
+  ] },
+  { id: 'management', label: 'Management', services: [
+    { id: 'ffb-counter', label: 'FFB Counter', desc: 'Fresh fruit bunches counted per block at harvest' },
   ] },
 ];
 

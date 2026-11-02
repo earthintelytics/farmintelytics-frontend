@@ -66,6 +66,7 @@ export const ORG_SERVICES = [
   svc('smallholder-hub', 'Smallholder', 'Members and parcels, farmer forms, farm monitoring, group carbon and EUDR.', 'advisory'),
   svc('advisor', 'Farm advisor', 'Advice for each field from your monitoring data and the weather.', 'advisory'),
   svc('rs-drone', 'Drone surveys', 'Drone surveys next to the latest satellite view.', 'engine'),
+  svc('ffb-counter', 'FFB Counter', 'Fresh fruit bunches counted per block at harvest.', 'management'),
 ];
 
 export const SERVICE_TABS = [
@@ -74,6 +75,7 @@ export const SERVICE_TABS = [
   { id: 'sustainability', label: 'Sustainability' },
   { id: 'advisory', label: 'Field advisory' },
   { id: 'engine', label: 'Engine' },
+  { id: 'management', label: 'Management' },
 ];
 
 export function licensedServices(profile) {

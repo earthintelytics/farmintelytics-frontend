@@ -10,6 +10,7 @@
  *         smallholder   the Smallholder hub (its cards open services)
  *         suitability   the suitability tool (FarmIntelytics team only)
  *         advisor       the farm advisor (modules/advisor/AdvisorApp.jsx)
+ *         management    a management tool (FFB Counter: modules/management/FfbCounterPage.jsx)
  *   teamOnly            only a team session may open it; clients receive its reports
  */
 import { SERVICE_CATALOG } from './services/serviceCatalog';
@@ -46,6 +47,7 @@ export function resolveModule(rawId) {
   if (id === 'smallholder-hub') return { id, kind: 'smallholder', name: 'Smallholder', teamOnly: false };
   // The farm advisor is its own phone-first app (chat, advisories, reports), not a map dashboard.
   if (id === 'advisor') return { id, kind: 'advisor', name: 'Farm advisor', teamOnly: false };
+  if (id === 'ffb-counter') return { id, kind: 'management', name: 'FFB Counter', teamOnly: false };
   if (SERVICE_CATALOG[id]) return { id, kind: 'service', name: SERVICE_CATALOG[id].title, teamOnly: false };
   return null;
 }

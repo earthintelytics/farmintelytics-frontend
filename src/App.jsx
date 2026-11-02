@@ -56,6 +56,7 @@ import PortalHub from './pages/PortalHub';
 // One portal for all of them: the organisation monitoring layout with the
 const ServicePortal = lazyWithReload(() => import('./modules/services/ServicePortal'));
 const AdvisorApp = lazyWithReload(() => import('./modules/advisor/AdvisorApp'));
+const FfbCounterPage = lazyWithReload(() => import('./modules/management/FfbCounterPage'));
 const SuitabilityPortal = lazyWithReload(() => import('./modules/suitability/SuitabilityPortal'));
 const SmallholderHub = lazyWithReload(() => import('./modules/smallholder/SmallholderHub'));
 // FarmIntelytics Buddy: the farmers' phone app (ask the advisor by voice or text; alerts and where to walk).
@@ -321,6 +322,8 @@ const PortalPage = () => {
     content = <SmallholderHub {...props} />;
   } else if (mod.kind === 'advisor') {
     content = <AdvisorApp {...props} />;
+  } else if (mod.kind === 'management') {
+    content = <FfbCounterPage {...props} />;
   } else {
     content = <ServicePortal moduleId={moduleId} {...props} />;
   }
