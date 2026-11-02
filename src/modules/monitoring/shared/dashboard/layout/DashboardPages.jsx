@@ -431,6 +431,7 @@ export function renderDashboardPages(ctx) {
               tenant={tenant}
               orgName={tenantDisplayName}
               subject={service ? `${tenantDisplayName} ${service.title}` : isOrg ? tenantDisplayName : `${tenantDisplayName} ${cropLabel}`}
+              serviceId={service?.id || (cropType ? `rs-${cropType}` : '')}
               cropType={cropType}
             />
           )}

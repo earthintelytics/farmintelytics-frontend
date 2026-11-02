@@ -286,6 +286,20 @@ export async function fetchReportsHistory() {
   return apiFetch('/reports');
 }
 
+/** GET /reports/kinds?service=: the report types a service offers, its own first ({ kinds: [{id, label}], default }). */
+export const fetchReportKinds = (service) => apiFetch(`/reports/kinds${service ? `?service=${encodeURIComponent(service)}` : ''}`);
+
+// The designed report (report engine) as a page, and as the PDF printed from the same pages. Both need the
+// sign-in, so they are fetched rather than linked.
+async function reportFile(path) {
+  const res = await fetch(`${API_BASE}${path}`, { cache: 'no-store', headers: { Authorization: `Bearer ${localStorage.getItem('fi_token') || ''}` } });
+  if (res.status === 401) handleTenantAuthFailure();
+  if (!res.ok) throw await responseError(res, path);
+  return res;
+}
+export const fetchReportHtml = async (reportId) => (await reportFile(`/reports/${encodeURIComponent(reportId)}/html`)).text();
+export const fetchReportPdf = async (reportId) => (await reportFile(`/reports/${encodeURIComponent(reportId)}/pdf`)).blob();
+
 /**
  * POST /api/reports/ai-recommendations
  * Generates on-demand decision intelligence recommendations for reports.

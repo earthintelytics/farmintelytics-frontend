@@ -1,30 +1,23 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Line } from 'react-chartjs-2';
 import {
   CalendarDays,
-  Layers,
   MapPin,
   GitCompare,
   Sprout,
   FileText,
-  Download,
   Sparkles,
-  AlertTriangle,
-  CheckCircle2,
   BrainCircuit,
   Send,
-  Clock,
   ShieldCheck,
-  Droplets,
-  Activity,
   ChevronRight,
-  TrendingUp,
 } from 'lucide-react';
 import * as api from '../../services/organizationMonitorApi';
+import DesignedReport from './DesignedReport';
 
 /**
  * Reports & AI Decision Intelligence Engine (design: docs/services/reports-and-verification.md).
- * Built by the server from stored results (POST /reports, report_builder.py),
+ * Built by the server from stored results (POST /reports, report_builder.py) and drawn by the report engine:
+ * the page shows the designed report exactly as its PDF prints (DesignedReport).
  * and live active alerts to provide actionable agronomic guidance.
  */
 const DEFAULT_TYPES = [
@@ -89,7 +82,7 @@ const Card = ({ className = '', children }) => (
 
 const selectCls = 'px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-600';
 
-export default function ReportBuilder({ plots, estates, tenant, orgName, subject, cropType, loading }) {
+export default function ReportBuilder({ plots, estates, tenant, orgName, subject, serviceId, cropType, loading }) {
   const [typesList] = useState(DEFAULT_TYPES);
   const [type, setType] = useState('monthly');
   const [level, setLevel] = useState('organisation');
@@ -102,6 +95,9 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
   const [compare, setCompare] = useState('previous');
   const [compareEstate, setCompareEstate] = useState(estates[1] || '');
   const [focusArea, setFocusArea] = useState('general');
+  // The report types this service offers (crop, EUDR, forestry, land use...), its own first.
+  const [kinds, setKinds] = useState([]);
+  const [kind, setKind] = useState('');
   const [busy, setBusy] = useState(false);
   const [report, setReport] = useState(null);
   const [history, setHistory] = useState([]);
@@ -109,12 +105,6 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
   // Settings fold away once a report is made, so the report and Download sit at the top.
   const [showSettings, setShowSettings] = useState(true);
   const [errorMsg, setErrorMsg] = useState('');
-  // A block's estate from the blocks list (the report rows carry only the block id).
-  const estateOf = (blockId) => {
-    const p = (plots || []).find((x) => String(x.id) === String(blockId));
-    return p?.subfarm || p?.division || '—';
-  };
-
   // Interactive AI Assistant State
   const [aiQuestion, setAiQuestion] = useState('');
   const [aiAnswers, setAiAnswers] = useState([]);
@@ -149,6 +139,14 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
     return () => { active = false; };
   }, [tenant]);
 
+  useEffect(() => {
+    let active = true;
+    api.fetchReportKinds(serviceId).then((r) => {
+      if (active && r?.kinds) { setKinds(r.kinds); setKind(r.default || r.kinds[0]?.id || ''); }
+    }).catch(() => {});
+    return () => { active = false; };
+  }, [serviceId]);
+
   const period = periodKind === 'month' ? monthRange(month) : range;
   // Search matches a block's name or code, or its estate; an estate found this way picks all its blocks at once.
   const q = blockQuery.trim().toLowerCase();
@@ -167,20 +165,6 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
     setErrorMsg('');
     const cmp = type === 'compare' && compare === 'estate' ? null : shift(period, compare === 'last_year' ? 'last_year' : 'previous');
 
-    // 1. Fetch timeseries data for the chart
-    const series = async (index, p) => {
-      try {
-        const r = await api.fetchTimeseriesSlider({ farm: tenant, index, start: p.from, end: p.to, cropType });
-        return (r?.timeline || []).filter(t => t.mean != null).map(t => ({ date: t.date, mean: t.mean }));
-      } catch { return []; }
-    };
-    const [health, water, healthCmp, waterCmp] = await Promise.all([
-      series('ndvi', period),
-      series('ndmi', period),
-      cmp ? series('ndvi', cmp) : [],
-      cmp ? series('ndmi', cmp) : [],
-    ]);
-
     // 2. Build and persist grounded report on backend
     try {
       const saved = await api.createReport({
@@ -189,38 +173,19 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
         period,
         compare: cmp,
         crop: cropType,
-        service: subject,
+        service: serviceId,
+        kind: kind || undefined,
         focus_area: focusArea !== 'general' ? focusArea : null,
       });
 
       const reportObj = {
         report_id: saved.report_id,
         type: saved.type || type,
+        kind: saved.kind || kind,
         title: saved.title || `${subject}: ${where}`,
         where: saved.numbers?.where || where,
         period: saved.period || period,
-        cmp: saved.compare || cmp,
-        health,
-        water,
-        healthCmp,
-        waterCmp,
-        status: saved.status || null,
-        actions: (saved.blocks_action || []).map(b => ({
-          block: b.field_id,
-          estate: estateOf(b.field_id),
-          problem: b.problem,
-          action: b.action,
-          priority: b.priority,
-          since: b.since,
-        })),
-        walk: saved.where_to_walk || [],
-        summary: typeof saved.summary === 'string' ? { text: saved.summary } : (saved.summary || { text: '' }),
         numbers: saved.numbers || {},
-        recommendations: saved.recommendations || [],
-        risks: saved.risks || [],
-        findings: saved.findings || [],
-        limits: saved.limits || [],
-        data_used: saved.data_used || { sources: [], dates: [] },
         created: new Date(saved.created_at || Date.now()),
       };
 
@@ -255,26 +220,6 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
     } finally {
       setAiQuerying(false);
     }
-  };
-
-  const chartData = (a, b, label) => ({
-    labels: a.map(p => p.date.slice(5)),
-    datasets: [
-      { label: `${label} (${fmtDate(report.period.from)} – ${fmtDate(report.period.to)})`, data: a.map(p => p.mean), borderColor: '#15803d', backgroundColor: 'transparent', tension: 0.3, pointRadius: 2 },
-      ...(b.length ? [{ label: 'Comparison period', data: b.map(p => p.mean), borderColor: '#94a3b8', borderDash: [5, 4], backgroundColor: 'transparent', tension: 0.3, pointRadius: 0 }] : []),
-    ],
-  });
-  const chartOpts = {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } } },
-    scales: { y: { ticks: { display: false }, grid: { color: '#f1f5f9' } }, x: { grid: { display: false }, ticks: { font: { size: 11 } } } },
-  };
-
-  const print = () => {
-    document.body.classList.add('fi-print-report');
-    window.print();
-    setTimeout(() => document.body.classList.remove('fi-print-report'), 500);
   };
 
   return (
@@ -318,6 +263,19 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
       )}
       {(showSettings || !report) && (
         <Card className="p-6 space-y-6">
+          {kinds.length > 1 && (
+            <div className="space-y-3">
+              <div className="text-sm font-semibold text-gray-900">Which report?</div>
+              <div className="flex flex-wrap gap-2">
+                {kinds.map((k) => (
+                  <button key={k.id} type="button" onClick={() => setKind(k.id)} aria-pressed={kind === k.id}
+                    className={`px-3 py-2 rounded-xl border text-sm font-semibold ${kind === k.id ? 'border-green-600 bg-green-50 text-green-800' : 'border-gray-200 text-gray-700 hover:border-gray-300'}`}>
+                    {k.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           {/* 1. Type */}
           <div className="space-y-3">
             <div className="text-sm font-semibold text-gray-900 flex items-center gap-2">
@@ -505,294 +463,31 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
           )}
         </Card>
       )}
-      {/* Generated Report View */}
+      {/* Generated Report View: the designed report as it prints */}
       {report && !historyTab && (
-        <div id="fi-report" className="space-y-8 animate-fadeIn">
-          {/* Title & Actions Bar */}
-          <div className="flex flex-wrap items-end justify-between gap-4 border-b border-gray-200 pb-5">
-            <div>
-              <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md text-xs font-semibold bg-green-100 text-green-800">
-                {typesList.find(t => t.id === report.type)?.label || 'Agronomic Report'}
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mt-2">{subject}: {report.where}</h3>
-              <div className="text-sm text-gray-500 mt-1 flex items-center gap-2">
-                <span>{fmtDate(report.period.from)} – {fmtDate(report.period.to)}</span>
-                {report.cmp && <span className="text-gray-400">· compared with {fmtDate(report.cmp.from)} – {fmtDate(report.cmp.to)}</span>}
-              </div>
+        <div id="fi-report" className="space-y-6">
+          <div className="border-b border-gray-200 pb-4">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md text-xs font-semibold bg-green-100 text-green-800">
+              {kinds.find((k) => k.id === report.kind)?.label || typesList.find(t => t.id === report.type)?.label || 'Report'}
             </div>
-            <div className="no-print flex items-center gap-3">
-              <button
-                onClick={print}
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-700 hover:bg-gray-50 shadow-xs"
-              >
-                <Download size={15} /> Download / Print PDF
-              </button>
-            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mt-2">{report.title || `${subject}: ${report.where}`}</h3>
+            {report.period?.from && <div className="text-sm text-gray-500 mt-1">{fmtDate(report.period.from)} – {fmtDate(report.period.to)}</div>}
           </div>
 
-          {/* SECTION 1: AI Executive Intelligence & Summary */}
-          <Card className="p-7 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-base font-bold text-gray-900">
-                <Sparkles size={18} className="text-green-700" />
-                Summary
-              </div>
-              {report.summary?.ai && <span className="text-xs font-medium text-gray-500">Written by the AI assistant from the figures below</span>}
-            </div>
-            <p className="text-base text-gray-800 leading-relaxed">{report.summary?.text || 'No written summary: the AI assistant was not available for this report. The figures below are complete.'}</p>
-          </Card>
+          <DesignedReport key={report.report_id} reportId={report.report_id} fileName={`${(report.title || 'report').replace(/[^\w -]+/g, '').trim()} ${report.period?.to || ''}`.trim()} />
 
-          {/* SECTION 2: Metric Overview Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              ['Blocks in this report', report.numbers?.blocks_total ?? '—', <Layers key="1" size={16} className="text-blue-600" />],
-              ['Need action now', report.status?.action ?? '—', <AlertTriangle key="2" size={16} className="text-amber-600" />],
-              ['Crop health', report.numbers?.crop_health_avg == null ? 'No clear image' : HEALTH_WORD(report.numbers.crop_health_avg), <Sprout key="3" size={16} className="text-green-600" />],
-              ['Change on the comparison period', report.numbers?.change_pct == null ? '—' : `${report.numbers.change_pct >= 0 ? '+' : ''}${report.numbers.change_pct}%`, <TrendingUp key="4" size={16} className="text-emerald-600" />],
-            ].map(([k, v, icon]) => (
-              <Card key={k} className="px-5 py-4">
-                <div className="flex items-center justify-between text-xs font-semibold text-gray-500">
-                  <span>{k}</span>
-                  {icon}
-                </div>
-                <div className="text-2xl font-bold text-gray-900 mt-2 capitalize">{v}</div>
-              </Card>
-            ))}
-          </div>
-
-          {/* SECTION 3: AI Prioritized Action Recommendations */}
-          <Card className="p-7 space-y-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                  <Activity size={18} className="text-green-700" />
-                  What to do
-                </h4>
-                <p className="text-xs text-gray-500 mt-1">
-                  Most urgent first.
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-              {(report.recommendations || []).map((rec, i) => (
-                <div
-                  key={i}
-                  className={`p-5 rounded-2xl border transition-all ${
-                    rec.priority.includes('Immediate')
-                      ? 'border-amber-200 bg-amber-50/40'
-                      : rec.priority.includes('Medium')
-                      ? 'border-blue-200 bg-blue-50/30'
-                      : 'border-green-200 bg-green-50/30'
-                  }`}
-                >
-                  <div className="flex items-center justify-between">
-                    <span
-                      className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
-                        rec.priority.includes('Immediate')
-                          ? 'bg-amber-100 text-amber-900'
-                          : rec.priority.includes('Medium')
-                          ? 'bg-blue-100 text-blue-900'
-                          : 'bg-green-100 text-green-900'
-                      }`}
-                    >
-                      {rec.priority}
-                    </span>
-                    <Clock size={14} className="text-gray-400" />
-                  </div>
-                  <h5 className="font-bold text-sm text-gray-900 mt-3">{rec.title}</h5>
-                  <p className="text-xs text-gray-700 mt-2 leading-relaxed">{rec.action}</p>
-                  <div className="mt-4 pt-3 border-t border-gray-200/60 text-xs">
-                    <div className="font-semibold text-gray-800">Expected Impact:</div>
-                    <div className="text-gray-600 mt-0.5">{rec.impact}</div>
-                  </div>
-                  {rec.responsible && (
-                    <div className="mt-2 text-2xs text-gray-400 font-medium">
-                      Assigned: {rec.responsible}
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </Card>
-
-          {/* SECTION 4: Risk Assessment & Field Findings */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Risk Assessment */}
-            <Card className="p-6 space-y-4">
-              <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
-                <AlertTriangle size={16} className="text-amber-600" />
-                Risks
-              </div>
-              <div className="space-y-3">
-                {(report.risks || []).map((r, i) => (
-                  <div key={i} className="p-3.5 rounded-xl border border-gray-100 bg-white space-y-1">
-                    <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="text-gray-900">{r.risk}</span>
-                      <span
-                        className={`px-2 py-0.5 rounded text-2xs font-bold ${
-                          r.level.includes('High')
-                            ? 'bg-red-100 text-red-800'
-                            : r.level.includes('Moderate')
-                            ? 'bg-amber-100 text-amber-800'
-                            : 'bg-green-100 text-green-800'
-                        }`}
-                      >
-                        {r.level} Risk
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-600">{r.mitigation}</p>
-                  </div>
-                ))}
-              </div>
-            </Card>
-
-            {/* Key Findings */}
-            <Card className="p-6 space-y-4">
-              <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
-                <Droplets size={16} className="text-blue-600" />
-                Key grounded findings
-              </div>
-              <ul className="space-y-2.5 text-xs text-gray-700">
-                {(report.findings || []).map((f, i) => (
-                  <li key={i} className="flex items-start gap-2.5 p-2 rounded-lg bg-white">
-                    <CheckCircle2 size={15} className="text-green-600 shrink-0 mt-0.5" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-            </Card>
-          </div>
-
-          {/* SECTION 5: Blocks Needing Action Table */}
-          <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
-                <AlertTriangle size={16} className="text-amber-600" />
-                Blocks needing action
-              </div>
-              <span className="text-xs text-gray-500 font-medium">{(report.actions || []).length} {(report.actions || []).length === 1 ? 'block' : 'blocks'}</span>
-            </div>
-            {(report.actions || []).length === 0 ? (
-              <div className="flex items-center gap-2 text-sm text-green-700 py-3">
-                <CheckCircle2 size={16} /> No open alerts for these blocks in this period.
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead className="border-b border-gray-200 text-gray-500 font-semibold bg-white">
-                    <tr>
-                      <th className="py-2.5 px-3">Block</th>
-                      <th className="py-2.5 px-3">Estate</th>
-                      <th className="py-2.5 px-3">Problem</th>
-                      <th className="py-2.5 px-3">What to do</th>
-                      <th className="py-2.5 px-3">Priority</th>
-                      <th className="py-2.5 px-3">Since</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {(report.actions || []).map((a, i) => (
-                      <tr key={i} className="hover:bg-gray-50/60">
-                        <td className="py-2.5 px-3 font-bold text-gray-900">{a.block}</td>
-                        <td className="py-2.5 px-3 text-gray-600">{a.estate || estateOf(a.block)}</td>
-                        <td className="py-2.5 px-3 text-gray-800 font-medium">{a.problem}</td>
-                        <td className="py-2.5 px-3 text-green-800">{a.action}</td>
-                        <td className="py-2.5 px-3">
-                          <span className={`px-2 py-0.5 rounded text-2xs font-semibold ${
-                            a.priority === 'CRITICAL' ? 'bg-red-100 text-red-800' : 'bg-amber-100 text-amber-800'
-                          }`}>
-                            {a.priority || 'HIGH'}
-                          </span>
-                        </td>
-                        <td className="py-2.5 px-3 text-gray-400">{a.since}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </Card>
-
-          {/* Where to walk: weak patches inside the blocks, with GPS points and what to check there */}
-          <Card className="p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
-                <MapPin size={16} className="text-amber-600" />
-                Where to walk
-              </div>
-              <span className="text-xs text-gray-500 font-medium">{(report.walk || []).length} {(report.walk || []).length === 1 ? 'patch' : 'patches'}</span>
-            </div>
-            {(report.walk || []).length === 0 ? (
-              <p className="text-sm text-gray-500 py-1">No weak patch inside these blocks on the latest pictures.</p>
-            ) : (
-              <>
-                <p className="text-xs text-gray-500">Found by comparing every satellite layer with the rest of each block on several pictures. The causes are what to check on the ground, not a diagnosis.</p>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead className="border-b border-gray-200 text-gray-500 font-semibold bg-white">
-                      <tr>
-                        <th className="py-2.5 px-3">Block</th>
-                        <th className="py-2.5 px-3">Where</th>
-                        <th className="py-2.5 px-3">Look for</th>
-                        <th className="py-2.5 px-3">What to do</th>
-                        <th className="py-2.5 px-3">GPS point</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {report.walk.map((w) => {
-                        const c = (w.causes || [])[0] || {};
-                        return (
-                          <tr key={w.field_id} className="hover:bg-gray-50/60 align-top">
-                            <td className="py-2.5 px-3 font-bold text-gray-900">{w.field_id}</td>
-                            <td className="py-2.5 px-3 text-gray-700">{w.where}, {w.weak_pct}% weak{w.getting_worse ? ', getting worse' : ''}</td>
-                            <td className="py-2.5 px-3 text-gray-800"><span className="font-medium">{c.title}</span>{c.check ? `: ${c.check}` : ''}</td>
-                            <td className="py-2.5 px-3 text-green-800">{c.do}</td>
-                            <td className="py-2.5 px-3 text-gray-600 tabular-nums whitespace-nowrap">{w.gps}</td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </>
-            )}
-          </Card>
-
-          {/* SECTION 6: Time-Series Comparison Charts */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {[['Crop health', report.health || [], report.healthCmp || []], ['Leaf water', report.water || [], report.waterCmp || []]].map(([label, a, b]) => (
-              <Card key={label} className="p-6">
-                <div className="text-sm font-bold text-gray-900">{label} over the period</div>
-                <div className="text-xs text-gray-500 mt-1">Farm average on each clear satellite image.</div>
-                <div className="h-56 mt-4">
-                  {a.length ? (
-                    <Line data={chartData(a, b, label)} options={chartOpts} />
-                  ) : (
-                    <div className="h-full flex items-center justify-center text-xs text-gray-400">
-                      No clear satellite image in this period.
-                    </div>
-                  )}
-                </div>
-              </Card>
-            ))}
-          </div>
-
-          {/* SECTION 7: Interactive AI Assistant on this Report */}
           <Card className="p-6 border-green-200 bg-white space-y-4 no-print">
             <div className="flex items-center gap-2 text-sm font-bold text-gray-900">
               <BrainCircuit size={16} className="text-green-700" />
-              Ask AI agronomist about this report
+              Ask the AI about this report
             </div>
-            <p className="text-xs text-gray-600">
-              Ask follow-up questions regarding water management, fertilizer schedules, or specific block anomalies from this report.
-            </p>
-
+            <p className="text-xs text-gray-600">Ask about water, fertiliser, or a block in this report.</p>
             <div className="flex items-center gap-2">
               <input
                 value={aiQuestion}
                 onChange={e => setAiQuestion(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && askAiOnReport()}
-                placeholder="e.g. Which block requires immediate fertilizer top-dressing?"
+                placeholder="For example: which block should I visit first?"
                 className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
               />
               <button
@@ -800,47 +495,19 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
                 disabled={aiQuerying || !aiQuestion.trim()}
                 className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-green-700 hover:bg-green-800 text-white text-sm font-semibold disabled:bg-gray-200 disabled:text-gray-400 transition-all"
               >
-                <Send size={14} /> Ask AI
+                <Send size={14} /> Ask
               </button>
             </div>
-
             {aiAnswers.length > 0 && (
               <div className="space-y-3 pt-2">
                 {aiAnswers.map((ans, i) => (
-                  <div key={i} className="p-4 rounded-xl bg-white border border-gray-200 text-xs space-y-1.5">
-                    <div className="font-bold text-gray-900 flex items-center gap-1.5">
-                      <span className="text-green-700">Q:</span> {ans.q}
-                    </div>
-                    <div className="text-gray-700 leading-relaxed">
-                      <span className="font-semibold text-green-800">AI:</span> {ans.a}
-                    </div>
+                  <div key={i} className="p-4 rounded-xl bg-white border border-gray-200 text-sm space-y-1.5">
+                    <div className="font-semibold text-gray-900">{ans.q}</div>
+                    <div className="text-gray-700 leading-relaxed">{ans.a}</div>
                   </div>
                 ))}
               </div>
             )}
-          </Card>
-
-          {/* SECTION 8: Data used and limits (plain words) */}
-          <Card className="p-6 space-y-3">
-            <div className="flex items-center gap-2 text-sm font-bold text-gray-900"><Layers size={16} className="text-gray-600" />Data used and limits</div>
-            <ul className="text-sm text-gray-700 space-y-1.5 list-disc pl-5">
-              <li>{(report.health || []).length ? `${report.health.length} clear view${report.health.length === 1 ? '' : 's'} of the farm from space in this period${report.cmp ? `, ${(report.healthCmp || []).length} in the comparison period` : ''}. Cloudy days are left out.` : 'No clear view of the farm in this period because of cloud.'}</li>
-              <li>Crop health and leaf water are estimates from satellite images, not measurements on the ground.</li>
-              {(report.limits || []).map((lim, i) => <li key={i}>{lim}</li>)}
-            </ul>
-          </Card>
-
-          {/* SECTION 9: Technical appendix (included by default; for agronomists, buyers and auditors) */}
-          <Card className="p-6 space-y-4 bg-white">
-            <div className="text-sm font-bold text-gray-900">Technical appendix</div>
-            <dl className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3 text-xs text-gray-700">
-              <div><dt className="font-semibold text-gray-900">Imagery</dt><dd>{(report.data_used?.sources || []).join('; ') || 'Not recorded for this report'}</dd></div>
-              <div><dt className="font-semibold text-gray-900">Measures behind the words</dt><dd>Crop health = NDVI (vegetation index); Leaf water = NDMI (moisture index). Farm averages per clear view.</dd></div>
-              <div><dt className="font-semibold text-gray-900">Period</dt><dd>{report.period.from} to {report.period.to}{report.cmp ? `; comparison ${report.cmp.from} to ${report.cmp.to}` : ''}</dd></div>
-              <div><dt className="font-semibold text-gray-900">Clear-view dates</dt><dd>{(report.health || []).map(d => d.date).join(', ') || 'none'}</dd></div>
-              <div><dt className="font-semibold text-gray-900">Method</dt><dd>Cloud-masked images; values averaged over the chosen area; block status from the latest clear view, classified with the legend classes set for this crop.</dd></div>
-              <div><dt className="font-semibold text-gray-900">Weather</dt><dd>Open-Meteo reanalysis and forecast for the farm location.</dd></div>
-            </dl>
           </Card>
         </div>
       )}
@@ -853,7 +520,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
             <p className="text-sm text-gray-500">Pick the report, the area and the period on the left, then press Create report. It reads top to bottom:</p>
           </div>
           <ol className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-3 max-w-3xl mx-auto">
-            {['Summary in plain words', 'Status at a glance', 'Blocks needing action, with what to do', 'What changed against the comparison', 'Advice for your focus', 'Data used and limits'].map((s, i) => (
+            {['How the farm is doing, in plain words', 'What to do next', 'The crop over the period', 'Rain and soil moisture', 'Where to walk', 'The farm grouped by condition and estate'].map((s, i) => (
               <li key={s} className="flex items-center gap-3 rounded-xl border border-gray-200 px-4 py-3 text-sm text-gray-700"><span className="w-6 h-6 rounded-full bg-gray-100 text-gray-600 text-xs font-semibold flex items-center justify-center">{i + 1}</span>{s}</li>
             ))}
           </ol>
