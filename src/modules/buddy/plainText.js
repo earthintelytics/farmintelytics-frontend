@@ -1,7 +1,9 @@
 // The advisor may answer with Markdown (headings, bold, lists, tables). FarmIntelytics Buddy shows and reads
-// plain sentences, so the marks are taken out and list items kept as their own lines.
+// plain sentences, so the marks are taken out and list items kept as their own lines. Block codes read as
+// people say them: "Plot_01" becomes "Plot 1".
 export function plainText(text) {
   return String(text || '')
+    .replace(/\b([A-Za-z]+)_0*(\d+)\b/g, '$1 $2')
     .replace(/```[\s\S]*?```/g, '')
     .replace(/`([^`]*)`/g, '$1')
     .replace(/!\[[^\]]*\]\([^)]*\)/g, '')

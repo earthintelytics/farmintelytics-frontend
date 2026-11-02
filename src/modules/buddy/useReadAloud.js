@@ -82,21 +82,34 @@ function useWebReadAloud() {
   return { speak, stop, speakingId, availability };
 }
 
-// The Android app: Android's voices (text-to-speech plugin), the same voice choice and lower pitch.
+// The Android app: Android's voices (text-to-speech plugin), the same voice choice. Android starts its speech
+// engine in the background, so the voice list can be empty at first: it is asked again for a few seconds,
+// and with no list the answer is still spoken in the language with the phone's default voice. Only a
+// failed attempt shows "not available".
+const RETRIES = [0, 1500, 4000, 8000];
+
 function useNativeReadAloud() {
   const tts = nativePlugins()?.TextToSpeech;
   const [voices, setVoices] = useState([]);
   const [ready, setReady] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [speakingId, setSpeakingId] = useState(null);
   const runRef = useRef(0);
 
   useEffect(() => {
     let live = true;
-    tts?.getSupportedVoices?.()
-      .then((r) => { if (live) setVoices((r?.voices || []).map((v, index) => ({ ...v, index }))); })
-      .catch(() => {})
-      .finally(() => { if (live) setReady(true); });
-    return () => { live = false; tts?.stop?.().catch(() => {}); };
+    let found = false;
+    const timers = RETRIES.map((ms, i) => setTimeout(() => {
+      if (!live || found) return;
+      tts?.getSupportedVoices?.()
+        .then((r) => {
+          const list = (r?.voices || []).map((v, index) => ({ ...v, index }));
+          if (live && list.length) { found = true; setVoices(list); }
+        })
+        .catch(() => {})
+        .finally(() => { if (live && (found || i === RETRIES.length - 1)) setReady(true); });
+    }, ms));
+    return () => { live = false; timers.forEach(clearTimeout); tts?.stop?.().catch(() => {}); };
   }, [tts]);
 
   const voiceFor = useCallback((language) => pickVoice(voices, language.voices), [voices]);
@@ -109,7 +122,8 @@ function useNativeReadAloud() {
 
   const speak = useCallback((id, text, language) => {
     const voice = voiceFor(language);
-    if (!tts || !voice) return false;
+    // No list from the phone yet: speak in the language and let Android choose its voice for it.
+    if (!tts || (!voice && voices.length)) return false;
     const parts = speechChunks(text);
     if (!parts.length) return false;
     const run = ++runRef.current;
@@ -119,20 +133,22 @@ function useNativeReadAloud() {
         await tts.stop().catch(() => {});
         for (const part of parts) {
           if (runRef.current !== run) return;
-          await tts.speak({ text: part, lang: voice.lang, voice: voice.index, rate: RATE, pitch: PITCH });
+          await tts.speak(voice ? { text: part, lang: voice.lang, voice: voice.index, rate: RATE, pitch: PITCH }
+            : { text: part, lang: language.voices[0], rate: RATE, pitch: PITCH });
         }
-      } catch { /* stopped or no voice */ }
+        setFailed(false);
+      } catch { if (!voice) setFailed(true); /* stopped, or the phone has no voice at all */ }
       if (runRef.current === run) setSpeakingId(null);
     })();
     return true;
-  }, [tts, voiceFor]);
+  }, [tts, voices, voiceFor]);
 
   const availability = useCallback((language) => {
     if (!tts) return 'none';
     if (voiceFor(language)) return 'yes';
-    if (!ready) return 'checking';
-    return voices.length ? 'no' : 'none';
-  }, [tts, ready, voices, voiceFor]);
+    if (!voices.length) return failed ? 'none' : ready ? 'yes' : 'checking';
+    return 'no';
+  }, [tts, ready, failed, voices, voiceFor]);
 
   return { speak, stop, speakingId, availability };
 }
