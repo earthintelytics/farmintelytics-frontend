@@ -1,4 +1,4 @@
-// The menu: installing Farm Buddy on the phone, and signing out. Nothing else.
+// The menu: installing FarmIntelytics Buddy on the phone, and signing out. Nothing else.
 import { useEffect, useState } from 'react';
 import { Download, LogOut } from 'lucide-react';
 import Sheet from './Sheet';

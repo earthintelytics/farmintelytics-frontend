@@ -1,6 +1,6 @@
 {
-  "name": "Farm Buddy",
-  "short_name": "Farm Buddy",
+  "name": "FarmIntelytics Buddy",
+  "short_name": "FarmIntelytics Buddy",
   "description": "Ask the farm advisor by voice or text, and see your farm's alerts and where to walk.",
   "id": "/buddy",
   "start_url": "/buddy",

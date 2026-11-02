@@ -1,4 +1,4 @@
-// Farm Buddy's talk with the farm advisor (POST /ai/query, style "conversation"). No service is chosen:
+// FarmIntelytics Buddy's talk with the farm advisor (POST /ai/query, style "conversation"). No service is chosen:
 // the advisor gets the whole organisation and asks which farm when the question does not say, and it
 // receives the earlier turns so it can follow the talk. The chat shows the farmer's own words; the
 // advisor also gets the chosen answer language, which the farmer never sees. Kept in memory only: a

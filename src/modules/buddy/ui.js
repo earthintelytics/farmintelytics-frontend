@@ -1,4 +1,4 @@
-// Farm Buddy's shared class names: big touch targets (48px and up), token colours only, solid focus
+// FarmIntelytics Buddy's shared class names: big touch targets (48px and up), token colours only, solid focus
 // rings, no shadows.
 const focus = 'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--brand-primary)]';
 

@@ -58,7 +58,7 @@ const ServicePortal = lazyWithReload(() => import('./modules/services/ServicePor
 const AdvisorApp = lazyWithReload(() => import('./modules/advisor/AdvisorApp'));
 const SuitabilityPortal = lazyWithReload(() => import('./modules/suitability/SuitabilityPortal'));
 const SmallholderHub = lazyWithReload(() => import('./modules/smallholder/SmallholderHub'));
-// Farm Buddy: the farmers' phone app (ask the advisor by voice or text; alerts and where to walk).
+// FarmIntelytics Buddy: the farmers' phone app (ask the advisor by voice or text; alerts and where to walk).
 const BuddyApp = lazyWithReload(() => import('./modules/buddy/BuddyApp'));
 const PublicFormPage = lazyWithReload(() => import('./modules/forms/PublicFormPage'));
 const PublicSuitabilitySharePage = lazyWithReload(() => import('./modules/suitability/pages/PublicSuitabilitySharePage'));
@@ -175,7 +175,7 @@ const OrgPage = ({ view }) => {
   );
 };
 
-// /buddy: Farm Buddy, the farmers' phone app. Signed in to an organisation, or to its sign-in and back.
+// /buddy: FarmIntelytics Buddy, the farmers' phone app. Signed in to an organisation, or to its sign-in and back.
 const BuddyPage = () => (sessionTenant()
   ? <ErrorBoundary><BuddyApp /></ErrorBoundary>
   : <Navigate to="/login?next=buddy" replace />);
@@ -213,7 +213,7 @@ const LoginPage = () => {
   const handleLogin = () => {
     const tenant = sessionTenant();
     if (!tenant) return;
-    if (moduleId === 'buddy') { navigate('/buddy', { replace: true }); return; } // Farm Buddy phone app
+    if (moduleId === 'buddy') { navigate('/buddy', { replace: true }); return; } // FarmIntelytics Buddy phone app
     navigate(moduleId ? paths.service(moduleId, tenant) : paths.orgHub(tenant), { replace: true });
   };
 
@@ -355,7 +355,7 @@ const AppRoutes = () => {
   return (
     <React.Suspense fallback={<RouteLoading />}>
       <Routes>
-        {/* The Farm Buddy Android app opens on Farm Buddy itself. */}
+        {/* The FarmIntelytics Buddy Android app opens on FarmIntelytics Buddy itself. */}
         <Route path="/"                         element={window.Capacitor?.isNativePlatform?.() ? <Navigate to="/buddy" replace /> : <RootPage />} />
         <Route path="/login"                    element={<LoginPage />} />
         <Route path="/policies"                 element={<PoliciesPage />} />
@@ -378,7 +378,7 @@ const AppRoutes = () => {
         <Route path="/org/:tenant/field"        element={<OrgPage view="field" />} />
         {/* The installed phone app opens here: the signed-in organisation's Field page. */}
         <Route path="/field"                    element={<Navigate to={sessionTenant() ? paths.orgField(sessionTenant()) : '/login?next=field'} replace />} />
-        {/* Farm Buddy, the farmers' phone app: /buddy (Ask) and /buddy/alerts. */}
+        {/* FarmIntelytics Buddy, the farmers' phone app: /buddy (Ask) and /buddy/alerts. */}
         <Route path="/buddy/*"                  element={<BuddyPage />} />
         <Route path="/org/:tenant/login"        element={<LoginPage />} />
         <Route path="/org/:tenant/:moduleId"    element={<PortalPage />} />

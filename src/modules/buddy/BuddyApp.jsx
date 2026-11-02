@@ -1,4 +1,4 @@
-// Farm Buddy: the farmers' phone app (/buddy, /buddy/alerts). Talk with the farm advisor by voice or
+// FarmIntelytics Buddy: the farmers' phone app (/buddy, /buddy/alerts). Talk with the farm advisor by voice or
 // text, and see the farm's open alerts and where to walk. No service is chosen: the advisor gets the
 // whole organisation and asks which farm when the question does not say. Everything comes from the
 // sign-in and the API; App.jsx sends anyone not signed in to the sign-in first.

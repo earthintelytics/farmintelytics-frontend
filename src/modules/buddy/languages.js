@@ -1,4 +1,4 @@
-// The languages Farm Buddy offers: English and Nigerian Pidgin for now (phones rarely have Hausa, Yoruba
+// The languages FarmIntelytics Buddy offers: English and Nigerian Pidgin for now (phones rarely have Hausa, Yoruba
 // or Igbo voices; those come back with a server voice service). `listen` is the code given to the phone's
 // speech recognition,
 // `voices` the voice languages that may read an answer aloud, best first. Pidgin has no voice of its

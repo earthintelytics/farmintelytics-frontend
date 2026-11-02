@@ -8,7 +8,7 @@ import { nativePlugins } from './native';
 const synth = () => (typeof window !== 'undefined' && 'speechSynthesis' in window && typeof window.SpeechSynthesisUtterance === 'function' ? window.speechSynthesis : null);
 const norm = (l) => String(l || '').replace('_', '-').toLowerCase();
 
-// Farm Buddy speaks with a deep male voice, Nigerian English first: among the phone's voices for the
+// FarmIntelytics Buddy speaks with a deep male voice, Nigerian English first: among the phone's voices for the
 // language, one named as male is preferred and those named as female are avoided (phones name voices
 // differently, so this is a preference, not a promise). Pitch and speed stay natural: lowering them made
 // phone voices sound shaky and unsure (31 Oct 2026).

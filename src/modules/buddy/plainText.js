@@ -1,4 +1,4 @@
-// The advisor may answer with Markdown (headings, bold, lists, tables). Farm Buddy shows and reads
+// The advisor may answer with Markdown (headings, bold, lists, tables). FarmIntelytics Buddy shows and reads
 // plain sentences, so the marks are taken out and list items kept as their own lines.
 export function plainText(text) {
   return String(text || '')

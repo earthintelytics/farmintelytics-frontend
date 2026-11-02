@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { Download, Mic, Bell, MapPin } from 'lucide-react';
 
-// The Farm Buddy Android app, downloaded straight from this server. What is offered comes from
+// The FarmIntelytics Buddy Android app, downloaded straight from this server. What is offered comes from
 // /downloads/farm-buddy.json, written when the APK is published; without it this section stays hidden.
 const INFO = '/downloads/farm-buddy.json';
 
@@ -38,7 +38,7 @@ export default function AppDownload() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
           <p className="text-sm font-medium text-[var(--brand-primary)]">For farmers in the field</p>
-          <h2 className="font-display text-3xl font-semibold tracking-tight text-gray-900 mt-2">Farm Buddy on your phone</h2>
+          <h2 className="font-display text-3xl font-semibold tracking-tight text-gray-900 mt-2">FarmIntelytics Buddy on your phone</h2>
           <p className="text-base text-gray-600 mt-3 max-w-2xl leading-relaxed">
             A simple app for the people who walk the fields. Sign in with the same details you use here.
           </p>
@@ -63,14 +63,14 @@ export default function AppDownload() {
             <ol className="mt-2 space-y-1.5 text-sm text-gray-600 list-decimal pl-5">
               <li>Open this page on your Android phone and tap Download for Android.</li>
               <li>Open the downloaded file. If the phone asks, allow installs from your browser.</li>
-              <li>Tap Install, then open Farm Buddy and sign in.</li>
+              <li>Tap Install, then open FarmIntelytics Buddy and sign in.</li>
             </ol>
             <p className="mt-3 text-xs text-gray-500">The app comes straight from this site, not from the Play Store, so your phone may warn you once before installing.</p>
           </div>
         </div>
         {qr && (
           <div className="hidden lg:flex flex-col items-center gap-3 rounded-2xl border border-gray-200 p-5">
-            <img src={qr} alt="Code to scan with your phone to download Farm Buddy" className="w-48 h-48" />
+            <img src={qr} alt="Code to scan with your phone to download FarmIntelytics Buddy" className="w-48 h-48" />
             <p className="text-xs text-gray-500 text-center max-w-[12rem]">On a computer? Scan this with your phone's camera to download.</p>
           </div>
         )}

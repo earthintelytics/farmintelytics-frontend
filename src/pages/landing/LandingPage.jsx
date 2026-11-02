@@ -3,7 +3,7 @@ import HeroSection from './components/HeroSection';
 import AppDownload from './components/AppDownload';
 import LandingFooter from './components/LandingFooter';
 
-/** Public front page: white, plain words, sign in, and the Farm Buddy app download. */
+/** Public front page: white, plain words, sign in, and the FarmIntelytics Buddy app download. */
 const LandingPage = () => (
   <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans">
     <LandingNav />

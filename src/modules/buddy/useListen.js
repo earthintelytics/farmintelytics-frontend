@@ -70,7 +70,9 @@ function useWebListen({ language, onText }) {
 }
 
 // The Android app: Android's own speech recognition (speech-recognition plugin; no https needed), the
-// same tap to start, live words in the box, tap or a pause to stop.
+// same tap to start, live words in the box, tap or a pause to stop. The plugin's stop() never reports back
+// and a failed recognition sends no event, so finishing never waits on it: a tap finishes at once with the
+// words heard so far, and while listening the phone is asked every second whether it still is.
 function useNativeListen({ language, onText }) {
   const sr = nativePlugins()?.SpeechRecognition;
   const [listening, setListening] = useState(false);
@@ -78,38 +80,48 @@ function useNativeListen({ language, onText }) {
   const [error, setError] = useState('');
   const textRef = useRef('');
   const onTextRef = useRef(onText);
-  const activeRef = useRef(false);
+  const activeRef = useRef(false);   // from the first tap (also while the microphone is starting) to the finish
+  const pollRef = useRef(null);
   useEffect(() => { onTextRef.current = onText; }, [onText]);
 
   const finish = useCallback(() => {
     if (!activeRef.current) return;
     activeRef.current = false;
+    clearInterval(pollRef.current);
+    pollRef.current = null;
     setListening(false);
     setHeard('');
-    sr?.removeAllListeners?.().catch?.(() => {});
+    sr?.removeAllListeners?.()?.catch?.(() => {});
     if (textRef.current) onTextRef.current?.(textRef.current);
     textRef.current = '';
   }, [sr]);
-  useEffect(() => () => { sr?.stop?.().catch?.(() => {}); sr?.removeAllListeners?.(); }, [sr]);
+  useEffect(() => () => { clearInterval(pollRef.current); sr?.stop?.()?.catch?.(() => {}); sr?.removeAllListeners?.()?.catch?.(() => {}); }, [sr]);
 
   const start = useCallback(async () => {
     if (!sr || activeRef.current) return;
+    activeRef.current = true;
     setError('');
+    textRef.current = '';
+    setHeard('');
+    setListening(true);
     try {
       const perm = await sr.requestPermissions();
-      if (perm?.speechRecognition && perm.speechRecognition !== 'granted') { setError(problem('not-allowed', language)); return; }
+      if (perm?.speechRecognition && perm.speechRecognition !== 'granted') { setError(problem('not-allowed', language)); finish(); return; }
       const { available } = await sr.available();
-      if (!available) { setError(problem('language-not-supported', language)); return; }
-      textRef.current = '';
-      setHeard('');
-      activeRef.current = true;
-      setListening(true);
+      if (!available) { setError(problem('language-not-supported', language)); finish(); return; }
+      if (!activeRef.current) return;   // tapped again while the microphone was starting
       await sr.addListener('partialResults', (d) => {
         const t = String(d?.matches?.[0] || '').trim();
-        if (t) { textRef.current = t; setHeard(t); }
+        if (t && activeRef.current) { textRef.current = t; setHeard(t); }
       });
-      await sr.addListener('listeningState', (d) => { if (d?.status === 'stopped') finish(); });
+      // Stopped by a pause: Android sends its final words just after, so finish a moment later.
+      const settle = () => { clearInterval(pollRef.current); setTimeout(finish, 700); };
+      await sr.addListener('listeningState', (d) => { if (d?.status === 'stopped') settle(); });
       await sr.start({ language: language.listen, maxResults: 1, partialResults: true, popup: false });
+      if (!activeRef.current) { sr.stop?.()?.catch?.(() => {}); return; }
+      pollRef.current = setInterval(async () => {
+        try { const r = await sr.isListening(); if (!r?.listening) settle(); } catch { finish(); }
+      }, 1000);
     } catch (e) {
       const msg = String(e?.message || e || '');
       setError(/permission/i.test(msg) ? problem('not-allowed', language) : /language/i.test(msg) ? problem('language-not-supported', language) : problem('no-speech', language));
@@ -117,8 +129,8 @@ function useNativeListen({ language, onText }) {
     }
   }, [sr, language, finish]);
 
-  const stop = useCallback(async () => {
-    try { await sr?.stop(); } catch { /* already stopped */ }
+  const stop = useCallback(() => {
+    sr?.stop?.()?.catch?.(() => {});   // not awaited: the plugin never answers it
     finish();
   }, [sr, finish]);
 
