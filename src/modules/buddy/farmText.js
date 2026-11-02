@@ -88,6 +88,8 @@ export function gpsPoints(text) {
 /** An answer as it is read aloud: GPS points and links are tapped, never spoken. */
 export const spokenAnswer = (text) => String(text || '')
   .replace(/https?:\/\/\S+/g, '')
-  .replace(GPS, 'the map button')
+  .replace(/\s*\(\s*GPS[^)]*\)/gi, '')
+  .replace(GPS, 'the point on the map button')
   .replace(/\s{2,}/g, ' ')
+  .replace(/\s+([.,!?])/g, '$1')
   .trim();
