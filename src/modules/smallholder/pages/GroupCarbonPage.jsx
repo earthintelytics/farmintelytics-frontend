@@ -19,7 +19,8 @@ const GroupCarbonPage = () => {
 
   const exportCsv = () => {
     const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const lines = ['group,member,area_ha,carbon_low_t,carbon_high_t'];
+    // Plain headings: a range, never one carbon figure (estimates, not certified).
+    const lines = ['Group,Member,Area (ha),Carbon estimate low (t),Carbon estimate high (t)'];
     groups.forEach((g) => (g.members || []).forEach((m) => lines.push([g.name, m.name, m.area_ha, m.carbon_t?.low, m.carbon_t?.high].map(esc).join(','))));
     const url = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
     Object.assign(document.createElement('a'), { href: url, download: 'group-carbon.csv' }).click();

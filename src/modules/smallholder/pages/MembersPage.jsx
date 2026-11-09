@@ -32,8 +32,9 @@ const MembersPage = ({ onOpenForms, onOpenAnswers }) => {
 
   const exportCsv = () => {
     const cols = ['code', 'name', 'phone', 'group_name', 'status', 'parcels_count', 'area_ha', 'eudr_status'];
+    const heads = ['Member code', 'Name', 'Phone', 'Group', 'Status', 'Parcels', 'Area (ha)', 'EUDR check'];
     const esc = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const lines = [cols.join(','), ...rows.map((r) => cols.map((c) => esc(r[c])).join(','))];
+    const lines = [heads.map(esc).join(','), ...rows.map((r) => cols.map((c) => esc(r[c])).join(','))];
     const url = URL.createObjectURL(new Blob([lines.join('\n')], { type: 'text/csv' }));
     Object.assign(document.createElement('a'), { href: url, download: 'members.csv' }).click();
     URL.revokeObjectURL(url);
