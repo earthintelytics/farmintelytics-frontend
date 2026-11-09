@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { fetchSuitabilityRun, generateReportPdf, downloadSuitabilityPdf, deleteSuitabilityRun } from '../../../services/suitabilityApi';
+import { useCallback, useEffect, useState } from 'react';
+import { fetchSuitabilityRun, deleteSuitabilityRun } from '../../../services/suitabilityApi';
 import { fetchSuitabilityThresholds } from '../../../services/adminApi';
 import { ErrorNote } from '../../../components/page/PageKit';
 import { useConfirm } from '../../../components/ConfirmProvider';
@@ -9,7 +9,8 @@ import SuitabilityHeader from '../components/SuitabilityHeader';
 import SuitabilitySidebar from '../components/SuitabilitySidebar';
 import SuitabilityMapView from '../components/SuitabilityMapView';
 import SuitabilityAnalyticsView from '../components/SuitabilityAnalyticsView';
-import SuitabilityReportView from '../components/SuitabilityReportView';
+import DesignedReport from '../../reports/DesignedReport';
+import { fetchSuitabilityReportHtml, fetchSuitabilityReportPdf } from '../../../services/suitabilityApi';
 import SuitabilityAiView from '../components/SuitabilityAiView';
 import FactorGuide from './FactorGuide';
 
@@ -20,7 +21,6 @@ export default function RunResult({ runId, companyId, onBack }) {
   const [error, setError] = useState('');
   const confirm = useConfirm();
   const [actions, setActions] = useState({});
-  const [pdf, setPdf] = useState({ busy: false, msg: '' });
   const [shareOpen, setShareOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [selectedAreaId, setSelectedAreaId] = useState('');
@@ -89,24 +89,9 @@ export default function RunResult({ runId, companyId, onBack }) {
     return ['final_class', ...list];
   })();
 
-  // 4. Download report action
-  const handleDownloadReport = async () => {
-    setPdf({ busy: true, msg: '' });
-    try {
-      await downloadSuitabilityPdf(runId);
-      setPdf({ busy: false, msg: '' });
-    } catch (e) {
-      try {
-        const r = await generateReportPdf(runId);
-        if (r?.pdf_url && r.status === 'ready') {
-          window.open(r.pdf_url, '_blank', 'noopener');
-        }
-        setPdf({ busy: false, msg: '' });
-      } catch (err) {
-        setPdf({ busy: false, msg: e.message || err.message });
-      }
-    }
-  };
+  // 4. The designed report (Report tab): its page and its PDF, for this run.
+  const loadReportHtml = useCallback(() => fetchSuitabilityReportHtml(runId), [runId]);
+  const loadReportPdf = useCallback(() => fetchSuitabilityReportPdf(runId), [runId]);
 
   // 5. Ask AI about a layer action
   const handleAskAiAboutLayer = (questionText) => {
@@ -227,14 +212,10 @@ export default function RunResult({ runId, companyId, onBack }) {
             </main>
           </>
         ) : activeTopTab === 'report' ? (
-          <main className="flex-1 overflow-y-auto bg-gray-50">
-            <SuitabilityReportView
-              run={run}
-              onDownloadPdf={handleDownloadReport}
-              pdfBusy={pdf.busy}
-              pdfMsg={pdf.msg}
-              onAskAi={handleAskAiAboutLayer}
-            />
+          <main className="flex-1 overflow-y-auto bg-white p-4 sm:p-8">
+            {/* The designed suitability report (report engine), as its PDF prints. */}
+            <DesignedReport key={runId} fileName={`Suitability ${cropName(run?.crop)} ${String(runId).slice(0, 8)}`}
+              loadHtml={loadReportHtml} loadPdf={loadReportPdf} />
           </main>
         ) : (
           <main className="flex-1 overflow-y-auto bg-gray-50">

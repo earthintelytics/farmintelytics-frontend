@@ -5,22 +5,23 @@ import { fetchReportHtml, fetchReportPdf } from '../../services/organizationMoni
 /**
  * The report as the client receives it: the designed pages from the report engine, shown in the page, and
  * the PDF printed from the same pages. The report's own HTML is shown in a frame with no scripts.
+ * By default a saved report (reportId); loadHtml / loadPdf give another source (a suitability run, a share link).
  */
-export default function DesignedReport({ reportId, fileName }) {
+export default function DesignedReport({ reportId, fileName, loadHtml, loadPdf }) {
   const [html, setHtml] = useState(null);
-  const [state, setState] = useState('loading'); // loading | ready | old | failed
+  const [state, setState] = useState('loading'); // loading | ready | failed
+  const [problem, setProblem] = useState('');
   const [busy, setBusy] = useState(false);
   const [height, setHeight] = useState(1200);
   const frame = useRef(null);
 
   useEffect(() => {
     let live = true;
-    fetchReportHtml(reportId)
+    (loadHtml ? loadHtml() : fetchReportHtml(reportId))
       .then((h) => { if (live) { setHtml(h); setState('ready'); } })
-      // 404: a report made before the new design; its PDF is still there.
-      .catch((e) => { if (live) setState(e?.status === 404 ? 'old' : 'failed'); });
+      .catch((e) => { if (live) { setProblem(e?.message || ''); setState('failed'); } });
     return () => { live = false; };
-  }, [reportId]);
+  }, [reportId, loadHtml]);
 
   const fit = () => {
     const doc = frame.current?.contentDocument;
@@ -30,7 +31,7 @@ export default function DesignedReport({ reportId, fileName }) {
   const download = async () => {
     setBusy(true);
     try {
-      const blob = await fetchReportPdf(reportId);
+      const blob = await (loadPdf ? loadPdf() : fetchReportPdf(reportId));
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -48,10 +49,9 @@ export default function DesignedReport({ reportId, fileName }) {
         <p className="text-sm text-gray-500">
           {state === 'loading' && 'Opening the report…'}
           {state === 'ready' && 'The report as it prints. The PDF has the same pages.'}
-          {state === 'old' && 'This report was made before the new design. Download its PDF, or make it again to see it here.'}
-          {state === 'failed' && 'The report could not be opened. Try again in a moment.'}
+          {state === 'failed' && (problem || 'The report could not be opened. Try again in a moment.')}
         </p>
-        <button type="button" onClick={download} disabled={busy || state === 'loading'}
+        <button type="button" onClick={download} disabled={busy || state !== 'ready'}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-700 text-white text-sm font-semibold hover:bg-green-800 disabled:bg-gray-200 disabled:text-gray-500">
           <Download size={15} />{busy ? 'Preparing the PDF…' : 'Download PDF'}
         </button>

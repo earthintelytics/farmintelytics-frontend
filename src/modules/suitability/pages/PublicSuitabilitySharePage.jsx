@@ -1,5 +1,5 @@
 import { daysLeftText } from '../suitabilityLabels';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { AlertTriangle, Compass, Layers, FileText, Sparkles, FileDown } from 'lucide-react';
 import { fetchPublicSuitability, publicReportPdfUrl } from '../../../services/suitabilityApi';
@@ -8,7 +8,8 @@ import { cropName } from '../suitabilityLabels';
 import SuitabilitySidebar from '../components/SuitabilitySidebar';
 import SuitabilityMapView from '../components/SuitabilityMapView';
 import SuitabilityAnalyticsView from '../components/SuitabilityAnalyticsView';
-import SuitabilityReportView from '../components/SuitabilityReportView';
+import DesignedReport from '../../reports/DesignedReport';
+import { fetchSharedReportHtml, fetchSharedReportPdf } from '../../../services/suitabilityApi';
 import SuitabilityAiView from '../components/SuitabilityAiView';
 
 export const PublicSuitabilitySharePage = () => {
@@ -31,6 +32,8 @@ export const PublicSuitabilitySharePage = () => {
 
   const [aiQuestion, setAiQuestion] = useState('');
   const [pdfBusy, setPdfBusy] = useState(false); // with the other hooks: hooks never come after an early return
+  const loadReportHtml = useCallback(() => fetchSharedReportHtml(token), [token]);
+  const loadReportPdf = useCallback(() => fetchSharedReportPdf(token), [token]);
 
   useEffect(() => {
     let live = true;
@@ -193,10 +196,11 @@ export const PublicSuitabilitySharePage = () => {
           <button
             type="button"
             onClick={handleDownloadPdf}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-green-700 text-white hover:bg-green-800 transition-all shadow-xs"
+            disabled={pdfBusy}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-green-700 text-white hover:bg-green-800 disabled:bg-gray-200 disabled:text-gray-500 transition-all"
           >
             <FileDown size={14} />
-            <span>PDF Report</span>
+            <span>{pdfBusy ? 'Preparing…' : 'Download report'}</span>
           </button>
         </div>
       </header>
@@ -239,14 +243,9 @@ export const PublicSuitabilitySharePage = () => {
             </main>
           </>
         ) : activeTopTab === 'report' ? (
-          <main className="flex-1 overflow-y-auto bg-white">
-            <SuitabilityReportView
-              run={runWithToken}
-              onDownloadPdf={handleDownloadPdf}
-              pdfBusy={pdfBusy}
-              pdfMsg=""
-              onAskAi={handleAskAiAboutLayer}
-            />
+          <main className="flex-1 overflow-y-auto bg-white p-4 sm:p-8">
+            {/* The designed suitability report (report engine), as its PDF prints. */}
+            <DesignedReport key={token} fileName={`Suitability report ${crop}`} loadHtml={loadReportHtml} loadPdf={loadReportPdf} />
           </main>
         ) : (
           <main className="flex-1 overflow-y-auto bg-white">

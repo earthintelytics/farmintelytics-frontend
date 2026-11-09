@@ -110,3 +110,21 @@ export const askPublicSuitabilityAi = async (token, question) => {
 
 export const publicReportPdfUrl = (token) =>
   `${API_BASE}/public/suitability/${encodeURIComponent(token)}/report.pdf`;
+
+// The designed suitability report (report engine) as a page and as its PDF, for the team (by run) and for
+// the client (by share link). Same pages as the Reports page.
+const teamFile = async (path) => {
+  const token = localStorage.getItem('fi_admin_token');
+  const res = await fetch(`${BASE_URL}${path}`, { cache: 'no-store', headers: token ? { Authorization: `Bearer ${token}` } : {} });
+  if (!res.ok) throw await responseError(res);
+  return res;
+};
+const publicFile = async (token, name) => {
+  const res = await fetch(`${API_BASE}/public/suitability/${encodeURIComponent(token)}/${name}`, { cache: 'no-store' });
+  if (!res.ok) throw await responseError(res);
+  return res;
+};
+export const fetchSuitabilityReportHtml = async (runId) => (await teamFile(`/runs/${encodeURIComponent(runId)}/report.html`)).text();
+export const fetchSuitabilityReportPdf = async (runId) => (await teamFile(`/runs/${encodeURIComponent(runId)}/report.pdf`)).blob();
+export const fetchSharedReportHtml = async (token) => (await publicFile(token, 'report.html')).text();
+export const fetchSharedReportPdf = async (token) => (await publicFile(token, 'report.pdf')).blob();
