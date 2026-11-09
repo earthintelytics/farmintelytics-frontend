@@ -30,6 +30,8 @@ import EudrPassportPage from '../../../../smallholder/pages/EudrPassportPage';
 import FormsPage from '../../../../forms/FormsPage';
 import SubmissionsPage from '../../../../forms/SubmissionsPage';
 import ScenarioBuilder from '../../../../assistant/ScenarioBuilder';
+import AiAnswer from '../../../../../components/ai/AiAnswer';
+import AiThinking from '../../../../../components/ai/AiThinking';
 
 export function renderDashboardPages(ctx) {
   const { blockMeasures, TIMELINE_DATA, activeAnalyticsSubpage, activeSidebarItem, activeTab, alerts, answersForm, basemapAttribution, basemapMaxNativeZoom, basemapUrl, blockValue, chatEndRef, chatInput, chatLoading, chatMessages, climateBoundariesOpacity, climatePlotsData, climatePlotsDataA, climatePlotsDataB, climateShowBoundaries, climateShowLayers, cropLabel, cropProfileEntries, cropType, currentTileUrl, currentTileUrlB, currentTimelineA, currentTimelineB, dashboardFilterKeys, dataFocus, defaultMapCenter, dynamicFilterValues, estateOptions, farmBoundary, filterDate, filterEstate, filterPlot, filteredPlotsData, glossaryFocus, handleAcknowledgeAlert, handleChatSubmit, handleEstateChange, handlePlotClick, handlePlotFilterChange, handleSidebarClick, handleSplitDragStart, healthBoundariesOpacity, healthPlotsData, healthPlotsDataA, healthPlotsDataB, healthShowBoundaries, healthShowLayers, intelBoundariesOpacity, intelShowBoundaries, intelShowLayers, isAiOnly, isCompareMode, isOrg, kpiContext, landCover, landCoverLoading, loadIssues, mapOpacity, moistureBoundariesOpacity, moisturePlotsData, moisturePlotsDataA, moisturePlotsDataB, moistureShowBoundaries, moistureShowLayers, nutrientData, overviewTrends, pageSet, pick, pixelTimeseries, plots, plotsData, plotsDataA, plotsDataB, rasterOverlayBounds, renderClimatePolygons, renderFloatingBasemapSelector, renderHealthPolygons, renderInfoTooltip, renderIntelPolygons, renderLegendCards, renderMapBottomPanel, renderMoisturePolygons, renderRestorePolygons, renderYieldPolygons, restorationPlotsData, restorationPlotsDataA, restorationPlotsDataB, restoreBoundariesOpacity, restoreShowBoundaries, restoreShowLayers, scenarioFormOpen, selectedIndex, selectedPlot, service, setActiveAnalyticsSubpage, setActiveSidebarItem, setActiveTab, setAnswersForm, setChatInput, setChatMessages, setClimateBoundariesOpacity, setClimateShowBoundaries, setClimateShowLayers, setDataFocus, setDynamicFilterValues, setFilterDate, setFilterEstate, setFilterPlot, setHealthBoundariesOpacity, setHealthShowBoundaries, setHealthShowLayers, setIntelBoundariesOpacity, setIntelShowBoundaries, setIntelShowLayers, setLoadIssues, setMapOpacity, setMoistureBoundariesOpacity, setMoistureShowBoundaries, setMoistureShowLayers, setRestoreBoundariesOpacity, setRestoreShowBoundaries, setRestoreShowLayers, setScenarioFormOpen, setSelectedPlot, setShowRasterLayer, setYieldBoundariesOpacity, setYieldShowBoundaries, setYieldShowLayers, showRasterLayer, splitPosition, tenant, tenantDisplayName, tileRefreshing, waterDemandData, waterDemandLoading, yieldBoundariesOpacity, yieldPlotsData, yieldPlotsDataA, yieldPlotsDataB, yieldShowBoundaries, yieldShowLayers, zarrBounds } = ctx;
@@ -477,7 +479,7 @@ export function renderDashboardPages(ctx) {
                               ? 'bg-green-700 text-white rounded-tr-none px-5 py-3.5'
                               : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none px-5 py-3.5'
                           }`}>
-                            <div style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</div>
+                            {msg.sender === 'user' ? <div className="whitespace-pre-wrap">{msg.text}</div> : <AiAnswer text={msg.text} />}
                             {msg.sources && msg.sources.length > 0 && (
                               <div className="mt-2 pt-2 border-t border-gray-100 flex flex-wrap gap-1">
                                 {msg.sources.map((src, si) => (
@@ -488,15 +490,7 @@ export function renderDashboardPages(ctx) {
                           </div>
                         </div>
                       ))}
-                      {chatLoading && (
-                        <div className="flex justify-start">
-                          <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-none px-5 py-3.5 flex items-center gap-2 text-sm text-gray-600" aria-label="The Assistant is writing">
-                            <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                            <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                            <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                          </div>
-                        </div>
-                      )}
+                      {chatLoading && <div className="flex justify-start"><AiThinking kind="farm" /></div>}
                       <div ref={chatEndRef} />
                     </div>
                   </div>

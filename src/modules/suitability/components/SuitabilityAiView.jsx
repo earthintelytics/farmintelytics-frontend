@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Send, Sparkles, ArrowRight, Plus, SlidersHorizontal, Sliders } from 'lucide-react';
 import { cropName } from '../suitabilityLabels';
 import { askPublicSuitabilityAi, askSuitabilityRun } from '../../../services/suitabilityApi';
+import AiAnswer from '../../../components/ai/AiAnswer';
+import AiThinking from '../../../components/ai/AiThinking';
 
 /**
  * Questions for land that is not planted yet, built from this analysis: the crop, what limits the land,
@@ -180,7 +182,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
                         : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none px-5 py-3.5 shadow-2xs'
                     }`}
                   >
-                    <div style={{ whiteSpace: 'pre-wrap' }}>{msg.text}</div>
+                    {msg.sender === 'user' ? <div className="whitespace-pre-wrap">{msg.text}</div> : <AiAnswer text={msg.text} />}
                     {msg.sources && msg.sources.length > 0 && (
                       <div className="mt-3 pt-2.5 border-t border-gray-100 flex flex-wrap items-center gap-1.5">
                         <span className="text-[10px] text-gray-400 font-semibold mr-1">Data sources:</span>
@@ -198,28 +200,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
                 </div>
               ))}
 
-              {chatLoading && (
-                <div className="flex justify-start">
-                  <div
-                    className="bg-white border border-gray-200 rounded-2xl rounded-tl-none px-5 py-3.5 flex items-center gap-2 text-xs text-gray-600 shadow-2xs"
-                    aria-label="The Assistant is calculating"
-                  >
-                    <span
-                      className="inline-block w-2 h-2 bg-green-600 rounded-full animate-bounce"
-                      style={{ animationDelay: '0ms' }}
-                    />
-                    <span
-                      className="inline-block w-2 h-2 bg-green-600 rounded-full animate-bounce"
-                      style={{ animationDelay: '150ms' }}
-                    />
-                    <span
-                      className="inline-block w-2 h-2 bg-green-600 rounded-full animate-bounce"
-                      style={{ animationDelay: '300ms' }}
-                    />
-                    <span className="text-gray-500 font-medium ml-1">Reading this analysis…</span>
-                  </div>
-                </div>
-              )}
+              {chatLoading && <div className="flex justify-start"><AiThinking kind="suitability" /></div>}
               <div ref={chatEndRef} />
             </div>
           </div>

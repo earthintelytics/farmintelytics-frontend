@@ -3,6 +3,8 @@ import { ArrowLeft, ArrowUp, Bell, FileText, MessageSquare, Plus, Download, LogO
 import { serviceCall } from '../../services/serviceClient';
 import { API_BASE } from '../../services/apiBase';
 import { tenantKey } from '../../services/session';
+import AiAnswer from '../../components/ai/AiAnswer';
+import AiThinking from '../../components/ai/AiThinking';
 
 /**
  * Farm advisor: a phone-first expert for this one farm. Ask questions (answers come only from this
@@ -13,19 +15,6 @@ const readChat = () => { try { return JSON.parse(localStorage.getItem(tenantKey(
 const saveChat = (m) => { try { localStorage.setItem(tenantKey(CHAT_KEY), JSON.stringify(m.slice(-40))); } catch { /* storage unavailable */ } };
 
 // Plain text with **bold**, "- " bullets and line breaks: no HTML is ever injected.
-function RichText({ text }) {
-  const blocks = String(text || '').split(/\n{2,}/);
-  const inline = (s, k) => s.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
-    part.startsWith('**') && part.endsWith('**') ? <strong key={`${k}-${i}`}>{part.slice(2, -2)}</strong> : <span key={`${k}-${i}`}>{part}</span>);
-  return blocks.map((b, bi) => {
-    const lines = b.split('\n').filter(Boolean);
-    if (lines.length && lines.every((l) => /^\s*([-*•]|\d+\.)\s+/.test(l))) {
-      return <ul key={bi} className="list-disc pl-5 space-y-1">{lines.map((l, li) => <li key={li}>{inline(l.replace(/^\s*([-*•]|\d+\.)\s+/, ''), `${bi}-${li}`)}</li>)}</ul>;
-    }
-    return <p key={bi}>{lines.map((l, li) => <span key={li}>{inline(l.replace(/^#+\s*/, ''), `${bi}-${li}`)}{li < lines.length - 1 && <br />}</span>)}</p>;
-  });
-}
-
 const TABS = [
   { id: 'ask', label: 'Ask', icon: MessageSquare },
   { id: 'advisories', label: 'Advisories', icon: Bell },
@@ -134,12 +123,12 @@ function AskTab({ prefill, onPrefillUsed }) {
               </div>
             ) : (
               <div key={i} className="space-y-2">
-                <div className={`text-[15px] leading-relaxed space-y-3 ${m.error ? 'text-red-700' : 'text-gray-900'}`}><RichText text={m.content} /></div>
+                <div className={`text-[15px] leading-relaxed space-y-3 ${m.error ? 'text-red-700' : 'text-gray-900'}`}><AiAnswer text={m.content} /></div>
                 {m.sources?.length > 0 && <p className="text-xs text-gray-400">From: {m.sources.join(' · ')}</p>}
               </div>
             )
           ))}
-          {busy && <div className="flex gap-1 py-2" aria-label="Thinking"><span className="w-2 h-2 rounded-full bg-gray-300 animate-bounce" /><span className="w-2 h-2 rounded-full bg-gray-300 animate-bounce [animation-delay:120ms]" /><span className="w-2 h-2 rounded-full bg-gray-300 animate-bounce [animation-delay:240ms]" /></div>}
+          {busy && <AiThinking kind="farm" />}
           <div ref={endRef} />
         </div>
       </div>

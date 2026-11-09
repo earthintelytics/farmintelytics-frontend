@@ -9,6 +9,7 @@ import MicButton from './MicButton';
 import { useListen } from './useListen';
 import { readAloudNote } from './useReadAloud';
 import { btnPrimary, inputBox, muted } from './ui';
+import AiThinking from '../../components/ai/AiThinking';
 
 export default function AskScreen({ chat, language, voice, person, photo }) {
   const location = useLocation();
@@ -54,7 +55,7 @@ export default function AskScreen({ chat, language, voice, person, photo }) {
           </div>
         )}
         {chat.messages.map((m) => <ChatBubble key={m.id} message={m} voice={voice} onRetry={chat.retry} />)}
-        {chat.busy && <p className={`text-[15px] ${muted}`} role="status">The advisor is thinking…</p>}
+        {chat.busy && <AiThinking kind="farm" />}
         <div ref={endRef} />
       </div>
 

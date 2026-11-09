@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import * as api from '../../services/organizationMonitorApi';
 import DesignedReport from './DesignedReport';
+import AiAnswer from '../../components/ai/AiAnswer';
+import AiThinking from '../../components/ai/AiThinking';
 
 /**
  * Reports & AI Decision Intelligence Engine (design: docs/services/reports-and-verification.md).
@@ -207,16 +209,16 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
     const q = aiQuestion.trim();
     setAiQuestion('');
     setAiQuerying(true);
-    const newEntry = { q, a: 'Analyzing report data and telemetry…', loading: true };
+    const newEntry = { q, a: '', loading: true };
     setAiAnswers(prev => [...prev, newEntry]);
 
     try {
       const prompt = `Context: Farm Report for ${where} (${fmtDate(period.from)} to ${fmtDate(period.to)}). Crop Health: ${HEALTH_WORD(report?.numbers?.crop_health_avg)}, Leaf Water: ${report?.numbers?.leaf_water_avg}, Alerts: ${report?.numbers?.alerts}. User Question: ${q}`;
       const res = await api.queryAiAgent(prompt, serviceId ? { module: serviceId } : {});
-      const answerText = res?.response || 'Analysis complete. Recommendations grounded in real data.';
+      const answerText = res?.response || 'No answer came back. Try again in a moment.';
       setAiAnswers(prev => prev.map(item => item.q === q ? { q, a: answerText, loading: false } : item));
     } catch {
-      setAiAnswers(prev => prev.map(item => item.q === q ? { q, a: 'Unable to connect to AI advisor. Please verify internet connection.', loading: false } : item));
+      setAiAnswers(prev => prev.map(item => item.q === q ? { q, a: 'The advisor could not be reached. Check the connection and try again.', loading: false } : item));
     } finally {
       setAiQuerying(false);
     }
@@ -503,7 +505,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
                 {aiAnswers.map((ans, i) => (
                   <div key={i} className="p-4 rounded-xl bg-white border border-gray-200 text-sm space-y-1.5">
                     <div className="font-semibold text-gray-900">{ans.q}</div>
-                    <div className="text-gray-700 leading-relaxed">{ans.a}</div>
+                    {ans.loading ? <AiThinking kind="report" /> : <AiAnswer text={ans.a} className="text-gray-700" />}
                   </div>
                 ))}
               </div>
