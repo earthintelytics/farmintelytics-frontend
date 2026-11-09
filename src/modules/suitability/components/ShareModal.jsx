@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react';
 import { Copy, Check, Trash2, Globe, Clock, MessageSquare, Share2, Sparkles, ExternalLink, Mail, MessageCircle } from 'lucide-react';
 import { Modal, PrimaryButton, SecondaryButton, StatusPill, ErrorNote, Field } from '../../../components/page/PageKit';
 import { fetchSuitabilityShares, createSuitabilityShare, revokeSuitabilityShare } from '../../../services/suitabilityApi';
+import { useConfirm } from '../../../components/ConfirmProvider';
 
 export const ShareModal = ({ runId, isOpen = true, onClose, cropName = 'Crop', companyName = 'Estate' }) => {
   const [shares, setShares] = useState([]);
   const [loading, setLoading] = useState(false);
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
+  const confirm = useConfirm();
   const [successMsg, setSuccessMsg] = useState('');
   const [copiedId, setCopiedId] = useState(null);
 
@@ -92,7 +94,7 @@ You can explore high-resolution 30m terrain, climate, and soil maps, inspect pla
   };
 
   const handleRevoke = async (shareId, email) => {
-    if (!window.confirm(`Revoke client access for ${email}? The link will stop working immediately.`)) return;
+    if (!(await confirm(`Revoke client access for ${email}? The link stops working at once.`, { typed: true, action: 'Revoke' }))) return;
     try {
       await revokeSuitabilityShare(shareId);
       loadShares();

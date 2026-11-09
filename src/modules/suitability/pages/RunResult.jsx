@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchSuitabilityRun, generateReportPdf, downloadSuitabilityPdf, deleteSuitabilityRun } from '../../../services/suitabilityApi';
 import { fetchSuitabilityThresholds } from '../../../services/adminApi';
 import { ErrorNote } from '../../../components/page/PageKit';
+import { useConfirm } from '../../../components/ConfirmProvider';
 import { CROPS, cropName, isFinished } from '../suitabilityLabels';
 import ShareModal from '../components/ShareModal';
 import SuitabilityHeader from '../components/SuitabilityHeader';
@@ -17,6 +18,7 @@ const POLL_MS = 5000;
 export default function RunResult({ runId, companyId, onBack }) {
   const [run, setRun] = useState(null);
   const [error, setError] = useState('');
+  const confirm = useConfirm();
   const [actions, setActions] = useState({});
   const [pdf, setPdf] = useState({ busy: false, msg: '' });
   const [shareOpen, setShareOpen] = useState(false);
@@ -115,15 +117,13 @@ export default function RunResult({ runId, companyId, onBack }) {
   // 6. Delete analysis run
   const handleDeleteRun = async () => {
     const name = cropName(run?.crop);
-    if (!window.confirm(`Permanently delete this ${name} suitability analysis and all associated map rasters? This cannot be undone.`)) {
-      return;
-    }
+    if (!(await confirm(`Delete this ${name} suitability analysis and all its maps?`, { typed: true, action: 'Delete' }))) return;
     setDeleting(true);
     try {
       await deleteSuitabilityRun(runId);
       if (onBack) onBack();
     } catch (err) {
-      alert(`Could not delete analysis: ${err.message}`);
+      setError(`Could not delete the analysis: ${err.message}`);
       setDeleting(false);
     }
   };
@@ -168,6 +168,7 @@ export default function RunResult({ runId, companyId, onBack }) {
         onDeleteRun={handleDeleteRun}
         deleting={deleting}
       />
+      {error && <div className="px-6 pt-3"><ErrorNote message={error} /></div>}
 
       {/* ── MAIN WORKSPACE CONTAINER ── */}
       <div className="flex-1 flex overflow-hidden relative">

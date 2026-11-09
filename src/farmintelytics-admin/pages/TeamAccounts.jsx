@@ -50,7 +50,7 @@ const TeamAccounts = () => {
     try { const r = await newTeamAccountCode(a.id); setIssued({ email: r.email, access_code: r.access_code }); } catch (e) { setError(e.message); }
   };
   const remove = async (a) => {
-    if (!(await confirm(`Remove ${a.email} from the team? They can no longer sign in.`))) return;
+    if (!(await confirm(`Remove ${a.email} from the team? They can no longer sign in.`, { typed: true, action: 'Remove' }))) return;
     try { await deleteTeamAccount(a.id); setData((d) => ({ ...d, accounts: d.accounts.filter((x) => x.id !== a.id) })); } catch (e) { setError(e.message); }
   };
   const copy = async () => { try { await copyText(issued.access_code); setCopied(true); setTimeout(() => setCopied(false), 1500); } catch { /* clipboard blocked */ } };

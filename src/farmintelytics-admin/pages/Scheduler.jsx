@@ -329,7 +329,7 @@ const Scheduler = () => {
   };
   const save = async (name, form) => { if (name) await updateSchedulerJob(name, form); else await createSchedulerJob(form); setModal(null); await load(); };
   const remove = async (name) => {
-    if (!(await confirm(`Delete the schedule "${name}"? Monitoring for that service stops until a new schedule is created.`))) return;
+    if (!(await confirm(`Delete the schedule "${name}"? Monitoring for that service stops until a new schedule is created.`, { typed: true, action: 'Delete' }))) return;
     try { await deleteSchedulerJob(name); await load(); } catch (e) { setError(e.message); }
   };
 

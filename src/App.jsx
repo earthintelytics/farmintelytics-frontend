@@ -108,6 +108,7 @@ const hasValidTeamSession = hasValidTeamToken;
 // tools (/tools/<id>) go back to the team hub.
 const backHub = (tenant) => (tenant ? paths.orgHub(tenant) : paths.teamHub);
 import LandingPage from './pages/LandingPage';
+import { ConfirmProvider } from './components/ConfirmProvider';
 
 // ─── Root Landing Page ───────────────────────────────────────────────────────
 // "/" renders the FarmIntelytics Online landing page (ArcGIS Online style).
@@ -333,10 +334,10 @@ const PortalPage = () => {
 
 // ─── Root App ────────────────────────────────────────────────────────────────
 const App = () => (
-  <>
+  <ConfirmProvider>
     <AdminActivity />
     <AppRoutes />
-  </>
+  </ConfirmProvider>
 );
 
 const AppRoutes = () => {

@@ -38,7 +38,7 @@ const OrgDetailPanel = ({ org: initialOrg, onClose }) => {
   useEffect(() => { load(); }, [org.schema_name]); // eslint-disable-line react-hooks/set-state-in-effect, react-hooks/exhaustive-deps
 
   const remove = async (farm) => {
-    if (!(await confirm(`Delete ${farm.farm_name} and everything stored for it?`))) return;
+    if (!(await confirm(`Delete ${farm.farm_name} and everything stored for it?`, { typed: true, action: 'Delete' }))) return;
     try { await deleteFarm(farm.farm_id); await load(); } catch (e) { setError(e.message); }
   };
   const replaceBoundary = async (farmId, file) => {

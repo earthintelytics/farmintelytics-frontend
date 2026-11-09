@@ -38,7 +38,7 @@ const EstateConfigModal = ({ farm, onClose }) => {
     return run('save', async () => { await savePipelineConfig({ filename, content }); setNotice('Saved.'); });
   };
   const remove = async () => {
-    if (!(await confirm(`Delete the pipeline settings for ${farm.farm_name}? The scheduler cannot run this estate until they are made again.`))) return;
+    if (!(await confirm(`Delete the pipeline settings for ${farm.farm_name}? The scheduler cannot run this estate until they are made again.`, { typed: true, action: 'Delete' }))) return;
     run('delete', async () => { await deletePipelineConfig(filename); setContent(''); setState('none'); setNotice('Deleted.'); });
   };
 

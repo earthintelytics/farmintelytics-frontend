@@ -1,11 +1,12 @@
 // The Advisor tab's conversation. One AI agent endpoint answers questions and what-if scenarios: the
 // chat shows the readable question; the agent also gets the portal context and, for scenarios, the
-// advisor answer layout.
+// advisor answer layout. The service (module) goes with every question, so the agent answers about this
+// service's crop and results only (a rice question from the Rice portal is never answered about maize).
 import { useEffect, useRef, useState } from 'react';
 import * as api from '../../../../../services/organizationMonitorApi';
 import { ANSWER_FORMAT } from '../../../../assistant/scenarioTemplates';
 
-export function useAdvisorChat({ contextLine }) {
+export function useAdvisorChat({ contextLine, module = null }) {
   const [scenarioFormOpen, setScenarioFormOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([
     { sender: 'assistant', text: "Ask about your fields: crop condition, water, weather or alerts. Answers use your own monitoring data." }
@@ -29,7 +30,7 @@ ${ANSWER_FORMAT}`
 
 Context: ${contextLine}.`;
     try {
-      const result = await api.queryAiAgent(agentQuery);
+      const result = await api.queryAiAgent(agentQuery, module ? { module } : {});
       const reply = result?.response || "No response from AI agent.";
       setChatMessages(prev => [...prev, { sender: 'assistant', text: reply, sources: result?.sources }]);
     } catch {

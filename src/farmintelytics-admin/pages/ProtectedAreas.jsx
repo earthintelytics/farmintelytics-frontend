@@ -12,6 +12,7 @@ import {
 } from '../../services/adminApi';
 import { getCssToken } from '../../utils/tokens';
 import UploadWdpaModal from './protected_areas/UploadWdpaModal';
+import { useConfirm } from '../components/ConfirmProvider';
 import UploadBoundaryModal from './protected_areas/UploadBoundaryModal';
 
 const IMAGERY = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
@@ -36,6 +37,7 @@ function MapBoundsFitter({ geojson }) {
 }
 
 export default function ProtectedAreas() {
+  const confirm = useConfirm();
   const [areas, setAreas] = useState([]);
   const [geojson, setGeojson] = useState(null);
   const [total, setTotal] = useState(0);
@@ -103,7 +105,7 @@ export default function ProtectedAreas() {
   };
 
   const handleDelete = async (area) => {
-    if (!window.confirm(`Delete "${area.name || 'this area'}"? This will update the active layer immediately.`)) return;
+    if (!(await confirm(`Delete "${area.name || 'this area'}"? The active protected-areas layer changes at once.`, { typed: true, action: 'Delete' }))) return;
     try {
       await deleteProtectedArea(area.id);
       loadData();

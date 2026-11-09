@@ -50,7 +50,7 @@ const Credentials = () => {
     try { const cred = await rotateCredential(id); if (cred?.access_code) setRevealed((r) => ({ ...r, [id]: cred.access_code })); await load(); } catch (e) { setError(e.message); } finally { setBusyId(null); }
   };
   const remove = async (cred) => {
-    if (!(await confirm(`Delete the sign-in for ${cred.email}? They can no longer sign in.`))) return;
+    if (!(await confirm(`Delete the sign-in for ${cred.email}? They can no longer sign in.`, { typed: true, action: 'Delete' }))) return;
     try { await deleteCredential(cred.id); await load(); } catch (e) { setError(e.message); }
   };
 

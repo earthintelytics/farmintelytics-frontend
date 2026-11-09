@@ -212,7 +212,7 @@ export default function ReportBuilder({ plots, estates, tenant, orgName, subject
 
     try {
       const prompt = `Context: Farm Report for ${where} (${fmtDate(period.from)} to ${fmtDate(period.to)}). Crop Health: ${HEALTH_WORD(report?.numbers?.crop_health_avg)}, Leaf Water: ${report?.numbers?.leaf_water_avg}, Alerts: ${report?.numbers?.alerts}. User Question: ${q}`;
-      const res = await api.queryAiAgent(prompt);
+      const res = await api.queryAiAgent(prompt, serviceId ? { module: serviceId } : {});
       const answerText = res?.response || 'Analysis complete. Recommendations grounded in real data.';
       setAiAnswers(prev => prev.map(item => item.q === q ? { q, a: answerText, loading: false } : item));
     } catch {

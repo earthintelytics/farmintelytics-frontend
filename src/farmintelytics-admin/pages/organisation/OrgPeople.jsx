@@ -49,7 +49,7 @@ const OrgPeople = ({ org }) => {
     setBusy(false);
   };
   const remove = async (p) => {
-    if (!(await confirm(`Remove ${p.email}? They can no longer sign in.`))) return;
+    if (!(await confirm(`Remove ${p.email}? They can no longer sign in.`, { typed: true, action: 'Remove' }))) return;
     try { await deleteCredential(p.id); await load(); } catch (e) { setError(e.message); }
   };
   const rotate = async (p) => {

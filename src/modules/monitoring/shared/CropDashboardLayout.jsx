@@ -205,7 +205,7 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   const {
     scenarioFormOpen, setScenarioFormOpen, chatMessages, setChatMessages, chatInput, setChatInput, chatLoading,
     chatEndRef, handleChatSubmit,
-  } = useAdvisorChat({ contextLine: chatContext });
+  } = useAdvisorChat({ contextLine: chatContext, module: service?.id || (!isOrg && cropType ? `rs-${cropType}` : null) });
 
   // Click on a block: the pixel history of the layer on the map at that point
   const handlePlotClick = async (plot, lat, lng) => {

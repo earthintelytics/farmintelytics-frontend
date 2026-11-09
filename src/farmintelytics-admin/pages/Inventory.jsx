@@ -44,7 +44,7 @@ const Inventory = () => {
     try { const res = await syncDatabaseWithMinio(); setNotice(res.message || 'Registry brought in step with storage.'); await load(); } catch (e) { setError(e.message); } finally { setSyncing(false); }
   };
   const remove = async (key) => {
-    if (!(await confirm(`Delete this file from storage permanently?\n\n${key}\n\nIf it is an estate boundary, the registry is updated.`))) return;
+    if (!(await confirm(`Delete this file from storage permanently?\n\n${key}\n\nIf it is an estate boundary, the registry is updated.`, { typed: true, action: 'Delete' }))) return;
     try { await deleteMinioObject(key); setNotice(`Deleted ${key.split('/').pop()}.`); await load(); } catch (e) { setError(e.message); }
   };
 
