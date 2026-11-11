@@ -17,9 +17,11 @@ import {
   Sliders,
   CheckCircle2,
   Search,
+  Loader2,
+  AlertTriangle,
 } from 'lucide-react';
 import { getFarmerLayerExplanation, FARMER_LAYER_EXPLANATIONS } from '../farmerLayerExplanations';
-import { CLASSES, cropName } from '../suitabilityLabels';
+import { CLASSES, cropName, isFinished } from '../suitabilityLabels';
 
 function Fit({ geometry }) {
   const map = useMap();
@@ -80,6 +82,9 @@ export default function SuitabilityMapView({
   const [showBoundaries, setShowBoundaries] = useState(true);
   const [boundaryOpacity, setBoundaryOpacity] = useState(1.0);
   const crop = cropName(run?.crop);
+  // What the map is doing, said on the map: the analysis still running, the layer being drawn, or parts that failed.
+  const [tilesLoading, setTilesLoading] = useState(false);
+  const [tileErr, setTileErr] = useState({ url: null, n: 0 });
 
   // Layer categories & individual cards collapsed by default
   const [expandedGroups, setExpandedGroups] = useState([]);
@@ -89,6 +94,19 @@ export default function SuitabilityMapView({
     selectedLayer === 'final_class'
       ? run?.tiles?.result || run?.tiles?.factors?.final_class || null
       : run?.tiles?.factors?.[selectedLayer] || null;
+  const tileErrors = tileErr.url === currentTileUrl ? tileErr.n : 0;  // counted per layer shown
+  const running = run && run.status && !isFinished(run.status);
+  const failed = run?.status === 'failed';
+  const layerName = getFarmerLayerExplanation(selectedLayer, crop)?.plainTitle || 'layer';
+  const mapNote = running
+    ? { icon: 'spin', text: `The analysis is still running${run.progress != null ? ` (${Math.round(run.progress)}%)` : ''}. The map fills in when it is done; large areas take longer.` }
+    : failed
+    ? { icon: 'warn', text: 'This analysis did not finish, so there is no map to show.' }
+    : showOverlay && currentTileUrl && tilesLoading
+    ? { icon: 'spin', text: `Drawing the ${layerName.toLowerCase()} map…` }
+    : showOverlay && currentTileUrl && tileErrors > 0
+    ? { icon: 'warn', text: 'Some parts of the map could not be drawn. Move or zoom the map to try again.' }
+    : null;
 
 
   // Group all available layers used to generate the analysis
@@ -182,6 +200,11 @@ export default function SuitabilityMapView({
               key={`${selectedLayer}-${currentTileUrl}-${layerOpacity}`}
               url={currentTileUrl}
               opacity={layerOpacity}
+              eventHandlers={{
+                loading: () => setTilesLoading(true),
+                load: () => setTilesLoading(false),
+                tileerror: () => setTileErr((e) => ({ url: currentTileUrl, n: e.url === currentTileUrl ? e.n + 1 : 1 })),
+              }}
             />
           )}
 
@@ -231,7 +254,7 @@ export default function SuitabilityMapView({
             <button
               type="button"
               onClick={() => setShowBasemapDropdown(!showBasemapDropdown)}
-              className="bg-white border border-gray-200 px-3 py-2 rounded-xl shadow-xs hover:bg-gray-50 flex items-center gap-1.5 font-bold text-xs text-gray-700 transition-all"
+              className="bg-white border border-gray-200 px-3 py-2 rounded-xl hover:bg-gray-50 flex items-center gap-1.5 font-bold text-xs text-gray-700 transition-all"
             >
               <span>{basemap === 'street' ? 'Streets' : 'Satellite (Esri)'}</span>
               <ChevronDown
@@ -240,7 +263,7 @@ export default function SuitabilityMapView({
               />
             </button>
             {showBasemapDropdown && (
-              <div className="absolute left-0 top-full mt-1.5 w-44 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden py-1 z-[500]">
+              <div className="absolute left-0 top-full mt-1.5 w-44 bg-white border border-gray-200 rounded-xl overflow-hidden py-1 z-[500]">
                 <button
                   type="button"
                   onClick={() => {
@@ -279,19 +302,30 @@ export default function SuitabilityMapView({
             <input
               type="text"
               placeholder="Find an estate or block..."
-              className="w-full bg-white border border-gray-200 rounded-xl py-2 pl-9 pr-4 text-xs font-medium text-gray-700 shadow-xs outline-none focus:border-green-600 transition-all placeholder:text-gray-400"
+              className="w-full bg-white border border-gray-200 rounded-xl py-2 pl-9 pr-4 text-xs font-medium text-gray-700 outline-none focus:border-green-600 transition-all placeholder:text-gray-400"
             />
           </div>
         </div>
+
+        {mapNote && (
+          <div role="status" aria-live="polite" className="absolute top-16 left-1/2 -translate-x-1/2 z-[400] w-[min(420px,calc(100%-2rem))] pointer-events-none">
+            <div className="flex items-start gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-xs font-medium text-gray-700">
+              {mapNote.icon === 'spin'
+                ? <Loader2 size={15} className="shrink-0 mt-px animate-spin text-[var(--brand-primary)]" aria-hidden="true" />
+                : <AlertTriangle size={15} className="shrink-0 mt-px text-amber-600" aria-hidden="true" />}
+              <span className="leading-snug">{mapNote.text}</span>
+            </div>
+          </div>
+        )}
 
         {/* ── TOP-RIGHT TOGGLE BUTTON (Matches Screenshot 1 CropHealthMapPage) ── */}
         <button
           type="button"
           onClick={() => setShowRightLegend(!showRightLegend)}
           aria-pressed={showRightLegend}
-          className={`absolute top-4 right-4 z-[400] flex items-center gap-2 px-3.5 py-2 rounded-xl border bg-white text-xs font-semibold shadow-xs transition-all ${
+          className={`absolute top-4 right-4 z-[400] flex items-center gap-2 px-3.5 py-2 rounded-xl border bg-white text-xs font-semibold transition-all ${
             showRightLegend
-              ? 'border-green-600 text-green-800 ring-2 ring-green-100'
+              ? 'border-green-600 text-green-800'
               : 'border-gray-200 text-gray-700 hover:bg-gray-50'
           }`}
         >
@@ -302,7 +336,7 @@ export default function SuitabilityMapView({
 
       {/* ── RIGHT-SIDE LEGEND & LAYERS PANEL (Matches Screenshot 1 MapLayersPanel Layout) ── */}
       {showRightLegend && (
-        <aside className="w-[310px] lg:w-[350px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-20 shadow-xs animate-in slide-in-from-right duration-150">
+        <aside className="w-[310px] lg:w-[350px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-20 animate-in slide-in-from-right duration-150">
           {/* Header (Matches Screenshot 1) */}
           <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between bg-white shrink-0 sticky top-0 z-30">
             <span className="flex items-center gap-2 font-display text-base font-semibold text-gray-900">
@@ -344,7 +378,7 @@ export default function SuitabilityMapView({
                     }`}
                   >
                     <div
-                      className={`w-4 h-4 rounded-full bg-white shadow transition-transform duration-150 ${
+                      className={`w-4 h-4 rounded-full bg-white transition-transform duration-150 ${
                         showBoundaries ? 'translate-x-4' : 'translate-x-0'
                       }`}
                     />
@@ -405,7 +439,7 @@ export default function SuitabilityMapView({
                             key={entry.key}
                             className={`border rounded-xl p-3 bg-white space-y-2.5 transition-all ${
                               isOnMap
-                                ? 'border-green-400 ring-2 ring-green-100/70 shadow-2xs'
+                                ? 'border-green-400'
                                 : isSelected
                                 ? 'border-gray-300 bg-gray-50/50'
                                 : 'border-gray-200 hover:border-gray-300'
@@ -422,7 +456,7 @@ export default function SuitabilityMapView({
                                     {info.plainTitle || info.label}
                                   </span>
                                   {isOnMap && (
-                                    <span className="text-[10px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-1.5 py-0.2 shrink-0">
+                                    <span className="text-[11px] font-bold text-green-700 bg-green-50 border border-green-200 rounded-full px-1.5 py-px shrink-0">
                                       On map
                                     </span>
                                   )}
@@ -448,7 +482,7 @@ export default function SuitabilityMapView({
                                 }`}
                               >
                                 <div
-                                  className={`w-4 h-4 rounded-full bg-white shadow transition-transform duration-150 ${
+                                  className={`w-4 h-4 rounded-full bg-white transition-transform duration-150 ${
                                     isOnMap ? 'translate-x-4' : 'translate-x-0'
                                   }`}
                                 />
@@ -460,7 +494,7 @@ export default function SuitabilityMapView({
                               <div className="space-y-2.5 pt-2 border-t border-gray-100">
                                 {/* ── COLOR SCALE / LEGEND ── */}
                                 <div>
-                                  <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
+                                  <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider block mb-1.5">
                                     Map Color Key
                                   </span>
 
@@ -472,7 +506,7 @@ export default function SuitabilityMapView({
                                         <span>{legend.edges?.[legend.edges.length - 1] != null ? `${legend.edges[legend.edges.length - 1]} ${legend.unit || 'm'}` : 'High'}</span>
                                       </div>
                                       <div
-                                        className="h-2.5 w-full rounded-full shadow-inner"
+                                        className="h-2.5 w-full rounded-full"
                                         style={{
                                           background: `linear-gradient(to right, ${(legend.colours || []).join(', ')})`,
                                         }}
@@ -483,7 +517,7 @@ export default function SuitabilityMapView({
                                     <div className="grid grid-cols-1 gap-1 text-[11px]">
                                       {Object.entries(legend.items || {}).map(([name, col]) => (
                                         <div key={name} className="flex items-center gap-1.5">
-                                          <span className="w-3 h-3 rounded-xs shrink-0 shadow-2xs" style={{ backgroundColor: col }} />
+                                          <span className="w-3 h-3 rounded-xs shrink-0" style={{ backgroundColor: col }} />
                                           <span className="text-gray-800 capitalize font-medium">{name.replace(/_/g, ' ')}</span>
                                         </div>
                                       ))}
@@ -495,25 +529,25 @@ export default function SuitabilityMapView({
                                         <ShieldAlert size={14} className="text-red-700 shrink-0" />
                                         <span>Regulatory Exclusion Zone</span>
                                       </div>
-                                      <p className="text-[10px] text-red-800 leading-tight">
+                                      <p className="text-[11px] text-red-800 leading-tight">
                                         {legend.meaning || 'Land is legally or environmentally excluded from clearing.'}
                                       </p>
                                     </div>
                                   ) : legend?.items?.length ? (
                                     /* 4. Threshold Class Bands */
-                                    <div className="space-y-1 text-[11px]">
+                                    <div className="space-y-1.5 text-[11px]">
                                       {legend.items.map((item, idx) => (
-                                        <div key={item.class || idx} className="flex items-center justify-between gap-1">
-                                          <div className="flex items-center gap-1.5 truncate">
-                                            <span
-                                              className="w-3 h-3 rounded-xs shrink-0 shadow-2xs"
-                                              style={{ backgroundColor: item.color || '#2e7d32' }}
-                                            />
-                                            <span className="font-semibold text-gray-800 truncate">{item.label || item.class}</span>
+                                        <div key={item.class || idx} className="flex items-start gap-2 min-w-0">
+                                          <span
+                                            className="w-3 h-3 mt-0.5 rounded-xs shrink-0"
+                                            style={{ backgroundColor: item.color || '#2e7d32' }}
+                                          />
+                                          <div className="min-w-0 leading-snug">
+                                            <span className="font-semibold text-gray-800">{item.label || item.class}</span>
+                                            {item.range && (
+                                              <span className={`block text-gray-500 break-words ${/\d/.test(item.range) ? 'font-mono' : ''}`}>{item.range}</span>
+                                            )}
                                           </div>
-                                          {item.range && (
-                                            <span className="font-mono text-gray-500 text-[10px] shrink-0">({item.range})</span>
-                                          )}
                                         </div>
                                       ))}
                                     </div>
@@ -522,10 +556,10 @@ export default function SuitabilityMapView({
                                     <div className="space-y-1 text-[11px]">
                                       {info.classesGuide ? (
                                         info.classesGuide.map((c) => (
-                                          <div key={c.code} className="flex items-center gap-2">
-                                            <span className="w-3 h-3 rounded-xs shrink-0 shadow-2xs" style={{ backgroundColor: c.color }} />
+                                          <div key={c.code} className="flex items-start gap-2">
+                                            <span className="w-3 h-3 rounded-xs shrink-0" style={{ backgroundColor: c.color }} />
                                             <span className="font-bold text-gray-800">{c.code}:</span>
-                                            <span className="text-gray-600 truncate">{c.name.split('(')[0]}</span>
+                                            <span className="text-gray-600 min-w-0 break-words">{c.name.split('(')[0]}</span>
                                           </div>
                                         ))
                                       ) : (
@@ -575,7 +609,7 @@ export default function SuitabilityMapView({
                                     <button
                                       type="button"
                                       onClick={() => onAskAiAboutLayer(info.farmerQuestions[0])}
-                                      className="inline-flex items-center gap-1.5 text-[10px] font-semibold text-green-800 hover:text-green-900 bg-green-50 hover:bg-green-100/80 px-2 py-1 rounded-md transition-colors w-full justify-center"
+                                      className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-green-800 hover:text-green-900 bg-green-50 hover:bg-green-100/80 px-2 py-1 rounded-md transition-colors w-full justify-center"
                                     >
                                       <Sparkles size={11} className="text-green-700" />
                                       <span>Ask AI: "{info.farmerQuestions[0]}"</span>
@@ -595,7 +629,7 @@ export default function SuitabilityMapView({
           </div>
 
           {/* Panel Footer */}
-          <div className="p-3 bg-gray-50 border-t border-gray-200 text-[10px] text-gray-400 text-center font-mono shrink-0">
+          <div className="p-3 bg-gray-50 border-t border-gray-200 text-[11px] text-gray-400 text-center font-mono shrink-0">
             {(run?.sources || []).map((x) => x?.name).filter(Boolean).join(' · ') || 'Sources not recorded for this run'}
           </div>
         </aside>
