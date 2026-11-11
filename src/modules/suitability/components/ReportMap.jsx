@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 /**
  * A map of the suitability report on the web page, drawn like the PDF's: a faint street map (when the run has
  * one), the analysis picture at its place inside it, the farm boundary, a light latitude/longitude grid with
- * labels on the left and bottom edges, a north arrow and a scale bar; the legend below, in the same frame.
+ * labels on the left and top edges, a north arrow and a scale bar; the legend below, in the same frame.
  * Extents are [west, south, east, north] in degrees; pictures are north up on a lon/lat grid.
  */
 
@@ -75,8 +75,8 @@ function Overlay({ view, rings, size }) {
           const t = degreeLabel(v, lonStep, 'E', 'W');
           return (
             <g key={`lx${v}`}>
-              <rect x={x(v) - t.length * 3.3} y={size.h - 16} width={t.length * 6.6} height="15" fill="#fff" opacity="0.85" />
-              <text x={x(v)} y={size.h - 5} textAnchor="middle">{t}</text>
+              <rect x={x(v) - t.length * 3.3} y="0" width={t.length * 6.6} height="15" fill="#fff" opacity="0.85" />
+              <text x={x(v)} y="11" textAnchor="middle">{t}</text>
             </g>
           );
         })}

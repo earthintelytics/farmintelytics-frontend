@@ -50,6 +50,12 @@ export const submitSuitabilityRun = (payload) => call('/runs', { method: 'POST',
 
 export const deleteSuitabilityRun = (runId) => call(`/runs/${encodeURIComponent(runId)}`, { method: 'DELETE' });
 
+// "Similar land elsewhere, and a plan" for a run's report (team only): make it (AI search of published
+// studies, about a minute) and mark it checked so the client sees it.
+export const makeSuitabilityStudies = (runId) => call(`/runs/${encodeURIComponent(runId)}/studies`, { method: 'POST' });
+export const checkSuitabilityStudies = (runId, checked = true) =>
+  call(`/runs/${encodeURIComponent(runId)}/studies/check`, { method: 'POST', body: JSON.stringify({ checked }) });
+
 export const generateReportPdf = (runId) =>
   call(`/runs/${encodeURIComponent(runId)}/report/pdf`, { method: 'POST' });
 

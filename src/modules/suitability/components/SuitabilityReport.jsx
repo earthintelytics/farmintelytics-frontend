@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Download, FileText, LayoutList } from 'lucide-react';
 import DesignedReport from '../../reports/DesignedReport';
 import ReportMap from './ReportMap';
+import StudiesSection from './StudiesSection';
 import ReportLoading from '../../reports/ReportLoading';
 
 /**
@@ -9,11 +10,16 @@ import ReportLoading from '../../reports/ReportLoading';
  * engine, the same content the PDF prints, so the page and the PDF always say the same thing. "Printed pages"
  * shows the PDF itself. Runs made before the report had this content show the PDF only.
  */
-export default function SuitabilityReport({ loadData, loadPdf, fileName }) {
+export default function SuitabilityReport({ loadData, loadPdf, fileName, team }) {
   const [data, setData] = useState(null);
   const [state, setState] = useState('loading'); // loading | ready | failed
   const [view, setView] = useState('report'); // report | pages
   const [busy, setBusy] = useState(false);
+  const [version, setVersion] = useState(0);   // bumped after a team action, so the report reloads
+  const teamActions = team ? {
+    onMake: async () => { await team.makeStudies(); setVersion((v) => v + 1); },
+    onCheck: async (checked) => { await team.checkStudies(checked); setVersion((v) => v + 1); },
+  } : null;
 
   useEffect(() => {
     let live = true;
@@ -21,7 +27,7 @@ export default function SuitabilityReport({ loadData, loadPdf, fileName }) {
       .then((d) => { if (live) { setData(d); setState('ready'); } })
       .catch(() => { if (live) setState('failed'); });
     return () => { live = false; };
-  }, [loadData]);
+  }, [loadData, version]);
 
   // The saved file is named after the analysis: "Suru LGA - Rice suitability - 11 Nov 2026.pdf".
   const savedName = data?.farm_name
@@ -64,25 +70,27 @@ export default function SuitabilityReport({ loadData, loadPdf, fileName }) {
           </button>
         )}
       </div>
-      {view === 'pages' ? <DesignedReport fileName={savedName} loadPdf={loadPdf} /> : <ReportBody d={data} />}
+      {view === 'pages' ? <DesignedReport fileName={savedName} loadPdf={loadPdf} /> : <ReportBody d={data} team={teamActions} />}
       {busy && <ReportLoading text="Preparing the PDF…" />}
     </div>
   );
 }
 
 // ── The page ─────────────────────────────────────────────────────────────────────────────────────
-function ReportBody({ d }) {
+function ReportBody({ d, team }) {
   const sections = d.sections || [];
   let n = 1;
   const numbered = sections.map((s) => ({ ...s, n: ++n }));
   const combineN = ++n;
   const stepsN = d.next_steps?.length ? ++n : null;
+  const studiesN = d.studies || team ? ++n : null;
   const limitsN = ++n;
   const toc = [
     ['summary', '1', 'Summary'],
     ...numbered.map((s) => [s.id, String(s.n), s.title]),
     ['combine', String(combineN), 'How the factors combine'],
     ...(stepsN ? [['next', String(stepsN), 'What to do next']] : []),
+    ...(studiesN ? [['studies', String(studiesN), 'Similar land and a plan']] : []),
     ['limits', String(limitsN), 'What was not counted'],
   ];
 
@@ -182,6 +190,8 @@ function ReportBody({ d }) {
               </ol>
             </Section>
           )}
+
+          {studiesN && <StudiesSection s={d.studies} n={studiesN} team={team} />}
 
           <Section id="limits" n={limitsN} eyebrow="Limits" title="What was not counted, and why">
             {d.limits.table && <DataTable t={d.limits.table} />}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchSuitabilityRun, deleteSuitabilityRun } from '../../../services/suitabilityApi';
 import { fetchSuitabilityThresholds } from '../../../services/adminApi';
 import { ErrorNote } from '../../../components/page/PageKit';
@@ -10,7 +10,7 @@ import SuitabilitySidebar from '../components/SuitabilitySidebar';
 import SuitabilityMapView from '../components/SuitabilityMapView';
 import SuitabilityAnalyticsView from '../components/SuitabilityAnalyticsView';
 import SuitabilityReport from '../components/SuitabilityReport';
-import { fetchSuitabilityReportData, fetchSuitabilityReportPdf } from '../../../services/suitabilityApi';
+import { checkSuitabilityStudies, fetchSuitabilityReportData, fetchSuitabilityReportPdf, makeSuitabilityStudies } from '../../../services/suitabilityApi';
 import SuitabilityAiView from '../components/SuitabilityAiView';
 import FactorGuide from './FactorGuide';
 
@@ -92,6 +92,9 @@ export default function RunResult({ runId, companyId, onBack }) {
   // 4. The designed report (Report tab): its page and its PDF, for this run.
   const loadReportPdf = useCallback(() => fetchSuitabilityReportPdf(runId), [runId]);
   const loadReportData = useCallback(() => fetchSuitabilityReportData(runId), [runId]);
+  // The team makes and checks the report's studies section; the client's share page has no such actions.
+  const studiesActions = useMemo(() => ({ makeStudies: () => makeSuitabilityStudies(runId),
+    checkStudies: (checked) => checkSuitabilityStudies(runId, checked) }), [runId]);
 
   // 5. Ask AI about a layer action
   const handleAskAiAboutLayer = (questionText) => {
@@ -215,7 +218,7 @@ export default function RunResult({ runId, companyId, onBack }) {
           <main className="flex-1 overflow-y-auto bg-white p-4 sm:p-8">
             {/* The suitability report as a web page (same content as its PDF), with the printed pages one click away. */}
             <SuitabilityReport key={runId} fileName={`Suitability ${cropName(run?.crop)} ${String(runId).slice(0, 8)}`}
-              loadData={loadReportData} loadPdf={loadReportPdf} />
+              loadData={loadReportData} loadPdf={loadReportPdf} team={studiesActions} />
           </main>
         ) : (
           <main className="flex-1 overflow-y-auto bg-gray-50">
