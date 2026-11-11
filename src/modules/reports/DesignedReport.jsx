@@ -1,65 +1,116 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download } from 'lucide-react';
-import { fetchReportHtml, fetchReportPdf } from '../../services/organizationMonitorApi';
+import { fetchReportPdf } from '../../services/organizationMonitorApi';
 
 /**
- * The report as the client receives it: the designed pages from the report engine, shown in the page, and
- * the PDF printed from the same pages. The report's own HTML is shown in a frame with no scripts.
- * By default a saved report (reportId); loadHtml / loadPdf give another source (a suitability run, a share link).
+ * The report as the client receives it: the PDF itself, drawn page by page in the browser (PDF.js), so the
+ * page shows exactly what the download holds (same pages, margins, page numbers, fonts and maps).
+ * The PDF is fetched once and the download hands over that same file.
+ * By default a saved report (reportId); loadPdf gives another source (a suitability run, a share link).
  */
-export default function DesignedReport({ reportId, fileName, loadHtml, loadPdf }) {
-  const [html, setHtml] = useState(null);
+const PAGE_PX = 794; // A4 width at 96 dpi: the pages are drawn at print size and shrink on narrow screens
+
+async function drawPdf(blob, holder, isLive) {
+  const pdfjs = await import('pdfjs-dist');
+  if (!pdfjs.GlobalWorkerOptions.workerPort) {
+    // Bundled by Vite as a plain .js worker, so any web server serves it with a script type.
+    const PdfWorker = (await import('pdfjs-dist/build/pdf.worker.min.mjs?worker')).default;
+    pdfjs.GlobalWorkerOptions.workerPort = new PdfWorker();
+  }
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(await blob.arrayBuffer()) }).promise;
+  const sharp = Math.max(2, window.devicePixelRatio || 1);
+  holder.replaceChildren();
+  for (let n = 1; n <= doc.numPages; n += 1) {
+    if (!isLive()) return;
+    const page = await doc.getPage(n);
+    const base = page.getViewport({ scale: 1 });
+    const fit = PAGE_PX / base.width;
+    const view = page.getViewport({ scale: fit * sharp });
+
+    const sheet = document.createElement('div');
+    sheet.className = 'relative mx-auto bg-white border border-gray-200';
+    sheet.style.width = '100%';
+    sheet.style.maxWidth = `${PAGE_PX}px`;
+    sheet.style.aspectRatio = `${base.width} / ${base.height}`;
+    sheet.setAttribute('aria-label', `Page ${n} of ${doc.numPages}`);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.round(view.width);
+    canvas.height = Math.round(view.height);
+    canvas.style.width = '100%';
+    canvas.style.height = '100%';
+    canvas.style.display = 'block';
+    sheet.appendChild(canvas);
+    holder.appendChild(sheet);
+    await page.render({ canvasContext: canvas.getContext('2d'), viewport: view }).promise;
+
+    // Links in the PDF (share links, "open in the app" buttons) stay clickable.
+    const notes = await page.getAnnotations();
+    notes.filter((a) => a.subtype === 'Link' && a.url).forEach((a) => {
+      const [x1, y1, x2, y2] = a.rect;
+      const link = document.createElement('a');
+      link.href = a.url;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.style.position = 'absolute';
+      link.style.left = `${(x1 / base.width) * 100}%`;
+      link.style.top = `${((base.height - y2) / base.height) * 100}%`;
+      link.style.width = `${((x2 - x1) / base.width) * 100}%`;
+      link.style.height = `${((y2 - y1) / base.height) * 100}%`;
+      link.setAttribute('aria-label', a.url);
+      sheet.appendChild(link);
+    });
+  }
+}
+
+export default function DesignedReport({ reportId, fileName, loadPdf }) {
+  const [pdf, setPdf] = useState(null);
   const [state, setState] = useState('loading'); // loading | ready | failed
   const [problem, setProblem] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [height, setHeight] = useState(1200);
-  const frame = useRef(null);
+  const holder = useRef(null);
 
   useEffect(() => {
     let live = true;
-    (loadHtml ? loadHtml() : fetchReportHtml(reportId))
-      .then((h) => { if (live) { setHtml(h); setState('ready'); } })
+    (loadPdf ? loadPdf() : fetchReportPdf(reportId))
+      .then((b) => { if (live) { setPdf(b); setState('ready'); } })
       .catch((e) => { if (live) { setProblem(e?.message || ''); setState('failed'); } });
     return () => { live = false; };
-  }, [reportId, loadHtml]);
+  }, [reportId, loadPdf]);
 
-  const fit = () => {
-    const doc = frame.current?.contentDocument;
-    if (doc?.body) setHeight(doc.documentElement.scrollHeight + 16);
-  };
+  useEffect(() => {
+    if (!pdf || !holder.current) return undefined;
+    let live = true;
+    drawPdf(pdf, holder.current, () => live).catch(() => {
+      if (live) { setProblem('The pages could not be shown here. Download the PDF to read the report.'); setState('failed'); }
+    });
+    return () => { live = false; };
+  }, [pdf]);
 
-  const download = async () => {
-    setBusy(true);
-    try {
-      const blob = await (loadPdf ? loadPdf() : fetchReportPdf(reportId));
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${fileName || reportId}.pdf`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 2000);
-    } finally {
-      setBusy(false);
-    }
+  const download = () => {
+    const url = URL.createObjectURL(pdf);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${fileName || reportId}.pdf`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-gray-500">
-          {state === 'loading' && 'Opening the report…'}
-          {state === 'ready' && 'The report as it prints. The PDF has the same pages.'}
+          {state === 'loading' && 'Preparing the report…'}
+          {state === 'ready' && 'The report exactly as it prints.'}
           {state === 'failed' && (problem || 'The report could not be opened. Try again in a moment.')}
         </p>
-        <button type="button" onClick={download} disabled={busy || state !== 'ready'}
+        <button type="button" onClick={download} disabled={!pdf}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-green-700 text-white text-sm font-semibold hover:bg-green-800 disabled:bg-gray-200 disabled:text-gray-500">
-          <Download size={15} />{busy ? 'Preparing the PDF…' : 'Download PDF'}
+          <Download size={15} />Download PDF
         </button>
       </div>
-      {state === 'ready' && (
-        <div className="rounded-2xl border border-gray-200 bg-gray-100 p-3 sm:p-6 overflow-x-auto">
-          <iframe ref={frame} title="Report" srcDoc={html} sandbox="allow-same-origin" onLoad={fit}
-            className="mx-auto block w-[210mm] max-w-none bg-white border border-gray-200" style={{ height }} />
+      {pdf && (
+        <div className="rounded-2xl border border-gray-200 bg-gray-100 p-3 sm:p-6">
+          <div ref={holder} className="space-y-4" />
         </div>
       )}
     </div>
