@@ -24,7 +24,7 @@ export default function SuitabilityReport({ loadData, loadPdf, fileName }) {
 
   // The saved file is named after the analysis: "Suru LGA - Rice suitability - 11 Nov 2026.pdf".
   const savedName = data?.farm_name
-    ? [data.farm_name, data.title, String(data.period_text || '').replace(/^Analysis of /, '')].filter(Boolean).join(' - ').replace(/[\\/:*?"<>|]+/g, ' ').trim()
+    ? [data.farm_name, data.title, String(data.period_text || '').replace(/^(Analysed on|Analysis of) /, '')].filter(Boolean).join(' - ').replace(/[\\/:*?"<>|]+/g, ' ').trim()
     : fileName;
 
   const download = async () => {
@@ -210,7 +210,7 @@ function Section({ id, n, eyebrow, title, children }) {
 }
 
 function Prose({ items }) {
-  return <div className="space-y-3 text-[15px] leading-relaxed text-gray-800">{(items || []).filter(Boolean).map((p) => <p key={p}>{p}</p>)}</div>;
+  return <div className="space-y-3 text-[15px] leading-relaxed text-gray-800 text-justify hyphens-auto" lang="en">{(items || []).filter(Boolean).map((p) => <p key={p}>{p}</p>)}</div>;
 }
 
 function Swatch({ c }) {
