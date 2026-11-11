@@ -145,7 +145,7 @@ function ReportBody({ d, team }) {
             <Prose items={[d.method]} />
             {d.result_map && (
               <Figure n={d.result_map.figure} caption={d.result_map.caption}>
-                <MapPanel map={d.result_map} extent={d.extent} outline={d.outline} basemap={d.basemap} tall />
+                <MapPanel map={d.result_map} extent={d.extent} outline={d.outline} tall />
               </Figure>
             )}
           </Section>
@@ -164,9 +164,9 @@ function ReportBody({ d, team }) {
                 <Figure n={s.figure} caption={s.caption}>
                   {s.maps.length > 1 ? (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {s.maps.map((m) => <MapPanel key={m.title} map={m} extent={d.extent} outline={d.outline} basemap={d.basemap} />)}
+                      {s.maps.map((m) => <MapPanel key={m.title} map={m} extent={d.extent} outline={d.outline} />)}
                     </div>
-                  ) : <MapPanel map={s.maps[0]} extent={d.extent} outline={d.outline} basemap={d.basemap} tall />}
+                  ) : <MapPanel map={s.maps[0]} extent={d.extent} outline={d.outline} tall />}
                 </Figure>
               )}
               {s.table && <DataTable t={s.table} />}
@@ -272,9 +272,9 @@ function DataTable({ t }) {
 }
 
 // ── Maps: the run's picture of a layer, north up, with north arrow, scale bar and legend ────────────
-function MapPanel({ map, extent, outline, basemap, tall = false }) {
+function MapPanel({ map, extent, outline, tall = false }) {
   return (
-    <ReportMap map={map} extent={extent} outline={outline} basemap={basemap} tall={tall}>
+    <ReportMap map={map} extent={extent} outline={outline} tall={tall}>
       {map.key?.type && <MapKey k={map.key} />}
     </ReportMap>
   );
