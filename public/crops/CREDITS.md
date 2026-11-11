@@ -17,3 +17,18 @@ All from Wikimedia Commons, resized and converted to WebP.
 The same photos at 1280 px are in `hero/` (sign-in pages).
 
 CC BY and CC BY-SA require this credit to stay with the images.
+
+## Suitability crops (added 2026-11-11)
+
+Also from Wikimedia Commons (1280 px, WebP here; JPEG on report covers in the backend's `report_engine/covers/`).
+
+| File | Source | Author | Licence |
+| --- | --- | --- | --- |
+| groundnut.webp | [Peanut field, Aduwan, Kafanchan 1](https://commons.wikimedia.org/wiki/File:Peanut_field,_Aduwan,_Kafanchan_1.jpg) (Kaduna State, Nigeria) | Kambai Akau | CC BY-SA 4.0 |
+| yam.webp | [Yam at monday market kaduna state 01](https://commons.wikimedia.org/wiki/File:Yam_at_monday_market_kaduna_state_01.jpg) (Kaduna State, Nigeria) | Dorcas Atule | CC BY-SA 4.0 |
+| millet.webp | [Cultivating mahangu](https://commons.wikimedia.org/wiki/File:Cultivating_mahangu.jpg) (pearl millet, Namibia) | Krystal S. Wright | CC BY-SA 4.0 |
+| sorghum.webp | [Sorghum Ethiopia](https://commons.wikimedia.org/wiki/File:Sorghum_Ethiopia.jpg) (Amhara, Ethiopia) | Radosław Botev | CC BY 3.0 PL |
+| sesame.webp | [Sesame crop, White Nile, autumn 2024, 01](https://commons.wikimedia.org/wiki/File:%D8%A7%D9%84%D9%85%D9%88%D8%B3%D9%85_%D8%A7%D9%84%D8%B2%D8%B1%D8%A7%D8%B9%D9%8A_%D9%81%D9%8A_%D9%88%D9%84%D8%A7%D9%8A%D8%A9_%D8%A7%D9%84%D9%86%D9%8A%D9%84_%D8%A7%D9%84%D8%A7%D8%A8%D9%8A%D8%B6_%D8%AE%D8%B1%D9%8A%D9%81_2024_%D9%85%D8%AD%D8%B5%D9%88%D9%84_%D8%A7%D9%84%D8%B3%D9%85%D8%B3%D9%85_01.jpg) (Sudan) | RamboSD | CC BY 4.0 |
+| cowpea.webp | [Field of Vigna unguiculata](https://commons.wikimedia.org/wiki/File:Field_of_Vigna_unguiculata.jpg) (Tamil Nadu, India) | Thamizhpparithi Maari | CC BY-SA 4.0 |
+| ginger.webp | [Ginger farm](https://commons.wikimedia.org/wiki/File:Ginger_farm.jpg) (Wayanad, India) | Aneesh Jose | CC BY 3.0 |
+| soybean.webp | [African Soya Bean after harvest](https://commons.wikimedia.org/wiki/File:African_Soya_Bean_after_harvest.jpg) | Nabimanya Norman | CC BY-SA 4.0 |

@@ -32,15 +32,15 @@ export const CROPS = [
   { id: 'rice', admin: 'rice', name: 'Rice', photo: '/crops/rice.webp' },
   { id: 'cassava', admin: 'cassava', name: 'Cassava', photo: '/crops/cassava.webp' },
   { id: 'sugarcane', admin: 'sugarcane', name: 'Sugarcane', photo: '/crops/sugarcane.webp' },
-  // Limits from FAO EcoCrop (docs/services/suitability-ecocrop-crops.md); no crop photo yet, so the tool's own.
-  { id: 'millet', admin: 'millet', name: 'Millet (pearl)', photo: '/crops/suitability.webp' },
-  { id: 'sorghum', admin: 'sorghum', name: 'Sorghum', photo: '/crops/suitability.webp' },
-  { id: 'ginger', admin: 'ginger', name: 'Ginger', photo: '/crops/suitability.webp' },
-  { id: 'cowpea', admin: 'cowpea', name: 'Cowpea', photo: '/crops/suitability.webp' },
-  { id: 'groundnut', admin: 'groundnut', name: 'Groundnut', photo: '/crops/suitability.webp' },
-  { id: 'soybean', admin: 'soybean', name: 'Soybean', photo: '/crops/suitability.webp' },
-  { id: 'yam', admin: 'yam', name: 'Yam (white)', photo: '/crops/suitability.webp' },
-  { id: 'sesame', admin: 'sesame', name: 'Sesame', photo: '/crops/suitability.webp' },
+  // Limits from FAO EcoCrop (docs/services/suitability-ecocrop-crops.md); photos from Wikimedia Commons (public/crops/CREDITS.md).
+  { id: 'millet', admin: 'millet', name: 'Millet (pearl)', photo: '/crops/millet.webp' },
+  { id: 'sorghum', admin: 'sorghum', name: 'Sorghum', photo: '/crops/sorghum.webp' },
+  { id: 'ginger', admin: 'ginger', name: 'Ginger', photo: '/crops/ginger.webp' },
+  { id: 'cowpea', admin: 'cowpea', name: 'Cowpea', photo: '/crops/cowpea.webp' },
+  { id: 'groundnut', admin: 'groundnut', name: 'Groundnut', photo: '/crops/groundnut.webp' },
+  { id: 'soybean', admin: 'soybean', name: 'Soybean', photo: '/crops/soybean.webp' },
+  { id: 'yam', admin: 'yam', name: 'Yam (white)', photo: '/crops/yam.webp' },
+  { id: 'sesame', admin: 'sesame', name: 'Sesame', photo: '/crops/sesame.webp' },
 ];
 export const cropName = (id) => CROPS.find((c) => c.id === id || c.admin === id)?.name || id;
 
