@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Download, FileText, LayoutList } from 'lucide-react';
 import DesignedReport from '../../reports/DesignedReport';
+import ReportMap from './ReportMap';
 import ReportLoading from '../../reports/ReportLoading';
 
 /**
@@ -136,7 +137,7 @@ function ReportBody({ d }) {
             <Prose items={[d.method]} />
             {d.result_map && (
               <Figure n={d.result_map.figure} caption={d.result_map.caption}>
-                <MapPanel map={d.result_map} extent={d.extent} outline={d.outline} tall />
+                <MapPanel map={d.result_map} extent={d.extent} outline={d.outline} basemap={d.basemap} tall />
               </Figure>
             )}
           </Section>
@@ -155,9 +156,9 @@ function ReportBody({ d }) {
                 <Figure n={s.figure} caption={s.caption}>
                   {s.maps.length > 1 ? (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {s.maps.map((m) => <MapPanel key={m.title} map={m} extent={d.extent} outline={d.outline} />)}
+                      {s.maps.map((m) => <MapPanel key={m.title} map={m} extent={d.extent} outline={d.outline} basemap={d.basemap} />)}
                     </div>
-                  ) : <MapPanel map={s.maps[0]} extent={d.extent} outline={d.outline} tall />}
+                  ) : <MapPanel map={s.maps[0]} extent={d.extent} outline={d.outline} basemap={d.basemap} tall />}
                 </Figure>
               )}
               {s.table && <DataTable t={s.table} />}
@@ -261,75 +262,11 @@ function DataTable({ t }) {
 }
 
 // ── Maps: the run's picture of a layer, north up, with north arrow, scale bar and legend ────────────
-function niceKm(x) {
-  if (!(x > 0)) return 0;
-  const e = 10 ** Math.floor(Math.log10(x));
-  return [5, 2, 1, 0.5].map((m) => m * e).find((v) => v <= x) || e;
-}
-
-function useScaleBar(extent) {
-  const img = useRef(null);
-  const [bar, setBar] = useState(null);
-  const measure = useCallback(() => {
-    const el = img.current;
-    if (!el || !extent || !el.clientWidth) return;
-    const [minx, miny, maxx, maxy] = extent;
-    const groundKm = (maxx - minx) * 111.32 * Math.cos(((miny + maxy) / 2) * (Math.PI / 180));
-    const kmPerPx = groundKm / el.clientWidth;
-    const km = niceKm(kmPerPx * el.clientWidth * 0.25);
-    if (km) setBar({ px: km / kmPerPx, label: km >= 1 ? `${km} km` : `${Math.round(km * 1000)} m` });
-  }, [extent]);
-  useEffect(() => {
-    const el = img.current;
-    if (!el || typeof ResizeObserver === 'undefined') return undefined;
-    const ro = new ResizeObserver(measure);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [measure]);
-  return [img, bar, measure];
-}
-
-function MapPanel({ map, extent, outline, tall = false }) {
-  const [img, bar, measure] = useScaleBar(extent);
+function MapPanel({ map, extent, outline, basemap, tall = false }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-      <div className="border-b border-gray-200 px-4 py-2.5 text-sm font-semibold">
-        {map.letter && <span className="mr-2 text-green-700">{map.letter}</span>}{map.title}
-      </div>
-      <div className={`relative flex items-center justify-center p-4 ${tall ? 'h-[340px] sm:h-[520px]' : 'h-[300px] sm:h-[400px]'}`}>
-        <span className="relative inline-block max-h-full max-w-full">
-          <img ref={img} src={map.image} alt={map.title} onLoad={measure} className={`block max-w-full ${tall ? 'max-h-[308px] sm:max-h-[488px]' : 'max-h-[268px] sm:max-h-[368px]'}`} />
-          <Boundary rings={outline} extent={extent} />
-        </span>
-        <svg className="absolute right-4 top-3" width="20" height="30" viewBox="0 0 20 30" aria-label="North">
-          <path d="M10,1 L16,17 L10,13 L4,17 Z" fill="#111827" />
-          <text x="10" y="28" fontSize="9" fontWeight="600" fill="#111827" textAnchor="middle" fontFamily="Inter, sans-serif">N</text>
-        </svg>
-        {bar && (
-          <div className="absolute bottom-3 left-4 flex items-center gap-2 rounded bg-white/85 px-1.5 py-1 text-[11px] text-gray-900">
-            <span className="flex h-1.5 border border-gray-900" style={{ width: bar.px }}>
-              <span className="h-full w-1/2 bg-gray-900" /><span className="h-full w-1/2 bg-white" />
-            </span>
-            {bar.label}
-          </div>
-        )}
-      </div>
-      {map.key?.type && <div className="border-t border-gray-200 px-4 py-3"><MapKey k={map.key} /></div>}
-    </div>
-  );
-}
-
-/** The farm boundary over a map picture (both are north up on a lon/lat grid with the same extent). */
-function Boundary({ rings, extent }) {
-  if (!rings?.length || !extent) return null;
-  const [minx, miny, maxx, maxy] = extent;
-  const w = 1000;
-  const h = (w * (maxy - miny)) / (maxx - minx || 1);
-  const d = rings.map((r) => r.map(([x, y], i) => `${i ? 'L' : 'M'}${(((x - minx) / (maxx - minx)) * w).toFixed(1)},${(((maxy - y) / (maxy - miny)) * h).toFixed(1)}`).join(' ') + ' Z').join(' ');
-  return (
-    <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox={`0 0 ${w} ${h.toFixed(1)}`} preserveAspectRatio="none" aria-hidden="true">
-      <path d={d} fill="none" stroke="#111827" strokeWidth="1.6" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
-    </svg>
+    <ReportMap map={map} extent={extent} outline={outline} basemap={basemap} tall={tall}>
+      {map.key?.type && <MapKey k={map.key} />}
+    </ReportMap>
   );
 }
 
