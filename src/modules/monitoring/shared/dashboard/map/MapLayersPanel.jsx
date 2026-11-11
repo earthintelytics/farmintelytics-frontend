@@ -2,6 +2,7 @@ import { Layers, X, Info } from 'lucide-react';
 import { indexName } from '../constants/indexNames';
 import LayerLegend from '../legends/LayerLegend';
 import { indexClassesFor, useIndexClasses } from '../legends/indexClasses';
+import { PHONE_SHEET } from '../../../../../hooks/useIsPhone';
 
 const Toggle = ({ on, onChange, label }) => (
   <button type="button" role="switch" aria-checked={on} aria-label={label} onClick={() => onChange(!on)}
@@ -59,7 +60,7 @@ const satelliteText = (sat) => (WATER_INDEX.test(String(sat.index || ''))
 const MapLayersPanel = ({ onClose, satellite, outlines, colourBy, cropType, unit = 'blocks', children }) => {
   useIndexClasses();
   return (
-  <aside className="w-[300px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-10">
+  <aside className={`w-[300px] ${PHONE_SHEET} bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-10`}>
     <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between">
       <span className="flex items-center gap-2 font-display text-base font-semibold text-gray-900"><Layers size={18} className="text-green-700" />Map layers</span>
       <button type="button" onClick={onClose} aria-label="Close map layers" className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100"><X size={18} /></button>

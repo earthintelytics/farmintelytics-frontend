@@ -4,6 +4,7 @@ import { PanelRightOpen, ChevronsRight, Layers, X, Sprout, Leaf, Droplets, Waves
 import { FitBoundsToPlots, ResizeMap, ZoomToPlot } from '../map/MapHelpers';
 import { hexOf, legendFor, useLayerLegends } from '../legends/layerLegends';
 import WhereToWalk, { useScoutingSpots } from '../components/WhereToWalk';
+import { PHONE_SHEET, isPhoneNow } from '../../../../../hooks/useIsPhone';
 
 // Zooms the map to a chosen weak point (Where to walk).
 function FlyToPoint({ point }) {
@@ -45,7 +46,7 @@ const fmt = (v, d = 2) => (v == null ? '—' : Number(v).toFixed(d));
 export default function BlockSummaryPage({ plotsData = [], measures = [], basemapUrl, basemapAttribution, basemapMaxNativeZoom, defaultMapCenter, farmBoundary, filterEstate, unitLabel = 'blocks' }) {
   const [key, setKey] = useState(measures[0]?.key || null);
   const [found, setFound] = useState(null);
-  const [panelOpen, setPanelOpen] = useState(true);
+  const [panelOpen, setPanelOpen] = useState(() => !isPhoneNow());   // on a phone the summary opens when asked
   const [railOpen, setRailOpen] = useState(true);
   const m = measures.find((x) => x.key === key) || measures[0];
   const scouting = useScoutingSpots();
@@ -172,7 +173,7 @@ export default function BlockSummaryPage({ plotsData = [], measures = [], basema
         )}
       </div>
 
-      {panelOpen && <aside className="w-[360px] shrink-0 bg-white border-l border-gray-200 overflow-y-auto p-6 space-y-6">
+      {panelOpen && <aside className={`w-[360px] ${PHONE_SHEET} shrink-0 bg-white border-l border-gray-200 overflow-y-auto p-6 space-y-6`}>
         <div>
           <div className="flex items-center justify-between gap-2">
             <h2 className="font-display text-xl font-semibold text-gray-900">Block summary</h2>

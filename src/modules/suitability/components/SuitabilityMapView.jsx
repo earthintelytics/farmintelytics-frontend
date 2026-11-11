@@ -22,6 +22,7 @@ import {
 } from 'lucide-react';
 import { getFarmerLayerExplanation, FARMER_LAYER_EXPLANATIONS } from '../farmerLayerExplanations';
 import { CLASSES, cropName, isFinished } from '../suitabilityLabels';
+import { PHONE_SHEET, isPhoneNow } from '../../../hooks/useIsPhone';
 
 function Fit({ geometry }) {
   const map = useMap();
@@ -79,7 +80,7 @@ export default function SuitabilityMapView({
   onAskAiAboutLayer,
   selectedAreaId = '',
 }) {
-  const [showRightLegend, setShowRightLegend] = useState(true);
+  const [showRightLegend, setShowRightLegend] = useState(() => !isPhoneNow());
   const [showBasemapDropdown, setShowBasemapDropdown] = useState(false);
   const [showBoundaries, setShowBoundaries] = useState(true);
   const [boundaryOpacity, setBoundaryOpacity] = useState(1.0);
@@ -350,7 +351,7 @@ export default function SuitabilityMapView({
 
       {/* ── RIGHT-SIDE LEGEND & LAYERS PANEL (Matches Screenshot 1 MapLayersPanel Layout) ── */}
       {showRightLegend && (
-        <aside className="w-[310px] lg:w-[350px] bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-20 animate-in slide-in-from-right duration-150">
+        <aside className={`w-[310px] lg:w-[350px] ${PHONE_SHEET} bg-white border-l border-gray-200 flex flex-col shrink-0 overflow-y-auto z-20 animate-in slide-in-from-right duration-150`}>
           {/* Header (Matches Screenshot 1) */}
           <div className="px-4 py-4 border-b border-gray-100 flex items-center justify-between bg-white shrink-0 sticky top-0 z-30">
             <span className="flex items-center gap-2 font-display text-base font-semibold text-gray-900">

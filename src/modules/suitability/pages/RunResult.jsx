@@ -159,7 +159,7 @@ export default function RunResult({ runId, companyId, onBack }) {
       {error && <div className="px-6 pt-3"><ErrorNote message={error} /></div>}
 
       {/* ── MAIN WORKSPACE CONTAINER ── */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         {activeTopTab === 'assessment' ? (
           <>
             {/* Left Sidebar (Views) */}

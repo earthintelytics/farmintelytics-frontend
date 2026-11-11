@@ -14,7 +14,7 @@ import { paths } from '../../../../../routes/paths';
 export function renderDashboardHeader(ctx) {
   const { activeTab, alerts, cropLabel, estateOptions, filterEstate, handleEstateChange, handleTopNavTabClick, onBack, onSignOut, pick, profileEmail, profileInitials, profileName, profileRole, service, setShowNotifications, setShowUserMenu, showNotifications, showUserMenu, tenant, tenantDisplayName, userMenuRef } = ctx;
   return (
-<header className="h-[72px] bg-white border-b border-gray-100 flex items-center justify-between gap-2 px-3 md:px-8 z-[100] shadow-sm shrink-0">
+<header className="min-h-[64px] md:h-[72px] bg-white border-b border-gray-100 flex flex-wrap md:flex-nowrap items-center justify-between gap-2 px-3 py-2 md:py-0 md:px-8 z-[100] shadow-sm shrink-0">
 
         {/* Brand */}
         <div className="flex items-center gap-2 md:gap-6 min-w-0">
@@ -23,8 +23,8 @@ export function renderDashboardHeader(ctx) {
           </button>
           <div className="flex items-center gap-3.5">
             {/* The organisation's logo once uploaded; the default icon until then. */}
-            <OrgLogo tenant={tenant} version={localStorage.getItem('fi_logo_version') || ''} className="w-11 h-11 rounded-xl" fallback={(
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-green-700">
+            <OrgLogo tenant={tenant} version={localStorage.getItem('fi_logo_version') || ''} className="w-9 h-9 md:w-11 md:h-11 rounded-xl" fallback={(
+              <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl flex items-center justify-center bg-green-700">
                 <Satellite className="text-white" size={21} />
               </div>
             )} />
@@ -38,13 +38,13 @@ export function renderDashboardHeader(ctx) {
             </div>
           </div>
           {estateOptions.length >= 2 && (
-            <label className="hidden md:flex items-center gap-2 pl-4 ml-1 border-l border-gray-200">
+            <label className="flex max-md:order-last max-md:basis-full items-center gap-2 md:pl-4 md:ml-1 md:border-l border-gray-200">
               <EstateIcon size={16} className="text-green-600" />
               <span className="sr-only">Estate</span>
               <select
                 value={estateOptions.includes(filterEstate) ? filterEstate : 'All'}
                 onChange={e => handleEstateChange(e.target.value)}
-                className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 hover:border-gray-300 outline-none cursor-pointer"
+                className="max-md:flex-1 min-w-0 px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 hover:border-gray-300 outline-none cursor-pointer"
                 aria-label="Estate"
               >
                 <option value="All">All estates ({estateOptions.length})</option>
@@ -80,7 +80,7 @@ export function renderDashboardHeader(ctx) {
 
         {/* User area */}
         <div className="flex items-center gap-2 md:gap-4 shrink-0">
-          <div className="relative">
+          <div className="md:relative">
             <button 
               onClick={() => { setShowNotifications(n => !n); setShowUserMenu(false); }}
               className={`p-2.5 rounded-xl transition-all border relative ${showNotifications ? 'bg-green-50 text-green-700 border-green-200' : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50 hover:text-gray-800'}`}
@@ -91,7 +91,7 @@ export function renderDashboardHeader(ctx) {
               )}
             </button>
             {showNotifications && (
-              <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-gray-200 rounded-2xl shadow-xl z-[500] overflow-hidden">
+              <div className="absolute right-0 top-full mt-2 w-80 max-md:fixed max-md:inset-x-3 max-md:top-16 max-md:w-auto bg-white border border-gray-200 rounded-2xl shadow-xl z-[500] overflow-hidden">
                 <div className="px-4 py-3.5 border-b border-gray-100 flex justify-between items-center bg-white">
                   <div className="text-xs font-bold text-gray-700">Live alerts feed</div>
                   <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${'bg-green-50 text-green-700'}`}>
@@ -120,23 +120,23 @@ export function renderDashboardHeader(ctx) {
               </div>
             )}
           </div>
-          <div className="w-px h-8 bg-gray-200"></div>
+          <div className="hidden md:block w-px h-8 bg-gray-200"></div>
           {/* Clickable user avatar with sign-out dropdown */}
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => { setShowUserMenu(s => !s); setShowNotifications(false); }}
               className="flex items-center gap-3 hover:opacity-80 transition-all"
             >
-              <div className="text-right">
+              <div className="hidden md:block text-right">
                 <div className="text-sm font-bold text-gray-900 leading-none">{profileName}</div>
                 <div className="text-xs font-medium mt-1 text-gray-500">{profileRole}</div>
               </div>
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center font-semibold text-sm border text-green-800 border-green-200 bg-green-50">
+              <div className="w-9 h-9 md:w-11 md:h-11 rounded-xl flex items-center justify-center font-semibold text-sm border text-green-800 border-green-200 bg-green-50">
                 {profileInitials}
               </div>
             </button>
             {showUserMenu && (
-              <div className="absolute right-0 top-full mt-2.5 w-64 bg-white border border-gray-200 rounded-2xl shadow-xl z-[500] overflow-hidden">
+              <div className="absolute right-0 top-full mt-2.5 w-64 max-w-[calc(100vw-1.5rem)] bg-white border border-gray-200 rounded-2xl shadow-xl z-[500] overflow-hidden">
                 <div className="p-4 bg-white flex flex-col items-center text-center border-b border-gray-100">
                   <div className="w-14 h-14 rounded-2xl flex items-center justify-center font-semibold text-white text-lg mb-2.5 bg-green-700">
                     {profileInitials}

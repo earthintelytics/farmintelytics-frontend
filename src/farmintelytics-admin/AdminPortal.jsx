@@ -42,6 +42,7 @@ import ActivityLog from './pages/Activity';
 // Loaded on demand: the markdown renderer is only needed on this page.
 const Documentation = lazy(() => import('./pages/Documentation'));
 import { fetchSystemStatus } from '../services/adminApi';
+import useIsPhone from '../hooks/useIsPhone';
 import { hasValidTeamToken, redirectToTeamSignIn, teamRole, TEAM_ROLES } from '../services/session';
 import { ConfirmProvider } from './components/ConfirmProvider';
 
@@ -80,7 +81,11 @@ const NAV_ITEMS = NAV_GROUPS.flatMap(g => g.items);
 const AdminPortal = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const phone = useIsPhone();
+  // On a wide screen the sidebar is open or slim; on a phone it is a slide-in menu, closed until asked for.
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const wide = phone || sidebarOpen;             // labels shown (always in the phone menu)
   const [systemHealth, setSystemHealth] = useState(null);
   const adminEmail = localStorage.getItem('fi_admin_email') || '';
   const role = teamRole();
@@ -125,10 +130,13 @@ const AdminPortal = () => {
     <div className="relative flex h-screen overflow-hidden bg-[var(--bg-main)] text-[var(--text-main)] font-sans">
 
       {/* ── Sidebar ── */}
-      <aside className={`relative flex flex-col shrink-0 bg-white border-r border-gray-200 transition-[width] duration-200 ${sidebarOpen ? 'w-64' : 'w-[68px]'}`}>
-        <div className={`h-16 flex items-center gap-3 border-b border-gray-200 ${sidebarOpen ? 'px-5' : 'justify-center'}`}>
+      {phone && menuOpen && <div className="fixed inset-0 z-40 bg-gray-900/30" onClick={() => setMenuOpen(false)} aria-hidden="true" />}
+      <aside className={phone
+        ? `fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-white border-r border-gray-200 transition-transform duration-200 ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`
+        : `relative flex flex-col shrink-0 bg-white border-r border-gray-200 transition-[width] duration-200 ${wide ? 'w-64' : 'w-[68px]'}`}>
+        <div className={`h-16 flex items-center gap-3 border-b border-gray-200 ${wide ? 'px-5' : 'justify-center'}`}>
           <img src="/farmintelytics-logo.png" alt="FarmIntelytics" className="h-9 w-9 object-contain shrink-0" width="36" height="36" />
-          {sidebarOpen && (
+          {wide && (
             <div className="leading-tight min-w-0">
               <p className="font-display text-sm font-semibold truncate">FarmIntelytics</p>
               <p className="text-xs text-[var(--text-muted)]">Admin console</p>
@@ -139,21 +147,21 @@ const AdminPortal = () => {
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
           {groups.map(group => (
             <div key={group.label}>
-              {sidebarOpen && <p className="px-3 mb-2 text-xs font-medium text-gray-400">{group.label}</p>}
+              {wide && <p className="px-3 mb-2 text-xs font-medium text-gray-400">{group.label}</p>}
               <div className="space-y-0.5">
                 {group.items.map(item => {
                   const active = activeId === item.id;
                   return (
                     <button
                       key={item.id}
-                      onClick={() => navigate(item.path)}
-                      title={!sidebarOpen ? item.label : undefined}
-                      className={`w-full flex items-center gap-3 rounded-[10px] text-sm transition-colors ${sidebarOpen ? 'px-3 py-2' : 'justify-center py-2.5'} ${
+                      onClick={() => { setMenuOpen(false); navigate(item.path); }}   // picking a page closes the phone menu
+                      title={!wide ? item.label : undefined}
+                      className={`w-full flex items-center gap-3 rounded-[10px] text-sm transition-colors ${wide ? 'px-3 py-2' : 'justify-center py-2.5'} ${
                         active ? 'bg-green-50 text-green-800 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                       }`}
                     >
                       <item.icon size={17} className={`shrink-0 ${active ? 'text-[var(--brand-primary)]' : ''}`} />
-                      {sidebarOpen && <span className="truncate">{item.label}</span>}
+                      {wide && <span className="truncate">{item.label}</span>}
                     </button>
                   );
                 })}
@@ -163,7 +171,7 @@ const AdminPortal = () => {
         </nav>
 
         <div className="p-3 border-t border-gray-200 space-y-1">
-          {sidebarOpen && (
+          {wide && (
             <div className="px-3 py-2">
               <p className="text-xs text-gray-400">Signed in as</p>
               <p className="text-sm text-gray-700 truncate">{adminEmail}</p>
@@ -171,27 +179,40 @@ const AdminPortal = () => {
             </div>
           )}
           <button onClick={() => navigate('/platformhub')} title="Platform hub"
-            className={`w-full flex items-center gap-3 rounded-[10px] text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors ${sidebarOpen ? 'px-3 py-2' : 'justify-center py-2.5'}`}>
-            <LayoutDashboard size={17} className="shrink-0" />{sidebarOpen && 'Platform hub'}
+            className={`w-full flex items-center gap-3 rounded-[10px] text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors ${wide ? 'px-3 py-2' : 'justify-center py-2.5'}`}>
+            <LayoutDashboard size={17} className="shrink-0" />{wide && 'Platform hub'}
           </button>
           <button onClick={handleSignOut} title="Sign out"
-            className={`w-full flex items-center gap-3 rounded-[10px] text-sm text-gray-600 hover:bg-red-50 hover:text-red-700 transition-colors ${sidebarOpen ? 'px-3 py-2' : 'justify-center py-2.5'}`}>
-            <LogOut size={17} className="shrink-0" />{sidebarOpen && 'Sign out'}
+            className={`w-full flex items-center gap-3 rounded-[10px] text-sm text-gray-600 hover:bg-red-50 hover:text-red-700 transition-colors ${wide ? 'px-3 py-2' : 'justify-center py-2.5'}`}>
+            <LogOut size={17} className="shrink-0" />{wide && 'Sign out'}
           </button>
         </div>
 
-        <button onClick={() => setSidebarOpen(!sidebarOpen)} aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
-          className="absolute top-5 -right-3 w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-900 z-30">
-          {sidebarOpen ? <X size={12} /> : <Menu size={12} />}
-        </button>
+        {phone ? (
+          <button onClick={() => setMenuOpen(false)} aria-label="Close menu"
+            className="absolute top-4 right-3 w-9 h-9 rounded-full flex items-center justify-center text-gray-500 hover:bg-gray-50 hover:text-gray-900">
+            <X size={18} />
+          </button>
+        ) : (
+          <button onClick={() => setSidebarOpen(!sidebarOpen)} aria-label={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
+            className="absolute top-5 -right-3 w-6 h-6 rounded-full bg-white border border-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-900 z-30">
+            {sidebarOpen ? <X size={12} /> : <Menu size={12} />}
+          </button>
+        )}
       </aside>
 
       {/* ── Main ── */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
         {/* Slim breadcrumb: each page renders its own title, counts and actions */}
-        <header className="shrink-0 h-12 flex items-center bg-white border-b border-gray-200 px-8 text-sm">
-          <span className="text-gray-400">Admin console</span>
-          {activeItem && <>
+        <header className="shrink-0 h-12 flex items-center bg-white border-b border-gray-200 px-4 md:px-8 text-sm">
+          {phone && (
+            <button onClick={() => setMenuOpen(true)} aria-label="Open menu"
+              className="-ml-1 mr-2 w-10 h-10 rounded-lg flex items-center justify-center text-gray-700 hover:bg-gray-50">
+              <Menu size={20} />
+            </button>
+          )}
+          {phone ? <span className="font-medium text-gray-800 truncate">{activeItem?.label || 'Admin console'}</span> : <span className="text-gray-400">Admin console</span>}
+          {!phone && activeItem && <>
             <span className="mx-2 text-gray-300">/</span>
             <span className="text-gray-400">{NAV_GROUPS.find(g => g.items.includes(activeItem))?.label}</span>
             <span className="mx-2 text-gray-300">/</span>
@@ -201,8 +222,8 @@ const AdminPortal = () => {
 
         {/* ── Red status alert line on admin console (T38) ── */}
         {(activeAlertsCount > 0 || isSystemDegraded) && (
-          <div className="shrink-0 bg-red-50 border-b border-red-200 px-8 py-2.5 flex items-center justify-between text-xs text-red-900">
-            <div className="flex items-center gap-2">
+          <div className="shrink-0 bg-red-50 border-b border-red-200 px-4 md:px-8 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-red-900">
+            <div className="flex items-center gap-2 min-w-0">
               <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse shrink-0" />
               <span className="font-semibold">System attention required:</span>
               <span>
@@ -213,7 +234,7 @@ const AdminPortal = () => {
             </div>
             <button
               onClick={() => navigate('/admin/system-status')}
-              className="font-medium underline hover:text-red-950 shrink-0 ml-4"
+              className="font-medium underline hover:text-red-950 shrink-0"
             >
               View system status →
             </button>
@@ -221,7 +242,7 @@ const AdminPortal = () => {
         )}
 
         {role === 'support' && (
-          <p className="shrink-0 px-8 py-2 bg-amber-50 border-b border-amber-200 text-sm text-amber-900">Support access: you can look at everything, but changes will be refused.</p>
+          <p className="shrink-0 px-4 md:px-8 py-2 bg-amber-50 border-b border-amber-200 text-sm text-amber-900">Support access: you can look at everything, but changes will be refused.</p>
         )}
         <main className="relative flex-1 overflow-auto">
           <Routes>

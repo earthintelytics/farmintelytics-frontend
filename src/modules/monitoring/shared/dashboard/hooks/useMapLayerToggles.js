@@ -2,12 +2,13 @@
 // Returned under the names the pages read (healthShowLayers, setHealthShowBoundaries, ...), with each
 // page's outline style. Blocks are outlines only: results show in charts and block details.
 import { useMemo, useState } from 'react';
+import { isPhoneNow } from '../../../../../hooks/useIsPhone';
 
 const PAGES = ['intel', 'health', 'moisture', 'yield', 'climate', 'restore'];
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
 
 export function useMapLayerToggles() {
-  const [state, setState] = useState(() => Object.fromEntries(PAGES.map(p => [p, { layers: true, boundaries: true, opacity: 100 }])));
+  const [state, setState] = useState(() => Object.fromEntries(PAGES.map(p => [p, { layers: !isPhoneNow(), boundaries: true, opacity: 100 }])));
   // Setters are made once, so like useState's own they never change between renders.
   const setters = useMemo(() => {
     const out = {};

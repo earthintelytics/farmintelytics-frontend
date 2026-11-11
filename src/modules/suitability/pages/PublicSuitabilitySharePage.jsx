@@ -1,7 +1,7 @@
 import { daysLeftText } from '../suitabilityLabels';
 import { useCallback, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { AlertTriangle, Compass, Layers, FileText, Sparkles, FileDown } from 'lucide-react';
+import { AlertTriangle, Compass, FileDown } from 'lucide-react';
 import { fetchPublicSuitability, publicReportPdfUrl } from '../../../services/suitabilityApi';
 import { StatusPill } from '../../../components/page/PageKit';
 import { cropName } from '../suitabilityLabels';
@@ -11,6 +11,7 @@ import SuitabilityAnalyticsView from '../components/SuitabilityAnalyticsView';
 import SuitabilityReport from '../components/SuitabilityReport';
 import { fetchSharedReportData, fetchSharedReportPdf } from '../../../services/suitabilityApi';
 import SuitabilityAiView from '../components/SuitabilityAiView';
+import SuitabilityTopTabs from '../components/SuitabilityTopTabs';
 
 export const PublicSuitabilitySharePage = () => {
   const { token } = useParams();
@@ -134,13 +135,13 @@ export const PublicSuitabilitySharePage = () => {
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col overflow-hidden font-sans">
       {/* ── TOP HEADER (Dashboard Chrome) ── */}
-      <header className="h-[72px] bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-8 z-[100] shadow-sm shrink-0">
-        <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-green-700 text-white shadow-xs">
+      <header className="md:h-[72px] bg-white border-b border-gray-100 flex flex-wrap md:flex-nowrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3 md:py-0 md:px-6 lg:px-8 z-[100] shadow-sm shrink-0">
+        <div className="flex items-center gap-3.5 min-w-0">
+          <div className="hidden sm:flex w-11 h-11 rounded-xl shrink-0 items-center justify-center bg-green-700 text-white shadow-xs">
             <Compass size={21} />
           </div>
-          <div>
-            <h1 className="text-base font-bold tracking-tight text-gray-900 leading-none flex items-center gap-2">
+          <div className="min-w-0">
+            <h1 className="text-base font-bold tracking-tight text-gray-900 leading-tight flex flex-wrap items-center gap-2">
               {crop} Suitability Analysis
               {result?.variant && (
                 <span className="text-xs font-normal px-2 py-0.5 rounded-full bg-green-50 text-green-700 border border-green-200">
@@ -161,38 +162,13 @@ export const PublicSuitabilitySharePage = () => {
           </div>
         </div>
 
-        {/* Center Top Tabs */}
-        <div className="hidden md:flex items-center gap-1 bg-gray-100 p-1 rounded-xl">
-          {[
-            { id: 'assessment', label: 'Assessment', icon: <Layers size={15} /> },
-            { id: 'report', label: 'Report', icon: <FileText size={15} /> },
-            {
-              id: 'ai-assistant',
-              label: `AI Advisor (${share?.ai_left_today ?? 10} left today)`,
-              icon: <Sparkles size={15} />,
-            },
-          ].map((tab) => {
-            const active = activeTopTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTopTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-semibold transition-all ${
-                  active
-                    ? 'bg-white text-green-700 shadow-xs'
-                    : 'text-gray-500 hover:text-gray-800 hover:bg-white/50'
-                }`}
-              >
-                {tab.icon}
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
+        {/* Main tabs: mid-header on a wide screen, their own row on a phone */}
+        <SuitabilityTopTabs value={activeTopTab} onChange={setActiveTopTab}
+          labels={{ 'ai-assistant': `AI Advisor (${share?.ai_left_today ?? 10} left today)` }} />
 
         {/* Right Controls */}
         <div className="flex items-center gap-3">
-          <StatusPill tone="good">Verified Evaluation</StatusPill>
+          <span className="hidden lg:inline-flex"><StatusPill tone="good">Verified Evaluation</StatusPill></span>
           <button
             type="button"
             onClick={handleDownloadPdf}
@@ -200,13 +176,13 @@ export const PublicSuitabilitySharePage = () => {
             className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-green-700 text-white hover:bg-green-800 disabled:bg-gray-200 disabled:text-gray-500 transition-all"
           >
             <FileDown size={14} />
-            <span>{pdfBusy ? 'Preparing…' : 'Download report'}</span>
+            <span>{pdfBusy ? 'Preparing…' : <>Download<span className="hidden sm:inline"> report</span></>}</span>
           </button>
         </div>
       </header>
 
       {/* ── MAIN WORKSPACE CONTAINER ── */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative">
         {activeTopTab === 'assessment' ? (
           <>
             {/* Left Sidebar (Views) */}
