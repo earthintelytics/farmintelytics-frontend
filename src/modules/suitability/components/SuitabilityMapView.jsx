@@ -54,6 +54,8 @@ function ResizeMap({ trigger }) {
   return null;
 }
 
+const TILE_RETRIES = 2;
+
 const CATEGORY_META = {
   Summary: { name: 'Suitability Analysis', icon: Layers, order: 1 },
   Terrain: { name: 'Topography & Terrain', icon: Mountain, order: 2 },
@@ -202,8 +204,20 @@ export default function SuitabilityMapView({
               opacity={layerOpacity}
               eventHandlers={{
                 loading: () => setTilesLoading(true),
-                load: () => setTilesLoading(false),
-                tileerror: () => setTileErr((e) => ({ url: currentTileUrl, n: e.url === currentTileUrl ? e.n + 1 : 1 })),
+                // Every tile on screen drawn: anything that failed earlier has come back, so the note goes.
+                load: () => { setTilesLoading(false); setTileErr({ url: currentTileUrl, n: 0 }); },
+                // A tile that fails (the server busy for a moment) is asked for again, twice, before the map says so.
+                tileerror: (ev) => {
+                  const img = ev.tile;
+                  const tries = Number(img?.dataset?.tries || 0);
+                  if (img && tries < TILE_RETRIES) {
+                    img.dataset.tries = String(tries + 1);
+                    const base = img.src.replace(/([?&])retry=\d+/, '').replace(/[?&]$/, '');
+                    setTimeout(() => { img.src = `${base}${base.includes('?') ? '&' : '?'}retry=${tries + 1}`; }, 1000 * (tries + 1));
+                    return;
+                  }
+                  setTileErr((e) => ({ url: currentTileUrl, n: e.url === currentTileUrl ? e.n + 1 : 1 }));
+                },
               }}
             />
           )}
