@@ -480,13 +480,6 @@ export function renderDashboardPages(ctx) {
                               : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none px-5 py-3.5'
                           }`}>
                             {msg.sender === 'user' ? <div className="whitespace-pre-wrap">{msg.text}</div> : <AiAnswer text={msg.text} />}
-                            {msg.sources && msg.sources.length > 0 && (
-                              <div className="mt-2 pt-2 border-t border-gray-100 flex flex-wrap gap-1">
-                                {msg.sources.map((src, si) => (
-                                  <span key={si} className="text-xs bg-green-50 text-green-700 border border-green-100 rounded-full px-2 py-0.5 font-medium">{src}</span>
-                                ))}
-                              </div>
-                            )}
                           </div>
                         </div>
                       ))}

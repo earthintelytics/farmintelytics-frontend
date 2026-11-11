@@ -41,7 +41,7 @@ export default function SuitabilityReport({ loadData, loadPdf, fileName }) {
   if (state === 'failed' || !data || data.version === 0) return <DesignedReport fileName={fileName} loadPdf={loadPdf} />;
 
   return (
-    <div className="space-y-6">
+    <div className="mx-auto w-full max-w-6xl space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="inline-flex rounded-xl border border-gray-200 p-1" role="tablist" aria-label="How to show the report">
           {[['report', 'Report', LayoutList], ['pages', 'Printed pages', FileText]].map(([key, label, Icon]) => (
@@ -81,8 +81,11 @@ function ReportBody({ d }) {
   ];
 
   return (
-    <article className="bg-white text-gray-900">
+    <article className="mx-auto w-full max-w-6xl bg-white text-gray-900">
       <header className="border-b border-gray-200 pb-8">
+        {d.cover_image && (
+          <img src={d.cover_image} alt="" className="mb-8 h-48 sm:h-72 w-full rounded-2xl object-cover" />
+        )}
         <p className="text-[11px] font-semibold uppercase tracking-[0.08em] text-green-700">FarmIntelytics · Crop suitability report</p>
         <h1 className="mt-3 font-display text-4xl sm:text-5xl font-bold tracking-tight">{d.title}</h1>
         <p className="mt-3 text-xl text-gray-800">{d.for_whom}</p>

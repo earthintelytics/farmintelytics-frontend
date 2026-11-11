@@ -90,7 +90,7 @@ function AskTab({ prefill, onPrefillUsed }) {
     setInput(''); setBusy(true);
     try {
       const r = await serviceCall('/chat/ask', { method: 'POST', body: { message: q, history } });
-      setMessages((m) => [...m, { role: 'assistant', content: r?.response || 'No answer came back.', sources: r?.sources || [] }]);
+      setMessages((m) => [...m, { role: 'assistant', content: r?.response || 'No answer came back.' }]);
     } catch (e) {
       setMessages((m) => [...m, { role: 'assistant', error: true, content: e?.message && e.status ? `Could not answer: ${e.message}` : 'No connection. Your question is kept; try again when you are back online.' }]);
     } finally { setBusy(false); }
@@ -124,7 +124,6 @@ function AskTab({ prefill, onPrefillUsed }) {
             ) : (
               <div key={i} className="space-y-2">
                 <div className={`text-[15px] leading-relaxed space-y-3 ${m.error ? 'text-red-700' : 'text-gray-900'}`}><AiAnswer text={m.content} /></div>
-                {m.sources?.length > 0 && <p className="text-xs text-gray-400">From: {m.sources.join(' · ')}</p>}
               </div>
             )
           ))}

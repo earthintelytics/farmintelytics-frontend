@@ -32,7 +32,7 @@ Context: ${contextLine}.`;
     try {
       const result = await api.queryAiAgent(agentQuery, module ? { module } : {});
       const reply = result?.response || "No response from AI agent.";
-      setChatMessages(prev => [...prev, { sender: 'assistant', text: reply, sources: result?.sources }]);
+      setChatMessages(prev => [...prev, { sender: 'assistant', text: reply }]);
     } catch {
       setChatMessages(prev => [...prev, { sender: 'assistant', text: "Sorry, the AI assistant is unavailable right now. Please try again." }]);
     } finally {

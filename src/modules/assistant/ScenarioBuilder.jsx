@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, Database, Plus, Sparkles, X } from 'lucide-react';
+import { ArrowRight, Plus, Sparkles, X } from 'lucide-react';
 import { SCENARIOS } from './scenarioTemplates';
 import { scopeKeys } from '../data/datasetDefinitions';
 
@@ -53,14 +53,23 @@ const ScenarioBuilder = ({ cropType, serviceId, estates = [], onRun, onFormOpen 
 
   const withNotes = (q) => (notes.trim() ? `${q}\n\nWhat we saw in the field: ${notes.trim()}` : q);
 
-  const open = (s) => {
+  // Sensible starting values: this month, the whole farm, and each what-if's usual numbers.
+  const defaults = (s) => {
     const v = {};
     for (const p of s.params) {
       if (p.type === 'month') v[p.name] = MONTHS[new Date().getMonth()];
-      else if (p.type === 'estate') v[p.name] = estates[0] || ALL;
+      else if (p.type === 'estate') v[p.name] = ALL;
+      else if (p.type === 'choice') v[p.name] = p.default ?? p.choices?.[0] ?? '';
       else v[p.name] = p.default ?? '';
     }
-    setValues(v); setNotes(''); setActive(s); setCustom(null);
+    return v;
+  };
+
+  // One click asks straight away; "Change the numbers" opens the form for anyone who wants other values.
+  const askNow = (s) => onRun(fill(s.question, defaults(s)), { scenario: s.id, params: defaults(s), customData: [], requiredData: s.requiredData || [] });
+
+  const open = (s) => {
+    setValues(defaults(s)); setNotes(''); setActive(s); setCustom(null);
   };
 
   const runScenario = () => onRun(withNotes(fill(active.question, values)), {
@@ -103,13 +112,6 @@ const ScenarioBuilder = ({ cropType, serviceId, estates = [], onRun, onFormOpen 
             </label>
           ))}
         </div>
-        {active.requiredData?.length > 0 && (
-          <div className="rounded-xl border border-gray-200 p-4 space-y-2">
-            <p className="flex items-center gap-2 text-sm font-semibold text-gray-800"><Database size={15} className="text-green-700" />Data that makes this answer better</p>
-            <p className="text-xs text-gray-500">The Assistant uses your monitoring results and the weather. Upload these in Farm data if you have them.</p>
-            <div className="flex flex-wrap gap-1.5">{active.requiredData.map((d) => <span key={d} className="px-2 py-0.5 rounded-md bg-gray-100 text-xs font-medium text-gray-700">{d}</span>)}</div>
-          </div>
-        )}
         <FieldNotes value={notes} onChange={setNotes} placeholder="e.g. Block 4B has yellow leaves near the drain; fertiliser went on 12 March." />
         <div className="rounded-xl bg-white border border-gray-200 p-4">
           <p className="text-xs font-semibold text-gray-500">The question that will be asked</p>
@@ -157,7 +159,7 @@ const ScenarioBuilder = ({ cropType, serviceId, estates = [], onRun, onFormOpen 
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <h2 className="font-display text-2xl font-semibold text-gray-900 tracking-tight">Ask, or try a what-if</h2>
-          <p className="text-sm text-gray-500 mt-1 max-w-2xl">Type a question below, or pick a what-if. Answers use your monitoring results and the weather.</p>
+          <p className="text-sm text-gray-500 mt-1 max-w-2xl">Type a question below, or pick a what-if: one click asks it for the whole farm this month.</p>
         </div>
         <button type="button" onClick={() => { setNotes(''); setCustom({ title: '', question: '', estate: estates[0] || ALL }); }} className={`${btnSecondary} inline-flex items-center gap-1.5 shrink-0`}>
           <Plus size={15} className="text-green-700" />Describe your own
@@ -168,17 +170,23 @@ const ScenarioBuilder = ({ cropType, serviceId, estates = [], onRun, onFormOpen 
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {scenarios.map((s) => (
-            <button key={s.id} type="button" onClick={() => open(s)} className="min-w-0 text-left p-5 bg-white border border-gray-200 hover:border-green-600 rounded-2xl flex flex-col gap-3 group">
-              <span className="flex items-center gap-2.5">
-                <span className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-700 shrink-0"><Sparkles size={16} /></span>
-                <span className="text-sm font-semibold text-gray-900">{s.title}</span>
-              </span>
-              <span className="text-sm text-gray-600 leading-relaxed">{s.desc}</span>
+            <div key={s.id} className="min-w-0 p-5 bg-white border border-gray-200 hover:border-green-600 rounded-2xl flex flex-col gap-3 group">
+              <button type="button" onClick={() => askNow(s)} className="text-left flex flex-col gap-3">
+                <span className="flex items-center gap-2.5">
+                  <span className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-700 shrink-0"><Sparkles size={16} /></span>
+                  <span className="text-sm font-semibold text-gray-900">{s.title}</span>
+                </span>
+                <span className="text-sm text-gray-600 leading-relaxed">{s.desc}</span>
+              </button>
               <span className="w-full min-w-0 mt-auto pt-3 border-t border-gray-100 flex items-center justify-between gap-3 text-xs">
-                <span className="min-w-0 flex-1 text-gray-500 truncate">Uses: {(s.requiredData || []).join(', ') || 'your monitoring results and the weather'}</span>
-                <span className="flex items-center gap-1 font-semibold text-green-800 shrink-0">Set up<ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" /></span>
+                {s.params?.length > 0
+                  ? <button type="button" onClick={() => open(s)} className="text-gray-500 hover:text-gray-800 font-medium">Change the numbers</button>
+                  : <span />}
+                <button type="button" onClick={() => askNow(s)} className="flex items-center gap-1 font-semibold text-green-800 hover:text-green-950 shrink-0">
+                  Ask now<ArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                </button>
               </span>
-            </button>
+            </div>
           ))}
         </div>
       )}

@@ -26,8 +26,6 @@ const questionsFor = (run, crop) => {
       requiredData: 'Soil pH (and any soil samples uploaded)', question: `Where does soil pH limit ${c}, would liming correct it, and how many hectares would improve if it did?` }] : []),
     ...(excluded.length ? [{ id: 'excluded', title: 'Land left out, and why', desc: `${excluded.join(', ')}: which areas, how large, and what that means for planting.`,
       requiredData: 'Forest in 2020, forest loss, protected areas, water', question: 'Which land was left out of this analysis, for what reason, how many hectares in each case, and what does that mean for the EUDR rules?' }] : []),
-    { id: 'confidence', title: 'How sure is this result', desc: 'Which values were measured on site and which come from global maps.',
-      requiredData: 'Data sources and gaps of this analysis', question: 'How reliable is this result? Which values come from global maps and which from our own data, what is missing, and what field checks would make it surer?' },
   ];
 };
 
@@ -73,10 +71,9 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
       const res = run?.share_token
         ? await askPublicSuitabilityAi(run.share_token, q)
         : await askSuitabilityRun(run?.run_id, q, run?.company_id);
-      const sources = (res?.sources?.length ? res.sources : (run?.sources || []).map((x) => x?.name).filter(Boolean));
       setChatMessages((prev) => [
         ...prev,
-        { sender: 'assistant', text: res?.answer || res?.response || 'No answer came back. Try again.', sources },
+        { sender: 'assistant', text: res?.answer || res?.response || 'No answer came back. Try again.' },
       ]);
     } catch (err) {
       setChatMessages((prev) => [
@@ -119,7 +116,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
                   Ask, or try a what-if
                 </h2>
                 <p className="text-xs text-gray-500 mt-1 max-w-2xl font-medium">
-                  Type a question below, or pick one. Answers use this analysis only: its maps, scores and sources.
+                  Type a question below, or pick one. Answers use this analysis only.
                 </p>
               </div>
 
@@ -136,33 +133,25 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
             {/* 2-Column Grid of What-If Cards (Matches Screenshot 3) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
               {scenarios.map((s) => (
-                <div
+                <button
                   key={s.id}
-                  className="min-w-0 text-left p-5 bg-white border border-gray-200 hover:border-green-600 rounded-2xl flex flex-col gap-3 group transition-all shadow-2xs hover:shadow-xs"
+                  type="button"
+                  onClick={() => handleChatSubmit(s.question)}
+                  className="min-w-0 text-left p-5 bg-white border border-gray-200 hover:border-green-600 rounded-2xl flex flex-col gap-3 group transition-colors"
                 >
-                  <div className="flex items-center gap-2.5">
+                  <span className="flex items-center gap-2.5">
                     <span className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-700 shrink-0">
                       <Sparkles size={16} />
                     </span>
                     <span className="text-sm font-bold text-gray-900">{s.title}</span>
-                  </div>
-
-                  <p className="text-xs text-gray-600 leading-relaxed">{s.desc}</p>
-
-                  <div className="w-full min-w-0 mt-auto pt-3 border-t border-gray-100 flex items-center justify-between gap-3 text-xs">
-                    <span className="min-w-0 flex-1 text-gray-400 truncate text-[11px]">
-                      Uses: {s.requiredData}
+                  </span>
+                  <span className="text-xs text-gray-600 leading-relaxed">{s.desc}</span>
+                  <span className="w-full mt-auto pt-3 border-t border-gray-100 flex items-center justify-end text-xs">
+                    <span className="flex items-center gap-1 font-semibold text-green-800 group-hover:text-green-950">
+                      Ask now<ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => handleChatSubmit(s.question)}
-                      className="flex items-center gap-1 font-semibold text-green-800 hover:text-green-950 shrink-0 text-xs cursor-pointer group-hover:translate-x-0.5 transition-transform"
-                    >
-                      <span>Set up</span>
-                      <ArrowRight size={13} />
-                    </button>
-                  </div>
-                </div>
+                  </span>
+                </button>
               ))}
             </div>
           </div>
@@ -183,19 +172,6 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
                     }`}
                   >
                     {msg.sender === 'user' ? <div className="whitespace-pre-wrap">{msg.text}</div> : <AiAnswer text={msg.text} />}
-                    {msg.sources && msg.sources.length > 0 && (
-                      <div className="mt-3 pt-2.5 border-t border-gray-100 flex flex-wrap items-center gap-1.5">
-                        <span className="text-[10px] text-gray-400 font-semibold mr-1">Data sources:</span>
-                        {msg.sources.map((src, si) => (
-                          <span
-                            key={si}
-                            className="text-[10px] bg-green-50 text-green-800 border border-green-200 rounded-full px-2 py-0.5 font-medium"
-                          >
-                            {src}
-                          </span>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 </div>
               ))}
