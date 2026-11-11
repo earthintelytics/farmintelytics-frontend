@@ -4,7 +4,7 @@ import { fetchCompanies, fetchSuitabilityRuns } from '../../services/suitability
 import { HERO_PLACEHOLDERS } from '../../constants/heroPlaceholders';
 import { PrimaryButton, NotConnectedNote, ErrorNote, EmptyState } from '../../components/page/PageKit';
 import { useLoader } from '../../components/page/useLoader';
-import { CROPS, CLASSES } from './suitabilityLabels';
+import { CROPS } from './suitabilityLabels';
 import RunWizard from './pages/RunWizard';
 import RunResult from './pages/RunResult';
 import FactorGuide from './pages/FactorGuide';
@@ -100,7 +100,6 @@ const SuitabilityPortal = ({ onBack, onSignOut }) => {
             {CROPS.map((c) => {
               const mine = runs.filter((r) => r.crop === c.id || r.crop === c.admin);
               const last = mine[0];
-              const total = last ? Object.values(last.classes_area_ha || {}).reduce((a, b) => a + (Number(b) || 0), 0) : 0;
               return (
                 <button key={c.id} onClick={() => { setCropId(c.id); setCropTab('runs'); }} className="group text-left bg-white rounded-2xl border border-gray-200 overflow-hidden hover:border-gray-400">
                   <div className="relative h-32 bg-gray-100 bg-cover bg-center" style={HERO_PLACEHOLDERS[c.photo] ? { backgroundImage: `url(${HERO_PLACEHOLDERS[c.photo]})` } : undefined}>
@@ -111,11 +110,6 @@ const SuitabilityPortal = ({ onBack, onSignOut }) => {
                       <p className="font-display font-semibold text-gray-900">{c.name}</p>
                       <span className="text-xs text-gray-500">{mine.length ? `${mine.length} ${mine.length === 1 ? 'analysis' : 'analyses'}` : 'None yet'}</span>
                     </div>
-                    {total > 0 ? (
-                      <div className="flex h-2 rounded-full overflow-hidden bg-gray-100" title={`Latest: ${last.company_name}`}>
-                        {CLASSES.map((k) => <span key={k.key} className={k.bar} style={{ width: `${((last.classes_area_ha?.[k.key] || 0) / total) * 100}%` }} />)}
-                      </div>
-                    ) : <div className="h-2 rounded-full bg-gray-100" />}
                     <p className="text-xs text-gray-500 truncate">{last ? `Latest: ${last.company_name}` : 'Open to start the first analysis'}</p>
                   </div>
                 </button>
