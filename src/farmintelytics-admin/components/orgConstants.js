@@ -5,6 +5,11 @@ export const CROP_LABELS = {
   cassava: 'Cassava', maize: 'Maize', rubber: 'Rubber', cashew: 'Cashew',
 };
 
+// Crops the suitability tool also rates (limits from FAO EcoCrop); not monitoring services.
+export const SUITABILITY_ONLY_CROPS = ['millet', 'sorghum', 'ginger', 'cowpea', 'groundnut', 'soybean', 'yam', 'sesame'];
+Object.assign(CROP_LABELS, { millet: 'Millet (pearl)', sorghum: 'Sorghum', ginger: 'Ginger', cowpea: 'Cowpea',
+  groundnut: 'Groundnut', soybean: 'Soybean', yam: 'Yam (white)', sesame: 'Sesame' });
+
 // Index names stay in the admin (technical setting); clients never see them.
 export const ALL_RS_INDICES = [
   { id: 'ndvi', label: 'NDVI · vegetation' },

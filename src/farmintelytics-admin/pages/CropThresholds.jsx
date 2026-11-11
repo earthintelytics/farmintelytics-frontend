@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { fetchCropThresholds, fetchOrganizations } from '../../services/adminApi';
 import ErrorBanner from '../components/ErrorBanner';
 import { ALL_CROPS, inputCls } from '../components/formHelpers';
-import { CROP_LABELS } from '../components/orgConstants';
+import { CROP_LABELS, SUITABILITY_ONLY_CROPS } from '../components/orgConstants';
 import { Page, Field, Chip, Tabs, Loading, Empty } from '../components/ui';
 import LegendEditor from './thresholds/LegendEditor';
 import SuitabilityEditor from './thresholds/SuitabilityEditor';
@@ -56,12 +56,12 @@ const CropThresholds = () => {
       title="Map classes and suitability"
       text="What clients see on their maps (class words, colours, value ranges and advice) and how land suitability is judged. Set for every organisation or for one. A dot after a name means it was changed from the default."
     >
-      <Tabs value={tab} onChange={(t) => { if (t !== 'map' && crop === 'all') setCrop('ffb'); setTab(t); }} tabs={[{ id: 'map', label: 'Map classes' }, { id: 'suitability', label: 'Suitability' }]} />
+      <Tabs value={tab} onChange={(t) => { if ((t !== 'map' && crop === 'all') || (t === 'map' && SUITABILITY_ONLY_CROPS.includes(crop))) setCrop('ffb'); setTab(t); }} tabs={[{ id: 'map', label: 'Map classes' }, { id: 'suitability', label: 'Suitability' }]} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl">
         <Field label="Crop">
           <select className={inputCls} value={crop} onChange={(e) => setCrop(e.target.value)}>
-            {ALL_CROPS.map((c) => <option key={c} value={c}>{CROP_LABELS[c] || c}</option>)}
+            {(tab === 'suitability' ? [...ALL_CROPS, ...SUITABILITY_ONLY_CROPS] : ALL_CROPS).map((c) => <option key={c} value={c}>{CROP_LABELS[c] || c}</option>)}
             {tab === 'map' && <option value="all">Every crop and service (restoration, weather)</option>}
           </select>
         </Field>
