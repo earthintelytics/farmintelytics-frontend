@@ -53,7 +53,7 @@ const SuitabilityPortal = ({ onBack, onSignOut }) => {
   const back = crop ? () => setCropId(null) : onBack;
 
   if (openRun) {
-    return <RunResult runId={openRun.runId} companyId={openRun.companyId} onBack={() => setOpenRun(null)} onSignOut={onSignOut} />;
+    return <RunResult runId={openRun.runId} companyId={openRun.companyId} onBack={() => { setOpenRun(null); reload(); }} onSignOut={onSignOut} />;
   }
 
   const body = () => {

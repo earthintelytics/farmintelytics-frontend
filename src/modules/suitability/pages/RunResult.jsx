@@ -102,13 +102,13 @@ export default function RunResult({ runId, companyId, onBack }) {
   // 6. Delete analysis run
   const handleDeleteRun = async () => {
     const name = cropName(run?.crop);
-    if (!(await confirm(`Delete this ${name} suitability analysis and all its maps?`, { typed: true, action: 'Delete' }))) return;
+    if (!(await confirm(`Delete this ${name} suitability analysis? Its maps and results go; saved reports and other analyses stay.`, { typed: true, action: 'Delete' }))) return;
     setDeleting(true);
     try {
       await deleteSuitabilityRun(runId);
       if (onBack) onBack();
     } catch (err) {
-      setError(`Could not delete the analysis: ${err.message}`);
+      setError(err.message || 'The analysis could not be deleted.');
       setDeleting(false);
     }
   };

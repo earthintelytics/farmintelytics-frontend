@@ -22,6 +22,11 @@ export default function SuitabilityReport({ loadData, loadPdf, fileName }) {
     return () => { live = false; };
   }, [loadData]);
 
+  // The saved file is named after the analysis: "Suru LGA - Rice suitability - 11 Nov 2026.pdf".
+  const savedName = data?.farm_name
+    ? [data.farm_name, data.title, String(data.period_text || '').replace(/^Analysis of /, '')].filter(Boolean).join(' - ').replace(/[\\/:*?"<>|]+/g, ' ').trim()
+    : fileName;
+
   const download = async () => {
     setBusy(true);
     try {
@@ -29,7 +34,7 @@ export default function SuitabilityReport({ loadData, loadPdf, fileName }) {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${fileName || 'Suitability report'}.pdf`;
+      a.download = `${savedName || 'Suitability report'}.pdf`;
       a.click();
       setTimeout(() => URL.revokeObjectURL(url), 2000);
     } finally {
@@ -58,7 +63,7 @@ export default function SuitabilityReport({ loadData, loadPdf, fileName }) {
           </button>
         )}
       </div>
-      {view === 'pages' ? <DesignedReport fileName={fileName} loadPdf={loadPdf} /> : <ReportBody d={data} />}
+      {view === 'pages' ? <DesignedReport fileName={savedName} loadPdf={loadPdf} /> : <ReportBody d={data} />}
       {busy && <ReportLoading text="Preparing the PDF…" />}
     </div>
   );
@@ -131,7 +136,7 @@ function ReportBody({ d }) {
             <Prose items={[d.method]} />
             {d.result_map && (
               <Figure n={d.result_map.figure} caption={d.result_map.caption}>
-                <MapPanel map={d.result_map} extent={d.extent} tall />
+                <MapPanel map={d.result_map} extent={d.extent} outline={d.outline} tall />
               </Figure>
             )}
           </Section>
@@ -150,9 +155,9 @@ function ReportBody({ d }) {
                 <Figure n={s.figure} caption={s.caption}>
                   {s.maps.length > 1 ? (
                     <div className="grid gap-4 md:grid-cols-2">
-                      {s.maps.map((m) => <MapPanel key={m.title} map={m} extent={d.extent} />)}
+                      {s.maps.map((m) => <MapPanel key={m.title} map={m} extent={d.extent} outline={d.outline} />)}
                     </div>
-                  ) : <MapPanel map={s.maps[0]} extent={d.extent} tall />}
+                  ) : <MapPanel map={s.maps[0]} extent={d.extent} outline={d.outline} tall />}
                 </Figure>
               )}
               {s.table && <DataTable t={s.table} />}
@@ -284,7 +289,7 @@ function useScaleBar(extent) {
   return [img, bar, measure];
 }
 
-function MapPanel({ map, extent, tall = false }) {
+function MapPanel({ map, extent, outline, tall = false }) {
   const [img, bar, measure] = useScaleBar(extent);
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
@@ -292,7 +297,10 @@ function MapPanel({ map, extent, tall = false }) {
         {map.letter && <span className="mr-2 text-green-700">{map.letter}</span>}{map.title}
       </div>
       <div className={`relative flex items-center justify-center p-4 ${tall ? 'h-[340px] sm:h-[520px]' : 'h-[300px] sm:h-[400px]'}`}>
-        <img ref={img} src={map.image} alt={map.title} onLoad={measure} className="max-h-full max-w-full" />
+        <span className="relative inline-block max-h-full max-w-full">
+          <img ref={img} src={map.image} alt={map.title} onLoad={measure} className={`block max-w-full ${tall ? 'max-h-[308px] sm:max-h-[488px]' : 'max-h-[268px] sm:max-h-[368px]'}`} />
+          <Boundary rings={outline} extent={extent} />
+        </span>
         <svg className="absolute right-4 top-3" width="20" height="30" viewBox="0 0 20 30" aria-label="North">
           <path d="M10,1 L16,17 L10,13 L4,17 Z" fill="#111827" />
           <text x="10" y="28" fontSize="9" fontWeight="600" fill="#111827" textAnchor="middle" fontFamily="Inter, sans-serif">N</text>
@@ -308,6 +316,20 @@ function MapPanel({ map, extent, tall = false }) {
       </div>
       {map.key?.type && <div className="border-t border-gray-200 px-4 py-3"><MapKey k={map.key} /></div>}
     </div>
+  );
+}
+
+/** The farm boundary over a map picture (both are north up on a lon/lat grid with the same extent). */
+function Boundary({ rings, extent }) {
+  if (!rings?.length || !extent) return null;
+  const [minx, miny, maxx, maxy] = extent;
+  const w = 1000;
+  const h = (w * (maxy - miny)) / (maxx - minx || 1);
+  const d = rings.map((r) => r.map(([x, y], i) => `${i ? 'L' : 'M'}${(((x - minx) / (maxx - minx)) * w).toFixed(1)},${(((maxy - y) / (maxy - miny)) * h).toFixed(1)}`).join(' ') + ' Z').join(' ');
+  return (
+    <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox={`0 0 ${w} ${h.toFixed(1)}`} preserveAspectRatio="none" aria-hidden="true">
+      <path d={d} fill="none" stroke="#111827" strokeWidth="1.6" strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+    </svg>
   );
 }
 
