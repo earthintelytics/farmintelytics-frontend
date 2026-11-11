@@ -9,8 +9,8 @@ import SuitabilityHeader from '../components/SuitabilityHeader';
 import SuitabilitySidebar from '../components/SuitabilitySidebar';
 import SuitabilityMapView from '../components/SuitabilityMapView';
 import SuitabilityAnalyticsView from '../components/SuitabilityAnalyticsView';
-import DesignedReport from '../../reports/DesignedReport';
-import { fetchSuitabilityReportPdf } from '../../../services/suitabilityApi';
+import SuitabilityReport from '../components/SuitabilityReport';
+import { fetchSuitabilityReportData, fetchSuitabilityReportPdf } from '../../../services/suitabilityApi';
 import SuitabilityAiView from '../components/SuitabilityAiView';
 import FactorGuide from './FactorGuide';
 
@@ -91,6 +91,7 @@ export default function RunResult({ runId, companyId, onBack }) {
 
   // 4. The designed report (Report tab): its page and its PDF, for this run.
   const loadReportPdf = useCallback(() => fetchSuitabilityReportPdf(runId), [runId]);
+  const loadReportData = useCallback(() => fetchSuitabilityReportData(runId), [runId]);
 
   // 5. Ask AI about a layer action
   const handleAskAiAboutLayer = (questionText) => {
@@ -212,9 +213,9 @@ export default function RunResult({ runId, companyId, onBack }) {
           </>
         ) : activeTopTab === 'report' ? (
           <main className="flex-1 overflow-y-auto bg-white p-4 sm:p-8">
-            {/* The designed suitability report (report engine), as its PDF prints. */}
-            <DesignedReport key={runId} fileName={`Suitability ${cropName(run?.crop)} ${String(runId).slice(0, 8)}`}
-              loadPdf={loadReportPdf} />
+            {/* The suitability report as a web page (same content as its PDF), with the printed pages one click away. */}
+            <SuitabilityReport key={runId} fileName={`Suitability ${cropName(run?.crop)} ${String(runId).slice(0, 8)}`}
+              loadData={loadReportData} loadPdf={loadReportPdf} />
           </main>
         ) : (
           <main className="flex-1 overflow-y-auto bg-gray-50">

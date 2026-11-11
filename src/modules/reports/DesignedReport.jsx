@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Download } from 'lucide-react';
 import { fetchReportPdf } from '../../services/organizationMonitorApi';
+import ReportLoading from './ReportLoading';
 
 /**
  * The report as the client receives it: the PDF itself, drawn page by page in the browser (PDF.js), so the
@@ -10,7 +11,7 @@ import { fetchReportPdf } from '../../services/organizationMonitorApi';
  */
 const PAGE_PX = 794; // A4 width at 96 dpi: the pages are drawn at print size and shrink on narrow screens
 
-async function drawPdf(blob, holder, isLive) {
+async function drawPdf(blob, holder, isLive, onFirstPage) {
   const pdfjs = await import('pdfjs-dist');
   if (!pdfjs.GlobalWorkerOptions.workerPort) {
     // Bundled by Vite as a plain .js worker, so any web server serves it with a script type.
@@ -43,6 +44,7 @@ async function drawPdf(blob, holder, isLive) {
     sheet.appendChild(canvas);
     holder.appendChild(sheet);
     await page.render({ canvasContext: canvas.getContext('2d'), viewport: view }).promise;
+    if (n === 1) onFirstPage();
 
     // Links in the PDF (share links, "open in the app" buttons) stay clickable.
     const notes = await page.getAnnotations();
@@ -67,6 +69,7 @@ export default function DesignedReport({ reportId, fileName, loadPdf }) {
   const [pdf, setPdf] = useState(null);
   const [state, setState] = useState('loading'); // loading | ready | failed
   const [problem, setProblem] = useState('');
+  const [drawn, setDrawn] = useState(false);
   const holder = useRef(null);
 
   useEffect(() => {
@@ -80,7 +83,7 @@ export default function DesignedReport({ reportId, fileName, loadPdf }) {
   useEffect(() => {
     if (!pdf || !holder.current) return undefined;
     let live = true;
-    drawPdf(pdf, holder.current, () => live).catch(() => {
+    drawPdf(pdf, holder.current, () => live, () => { if (live) setDrawn(true); }).catch(() => {
       if (live) { setProblem('The pages could not be shown here. Download the PDF to read the report.'); setState('failed'); }
     });
     return () => { live = false; };
@@ -108,6 +111,7 @@ export default function DesignedReport({ reportId, fileName, loadPdf }) {
           <Download size={15} />Download PDF
         </button>
       </div>
+      {(state === 'loading' || (pdf && !drawn && state !== 'failed')) && <ReportLoading />}
       {pdf && (
         <div className="rounded-2xl border border-gray-200 bg-gray-100 p-3 sm:p-6">
           <div ref={holder} className="space-y-4" />

@@ -111,7 +111,7 @@ export const askPublicSuitabilityAi = async (token, question) => {
 export const publicReportPdfUrl = (token) =>
   `${API_BASE}/public/suitability/${encodeURIComponent(token)}/report.pdf`;
 
-// The designed suitability report (report engine) as a page and as its PDF, for the team (by run) and for
+// The designed suitability report (report engine) as its content (for the web page) and as its PDF, for the team (by run) and for
 // the client (by share link). Same pages as the Reports page.
 const teamFile = async (path) => {
   const token = localStorage.getItem('fi_admin_token');
@@ -124,7 +124,7 @@ const publicFile = async (token, name) => {
   if (!res.ok) throw await responseError(res);
   return res;
 };
-export const fetchSuitabilityReportHtml = async (runId) => (await teamFile(`/runs/${encodeURIComponent(runId)}/report.html`)).text();
+export const fetchSuitabilityReportData = async (runId) => (await teamFile(`/runs/${encodeURIComponent(runId)}/report.json`)).json();
 export const fetchSuitabilityReportPdf = async (runId) => (await teamFile(`/runs/${encodeURIComponent(runId)}/report.pdf`)).blob();
-export const fetchSharedReportHtml = async (token) => (await publicFile(token, 'report.html')).text();
+export const fetchSharedReportData = async (token) => (await publicFile(token, 'report.json')).json();
 export const fetchSharedReportPdf = async (token) => (await publicFile(token, 'report.pdf')).blob();
