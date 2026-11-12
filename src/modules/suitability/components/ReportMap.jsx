@@ -14,11 +14,11 @@ const GRID_STEPS = [1 / 3600, 5 / 3600, 10 / 3600, 30 / 3600, 1 / 60, 2 / 60, 3 
 const GRID_TARGET_LINES = 4;   // about this many ticks along each edge
 const TICK_PX = 5;
 const LABEL_PX = 11;
-const MARGIN_PX = 24;          // room outside the frame for the coordinates, each side
-const FOOTER_PX = 34;          // strip under the map for the scale bar and north arrow
+const MARGIN_PX = 22;          // room outside the frame for the coordinates, each side
+const FOOTER_PX = 30;          // strip under the map for the scale bar and north arrow
 const SCALE_BAR_SHARE = 0.25;
-const FRAME_PAD_SHARE = 0.07;  // white space inside the frame round the map: this share of its longer side
-const HEIGHTS = { tall: [360, 540], normal: [320, 420] };   // [phone, wider screens]
+const FRAME_PAD_SHARE = 0.05;  // white space inside the frame round the map: this share of its longer side
+const HEIGHTS = { tall: [420, 680], normal: [380, 540] };   // [phone, wider screens]
 const INK = '#111827';
 
 const groundAspect = ([w, s, e, n]) => ((e - w) * Math.cos(((s + n) / 2) * (Math.PI / 180))) / (n - s || 1);
@@ -156,7 +156,7 @@ export default function ReportMap({ map, extent, outline, tall = false, children
       <div className="border-b border-gray-200 px-4 py-2.5 text-sm font-semibold">
         {map.letter && <span className="mr-2 text-green-700">{map.letter}</span>}{map.title}
       </div>
-      <div ref={holder} className="relative flex flex-col items-center" style={{ height: `clamp(${phone}px, 50vw, ${wide}px)` }}>
+      <div ref={holder} className="relative flex flex-col items-center" style={{ height: `clamp(${phone}px, 60vw, ${wide}px)` }}>
         <div className="flex-1 w-full flex items-center justify-center">
           {size && extent ? (
             <div className="relative" style={{ width: size.w, height: size.h }}>

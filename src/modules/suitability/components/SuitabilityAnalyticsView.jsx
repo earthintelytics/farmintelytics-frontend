@@ -105,31 +105,12 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h4 className="text-sm font-bold text-gray-900">Land in each class</h4>
-              <span className="text-xs font-mono text-gray-400 font-semibold">{ha(totalArea)}</span>
+              <span className="text-xs font-mono text-gray-400 font-semibold">{ha(totalArea)} · {run?.resolution_m || 30} m squares</span>
             </div>
 
             {/* Hectares per class as a bar chart */}
             <ClassBarChart areas={run?.classes_area_ha} total={totalArea} />
 
-            {/* Legend list */}
-            <div className="mt-5 space-y-2.5">
-              {CLASSES.map((c) => {
-                const v = Number(run?.classes_area_ha?.[c.key] || 0);
-                const share = totalArea > 0 ? Math.round((v / totalArea) * 100) : 0;
-                return (
-                  <div key={c.key} className="flex items-center justify-between text-xs">
-                    <div className="flex items-center gap-2">
-                      <span className="w-3 h-3 rounded-xs" style={{ background: c.hex }} />
-                      <span className="font-semibold text-gray-800">{c.label}</span>
-                      <span className="font-mono text-gray-400 text-[11px]">({c.key})</span>
-                    </div>
-                    <div className="font-mono font-semibold text-gray-700">
-                      {ha(v)} <span className="text-gray-400 font-normal">({share}%)</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
           </div>
 
           {/* Terrain Snapshot Footer */}
@@ -193,41 +174,6 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
             </div>
           )}
         </Card>
-      </div>
-
-      {/* ── KPI CARDS: FAO SUITABILITY CLASSES (AT LOWER SIDE) ── */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-            FAO Planting Suitability Breakdown
-          </h3>
-          <span className="text-xs font-mono text-gray-400 font-semibold">
-            {run?.resolution_m || 30} m Pixel Evaluation
-          </span>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {CLASSES.map((c) => {
-            const v = Number(run?.classes_area_ha?.[c.key] || 0);
-            const share = totalArea > 0 ? Math.round((v / totalArea) * 100) : 0;
-
-            return (
-              <Card key={c.key} className="p-5">
-                <div className="flex items-center justify-between">
-                  <StatusPill tone={c.tone}>{c.label}</StatusPill>
-                  <span className="text-xs font-bold font-mono text-gray-400">{c.key}</span>
-                </div>
-                <p className="font-mono text-2xl font-bold text-gray-900 mt-3">{ha(v)}</p>
-                <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
-                  <span>{share}% of total area</span>
-                  <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                    <div className={`h-full ${c.bar}`} style={{ width: `${share}%` }} />
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
       </div>
 
       {/* ── PER-FIELD EVALUATION TABLE ── */}
