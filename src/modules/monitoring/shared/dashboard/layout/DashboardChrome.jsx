@@ -174,21 +174,10 @@ export function renderDashboardHeader(ctx) {
   );
 }
 
-export function renderDashboardSidebar(ctx) {
-  const { TIMELINE_DATA, activeDateSlot, activeSidebarItem, alerts, compareTimelineIndex, handleSidebarClick, isCompareMode, pageSet, pick, selectedTimelineIndex, service, setActiveDateSlot, setCompareTimelineIndex, setIsCompareMode, setShowCalendarTool, setShowTimeSliderTool, showCalendarTool, showTimeSliderTool, sidebarWidth, startSidebarResize } = ctx;
-  return (
-<aside style={{ '--sidebar-w': `${sidebarWidth}px` }} className="w-16 md:w-[var(--sidebar-w)] bg-white border-r border-gray-100 flex flex-col z-50 shadow-sm shrink-0 relative">
-            {/* Draggable vertical divider */}
-            <div 
-              onMouseDown={startSidebarResize} 
-              className="hidden md:block absolute right-[-4px] top-0 bottom-0 w-2 cursor-col-resize hover:bg-green-500/50 active:bg-green-500 transition-colors z-50"
-            />
-            <div className="flex-1 overflow-y-auto py-6 px-2 md:px-4 space-y-8">
-
-              {/* MAIN */}
-              <div className="space-y-1">
-                <div className="hidden md:block text-[11px] font-bold text-gray-600 px-3 mb-3">Main</div>
-                {pick([
+/** The dashboard's pages, tools and settings: one list for the sidebar (wide screens) and the bottom bar (phone). */
+export function dashboardNav(ctx) {
+  const { TIMELINE_DATA, alerts, compareTimelineIndex, isCompareMode, pageSet, pick, selectedTimelineIndex, service, setActiveDateSlot, setCompareTimelineIndex, setIsCompareMode, setShowCalendarTool, setShowTimeSliderTool, showCalendarTool, showTimeSliderTool } = ctx;
+  const main = pick([
                   { id: 'analytics',           label: 'Analytics hub',       icon: <LayoutDashboard size={17} /> },
                   { id: 'intelligence-layers', label: 'Map',                 icon: <MapIcon size={17} /> },
                   { id: 'crop-health',         label: 'Crop health',         icon: <Activity size={17} /> },
@@ -205,8 +194,44 @@ export function renderDashboardSidebar(ctx) {
                   // Block summary sits after the last map page of the service.
                   const MAPS = ['intelligence-layers', 'crop-health', 'crop-yield', 'moisture-content', 'climate', 'land-restoration'];
                   const lastMap = all.map(x => x.id).filter(id => MAPS.includes(id)).pop();
-                  return item.id === lastMap ? [item, { id: 'block-summary', label: 'Block summary', icon: <BarChart3 size={17} /> }] : [item];
-                }).map(item => (
+                  return item.id === lastMap ? [item, { id: 'block-summary', label: 'Block summary', icon: <BarChart3 size={17} /> }] : [item];});
+  const tools = [
+                  { id: 'calendar-tool', label: 'Calendar',     icon: <CalendarIcon size={17} />, active: showCalendarTool, toggle: () => setShowCalendarTool(!showCalendarTool) },
+                  { id: 'slider-tool',   label: 'Time slider',  icon: <SlidersHorizontal size={17} />, active: showTimeSliderTool, toggle: () => setShowTimeSliderTool(!showTimeSliderTool) },
+                  { id: 'compare-tool',  label: 'Split comparison', icon: <Columns size={17} />, active: isCompareMode, toggle: () => {
+                    const nextVal = !isCompareMode;
+                    setIsCompareMode(nextVal);
+                    if (nextVal) {
+                      if (compareTimelineIndex === selectedTimelineIndex) {
+                        setCompareTimelineIndex((selectedTimelineIndex + 1) % TIMELINE_DATA.length);
+                      }
+                      setActiveDateSlot('B');
+                    } else {
+                      setActiveDateSlot('A');
+                    }
+                  } }];
+  const settings = [
+                  { id: 'farm-data', label: 'Farm data',        icon: <UploadIcon size={17} /> },
+                  { id: 'help',      label: 'Glossary',         icon: <Info size={17} /> }];
+  return { main, tools, settings };
+}
+
+export function renderDashboardSidebar(ctx) {
+  const { activeDateSlot, activeSidebarItem, handleSidebarClick, isCompareMode, setActiveDateSlot, sidebarWidth, startSidebarResize } = ctx;
+  const nav = dashboardNav(ctx);
+  return (
+<aside style={{ '--sidebar-w': `${sidebarWidth}px` }} className="hidden md:flex w-[var(--sidebar-w)] bg-white border-r border-gray-100 flex-col z-50 shadow-sm shrink-0 relative">
+            {/* Draggable vertical divider */}
+            <div 
+              onMouseDown={startSidebarResize} 
+              className="hidden md:block absolute right-[-4px] top-0 bottom-0 w-2 cursor-col-resize hover:bg-green-500/50 active:bg-green-500 transition-colors z-50"
+            />
+            <div className="flex-1 overflow-y-auto py-6 px-2 md:px-4 space-y-8">
+
+              {/* MAIN */}
+              <div className="space-y-1">
+                <div className="hidden md:block text-[11px] font-bold text-gray-600 px-3 mb-3">Main</div>
+                {nav.main.map(item => (
                   <button
                     key={item.id}
                     onClick={() => handleSidebarClick(item.id)}
@@ -234,22 +259,7 @@ export function renderDashboardSidebar(ctx) {
               {/* TOOLS */}
               <div className="space-y-1">
                 <div className="hidden md:block text-[11px] font-bold text-gray-600 px-3 mb-3">Tools</div>
-                {[
-                  { id: 'calendar-tool', label: 'Calendar',     icon: <CalendarIcon size={17} />, active: showCalendarTool, toggle: () => setShowCalendarTool(!showCalendarTool) },
-                  { id: 'slider-tool',   label: 'Time slider',  icon: <SlidersHorizontal size={17} />, active: showTimeSliderTool, toggle: () => setShowTimeSliderTool(!showTimeSliderTool) },
-                  { id: 'compare-tool',  label: 'Split comparison', icon: <Columns size={17} />, active: isCompareMode, toggle: () => {
-                    const nextVal = !isCompareMode;
-                    setIsCompareMode(nextVal);
-                    if (nextVal) {
-                      if (compareTimelineIndex === selectedTimelineIndex) {
-                        setCompareTimelineIndex((selectedTimelineIndex + 1) % TIMELINE_DATA.length);
-                      }
-                      setActiveDateSlot('B');
-                    } else {
-                      setActiveDateSlot('A');
-                    }
-                  } }
-                ].map(item => (
+                {nav.tools.map(item => (
                   <button
                     key={item.id}
                     onClick={item.toggle}
@@ -304,10 +314,7 @@ export function renderDashboardSidebar(ctx) {
               {/* SETTINGS */}
               <div className="space-y-1">
                 <div className="hidden md:block text-[11px] font-bold text-gray-600 px-3 mb-3">Settings</div>
-                {[
-                  { id: 'farm-data', label: 'Farm data',        icon: <UploadIcon size={17} /> },
-                  { id: 'help',      label: 'Glossary',         icon: <Info size={17} /> }
-                ].map(item => (
+                {nav.settings.map(item => (
                   <button
                     key={item.id}
                     onClick={() => handleSidebarClick(item.id)}

@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowLeft, ArrowUp, Bell, FileText, MessageSquare, Plus, Download, LogOut, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ArrowLeft, Bell, FileText, MessageSquare, Download, LogOut, RefreshCw } from 'lucide-react';
 import { serviceCall } from '../../services/serviceClient';
 import { API_BASE } from '../../services/apiBase';
 import { tenantKey } from '../../services/session';
-import AiAnswer from '../../components/ai/AiAnswer';
-import AiThinking from '../../components/ai/AiThinking';
+import AdvisorChat from '../../components/ai/AdvisorChat';
 
 /**
  * Farm advisor: a phone-first expert for this one farm. Ask questions (answers come only from this
@@ -64,98 +63,41 @@ export default function AdvisorApp({ onBack, onSignOut }) {
 
 function AskTab({ prefill, onPrefillUsed }) {
   const [messages, setMessages] = useState(readChat);
-  const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
-  const endRef = useRef(null);
-  const boxRef = useRef(null);
+  const [groups, setGroups] = useState([]);   // the same questions by topic
 
   useEffect(() => {
-    serviceCall('/advisor/suggestions').then((d) => setSuggestions(d?.suggestions || [])).catch(() => setSuggestions([]));
+    serviceCall('/advisor/suggestions').then((d) => { setSuggestions(d?.suggestions || []); setGroups(d?.groups || []); }).catch(() => setSuggestions([]));
   }, []);
-  useEffect(() => { saveChat(messages); endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }); }, [messages]);
-  useEffect(() => {
-    if (prefill) { setInput(prefill); onPrefillUsed(); boxRef.current?.focus(); }
-  }, [prefill, onPrefillUsed]);
-  useEffect(() => {  // grow the box with its text, up to a few lines
-    const el = boxRef.current; if (!el) return;
-    el.style.height = 'auto'; el.style.height = `${Math.min(el.scrollHeight, 160)}px`;
-  }, [input]);
+  useEffect(() => { saveChat(messages); }, [messages]);
+  useEffect(() => { if (prefill) onPrefillUsed(); }, [prefill, onPrefillUsed]);   // the chat has put it in its box
 
-  const send = useCallback(async (text) => {
-    const q = (text ?? input).trim();
-    if (!q || busy) return;
+  const send = useCallback(async (q) => {
+    if (busy) return;
     const history = messages.filter((m) => !m.error).map((m) => ({ role: m.role, content: m.content })).slice(-8);
     setMessages((m) => [...m, { role: 'user', content: q }]);
-    setInput(''); setBusy(true);
+    setBusy(true);
     try {
       const r = await serviceCall('/chat/ask', { method: 'POST', body: { message: q, history } });
-      setMessages((m) => [...m, { role: 'assistant', content: r?.response || 'No answer came back.' }]);
+      setMessages((m) => [...m, { role: 'assistant', content: r?.response || 'No answer came back.', followUps: r?.follow_ups || [] }]);
     } catch (e) {
       setMessages((m) => [...m, { role: 'assistant', error: true, content: e?.message && e.status ? `Could not answer: ${e.message}` : 'No connection. Your question is kept; try again when you are back online.' }]);
     } finally { setBusy(false); }
-  }, [input, busy, messages]);
+  }, [busy, messages]);
 
-  const empty = messages.length === 0;
   return (
-    <div className="h-full flex flex-col">
-      <div className="flex-1 min-h-0 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
-          {empty ? (
-            <div className="pt-6 sm:pt-12 space-y-6">
-              <div>
-                <h2 className="font-display text-2xl font-semibold">Ask about your farm</h2>
-                <p className="text-sm text-gray-500 mt-1">Crop condition, water, alerts, what to do this week. Answers use your farm's satellite readings, alerts, field visits and farm data, and say how recent they are.</p>
-              </div>
-              {suggestions.length > 0 && (
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {suggestions.map((s) => (
-                    <button key={s} type="button" onClick={() => send(s)}
-                      className="text-left text-sm px-4 py-3 rounded-xl border border-gray-200 hover:bg-gray-50 active:bg-gray-100">{s}</button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ) : messages.map((m, i) => (
-            m.role === 'user' ? (
-              <div key={i} className="flex justify-end">
-                <div className="max-w-[85%] rounded-2xl rounded-br-md bg-gray-100 px-4 py-2.5 text-[15px] whitespace-pre-wrap">{m.content}</div>
-              </div>
-            ) : (
-              <div key={i} className="space-y-2">
-                <div className={`text-[15px] leading-relaxed space-y-3 ${m.error ? 'text-red-700' : 'text-gray-900'}`}><AiAnswer text={m.content} /></div>
-              </div>
-            )
-          ))}
-          {busy && <AiThinking kind="farm" />}
-          <div ref={endRef} />
+    <AdvisorChat
+      messages={messages.map((m) => ({ role: m.role, text: m.content, followUps: m.followUps, error: m.error }))}
+      busy={busy} onAsk={send} onNew={() => { setMessages([]); saveChat([]); }}
+      groups={groups} suggestions={suggestions} about="Farm advisor" prefill={prefill}
+      intro={(
+        <div>
+          <h2 className="font-display text-2xl font-semibold">Ask about your farm</h2>
+          <p className="text-sm text-gray-500 mt-1">Crop condition, water, alerts, what to do this week. Answers use your farm's satellite readings, alerts, field visits and farm data, and say how recent they are.</p>
         </div>
-      </div>
-
-      <div className="shrink-0 border-t border-gray-100 bg-white">
-        <div className="max-w-3xl mx-auto px-4 py-3">
-          {!empty && suggestions.length > 0 && !busy && (
-            <div className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1 [scrollbar-width:none]">
-              {suggestions.slice(0, 4).map((s) => (
-                <button key={s} type="button" onClick={() => send(s)} className="shrink-0 text-xs px-3 py-1.5 rounded-full border border-gray-200 text-gray-700 hover:bg-gray-50">{s}</button>
-              ))}
-            </div>
-          )}
-          <form onSubmit={(e) => { e.preventDefault(); send(); }} className="flex items-end gap-2 rounded-2xl border border-gray-300 px-3 py-2 focus-within:border-green-700">
-            {!empty && (
-              <button type="button" onClick={() => { setMessages([]); saveChat([]); }} aria-label="New conversation" title="New conversation" className="p-1.5 rounded-lg text-gray-500 hover:bg-gray-100"><Plus size={18} /></button>
-            )}
-            <textarea ref={boxRef} rows={1} value={input} onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(min-width: 640px)').matches) { e.preventDefault(); send(); } }}
-              placeholder="Ask about your farm" aria-label="Your question"
-              className="flex-1 resize-none bg-transparent outline-none text-[16px] py-1.5 max-h-40" />
-            <button type="submit" disabled={!input.trim() || busy} aria-label="Send"
-              className="w-9 h-9 rounded-full flex items-center justify-center bg-[var(--brand-primary)] text-white disabled:bg-gray-200 disabled:text-gray-400"><ArrowUp size={18} /></button>
-          </form>
-          <p className="text-[11px] text-gray-400 mt-1.5 text-center">The advisor can be wrong. Check important decisions in the field.</p>
-        </div>
-      </div>
-    </div>
+      )}
+    />
   );
 }
 

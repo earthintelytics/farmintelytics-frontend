@@ -1,10 +1,11 @@
 /** Plain words for suitability classes and run status, and the crops (identity only). */
 
+// hex: the class colours of the maps and the report (report_engine/suitability.py CLASS_WORDS).
 export const CLASSES = [
-  { key: 'S1', label: 'Well suited', tone: 'good', bar: 'bg-green-700' },
-  { key: 'S2', label: 'Suited', tone: 'good', bar: 'bg-green-400' },
-  { key: 'S3', label: 'Marginal', tone: 'warning', bar: 'bg-amber-400' },
-  { key: 'N', label: 'Not suited', tone: 'critical', bar: 'bg-red-500' },
+  { key: 'S1', label: 'Well suited', tone: 'good', bar: 'bg-green-700', hex: '#2E7D32' },
+  { key: 'S2', label: 'Suited', tone: 'good', bar: 'bg-green-400', hex: '#7CB342' },
+  { key: 'S3', label: 'Marginal', tone: 'warning', bar: 'bg-amber-400', hex: '#FBC02D' },
+  { key: 'N', label: 'Not suited', tone: 'critical', bar: 'bg-red-500', hex: '#C62828' },
 ];
 const EXTRA = { N1: 'Not suited now (fixable with investment)', N2: 'Not suited' };
 export const classLabel = (k) => EXTRA[k] || CLASSES.find((c) => c.key === k)?.label || k || '—';

@@ -13,12 +13,11 @@ export default function SuitabilityHeader({
   deleting = false,
 }) {
   const crop = cropName(run?.crop);
-  const fields = run?.fields || [];
 
   return (
     <header className="md:h-[72px] bg-white border-b border-gray-100 flex flex-wrap md:flex-nowrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3 md:py-0 md:px-6 lg:px-8 z-[100] shadow-sm shrink-0">
       {/* Brand & Run Identity */}
-      <div className="flex items-center gap-3 lg:gap-6 min-w-0">
+      <div className="flex flex-1 md:flex-none items-center gap-3 lg:gap-6 min-w-0">
         <button
           onClick={onBack}
           title="Back to all analyses"
@@ -49,11 +48,37 @@ export default function SuitabilityHeader({
 
       {/* Right Controls: Area selector & Delete run action */}
       <div className="flex items-center gap-2 md:gap-3 min-w-0">
-        {fields.length > 0 && onSelectArea && (
+        {/* The area picker: here on a wide screen; on a phone it sits at the top of the Assessment view. */}
+        <span className="hidden md:block"><AreaPicker run={run} value={selectedAreaId} onChange={onSelectArea} /></span>
+
+        {onDeleteRun && (
+          <button
+            type="button"
+            onClick={onDeleteRun}
+            disabled={deleting}
+            title="Delete this analysis run and artifacts"
+            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl border border-gray-200 transition-colors disabled:opacity-50"
+          >
+            <Trash2 size={16} />
+          </button>
+        )}
+      </div>
+    </header>
+  );
+}
+
+
+/** Which plot or block the result shows ("All areas" or one field), for the header and the phone view. */
+export function AreaPicker({ run, value = '', onChange, className = '' }) {
+  const fields = run?.fields || [];
+  if (!fields.length || !onChange) return null;
+  const selectedAreaId = value;
+  const onSelectArea = onChange;
+  return (
           <select
             value={selectedAreaId}
             onChange={(e) => onSelectArea(e.target.value)}
-            className="max-w-[10rem] md:max-w-none bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-700 rounded-xl px-3 py-2 focus:outline-none focus:border-green-600 cursor-pointer shadow-2xs"
+            className={`max-w-full md:max-w-none bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-700 rounded-xl px-3 py-2 focus:outline-none focus:border-green-600 cursor-pointer shadow-2xs ${className}`}
             title="Filter by specific plot/block"
           >
             <option value="">All Areas ({fields.length} plots · {Math.round(Number(run?.total_area_ha || 0)).toLocaleString()} ha)</option>
@@ -69,20 +94,5 @@ export default function SuitabilityHeader({
               );
             })}
           </select>
-        )}
-
-        {onDeleteRun && (
-          <button
-            type="button"
-            onClick={onDeleteRun}
-            disabled={deleting}
-            title="Delete this analysis run and artifacts"
-            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl border border-gray-200 transition-colors disabled:opacity-50"
-          >
-            <Trash2 size={16} />
-          </button>
-        )}
-      </div>
-    </header>
   );
 }

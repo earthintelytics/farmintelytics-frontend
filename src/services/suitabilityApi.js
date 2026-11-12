@@ -114,6 +114,22 @@ export const askPublicSuitabilityAi = async (token, question) => {
   return res.json();
 };
 
+/** Questions the AI can answer about a result, for the team (by run) or a client (by share link): {suggestions, groups}. */
+export const fetchSuitabilitySuggestions = async (run) => {
+  const none = { suggestions: [], groups: [] };
+  let r;
+  if (run?.share_token) {
+    const res = await fetch(`${API_BASE}/public/suitability/${encodeURIComponent(run.share_token)}/suggestions`);
+    if (!res.ok) return none;
+    r = await res.json();
+  } else if (run?.run_id) {
+    r = await call(`/runs/${encodeURIComponent(run.run_id)}/suggestions${run.company_id ? `?company_id=${encodeURIComponent(run.company_id)}` : ''}`);
+  } else {
+    return none;
+  }
+  return { suggestions: r?.suggestions || [], groups: r?.groups || [] };
+};
+
 export const publicReportPdfUrl = (token) =>
   `${API_BASE}/public/suitability/${encodeURIComponent(token)}/report.pdf`;
 

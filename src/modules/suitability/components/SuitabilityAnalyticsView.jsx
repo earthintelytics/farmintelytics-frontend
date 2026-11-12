@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { Card, StatusPill, EmptyState } from '../../../components/page/PageKit';
 import { CLASSES, classLabel, cropName, adviceFor } from '../suitabilityLabels';
+import ClassBarChart from './ClassBarChart';
 import { Sparkles, ShieldCheck, Sprout } from 'lucide-react';
 
 const ha = (v) => (v != null ? `${Number(v).toLocaleString(undefined, { maximumFractionDigits: 1 })} ha` : '—');
@@ -103,28 +104,12 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
         <Card className="lg:col-span-5 p-5 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-bold text-gray-900">Suitability Share Distribution</h4>
+              <h4 className="text-sm font-bold text-gray-900">Land in each class</h4>
               <span className="text-xs font-mono text-gray-400 font-semibold">{ha(totalArea)}</span>
             </div>
 
-            {/* Stacked Percentage Bar */}
-            <div className="h-6 w-full rounded-xl overflow-hidden flex shadow-inner bg-gray-100">
-              {CLASSES.map((c) => {
-                const v = Number(run?.classes_area_ha?.[c.key] || 0);
-                const share = totalArea > 0 ? (v / totalArea) * 100 : 0;
-                if (share <= 0) return null;
-                return (
-                  <div
-                    key={c.key}
-                    style={{ width: `${share}%` }}
-                    className={`${c.bar} h-full transition-all flex items-center justify-center text-[10px] font-bold text-white overflow-hidden`}
-                    title={`${c.label} (${c.key}): ${ha(v)} (${Math.round(share)}%)`}
-                  >
-                    {share > 8 ? `${Math.round(share)}%` : ''}
-                  </div>
-                );
-              })}
-            </div>
+            {/* Hectares per class as a bar chart */}
+            <ClassBarChart areas={run?.classes_area_ha} total={totalArea} />
 
             {/* Legend list */}
             <div className="mt-5 space-y-2.5">
@@ -134,7 +119,7 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
                 return (
                   <div key={c.key} className="flex items-center justify-between text-xs">
                     <div className="flex items-center gap-2">
-                      <span className={`w-3 h-3 rounded-xs ${c.bar}`} />
+                      <span className="w-3 h-3 rounded-xs" style={{ background: c.hex }} />
                       <span className="font-semibold text-gray-800">{c.label}</span>
                       <span className="font-mono text-gray-400 text-[11px]">({c.key})</span>
                     </div>
@@ -153,14 +138,14 @@ export default function SuitabilityAnalyticsView({ run, actions, onAskAi }) {
               <div className="bg-gray-50 p-2.5 rounded-xl">
                 <span className="text-gray-500 block text-[11px]">Average Slope</span>
                 <span className="font-mono font-bold text-gray-900 text-sm">{terrainStats.avgSlope}°</span>
-                <span className="text-gray-400 text-[10px] block mt-0.5">Max {terrainStats.maxSlope}°</span>
+                <span className="text-gray-400 text-[11px] block mt-0.5">Max {terrainStats.maxSlope}°</span>
               </div>
               <div className="bg-gray-50 p-2.5 rounded-xl">
                 <span className="text-gray-500 block text-[11px]">Elevation Range</span>
                 <span className="font-mono font-bold text-gray-900 text-sm">
                   {terrainStats.minElev} – {terrainStats.maxElev} m
                 </span>
-                <span className="text-gray-400 text-[10px] block mt-0.5">Above sea level</span>
+                <span className="text-gray-400 text-[11px] block mt-0.5">Above sea level</span>
               </div>
             </div>
           )}

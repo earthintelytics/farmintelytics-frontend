@@ -4,7 +4,7 @@
  * layout's state and helpers it uses as `ctx`.
  */
 import BlockSummaryPage from '../pages/BlockSummaryPage';
-import { Droplets, Sun, TrendingUp, LayoutDashboard, Search, X, RefreshCw, Clock, SlidersHorizontal, Waves, Send } from 'lucide-react';
+import { Droplets, Sun, TrendingUp, LayoutDashboard, Search, X, RefreshCw, Clock, Waves } from 'lucide-react';
 import { Radar } from 'react-chartjs-2';
 import FarmDataPage from '../../../../data/FarmDataPage';
 import RegisterPage from '../../../../services/RegisterPage';
@@ -30,11 +30,10 @@ import EudrPassportPage from '../../../../smallholder/pages/EudrPassportPage';
 import FormsPage from '../../../../forms/FormsPage';
 import SubmissionsPage from '../../../../forms/SubmissionsPage';
 import ScenarioBuilder from '../../../../assistant/ScenarioBuilder';
-import AiAnswer from '../../../../../components/ai/AiAnswer';
-import AiThinking from '../../../../../components/ai/AiThinking';
+import AdvisorChat from '../../../../../components/ai/AdvisorChat';
 
 export function renderDashboardPages(ctx) {
-  const { blockMeasures, TIMELINE_DATA, activeAnalyticsSubpage, activeSidebarItem, activeTab, alerts, answersForm, basemapAttribution, basemapMaxNativeZoom, basemapUrl, blockValue, chatEndRef, chatInput, chatLoading, chatMessages, climateBoundariesOpacity, climatePlotsData, climatePlotsDataA, climatePlotsDataB, climateShowBoundaries, climateShowLayers, cropLabel, cropProfileEntries, cropType, currentTileUrl, currentTileUrlB, currentTimelineA, currentTimelineB, dashboardFilterKeys, dataFocus, defaultMapCenter, dynamicFilterValues, estateOptions, farmBoundary, filterDate, filterEstate, filterPlot, filteredPlotsData, glossaryFocus, handleAcknowledgeAlert, handleChatSubmit, handleEstateChange, handlePlotClick, handlePlotFilterChange, handleSidebarClick, handleSplitDragStart, healthBoundariesOpacity, healthPlotsData, healthPlotsDataA, healthPlotsDataB, healthShowBoundaries, healthShowLayers, intelBoundariesOpacity, intelShowBoundaries, intelShowLayers, isAiOnly, isCompareMode, isOrg, kpiContext, landCover, landCoverLoading, loadIssues, mapOpacity, moistureBoundariesOpacity, moisturePlotsData, moisturePlotsDataA, moisturePlotsDataB, moistureShowBoundaries, moistureShowLayers, nutrientData, overviewTrends, pageSet, pick, pixelTimeseries, plots, plotsData, plotsDataA, plotsDataB, rasterOverlayBounds, renderClimatePolygons, renderFloatingBasemapSelector, renderHealthPolygons, renderInfoTooltip, renderIntelPolygons, renderLegendCards, renderMapBottomPanel, renderMoisturePolygons, renderRestorePolygons, renderYieldPolygons, restorationPlotsData, restorationPlotsDataA, restorationPlotsDataB, restoreBoundariesOpacity, restoreShowBoundaries, restoreShowLayers, scenarioFormOpen, selectedIndex, selectedPlot, service, setActiveAnalyticsSubpage, setActiveSidebarItem, setActiveTab, setAnswersForm, setChatInput, setChatMessages, setClimateBoundariesOpacity, setClimateShowBoundaries, setClimateShowLayers, setDataFocus, setDynamicFilterValues, setFilterDate, setFilterEstate, setFilterPlot, setHealthBoundariesOpacity, setHealthShowBoundaries, setHealthShowLayers, setIntelBoundariesOpacity, setIntelShowBoundaries, setIntelShowLayers, setLoadIssues, setMapOpacity, setMoistureBoundariesOpacity, setMoistureShowBoundaries, setMoistureShowLayers, setRestoreBoundariesOpacity, setRestoreShowBoundaries, setRestoreShowLayers, setScenarioFormOpen, setSelectedPlot, setShowRasterLayer, setYieldBoundariesOpacity, setYieldShowBoundaries, setYieldShowLayers, showRasterLayer, splitPosition, tenant, tenantDisplayName, tileRefreshing, waterDemandData, waterDemandLoading, yieldBoundariesOpacity, yieldPlotsData, yieldPlotsDataA, yieldPlotsDataB, yieldShowBoundaries, yieldShowLayers, zarrBounds } = ctx;
+  const { advisorSuggestions, blockMeasures, TIMELINE_DATA, activeAnalyticsSubpage, activeSidebarItem, activeTab, alerts, answersForm, basemapAttribution, basemapMaxNativeZoom, basemapUrl, blockValue, chatLoading, chatMessages, climateBoundariesOpacity, climatePlotsData, climatePlotsDataA, climatePlotsDataB, climateShowBoundaries, climateShowLayers, cropLabel, cropProfileEntries, cropType, currentTileUrl, currentTileUrlB, currentTimelineA, currentTimelineB, dashboardFilterKeys, dataFocus, defaultMapCenter, dynamicFilterValues, estateOptions, farmBoundary, filterDate, filterEstate, filterPlot, filteredPlotsData, glossaryFocus, handleAcknowledgeAlert, handleChatSubmit, handleEstateChange, handlePlotClick, handlePlotFilterChange, handleSidebarClick, handleSplitDragStart, healthBoundariesOpacity, healthPlotsData, healthPlotsDataA, healthPlotsDataB, healthShowBoundaries, healthShowLayers, intelBoundariesOpacity, intelShowBoundaries, intelShowLayers, isAiOnly, isCompareMode, isOrg, kpiContext, landCover, landCoverLoading, loadIssues, mapOpacity, moistureBoundariesOpacity, moisturePlotsData, moisturePlotsDataA, moisturePlotsDataB, moistureShowBoundaries, moistureShowLayers, nutrientData, overviewTrends, pageSet, pick, pixelTimeseries, plots, plotsData, plotsDataA, plotsDataB, rasterOverlayBounds, renderClimatePolygons, renderFloatingBasemapSelector, renderHealthPolygons, renderInfoTooltip, renderIntelPolygons, renderLegendCards, renderMapBottomPanel, renderMoisturePolygons, renderRestorePolygons, renderYieldPolygons, restorationPlotsData, restorationPlotsDataA, restorationPlotsDataB, restoreBoundariesOpacity, restoreShowBoundaries, restoreShowLayers, scenarioFormOpen, selectedIndex, selectedPlot, service, setActiveAnalyticsSubpage, setActiveSidebarItem, setActiveTab, setAnswersForm, setChatMessages, setClimateBoundariesOpacity, setClimateShowBoundaries, setClimateShowLayers, setDataFocus, setDynamicFilterValues, setFilterDate, setFilterEstate, setFilterPlot, setHealthBoundariesOpacity, setHealthShowBoundaries, setHealthShowLayers, setIntelBoundariesOpacity, setIntelShowBoundaries, setIntelShowLayers, setLoadIssues, setMapOpacity, setMoistureBoundariesOpacity, setMoistureShowBoundaries, setMoistureShowLayers, setRestoreBoundariesOpacity, setRestoreShowBoundaries, setRestoreShowLayers, setScenarioFormOpen, setSelectedPlot, setShowRasterLayer, setYieldBoundariesOpacity, setYieldShowBoundaries, setYieldShowLayers, showRasterLayer, splitPosition, tenant, tenantDisplayName, tileRefreshing, waterDemandData, waterDemandLoading, yieldBoundariesOpacity, yieldPlotsData, yieldPlotsDataA, yieldPlotsDataB, yieldShowBoundaries, yieldShowLayers, zarrBounds } = ctx;
   return (
 <main className={`flex-1 flex flex-col relative bg-white ${['intelligence-layers', 'crop-health', 'crop-yield', 'moisture-content', 'climate', 'land-restoration', 'block-summary'].includes(activeSidebarItem) ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           {loadIssues.length > 0 && (
@@ -442,90 +441,28 @@ export function renderDashboardPages(ctx) {
               AI ASSISTANT
           ══════════════════════════════════════════════════════════════ */}
           {((isAiOnly && activeTab === 'ai-assistant') || (activeSidebarItem === 'analytics' && activeTab === 'ai-assistant')) && (
-            <div className="flex flex-col flex-1 h-full bg-white overflow-hidden">
-              {/* In a conversation: one slim bar to start again (the page title is the header tab). */}
-              {chatMessages.length > 1 && (
-                <div className="px-6 py-3 border-b border-gray-100 flex items-center justify-between shrink-0">
-                  <span className="text-sm font-semibold text-gray-700">Conversation</span>
-                  <button type="button"
-                    onClick={() => setChatMessages([{ sender: 'assistant', text: "Ask about your crop condition, water or weather, or choose a what-if scenario. Answers use your own monitoring data." }])}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-gray-300 text-sm font-semibold text-gray-700 hover:bg-gray-50">
-                    <SlidersHorizontal size={14} className="text-green-700" />New question
-                  </button>
-                </div>
-              )}
-
-              {/* Main Content Area */}
-              <div className="flex-1 overflow-y-auto flex flex-col min-h-0 bg-white">
-                {chatMessages.length === 1 ? (
-                  /* Start page: what-ifs, scrolls from the top so nothing is cut off */
-                  <div className="w-full max-w-4xl mx-auto px-6 py-8">
-                    <ScenarioBuilder
-                      cropType={isOrg ? null : cropType}
-                      serviceId={service?.id}
-                      estates={estateOptions}
-                      onRun={(text, meta) => handleChatSubmit(text, meta)}
-                      onFormOpen={setScenarioFormOpen}
-                    />
-                  </div>
-                ) : (
-                  /* Active Message History */
-                  <div className="flex-1 overflow-y-auto px-6 py-8">
-                    <div className="max-w-3xl mx-auto space-y-6">
-                      {chatMessages.map((msg, idx) => (
-                        <div key={idx} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                          <div className={`max-w-[85%] rounded-2xl text-sm leading-relaxed ${
-                            msg.sender === 'user'
-                              ? 'bg-green-700 text-white rounded-tr-none px-5 py-3.5'
-                              : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none px-5 py-3.5'
-                          }`}>
-                            {msg.sender === 'user' ? <div className="whitespace-pre-wrap">{msg.text}</div> : <AiAnswer text={msg.text} />}
-                          </div>
-                        </div>
-                      ))}
-                      {chatLoading && <div className="flex justify-start"><AiThinking kind="farm" /></div>}
-                      <div ref={chatEndRef} />
-                    </div>
-                  </div>
+            <div className="flex flex-col flex-1 h-full min-h-0 bg-white overflow-hidden">
+              {/* The shared advisor chat; before the first question: the questions by topic and the what-ifs. */}
+              <AdvisorChat
+                messages={chatMessages.slice(1).map((m) => ({ role: m.sender === 'user' ? 'user' : 'assistant', text: m.text, followUps: m.followUps, error: m.error }))}
+                busy={chatLoading}
+                onAsk={(q) => handleChatSubmit(q)}
+                onNew={() => setChatMessages([{ sender: 'assistant', text: "Ask about your crop condition, water or weather, or choose a what-if scenario. Answers use your own monitoring data." }])}
+                groups={advisorSuggestions?.groups}
+                suggestions={advisorSuggestions?.suggestions}
+                about={[tenantDisplayName, service?.title || (cropLabel ? `${cropLabel} monitoring` : '')].filter(Boolean).join(' · ')}
+                placeholder="Ask about your farm, e.g. Which blocks are short of water this month?"
+                hideInput={scenarioFormOpen && chatMessages.length === 1}
+                extra={(
+                  <ScenarioBuilder
+                    cropType={isOrg ? null : cropType}
+                    serviceId={service?.id}
+                    estates={estateOptions}
+                    onRun={(text, meta) => handleChatSubmit(text, meta)}
+                    onFormOpen={setScenarioFormOpen}
+                  />
                 )}
-              </div>
-
-              {/* Bottom Input Area (hidden while a what-if form, which has its own button, is open) */}
-              {!(scenarioFormOpen && chatMessages.length === 1) && (
-              <div className="bg-white px-6 py-4 border-t border-gray-100 shrink-0">
-                <div className="max-w-3xl mx-auto">
-                  <form
-                    onSubmit={(e) => { e.preventDefault(); handleChatSubmit(); }}
-                    className="relative flex flex-col"
-                  >
-                    <textarea
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      disabled={chatLoading}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                          e.preventDefault();
-                          handleChatSubmit();
-                        }
-                      }}
-                      placeholder="Ask about your farm, e.g. Which blocks are short of water this month?"
-                      rows={3}
-                      aria-label="Your question"
-                      className="w-full bg-white border border-gray-300 focus:border-green-700 rounded-2xl py-3.5 pl-4 pr-16 text-sm outline-none text-gray-900 placeholder-gray-400 resize-none disabled:opacity-50"
-                    />
-                    <button
-                      type="submit"
-                      disabled={chatLoading}
-                      className="absolute right-3 bottom-3 w-10 h-10 bg-green-700 hover:bg-green-800 text-white rounded-xl flex items-center justify-center shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
-                      aria-label="Send"
-                    >
-                      <Send size={18} />
-                    </button>
-                  </form>
-                </div>
-              </div>
-              )}
-
+              />
             </div>
           )}
 

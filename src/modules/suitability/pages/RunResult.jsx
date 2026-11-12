@@ -5,7 +5,7 @@ import { ErrorNote } from '../../../components/page/PageKit';
 import { useConfirm } from '../../../components/ConfirmProvider';
 import { CROPS, cropName, isFinished } from '../suitabilityLabels';
 import ShareModal from '../components/ShareModal';
-import SuitabilityHeader from '../components/SuitabilityHeader';
+import SuitabilityHeader, { AreaPicker } from '../components/SuitabilityHeader';
 import SuitabilitySidebar from '../components/SuitabilitySidebar';
 import SuitabilityMapView from '../components/SuitabilityMapView';
 import SuitabilityAnalyticsView from '../components/SuitabilityAnalyticsView';
@@ -177,6 +177,8 @@ export default function RunResult({ runId, companyId, onBack }) {
 
             {/* View Content (Map Studio, Analytics Hub, or Glossary) */}
             <main className="flex-1 h-full overflow-hidden relative flex flex-col">
+              {/* On a phone the area picker is here rather than in the header. */}
+              <div className="md:hidden shrink-0 px-3 pt-2"><AreaPicker run={run} value={selectedAreaId} onChange={setSelectedAreaId} className="w-full" /></div>
               {activeView === 'map-view' ? (
                 <SuitabilityMapView
                   run={run}

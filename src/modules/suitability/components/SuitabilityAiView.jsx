@@ -1,9 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, ArrowRight, Plus, SlidersHorizontal, Sliders } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Sparkles, ArrowRight, Plus, Sliders } from 'lucide-react';
 import { cropName } from '../suitabilityLabels';
-import { askPublicSuitabilityAi, askSuitabilityRun } from '../../../services/suitabilityApi';
-import AiAnswer from '../../../components/ai/AiAnswer';
-import AiThinking from '../../../components/ai/AiThinking';
+import { askPublicSuitabilityAi, askSuitabilityRun, fetchSuitabilitySuggestions } from '../../../services/suitabilityApi';
+import AdvisorChat from '../../../components/ai/AdvisorChat';
 
 /**
  * Questions for land that is not planted yet, built from this analysis: the crop, what limits the land,
@@ -34,193 +33,78 @@ const questionsFor = (run, crop) => {
  */
 export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
   const crop = cropName(run?.crop);
-  const total = Number(run?.total_area_ha) || 0;
-
-  const initialGreeting = `Ask about this ${crop.toLowerCase()} analysis: what limits the land, where to plant, what would change with irrigation or lime. Answers use this analysis only (${Math.round(total).toLocaleString()} ha analysed).`;
   const scenarios = questionsFor(run, crop);
 
-  const [chatMessages, setChatMessages] = useState([
-    { sender: 'assistant', text: initialGreeting },
-  ]);
-  const [chatInput, setChatInput] = useState(preloadedQuestion || '');
-  const [chatLoading, setChatLoading] = useState(false);
+  const [messages, setMessages] = useState([]);   // [{ role, text, followUps?, error? }]
+  const [busy, setBusy] = useState(false);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customPrompt, setCustomPrompt] = useState('');
-  const chatEndRef = useRef(null);
+  const [suggestions, setSuggestions] = useState({ suggestions: [], groups: [] });   // questions the AI can answer about this result
 
   useEffect(() => {
-    if (preloadedQuestion) {
-      setChatInput(preloadedQuestion);
-    }
-  }, [preloadedQuestion]);
+    let live = true;
+    fetchSuitabilitySuggestions(run).then((s) => { if (live) setSuggestions(s); }).catch(() => {});
+    return () => { live = false; };
+  }, [run]);
 
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [chatMessages, chatLoading]);
-
-  const handleChatSubmit = async (textToSend) => {
-    const q = (textToSend || chatInput).trim();
-    if (!q || chatLoading) return;
-
-    setChatMessages((prev) => [...prev, { sender: 'user', text: q }]);
-    setChatInput('');
-    setChatLoading(true);
-
+  const ask = async (q) => {
+    if (!q || busy) return;
+    setMessages((prev) => [...prev, { role: 'user', text: q }]);
+    setBusy(true);
     try {
-      // Real AI only, answering from this result; never a made-up answer (the old local "synthesis" invented figures).
+      // Real AI only, answering from this result; never a made-up answer.
       const res = run?.share_token
         ? await askPublicSuitabilityAi(run.share_token, q)
         : await askSuitabilityRun(run?.run_id, q, run?.company_id);
-      setChatMessages((prev) => [
-        ...prev,
-        { sender: 'assistant', text: res?.answer || res?.response || 'No answer came back. Try again.' },
-      ]);
+      setMessages((prev) => [...prev, { role: 'assistant', text: res?.answer || res?.response || 'No answer came back. Try again.', followUps: res?.follow_ups || [] }]);
     } catch (err) {
-      setChatMessages((prev) => [
-        ...prev,
-        { sender: 'assistant', text: err.message || 'The AI could not answer just now. Try again in a moment.' },
-      ]);
+      setMessages((prev) => [...prev, { role: 'assistant', error: true, text: err.message || 'The AI could not answer just now. Try again in a moment.' }]);
     } finally {
-      setChatLoading(false);
+      setBusy(false);
     }
   };
 
   return (
-    <div className="flex flex-col flex-1 h-full bg-white overflow-hidden font-sans">
-      {/* If conversation active: top bar to reset */}
-      {chatMessages.length > 1 && (
-        <div className="px-6 py-3 border-b border-gray-100 flex items-center justify-between shrink-0 bg-white">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-gray-700">Questions about this analysis</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => setChatMessages([{ sender: 'assistant', text: initialGreeting }])}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-gray-300 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-all shadow-xs"
-          >
-            <SlidersHorizontal size={13} className="text-green-700" />
-            <span>New question or what-if</span>
-          </button>
-        </div>
-      )}
-
-      {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto flex flex-col min-h-0 bg-white">
-        {chatMessages.length === 1 ? (
-          /* ── START PAGE (Matches Screenshot 3) ── */
-          <div className="w-full max-w-4xl mx-auto px-6 lg:px-8 py-10 space-y-6">
-            {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-              <div>
-                <h2 className="font-display text-2xl font-bold text-gray-900 tracking-tight">
-                  Ask, or try a what-if
-                </h2>
-                <p className="text-xs text-gray-500 mt-1 max-w-2xl font-medium">
-                  Type a question below, or pick one. Answers use this analysis only.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowCustomModal(true)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 inline-flex items-center gap-1.5 shrink-0 transition-all shadow-xs cursor-pointer"
-              >
-                <Plus size={14} className="text-green-700" />
-                <span>Describe your own</span>
-              </button>
+    <div className="flex flex-col flex-1 h-full min-h-0 bg-white overflow-hidden font-sans">
+      <AdvisorChat
+        messages={messages} busy={busy} onAsk={ask} onNew={() => setMessages([])}
+        groups={suggestions.groups} suggestions={suggestions.suggestions}
+        about={`${crop} suitability`} thinkingKind="suitability" prefill={preloadedQuestion}
+        placeholder="Ask about this land, e.g. Which fields are best for planting?"
+        intro={(
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+            <div>
+              <h2 className="font-display text-2xl font-bold text-gray-900 tracking-tight">Ask, or try a what-if</h2>
+              <p className="text-sm text-gray-500 mt-1">Type a question below, or pick one. Answers use this analysis only.</p>
             </div>
-
-            {/* 2-Column Grid of What-If Cards (Matches Screenshot 3) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
+            <button type="button" onClick={() => setShowCustomModal(true)}
+              className="px-4 py-2 rounded-xl text-xs font-semibold text-gray-700 bg-white border border-gray-300 hover:bg-gray-50 inline-flex items-center gap-1.5 shrink-0 self-start sm:self-auto">
+              <Plus size={14} className="text-green-700" /><span>Describe your own what-if</span>
+            </button>
+          </div>
+        )}
+        extra={scenarios.length > 0 && (
+          <div className="space-y-3">
+            <p className="text-sm font-semibold text-gray-800">What-ifs for this land</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {scenarios.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  onClick={() => handleChatSubmit(s.question)}
-                  className="min-w-0 text-left p-5 bg-white border border-gray-200 hover:border-green-600 rounded-2xl flex flex-col gap-3 group transition-colors"
-                >
+                <button key={s.id} type="button" onClick={() => ask(s.question)}
+                  className="min-w-0 text-left p-4 bg-white border border-gray-200 hover:border-green-600 rounded-2xl flex flex-col gap-2 group transition-colors">
                   <span className="flex items-center gap-2.5">
-                    <span className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-700 shrink-0">
-                      <Sparkles size={16} />
-                    </span>
+                    <span className="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center text-green-700 shrink-0"><Sparkles size={16} /></span>
                     <span className="text-sm font-bold text-gray-900">{s.title}</span>
                   </span>
                   <span className="text-xs text-gray-600 leading-relaxed">{s.desc}</span>
-                  <span className="w-full mt-auto pt-3 border-t border-gray-100 flex items-center justify-end text-xs">
-                    <span className="flex items-center gap-1 font-semibold text-green-800 group-hover:text-green-950">
-                      Ask now<ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
-                    </span>
+                  <span className="flex items-center justify-end gap-1 text-xs font-semibold text-green-800 group-hover:text-green-950">
+                    Ask now<ArrowRight size={13} className="group-hover:translate-x-0.5 transition-transform" />
                   </span>
                 </button>
               ))}
             </div>
           </div>
-        ) : (
-          /* ── ACTIVE CHAT MESSAGE HISTORY (Matches Screenshot 3) ── */
-          <div className="flex-1 overflow-y-auto px-6 py-8">
-            <div className="max-w-3xl mx-auto space-y-6">
-              {chatMessages.map((msg, idx) => (
-                <div
-                  key={idx}
-                  className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className={`max-w-[85%] rounded-2xl text-xs sm:text-sm leading-relaxed ${
-                      msg.sender === 'user'
-                        ? 'bg-green-700 text-white rounded-tr-none px-5 py-3.5 shadow-xs'
-                        : 'bg-white border border-gray-200 text-gray-800 rounded-tl-none px-5 py-3.5 shadow-2xs'
-                    }`}
-                  >
-                    {msg.sender === 'user' ? <div className="whitespace-pre-wrap">{msg.text}</div> : <AiAnswer text={msg.text} />}
-                  </div>
-                </div>
-              ))}
-
-              {chatLoading && <div className="flex justify-start"><AiThinking kind="suitability" /></div>}
-              <div ref={chatEndRef} />
-            </div>
-          </div>
         )}
-      </div>
+      />
 
-      {/* ── BOTTOM CHAT BAR (Matches Screenshot 3) ── */}
-      <div className="bg-white px-6 py-4 border-t border-gray-100 shrink-0">
-        <div className="max-w-3xl mx-auto">
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              handleChatSubmit();
-            }}
-            className="relative flex flex-col"
-          >
-            <textarea
-              value={chatInput}
-              onChange={(e) => setChatInput(e.target.value)}
-              disabled={chatLoading}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleChatSubmit();
-                }
-              }}
-              placeholder="Ask about this land, e.g. Which fields are best for planting, and what limits the rest?"
-              rows={3}
-              aria-label="Your question"
-              className="w-full bg-white border border-gray-300 focus:border-green-700 rounded-2xl py-3.5 pl-4 pr-16 text-xs sm:text-sm outline-none text-gray-900 placeholder-gray-400 resize-none disabled:opacity-50"
-            />
-            <button
-              type="submit"
-              disabled={chatLoading || !chatInput.trim()}
-              className="absolute right-3 bottom-3 w-10 h-10 bg-green-700 hover:bg-green-800 text-white rounded-xl flex items-center justify-center shrink-0 disabled:opacity-40 disabled:cursor-not-allowed transition-all shadow-xs cursor-pointer"
-              aria-label="Send"
-            >
-              <Send size={16} />
-            </button>
-          </form>
-        </div>
-      </div>
-
-      {/* ── MODAL: DESCRIBE YOUR OWN WHAT-IF ── */}
       {showCustomModal && (
         <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-xl border border-gray-200">
@@ -263,7 +147,7 @@ export default function SuitabilityAiView({ run, preloadedQuestion = '' }) {
                   const q = customPrompt.trim();
                   setShowCustomModal(false);
                   setCustomPrompt('');
-                  handleChatSubmit(q);
+                  ask(q);
                 }}
                 className="px-4 py-2 rounded-xl text-xs font-semibold bg-green-700 text-white hover:bg-green-800 disabled:opacity-50"
               >

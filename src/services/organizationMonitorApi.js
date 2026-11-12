@@ -447,6 +447,12 @@ export async function fetchFarmBoundary() {
  * Returns { response: string, sources: string[] }
  */
 // opts: { history: [{ role: 'user'|'assistant', content }], module, style: 'conversation' } (all optional)
+/** Questions the advisor can answer for this farm and service (made from its own data): a flat list and by topic. */
+export async function getAdvisorSuggestions(module = null) {
+  const r = await apiFetch(`/advisor/suggestions${module ? `?module=${encodeURIComponent(module)}` : ''}`);
+  return { suggestions: r?.suggestions || [], groups: r?.groups || [] };
+}
+
 export async function queryAiAgent(question, opts = {}) {
   return apiFetch('/ai/query', {
     method: 'POST',
