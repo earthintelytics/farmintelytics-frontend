@@ -180,6 +180,7 @@ export default function FfbControlPlane() {
                 <th className="px-4 py-3">Organisation</th>
                 <th className="px-4 py-3">Direct FFB Portal Link</th>
                 <th className="px-4 py-3">Workforce</th>
+                <th className="px-4 py-3">Devices</th>
                 <th className="px-4 py-3">Fishnet Cells</th>
                 <th className="px-4 py-3">Records</th>
                 <th className="px-4 py-3 text-right">Mobile Provisioning</th>
@@ -187,7 +188,7 @@ export default function FfbControlPlane() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {orgs.length === 0 ? (
-                <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">No organisations have FFB licensed yet. Enable it under Organisations → Licence.</td></tr>
+                <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">No organisations have FFB licensed yet. Enable it under Organisations → Licence.</td></tr>
               ) : orgs.map((o) => {
                 const portalUrl = `${config?.portal_url || window.location.origin}/org/${o.company_id}/ffb-counter`;
                 const loginUrl = `${config?.portal_url || window.location.origin}/org/${o.company_id}/login?next=ffb-counter`;
@@ -210,6 +211,7 @@ export default function FfbControlPlane() {
                       </button>
                     </td>
                     <td className="px-4 py-3 font-mono">{o.employees}</td>
+                    <td className="px-4 py-3 font-mono">{o.devices ?? 0}</td>
                     <td className="px-4 py-3 font-mono">{o.grid_cells}</td>
                     <td className="px-4 py-3 font-mono">{o.records}</td>
                     <td className="px-4 py-3 text-right">

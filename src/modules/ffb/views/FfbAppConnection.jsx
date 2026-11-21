@@ -237,30 +237,50 @@ export default function FfbAppConnection({ tenantSlug }) {
 
                 {devices.length === 0 ? (
                   <div className="p-6 text-center text-xs text-[var(--text-muted)]">
-                    No mobile syncs recorded for <span className="font-mono font-normal">{pack.display_name || pack.company_id}</span> yet. Once a field operator connects with your Organisation Access Code and syncs field bunches, their device ID appears here.
+                    No field devices linked to <span className="font-mono font-normal">{pack.display_name || pack.company_id}</span> yet. Once a phone enters your Organisation Access Code or signs in, it registers here immediately.
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
                       <thead className="bg-[var(--bg-subtle)] text-[var(--text-muted)] border-b border-[var(--border-light)]">
                         <tr>
-                          <th className="px-4 py-2.5 font-normal">Device ID</th>
+                          <th className="px-4 py-2.5 font-normal">Device</th>
+                          <th className="px-4 py-2.5 font-normal">Status</th>
                           <th className="px-4 py-2.5 font-normal">Worker ID</th>
                           <th className="px-4 py-2.5 font-normal">Synced Scans</th>
-                          <th className="px-4 py-2.5 font-normal">Last Sync</th>
+                          <th className="px-4 py-2.5 font-normal">Last Active</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
-                        {devices.map((d, idx) => (
-                          <tr key={`${d.device_id}-${d.clerk_id}-${idx}`}>
-                            <td className="px-4 py-2.5 font-mono font-medium text-gray-900">{d.device_id}</td>
-                            <td className="px-4 py-2.5 font-mono text-gray-700">{d.clerk_id || '—'}</td>
-                            <td className="px-4 py-2.5 font-normal text-gray-900">{d.scans}</td>
-                            <td className="px-4 py-2.5 text-gray-600">
-                              {d.last_sync_at ? new Date(d.last_sync_at).toLocaleString() : '—'}
-                            </td>
-                          </tr>
-                        ))}
+                        {devices.map((d, idx) => {
+                          const st = d.status || (d.scans > 0 ? 'active' : 'connected');
+                          const badge = st === 'active'
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : st === 'signed_in'
+                              ? 'bg-blue-50 text-blue-700'
+                              : 'bg-gray-100 text-gray-700';
+                          const stLabel = st === 'active' ? 'Syncing' : st === 'signed_in' ? 'Signed In' : 'Linked';
+                          return (
+                            <tr key={`${d.device_id}-${d.clerk_id}-${idx}`}>
+                              <td className="px-4 py-2.5">
+                                <p className="font-mono font-medium text-gray-900">{d.device_id}</p>
+                                {(d.device_name || d.app_version) && (
+                                  <p className="text-[11px] text-gray-500">
+                                    {[d.device_name, d.app_version ? `v${d.app_version}` : ''].filter(Boolean).join(' · ')}
+                                  </p>
+                                )}
+                              </td>
+                              <td className="px-4 py-2.5">
+                                <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${badge}`}>{stLabel}</span>
+                              </td>
+                              <td className="px-4 py-2.5 font-mono text-gray-700">{d.clerk_id || '—'}</td>
+                              <td className="px-4 py-2.5 font-normal text-gray-900">{d.scans ?? 0}</td>
+                              <td className="px-4 py-2.5 text-gray-600">
+                                {(d.last_sync_at || d.last_seen_at) ? new Date(d.last_sync_at || d.last_seen_at).toLocaleString() : '—'}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
