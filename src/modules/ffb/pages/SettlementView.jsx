@@ -22,7 +22,7 @@ const EXPORT_COLS = [
 ];
 
 const label = { fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' };
-const input = { width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600 };
+const input = { width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400 };
 
 const fmtWhen = (iso) => {
   if (!iso) return '';
@@ -229,7 +229,7 @@ export function SettlementView() {
                 {c.value} <span style={{ fontSize: '13px', fontWeight: 500, color: c.danger ? '#B91C1C' : '#64748B' }}>{c.unit}</span>
               </div>
               <div style={{ fontSize: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '6px', color: c.danger ? '#B91C1C' : '#0F172A' }}>{c.label}</div>
-              <div style={{ fontSize: '12px', fontWeight: 600, marginTop: '2px', color: c.danger ? '#B91C1C' : '#64748B' }}>{c.sub}</div>
+              <div style={{ fontSize: '12px', fontWeight: 400, marginTop: '2px', color: c.danger ? '#B91C1C' : '#64748B' }}>{c.sub}</div>
             </div>
           </div>
         ))}

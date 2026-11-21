@@ -4,7 +4,7 @@ import { API } from '../services/api';
 import { LOGO_ICON } from '../utils/icons';
 import { fmtNumber } from '../utils/formatters';
 
-// Public page (no sign-in): choose one or more harvesting clerks (the recorders) from a searchable dropdown, pick dates (the last
+// Public page (no sign-in): choose one or more harvester roles (the recorders) from a searchable dropdown, pick dates (the last
 // 30 days), and see what each clerk recorded in four tabs: Approved (the default), Pending, Mismatch and Rejected. The
 // server returns totals only (see api/route/public_lookup.py).
 
@@ -16,7 +16,7 @@ const INK = '#0f172a';
 const TABS = [['approved', 'Approved', GREEN], ['pending', 'Pending', AMBER], ['mismatch', 'Mismatch', RED], ['rejected', 'Rejected', SLATE]];
 
 const label = { fontSize: '12px', fontWeight: 500, color: INK, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: '6px', display: 'block' };
-const field = { width: '100%', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '10px 12px', fontSize: '15px', fontWeight: 600, color: INK, background: '#ffffff', fontFamily: 'inherit' };
+const field = { width: '100%', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '10px 12px', fontSize: '15px', fontWeight: 400, color: INK, background: '#ffffff', fontFamily: 'inherit' };
 const th = { textAlign: 'left', fontSize: '12px', fontWeight: 500, color: INK, textTransform: 'uppercase', letterSpacing: '0.03em', padding: '12px 14px', borderBottom: `2px solid ${INK}` };
 const num = { textAlign: 'right' };
 const td = { padding: '13px 14px', fontSize: '14px', color: INK, borderBottom: '1px solid #e2e8f0' };
@@ -38,7 +38,7 @@ const isZero = (v) => !Number(v);
 const PAGE_SIZE_PHONE = 5;
 const PAGE_SIZE_COMPUTER = 20;
 
-// The clerks' rows of one status, and how many different clerks have something in it (a clerk counts once, however
+// The clerks' rows of one status, and how many different operators have something in it (a clerk counts once, however
 // many records they have).
 const rowsOf = (data, status) => data.clerks.map(c => (status === 'approved' ? c : { ...c, ...(c.by_status?.[status] || { workers: 0, plots: [], lines: [], total: { records: 0, bunches: 0, unripe: 0, rotten: 0, kg: 0 } }) }));
 // The printout: each clerk is their own table (name at the top), one line per record.
@@ -55,8 +55,8 @@ const linesOfClerk = (c) => TABS.flatMap(([key, name], order) =>
   ((key === 'approved' ? c.lines : c.by_status?.[key]?.lines) || []).map(l => ({ ...l, status: name, order })))
   .sort((x, y) => x.order - y.order || String(x.time).localeCompare(String(y.time)));
 
-function PrintedLines({ clerks }) {
-  const blocks = clerks.map(c => ({ ...c, all: linesOfClerk(c) })).filter(c => c.all.length > 0);
+function PrintedLines({ operators }) {
+  const blocks = operators.map(c => ({ ...c, all: linesOfClerk(c) })).filter(c => c.all.length > 0);
   if (blocks.length === 0) return <p style={{ fontSize: '13px', fontWeight: 500 }}>No records on these dates.</p>;
   return blocks.map(c => {
     const counts = TABS.map(([, name]) => [name, c.all.filter(l => l.status === name).length]).filter(([, n]) => n > 0);
@@ -64,7 +64,7 @@ function PrintedLines({ clerks }) {
       <div key={c.clerk_id} className="lk-clerk-block">
         <div className="lk-clerk-head">
           {c.name || 'Clerk'} · {c.clerk_id}
-          <span style={{ fontWeight: 600 }}> · {c.all.length} record{c.all.length === 1 ? '' : 's'} ({counts.map(([n, k]) => `${k} ${n.toLowerCase()}`).join(', ')})</span>
+          <span style={{ fontWeight: 400 }}> · {c.all.length} record{c.all.length === 1 ? '' : 's'} ({counts.map(([n, k]) => `${k} ${n.toLowerCase()}`).join(', ')})</span>
         </div>
         <table data-no-tools className="lk-lines">
           <thead>
@@ -112,7 +112,7 @@ function AggTable({ rows, empty, phone, onlyWithRecords }) {
         <tbody>
           {shown.map((w, i) => (
             <tr key={w.clerk_id} className={Math.floor(i / size) === current ? undefined : 'lk-pg-hide'}>
-              <td data-label="Clerk" style={td}><span><span style={{ fontWeight: 500 }}>{w.name || 'Clerk'}</span> <span style={{ fontWeight: 600 }}>· {w.clerk_id}</span></span></td>
+              <td data-label="Clerk" style={td}><span><span style={{ fontWeight: 500 }}>{w.name || 'Clerk'}</span> <span style={{ fontWeight: 400 }}>· {w.clerk_id}</span></span></td>
               <td data-label="Plots" data-empty={w.plots?.length ? undefined : '1'} style={td}>{w.plots?.length ? w.plots.join(', ') : '—'}</td>
               <td data-label="Workers" data-empty={isZero(w.workers) ? '1' : undefined} style={{ ...td, ...num, fontWeight: isZero(w.workers) ? 600 : 800 }}>{isZero(w.workers) ? '—' : fmtNumber(w.workers)}</td>
               {NUM_COLS.map(k => (
@@ -161,7 +161,7 @@ tr.lk-pg-hide { display: none !important; }
   .lk-stack thead { display: none; }
   .lk-stack tr { display: block; padding: 10px 0; border-bottom: 1px solid #cbd5e1; }
   .lk-stack td { display: flex; justify-content: space-between; gap: 16px; padding: 4px 0 !important; border-bottom: none !important; text-align: right !important; }
-  .lk-stack td::before { content: attr(data-label); font-weight: 800; text-align: left; flex: 0 0 auto; }
+  .lk-stack td::before { content: attr(data-label); font-weight: 500; text-align: left; flex: 0 0 auto; }
   .lk-stack td[data-empty="1"] { display: none; }
 }
 @media print {
@@ -178,12 +178,12 @@ tr.lk-pg-hide { display: none !important; }
   .lk-page { padding: 0 !important; max-width: none !important; }
   .lk-clerk-block { margin: 0 0 18px; }
   /* The clerk's name: a grey band above their table. */
-  .lk-clerk-head { font-size: 13px; font-weight: 900; color: #0f172a !important; background: #e5e7eb !important; border: 1.5px solid #111827; border-bottom: none;
+  .lk-clerk-head { font-size: 13px; font-weight: 500; color: #0f172a !important; background: #e5e7eb !important; border: 1.5px solid #111827; border-bottom: none;
                    padding: 7px 8px; break-after: avoid; }
   .lk-lines { width: 100%; border-collapse: collapse !important; border: 1.5px solid #111827 !important; font-size: 10px; }
   /* Grey heading row and clear, dark grid lines (forced over the portal's own table styles). */
   .lk-lines th { background: #d1d5db !important; color: #0f172a !important; border: 1px solid #111827 !important; padding: 6px !important;
-                 text-align: left; font-size: 9.5px !important; font-weight: 900 !important; text-transform: uppercase; }
+                 text-align: left; font-size: 9.5px !important; font-weight: 500 !important; text-transform: uppercase; }
   .lk-lines td { background: #ffffff !important; color: #0f172a !important; border: 1px solid #4b5563 !important; padding: 5px 6px !important; vertical-align: top; }
   .lk-lines tbody tr:nth-child(even) td { background: #f3f4f6 !important; }   /* every other line in light grey */
   .lk-lines .lk-num { text-align: right !important; white-space: nowrap; }
@@ -207,9 +207,9 @@ tr.lk-pg-hide { display: none !important; }
   tr { break-inside: avoid; }
 }`;
 
-// The dropdown of harvesting clerks: always the current list (read from the server each time the page opens and each
-// time the list is opened). It shows names only; an ID appears only when two clerks share a name. Typing a name (or an
-// ID) filters the list and shows the matching letters in bold. Chosen clerks come first. Several can be chosen; with
+// The dropdown of harvester roles: always the current list (read from the server each time the page opens and each
+// time the list is opened). It shows names only; an ID appears only when two operators share a name. Typing a name (or an
+// ID) filters the list and shows the matching letters in bold. Chosen operators come first. Several can be chosen; with
 // many chosen the box shows two names and "+N more". Done closes the list and runs the search. Big tap targets and a
 // 16 px search box so a phone neither zooms in nor mis-taps.
 const CHIPS_SHOWN = 2;
@@ -229,7 +229,7 @@ function ClerkPicker({ options, selected, onChange, status, onOpen, onRetry, onD
   const box = useRef(null);
   const activeRow = useRef(null);
 
-  // A name is enough, unless two clerks share it: then the ID tells them apart.
+  // A name is enough, unless two operators share it: then the ID tells them apart.
   const labelOf = useMemo(() => {
     const seen = new Map();
     options.forEach(o => seen.set(o.name.toLowerCase(), (seen.get(o.name.toLowerCase()) || 0) + 1));
@@ -237,7 +237,7 @@ function ClerkPicker({ options, selected, onChange, status, onOpen, onRetry, onD
     return (id) => byId.get(id) || id;
   }, [options]);
 
-  // What the list shows: matches for the typed text (name or ID), or everyone with the chosen clerks first.
+  // What the list shows: matches for the typed text (name or ID), or everyone with the chosen operators first.
   const typed = text.trim().toLowerCase();
   const rows = useMemo(() => {
     if (typed) return options.filter(o => `${o.name} ${o.clerk_id}`.toLowerCase().includes(typed));
@@ -295,8 +295,8 @@ function ClerkPicker({ options, selected, onChange, status, onOpen, onRetry, onD
           className="lk-combo-input" role="combobox" aria-expanded={open} aria-controls="clerk-list" aria-autocomplete="list" autoComplete="off"
           value={text} disabled={loadingList}
           onChange={(e) => { setText(e.target.value); setActive(0); show(); }} onFocus={show} onKeyDown={onKey}
-          placeholder={loadingList ? 'Loading the clerks...' : selected.length ? 'Add another clerk' : 'Search a clerk by name'}
-          style={{ flex: '1 1 140px', minWidth: '120px', border: 'none', outline: 'none', background: 'transparent', fontSize: '15px', fontWeight: 600, color: INK, fontFamily: 'inherit', padding: '8px 4px' }}
+          placeholder={loadingList ? 'Loading the operators...' : selected.length ? 'Add another clerk' : 'Search a clerk by name'}
+          style={{ flex: '1 1 140px', minWidth: '120px', border: 'none', outline: 'none', background: 'transparent', fontSize: '15px', fontWeight: 400, color: INK, fontFamily: 'inherit', padding: '8px 4px' }}
         />
         <ChevronDown size={18} color={INK} style={{ flex: '0 0 auto', transform: open ? 'rotate(180deg)' : 'none' }} aria-hidden="true" />
       </div>
@@ -310,13 +310,13 @@ function ClerkPicker({ options, selected, onChange, status, onOpen, onRetry, onD
           ) : (
             <ul id="clerk-list" role="listbox" aria-multiselectable="true" style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: 'min(320px, 45vh)', overflowY: 'auto' }}>
               {rows.length === 0 && (
-                <li style={{ padding: '16px', fontSize: '14px', fontWeight: 500 }}>{options.length === 0 ? 'No harvesting clerks yet.' : `No clerk called "${text.trim()}".`}</li>
+                <li style={{ padding: '16px', fontSize: '14px', fontWeight: 500 }}>{options.length === 0 ? 'No harvester roles yet.' : `No clerk called "${text.trim()}".`}</li>
               )}
               {rows.map((o, i) => {
                 const on = selected.includes(o.clerk_id);
                 return [
                   !typed && i === 0 && chosenCount > 0 ? <li key="h-chosen" aria-hidden="true" style={section}>Chosen ({chosenCount})</li> : null,
-                  !typed && i === chosenCount && chosenCount > 0 ? <li key="h-all" aria-hidden="true" style={{ ...section, borderTop: '1px solid #e2e8f0' }}>All clerks</li> : null,
+                  !typed && i === chosenCount && chosenCount > 0 ? <li key="h-all" aria-hidden="true" style={{ ...section, borderTop: '1px solid #e2e8f0' }}>All operators</li> : null,
                   <li key={o.clerk_id} ref={i === active ? activeRow : undefined} role="option" aria-selected={on}
                     onMouseDown={(e) => e.preventDefault()} onClick={() => toggle(o.clerk_id)} onMouseEnter={() => setActive(i)}
                     style={{ display: 'flex', alignItems: 'center', gap: '12px', minHeight: '48px', padding: '8px 14px', cursor: 'pointer', fontSize: '15px', color: INK, background: i === active ? '#f1f5f9' : '#ffffff' }}>
@@ -347,7 +347,7 @@ function ClerkPicker({ options, selected, onChange, status, onOpen, onRetry, onD
 }
 
 // The last search is remembered on this device: coming back, or refreshing, shows it again.
-const SAVED_KEY = 'fi_ffb_harvest_last_search_v3';   // v3: the clerks are chosen from a list (ids), not typed
+const SAVED_KEY = 'fi_ffb_harvest_last_search_v3';   // v3: the operators are chosen from a list (ids), not typed
 const loadSaved = () => { try { return JSON.parse(localStorage.getItem(SAVED_KEY) || 'null') || {}; } catch { return {}; } };
 const saveLast = (v) => { try { localStorage.setItem(SAVED_KEY, JSON.stringify(v)); } catch { /* storage blocked: nothing to remember */ } };
 
@@ -355,7 +355,7 @@ const tabOf = (v) => (TABS.some(([k]) => k === v) ? v : 'approved');
 
 export function ClerkLookup() {
   const params = useMemo(() => new URLSearchParams(window.location.search), []);
-  // A shared link wins (its clerks= list); otherwise the last search of this device.
+  // A shared link wins (its operators= list); otherwise the last search of this device.
   const linked = params.get('clerks') || '';
   const saved = useMemo(() => (linked ? {} : loadSaved()), [linked]);
   const [selected, setSelected] = useState(() => (linked ? linked.split(/[,;\n]+/).map(x => x.trim().toUpperCase()).filter(Boolean) : (saved.clerks || [])));
@@ -383,7 +383,7 @@ export function ClerkLookup() {
     return () => mq.removeEventListener('change', on);
   }, []);
 
-  // The clerks to choose from, read fresh from the server (never cached): when the page opens and when the list is opened.
+  // The operators to choose from, read fresh from the server (never cached): when the page opens and when the list is opened.
   const loadOptions = useCallback(async () => {
     try {
       const r = await API.clerkOptions();
@@ -396,16 +396,16 @@ export function ClerkLookup() {
   useEffect(() => { loadOptions(); }, [loadOptions]);
 
   const remember = (over = {}) => {
-    const v = { clerks: selected, from, to, tab, ...over };
+    const v = { operators: selected, from, to, tab, ...over };
     saveLast(v);
-    window.history.replaceState(null, '', `${window.location.pathname}?${new URLSearchParams({ clerks: v.clerks.join(','), from: v.from, to: v.to, tab: v.tab })}`);
+    window.history.replaceState(null, '', `${window.location.pathname}?${new URLSearchParams({ operators: v.clerks.join(','), from: v.from, to: v.to, tab: v.tab })}`);
   };
 
   const search = async (e, override) => {
     if (e) e.preventDefault();
     const f = clampDate(override?.from ?? from);
     const t = clampDate(override?.to ?? to);
-    if (selected.length === 0) { setError('Choose at least one harvesting clerk.'); return; }
+    if (selected.length === 0) { setError('Choose at least one harvester role.'); return; }
     setLoading(true); setError('');
     try {
       const res = await API.lookupClerks(selected.join(','), f, t);
@@ -426,7 +426,7 @@ export function ClerkLookup() {
   // Print: the browser's print dialog (also saves as PDF) for the open tab. The page title becomes the PDF's file name.
   const printReport = () => {
     const old = document.title;
-    document.title = `FarmIntelytics Clerk Lookup ${data.from}${data.from === data.to ? '' : ` to ${data.to}`}`;
+    document.title = `FarmIntelytics Staff Activity ${data.from}${data.from === data.to ? '' : ` to ${data.to}`}`;
     const restore = () => { document.title = old; window.removeEventListener('afterprint', restore); };
     window.addEventListener('afterprint', restore);
     window.print();
@@ -442,18 +442,18 @@ export function ClerkLookup() {
         <header className="lk-screen" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '28px' }}>
           <img src={LOGO_ICON} alt="FarmIntelytics" style={{ width: '48px' }} />
           <div>
-            <h1 className="lk-title" style={{ fontSize: '28px', fontWeight: 500, margin: 0, letterSpacing: '-0.01em' }}>Clerk Lookup</h1>
-            <p style={{ margin: '4px 0 0', fontSize: '14px', fontWeight: 600 }}>
-              Choose one or more harvesting clerks, pick the dates, and see what each clerk recorded.
+            <h1 className="lk-title" style={{ fontSize: '28px', fontWeight: 500, margin: 0, letterSpacing: '-0.01em' }}>Staff Activity</h1>
+            <p style={{ margin: '4px 0 0', fontSize: '14px', fontWeight: 400 }}>
+              Choose one or more harvester roles, pick the dates, and see what each clerk recorded.
             </p>
           </div>
         </header>
 
         <form className="lk-screen" onSubmit={search} style={{ marginBottom: '8px' }}>
-          <label style={label}>Harvesting clerks</label>
+          <label style={label}>Harvester Roles</label>
           <ClerkPicker options={options} selected={selected} onChange={setSelected} status={optionsStatus} onOpen={loadOptions} onRetry={loadOptions}
             onDone={() => { if (selected.length) search(); }} />
-          <div style={{ fontSize: '12px', fontWeight: 600, marginTop: '6px' }}>
+          <div style={{ fontSize: '12px', fontWeight: 400, marginTop: '6px' }}>
             Tap to open the list, type a name to find a clerk. You can choose several.
           </div>
 
@@ -473,7 +473,7 @@ export function ClerkLookup() {
               <Search size={18} /> {loading ? 'Searching...' : 'Search'}
             </button>
           </div>
-          <div style={{ fontSize: '12px', fontWeight: 600, marginTop: '8px' }}>You can look back up to 30 days.</div>
+          <div style={{ fontSize: '12px', fontWeight: 400, marginTop: '8px' }}>You can look back up to 30 days.</div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '14px', alignItems: 'center' }}>
             <CalendarDays size={16} color={GREEN} />
@@ -495,15 +495,15 @@ export function ClerkLookup() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <img src={LOGO_ICON} alt="" style={{ width: '40px' }} />
                 <div>
-                  <div style={{ fontSize: '20px', fontWeight: 500 }}>FarmIntelytics · Clerk Lookup · All statuses</div>
-                  <div style={{ fontSize: '12px', fontWeight: 600 }}>
+                  <div style={{ fontSize: '20px', fontWeight: 500 }}>FarmIntelytics · Staff Activity · All statuses</div>
+                  <div style={{ fontSize: '12px', fontWeight: 400 }}>
                     Period: {data.from === data.to ? data.from : `${data.from} to ${data.to}`} · {data.clerks.length} clerk{data.clerks.length === 1 ? '' : 's'} · Printed {new Date().toLocaleString()}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* The four tabs: Approved (default), Pending, Mismatch, Rejected, each with how many different clerks it holds. */}
+            {/* The four tabs: Approved (default), Pending, Mismatch, Rejected, each with how many different operators it holds. */}
             <div className="lk-screen lk-tabs" role="tablist" aria-label="Record status">
               {TABS.map(([key, name, color]) => {
                 const active = tab === key;
@@ -525,13 +525,13 @@ export function ClerkLookup() {
 
             <div role="tabpanel" className="lk-screen" style={{ marginTop: '20px' }}>
               <AggTable key={`${tab}-${data.from}-${data.to}-${data.clerks.length}-${phone}`} rows={rowsOf(data, tab)} onlyWithRecords={tab !== 'approved'}
-                empty={data.clerks.length === 0 ? 'No clerks found.' : `No ${tab} records on these dates.`} phone={phone} />
+                empty={data.clerks.length === 0 ? 'No operators found.' : `No ${tab} records on these dates.`} phone={phone} />
             </div>
 
             {/* On paper: each clerk's own table, line by line (the screen keeps the summary above). */}
             <div className="lk-print-only">
-              <PrintedLines clerks={data.clerks} />
-              {data.lines_truncated && <p style={{ fontSize: '12px', fontWeight: 500 }}>Only the first 3,000 records are printed. Pick fewer days or fewer clerks.</p>}
+              <PrintedLines operators={data.clerks} />
+              {data.lines_truncated && <p style={{ fontSize: '12px', fontWeight: 500 }}>Only the first 3,000 records are printed. Pick fewer days or fewer operators.</p>}
             </div>
 
             {data.not_found.length > 0 && (
@@ -540,9 +540,9 @@ export function ClerkLookup() {
               </div>
             )}
             {data.truncated && (
-              <div style={{ marginTop: '12px', fontSize: '14px', fontWeight: 500 }}>Showing the first 100 clerks. Search fewer names to see the rest.</div>
+              <div style={{ marginTop: '12px', fontSize: '14px', fontWeight: 500 }}>Showing the first 100 operators. Search fewer names to see the rest.</div>
             )}
-            <p style={{ marginTop: '24px', fontSize: '13px', fontWeight: 600 }}>{data.note}</p>
+            <p style={{ marginTop: '24px', fontSize: '13px', fontWeight: 400 }}>{data.note}</p>
           </section>
         )}
       </div>

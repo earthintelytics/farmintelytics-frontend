@@ -49,7 +49,7 @@ const PAGE_CSS = `
 .mth-grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
 .mth-grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
 .mth-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.mth-table th { padding: 12px 16px; color: ${C.ink}; font-weight: 900; text-align: left; background: ${C.panel}; border-bottom: 2px solid ${C.line}; white-space: nowrap; }
+.mth-table th { padding: 12px 16px; color: ${C.ink}; font-weight: 500; text-align: left; background: ${C.panel}; border-bottom: 2px solid ${C.line}; white-space: nowrap; }
 .mth-table td { padding: 12px 16px; border-bottom: 1px solid ${C.line}; color: ${C.body}; vertical-align: top; }
 .mth-table tr:last-child td { border-bottom: none; }
 .mth-table tbody tr:hover td { background: ${C.greenTint}; }
@@ -114,7 +114,7 @@ function Figure({ caption, children }) {
     <figure style={{ margin: 0, background: C.panel, border: `1px solid ${C.line}`, borderRadius: '14px', padding: '20px 20px 14px' }}>
       <div style={{ overflowX: 'auto' }}>{children}</div>
       {caption && (
-        <figcaption style={{ fontSize: '12px', color: C.faint, fontWeight: 600, marginTop: '10px', textAlign: 'center', lineHeight: 1.5 }}>
+        <figcaption style={{ fontSize: '12px', color: C.faint, fontWeight: 400, marginTop: '10px', textAlign: 'center', lineHeight: 1.5 }}>
           {caption}
         </figcaption>
       )}
@@ -184,8 +184,8 @@ function RoleGroupDiagram() {
     { name: 'Cutter', raw: ['CUTTER', 'HARVESTING', 'AGRIC WORKER'] },
     { name: 'Carrier', raw: ['CARRIER'] },
     { name: 'Picker', raw: ['LOOSE FRUIT PICKER', 'PICKER'] },
-    { name: 'Loading Clerk', raw: ['COUNTER'] },
-    { name: 'Harvesting Clerk', raw: ['RECORDER'] }
+    { name: 'Loading Role', raw: ['COUNTER'] },
+    { name: 'Harvester Role', raw: ['RECORDER'] }
   ];
   const unknown = ['FFB LOADER', 'Headman', 'Headperson', 'Headwoman', 'FIELD HAND', 'PRUNNING', 'Tapping'];
   const rowH = 26, top = 36;
@@ -238,7 +238,7 @@ function CompatibilityDiagram() {
   };
   const cellW = 150, cellH = 40, left = 140, top = 44;
   return (
-    <svg viewBox={`0 0 ${left + slots.length * cellW + 10} ${top + workers.length * cellH + 10}`} style={{ width: '100%', minWidth: '540px', display: 'block', ...svgText }} role="img" aria-label="Assignment matrix: cutters may fill cutter and carrier slots; carriers and pickers may fill carrier and picker slots; clerks may not fill field slots">
+    <svg viewBox={`0 0 ${left + slots.length * cellW + 10} ${top + workers.length * cellH + 10}`} style={{ width: '100%', minWidth: '540px', display: 'block', ...svgText }} role="img" aria-label="Assignment matrix: cutters may fill cutter and carrier slots; carriers and pickers may fill carrier and picker slots; operators may not fill field slots">
       {slots.map((s, j) => (
         <text key={s} x={left + j * cellW + cellW / 2} y={top - 14} textAnchor="middle" fontSize="12" fontWeight="900" fill={C.ink}>{s}</text>
       ))}
@@ -350,8 +350,8 @@ function FishnetDiagram() {
 function ReconciliationDiagram() {
   const layers = [
     { n: 'Record 1', t: 'Worker field log', s: 'owner_records' },
-    { n: 'Record 2', t: 'Harvesting Clerk AI count', s: 'approval_status' },
-    { n: 'Record 3', t: 'Loading Clerk verification', s: 'loading_clerk_records' }
+    { n: 'Record 2', t: 'Harvester Role AI count', s: 'approval_status' },
+    { n: 'Record 3', t: 'Loading Role verification', s: 'loading_clerk_records' }
   ];
   const outcomes = [
     { t: 'CLEAN', s: 'counts or weight match', c: C.green },
@@ -433,12 +433,12 @@ const SCORE_CHECKS = [
 ];
 
 const SCORE_EXAMPLES = [
-  ['A · Everything right', 'GPS inside B3.3, no duplicates, normal count, loading clerk count matches.', '100', 'Automatic APPROVE', C.green],
-  ['B · Big job, 5 scans', 'Worker has 100 bunches, arranged in lots of 20 and scanned 5 times (Same Worker). The 5 scans are one job of 100; loading clerk records 100.', '100 each scan', 'Automatic APPROVE', C.green],
-  ['C · Small issues', 'GPS 15 m outside the boundary (7 pts: −3) and job 2× the plot history (5 pts: −5); loading clerk count matches.', '100 − 3 − 5 = 92', 'Automatic APPROVE', C.green],
+  ['A · Everything right', 'GPS inside B3.3, no duplicates, normal count, loading role count matches.', '100', 'Automatic APPROVE', C.green],
+  ['B · Big job, 5 scans', 'Worker has 100 bunches, arranged in lots of 20 and scanned 5 times (Same Worker). The 5 scans are one job of 100; loading role records 100.', '100 each scan', 'Automatic APPROVE', C.green],
+  ['C · Small issues', 'GPS 15 m outside the boundary (7 pts: −3) and job 2× the plot history (5 pts: −5); loading role count matches.', '100 − 3 − 5 = 92', 'Automatic APPROVE', C.green],
   ['D · Loading mismatch', 'All checks fine but harvested 100 while loaded + rotten = 90 (Loading match 0: −15).', '85, not CLEAN', 'SUPERVISOR decides (recount)', C.amber],
   ['H · Plot off, platform balances', 'Plot B3.3: harvested 70, loaded 60. Worker 1 scanned 40 on platform 134 where 40 were loaded; worker 2 scanned 30 on platform 135 where 20 were loaded.', 'W1: 100 · W2: 85', 'W1 Automatic APPROVE · W2 SUPERVISOR (platform 135 is 10 short)', C.amber],
-  ['E · Loading clerk not synced yet', 'Harvest synced, loading clerk has not.', 'up to 100, waiting', 'Stays Pending until the loading clerk syncs, then re-scored', C.amber],
+  ['E · Loading Role not synced yet', 'Harvest synced, loading role has not.', 'up to 100, waiting', 'Stays Pending until the loading role syncs, then re-scored', C.amber],
   ['F · Several red flags', 'Same GPS as another worker (−15), two jobs 30 s apart (−7), same total 5 jobs running (−10), 3× plot history (−10).', '100 − 42 = 58', 'SUPERVISOR decides', C.amber],
   ['G · Fraud pattern', 'Case F plus the phone "jumped" 2 km in a minute (−10).', '48', 'Automatic REJECT', C.red]
 ];
@@ -548,7 +548,7 @@ export default function MethodologyView() {
                 Cutters sever ripe Fresh Fruit Bunches (FFB) from palm crowns with poles or chisels. Loose Fruit Pickers gather individual fruits that fall around the tree base.
               </Card>
               <Card eyebrow="Tier 4" title="Collection Platform" icon={Truck}>
-                The roadside staging area at the plot edge. Carriers bring bunches here; Harvesting Clerks photograph them for <strong>YOLOv11 AI counting</strong> (every bunch in the photo) and Loading Clerks log truck loading.
+                The roadside staging area at the plot edge. Carriers bring bunches here; Harvester Roles photograph them for <strong>YOLOv11 AI counting</strong> (every bunch in the photo) and Loading Roles log truck loading.
               </Card>
               <Card eyebrow="Tier 5" title="Weighbridge (Mill Scale)" icon={Scale}>
                 Trucks are weighed full (Gross) and empty (Tare) at the mill. <strong>Net FFB Tonnage = Gross − Tare</strong> is the physical ground truth that reconciles back to plot quotas.
@@ -600,14 +600,14 @@ export default function MethodologyView() {
                     <td style={{ color: C.red, fontWeight: 500 }}>Cutter</td>
                   </tr>
                   <tr>
-                    <td style={{ fontWeight: 500, color: C.ink }}>Loading Clerk</td>
+                    <td style={{ fontWeight: 500, color: C.ink }}>Loading Role</td>
                     <td style={{ fontFamily: 'monospace' }}>COUNTER</td>
                     <td>Sign in to the APK; verify truck loading.</td>
                     <td>—</td>
                     <td style={{ color: C.red, fontWeight: 500 }}>Any field slot</td>
                   </tr>
                   <tr>
-                    <td style={{ fontWeight: 500, color: C.ink }}>Harvesting Clerk</td>
+                    <td style={{ fontWeight: 500, color: C.ink }}>Harvester Role</td>
                     <td style={{ fontFamily: 'monospace' }}>RECORDER</td>
                     <td>Sign in to the APK; record harvests and AI counts.</td>
                     <td>—</td>
@@ -667,8 +667,8 @@ export default function MethodologyView() {
             </Card>
 
             <div className="mth-grid-2">
-              <Card title="Rule 6 · Loading clerk platform duplicates">
-                Loading clerk submissions for the same plot and date with identical counts within five minutes are flagged during enrichment (<code>enrich_paginated_records</code>).
+              <Card title="Rule 6 · Loading Role platform duplicates">
+                Loading Role submissions for the same plot and date with identical counts within five minutes are flagged during enrichment (<code>enrich_paginated_records</code>).
               </Card>
               <Card title="Rules 7 & 8 · Spatial auto-correction">
                 If the GPS point falls inside a registered polygon (<code>ST_Contains()</code>), reports, reconciliation and the Approval Center use that verified plot instead of the typed <code>h_plot_id</code>, so a clerk cannot misreport where a harvest happened. The typed plot is kept on the record for audit.
@@ -718,8 +718,8 @@ export default function MethodologyView() {
 
             <div className="mth-grid-3">
               <Card eyebrow="Record 1" title="Worker field log">Harvesters and pickers log work at plot GPS coordinates (<code>owner_records</code>).</Card>
-              <Card eyebrow="Record 2" title="Harvesting Clerk QA">Platform photo → YOLOv11 counts every bunch in the photo (the record's count); the clerk also types good, unripe and rotten bunches, or the loose-fruit weight (<code>approval_status</code>).</Card>
-              <Card eyebrow="Record 3" title="Loading Clerk verification">Stacked platform counts and truck weights checked before the weighbridge (<code>loading_clerk_records</code>).</Card>
+              <Card eyebrow="Record 2" title="Harvester Role QA">Platform photo → YOLOv11 counts every bunch in the photo (the record's count); the clerk also types good, unripe and rotten bunches, or the loose-fruit weight (<code>approval_status</code>).</Card>
+              <Card eyebrow="Record 3" title="Loading Role verification">Stacked platform counts and truck weights checked before the weighbridge (<code>loading_clerk_records</code>).</Card>
             </div>
 
             <Card title="Work mode">
@@ -746,8 +746,8 @@ export default function MethodologyView() {
                     </tr>
                     <tr>
                       <td style={{ fontWeight: 500, color: C.amber }}>INCOMPLETE</td>
-                      <td style={{ fontFamily: 'monospace' }}>Harvesting clerk OR loading clerk records missing for plot/date</td>
-                      <td>Waiting on the loading or harvesting clerk.</td>
+                      <td style={{ fontFamily: 'monospace' }}>Harvester Role OR loading role records missing for plot/date</td>
+                      <td>Waiting on the loading or harvester role.</td>
                     </tr>
                     <tr>
                       <td style={{ fontWeight: 500, color: C.red }}>DISCREPANCY</td>
@@ -769,7 +769,7 @@ export default function MethodologyView() {
           <SectionShell
             id="section-6" number={6} icon={ShieldCheck}
             title="Approval: Score & Decisions"
-            lead="Every harvest record gets a trust score from 0 to 100 as soon as it syncs, and again whenever loading clerk records for its plot arrive. The score decides whether the record is approved automatically, rejected automatically, or sent to a supervisor who must investigate it and write a note."
+            lead="Every harvest record gets a trust score from 0 to 100 as soon as it syncs, and again whenever loading role records for its plot arrive. The score decides whether the record is approved automatically, rejected automatically, or sent to a supervisor who must investigate it and write a note."
           >
             <div>
               <h3 style={{ fontSize: '15px', fontWeight: 500, color: C.ink, margin: '0 0 10px 0' }}>The formula</h3>
@@ -801,15 +801,15 @@ export default function MethodologyView() {
 
             <div className="mth-grid-3">
               <Card title="Automatic approve" icon={CheckSquare}>
-                Score <strong>80 or more</strong>, the loading match is <strong>CLEAN</strong> (loading clerk records exist and agree) and the GPS check gives <strong>at least 7</strong> (on the plot edge, or within 20 m outside it).
+                Score <strong>80 or more</strong>, the loading match is <strong>CLEAN</strong> (loading role records exist and agree) and the GPS check gives <strong>at least 7</strong> (on the plot edge, or within 20 m outside it).
                 No supervisor needed. The record is signed <code>System</code> with the note "Automatic approval: score N/100".
               </Card>
               <Card title="Automatic reject" icon={Clock}>
                 Score <strong>under 50</strong>. Signed <code>System</code>; the note lists every check that lost points, so anyone can see why.
               </Card>
               <Card title="Supervisor decides" icon={Users}>
-                Everything else (50–79, or 80+ while the loading clerk record is missing or mismatched, or the scan was deep inside the field, far away or on another plot). The supervisor opens the record in
-                <strong> Individual Records</strong>, checks the photo, counts, plot and loading clerk records, and must <strong>write a note</strong> before Approve or Reject is enabled.
+                Everything else (50–79, or 80+ while the loading role record is missing or mismatched, or the scan was deep inside the field, far away or on another plot). The supervisor opens the record in
+                <strong> Individual Records</strong>, checks the photo, counts, plot and loading role records, and must <strong>write a note</strong> before Approve or Reject is enabled.
               </Card>
             </div>
 
@@ -854,17 +854,17 @@ export default function MethodologyView() {
               <Card title="Re-scoring" icon={Zap}>
                 <ul style={{ margin: 0, paddingLeft: '18px' }}>
                   <li>Each record is scored when it syncs, and the whole plot-day is re-scored after every harvest or loading upload.</li>
-                  <li>Pending records and automatic decisions follow the new score (an automatic approval can become a supervisor case if a later loading clerk record disagrees).</li>
+                  <li>Pending records and automatic decisions follow the new score (an automatic approval can become a supervisor case if a later loading role record disagrees).</li>
                   <li><strong>A supervisor's approve or reject is never changed</strong> by re-scoring.</li>
                 </ul>
               </Card>
               <Card title="Counts, pairs and times (one rule everywhere)" icon={CheckSquare}>
                 <ul style={{ margin: 0, paddingLeft: '18px' }}>
                   <li><strong>A record's count is the AI count</strong> from the photo (every bunch in it); the clerk's typed total (good + unripe + rotten) is used only when the AI found none. Cards and the map show <strong>9 bunches (typed 16)</strong>: the typed total in brackets only when both are above 0. All totals, the loading match and the scoring use this count.</li>
-                  <li><strong>Typed total ≠ AI count</strong> (higher or lower): the record is flagged in red, <strong>held for a supervisor</strong> and never approved automatically, and it must still reconcile with the loading clerk.</li>
+                  <li><strong>Typed total ≠ AI count</strong> (higher or lower): the record is flagged in red, <strong>held for a supervisor</strong> and never approved automatically, and it must still reconcile with the loading role.</li>
                   <li><strong>Each harvest record is paired with one load</strong>: same plot, same day, same work type, closest in time (at most 3 hours apart), each load used once. The plot view shows each harvest beside its own load with both dates and times; the map popup and the Individual Records CSV show the paired load.</li>
                   <li><strong>Matched</strong> is still decided on the plot-day total (harvested = loaded + rotten). When the plot balances, platform differences only mean bunches were loaded from a nearby platform (shown under <strong>Platform detail</strong>); <strong>Investigate</strong> appears only on a mismatch.</li>
-                  <li><strong>Average Duration</strong> (Worker Analytics) = how long each plot took that day, from its first work start to its last scan, averaged over plots. Clerks working side by side are not added up.</li>
+                  <li><strong>Average Duration</strong> (Worker Analytics) = how long each plot took that day, from its first work start to its last scan, averaged over plots. Operators working side by side are not added up.</li>
                 </ul>
               </Card>
               <Card title="Where to see it" icon={Map}>
@@ -872,7 +872,7 @@ export default function MethodologyView() {
                   <li>Every record card in <strong>Individual Records</strong> has a small <strong>“Why this needs review”</strong> box: the score, the (at most) three checks that lost the most points in plain words with what to check, and a folded list of all 9 checks.</li>
                   <li>Approved records appear in <strong>Approved Workers</strong> and its Export CSV.</li>
                   <li>The reviewer column shows <code>System</code> for automatic decisions and the supervisor's login for their decisions.</li>
-                  <li>A record that passes every check and matches the loads is <strong>approved automatically and needs no action</strong>. It still shows, read-only with its photo, carrier and clerks, under <strong>Approved harvesting clerk records</strong> in the plot's view.</li>
+                  <li>A record that passes every check and matches the loads is <strong>approved automatically and needs no action</strong>. It still shows, read-only with its photo, carrier and operators, under <strong>Approved harvester role records</strong> in the plot's view.</li>
                 </ul>
               </Card>
               <Card title="Which pages count what" icon={CheckSquare}>
@@ -894,7 +894,7 @@ export default function MethodologyView() {
             <div className="mth-grid-2">
               <Card title="Sign-in" icon={ShieldCheck}>
                 <ul style={{ margin: 0, paddingLeft: '18px' }}>
-                  <li>Only <strong>Harvesting Clerks</strong> and <strong>Loading Clerks</strong> can sign in; inactive accounts are blocked.</li>
+                  <li>Only <strong>Harvester Roles</strong> and <strong>Loading Roles</strong> can sign in; inactive accounts are blocked.</li>
                   <li><strong>Scanning the ID badge</strong> signs the clerk in directly with the role on their record.</li>
                   <li><strong>Typing the ID</strong> also needs the role picked in the dropdown, and it must match the record.</li>
                   <li><strong>Portal:</strong> every change needs a signed-in session. Approvals need Edit or Super Admin rights; uploads, users and settings need Super Admin. An expired session goes back to the login page.</li>
@@ -904,7 +904,7 @@ export default function MethodologyView() {
                 <ul style={{ margin: 0, paddingLeft: '18px' }}>
                   <li>IDs are <strong>text everywhere</strong> (e.g. <code>HAC30148</code>), in every table and view; they are never turned into numbers.</li>
                   <li>Old phones that send only the digits (<code>30148</code>) are matched to the full ID. Uploads with two IDs sharing the same digits are refused.</li>
-                  <li>On upload, functions become one of five groups: Cutter, Carrier, Picker, Loading Clerk (<code>COUNTER</code> only), Harvesting Clerk (<code>RECORDER</code>).</li>
+                  <li>On upload, functions become one of five groups: Cutter, Carrier, Picker, Loading Role (<code>COUNTER</code> only), Harvester Role (<code>RECORDER</code>).</li>
                   <li><strong>FFB LOADER</strong>, Headman, Headperson, Headwoman, Field Hand, Prunning and Tapping are <strong>unknown</strong>: skipped at upload, never stored, no QR badge.</li>
                 </ul>
               </Card>
@@ -930,25 +930,25 @@ export default function MethodologyView() {
               </Card>
               <Card title="Who did the work" icon={TreePalm}>
                 <ul style={{ margin: 0, paddingLeft: '18px' }}>
-                  <li>Every harvest record stores the <strong>cutter</strong>, the <strong>carrier</strong> and the <strong>recorder</strong> (harvesting clerk).</li>
+                  <li>Every harvest record stores the <strong>cutter</strong>, the <strong>carrier</strong> and the <strong>recorder</strong> (harvester role).</li>
                   <li><strong>Carried by = Self</strong> when the cutter carried their own bunches; otherwise the carrier's name and ID are shown.</li>
                   <li>Pickers record themselves; carrier fields may be empty for picker records.</li>
-                  <li>Worker Analytics and Approved Workers also show the <strong>loading clerk</strong> who loaded that plot that day.</li>
+                  <li>Worker Analytics and Approved Workers also show the <strong>loading role</strong> who loaded that plot that day.</li>
                 </ul>
               </Card>
               <Card title="Loading & reconciliation" icon={Scale}>
                 <ul style={{ margin: 0, paddingLeft: '18px' }}>
                   <li>Loading records are stored by mode: <code>harvester</code> (bunches) or <code>picker</code> (sacks), whatever role the phone sends.</li>
                   <li>The <strong>Reconciliation</strong> view of Geospatial Intel compares harvested bunches with bunch loads, and picker weight with sack loads, per plot and day; <strong>Open in Approval Center</strong> opens that plot-day's records.</li>
-                  <li>A plot with loads but no harvest yet shows <strong>Awaiting Recorders</strong>; Individual Records still lists the loading clerk records and photos for investigation.</li>
+                  <li>A plot with loads but no harvest yet shows <strong>Awaiting Recorders</strong>; Individual Records still lists the loading role records and photos for investigation.</li>
                   <li>Reconciliation is re-run in the background after every harvest or loading upload (each plot-day at most once every few seconds, so many phones syncing at once do not repeat the work).</li>
                 </ul>
               </Card>
               <Card title="Geospatial Intel" icon={Map}>
                 <ul style={{ margin: 0, paddingLeft: '18px' }}>
-                  <li><strong>Harvest interval</strong> colours each plot by days since its last harvest. It uses <strong>approved harvesting clerk records only</strong>; loading records do not change it.</li>
+                  <li><strong>Harvest interval</strong> colours each plot by days since its last harvest. It uses <strong>approved harvester role records only</strong>; loading records do not change it.</li>
                   <li>Clicking a plot shows its <strong>approved harvest</strong> over a chosen range (default 30 days): bunches per day split into ripe, unripe and rotten, picker kg, and the approved workers.</li>
-                  <li><strong>Reconciliation</strong> colours each plot by its most serious status: Mismatch, Awaiting Loading Clerk, Awaiting Recorders, Matched.</li>
+                  <li><strong>Reconciliation</strong> colours each plot by its most serious status: Mismatch, Awaiting Loading Role, Awaiting Recorders, Matched.</li>
                 </ul>
               </Card>
               <Card title="Errors reach the admin" icon={Clock}>
@@ -986,7 +986,7 @@ export default function MethodologyView() {
               <Card title="Portal access levels" icon={ShieldCheck}>
                 <ul style={{ margin: 0, paddingLeft: '18px' }}>
                   <li><strong>View:</strong> read-only maps, dashboards and yield tables.</li>
-                  <li><strong>Edit (supervisor):</strong> Approval Center — investigate each record (photo, counts, plot, loading clerk record), then approve or reject it with a written note. The note is required; there is no bulk or force approval.</li>
+                  <li><strong>Edit (supervisor):</strong> Approval Center — investigate each record (photo, counts, plot, loading role record), then approve or reject it with a written note. The note is required; there is no bulk or force approval.</li>
                   <li><strong>Super Admin:</strong> everything Edit can do, plus user management, worker directory and uploads, pay rates, alert settings, system logs and view refreshes.</li>
                   <li>The server checks the role on every change, not only the portal menus; a signed-out or expired session cannot change anything.</li>
                 </ul>

@@ -105,7 +105,7 @@ export function fmtStatusBadge(status) {
     rejected: { label: 'Rejected', color: '#dc2626' },
   };
   const cfg = map[status] || { label: status || '—', color: '#64748b' };
-  return `<span style="font-weight: 800; font-size: 13px; color: ${cfg.color};">${cfg.label}</span>`;
+  return `<span style="font-weight: 500; font-size: 13px; color: ${cfg.color};">${cfg.label}</span>`;
 }
 
 /**
@@ -127,7 +127,7 @@ export function fmtRelativeTime(iso) {
  * Map technical field names to human-readable display names.
  */
 export const FIELD_LABELS = {
-  // Harvesting Clerk (H_)
+  // Harvester Role (H_)
   h_total_count:        'Harvested FFB',
   h_ai_detected_count:  'FFB Bunches (AI)',
   h_rotten_count:       'Rotten FFB',
@@ -136,7 +136,7 @@ export const FIELD_LABELS = {
   h_plot_id:            'Plot ID',
   h_weight:             'Loose Fruit Weight',
   
-  // Loading Clerk (L_)
+  // Loading Role (L_)
   l_total_count:        'Loaded FFB',
   l_ai_detected_count:  'Loaded Bunches (AI)',
   l_worker_id:          'Loader ID',

@@ -265,7 +265,7 @@ const ClusterMarkers = memo(({ markers, onMarkerClick }) => {
         const size = count < 10 ? 30 : count < 100 ? 36 : 44;
 
         return L.divIcon({
-          html: `<div style="width:${size}px;height:${size}px;background:${bg};border:2.5px solid #ffffff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffffff;font-family:'Inter',sans-serif;font-weight:900;font-size:${size >= 36 ? '13px' : '11.5px'};box-shadow:0 3px 10px rgba(0,0,0,0.35),0 0 0 1px ${dark} inset;text-shadow:0 1px 2px rgba(0,0,0,0.4);">${count}</div>`,
+          html: `<div style="width:${size}px;height:${size}px;background:${bg};border:2.5px solid #ffffff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffffff;font-family:'Inter',sans-serif;font-weight: 500;font-size:${size >= 36 ? '13px' : '11.5px'};box-shadow:0 3px 10px rgba(0,0,0,0.35),0 0 0 1px ${dark} inset;text-shadow:0 1px 2px rgba(0,0,0,0.4);">${count}</div>`,
           className: 'custom-status-cluster',
           iconSize: L.point(size, size),
           iconAnchor: L.point(size / 2, size / 2)
@@ -494,7 +494,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
       const { plot_id, site_id, plot_number, last_harvested_at } = feature.properties;
 
       if (plot_id && showLabels) {
-        layer.bindTooltip(`<div style="font-weight:900;font-size:11px;">${plot_id}</div>`, {
+        layer.bindTooltip(`<div style="font-weight: 500;font-size:11px;">${plot_id}</div>`, {
           permanent: true, direction: 'center', className: 'plot-label-tooltip'
         });
       }
@@ -513,11 +513,11 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
       layer.bindPopup(`
         <div style="font-family:'Inter',sans-serif;min-width:200px;padding:0;border-radius:12px;overflow:hidden;">
           <div style="background:#3F8432;padding:12px 14px;">
-            <div style="font-size:13px;font-weight:900;color:white;letter-spacing:0.01em;">Plot ${plot_id || '—'}</div>
+            <div style="font-size:13px;font-weight: 500;color:white;letter-spacing:0.01em;">Plot ${plot_id || '—'}</div>
             <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Site: ${site_id || '—'} &nbsp;·&nbsp; #${plot_number || '—'}</div>
           </div>
           <div style="padding:12px 14px;background:white;">
-            <div style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight:800;background:${statusBg};color:${statusColor};border:1px solid ${statusBorder};">
+            <div style="display:inline-block;padding:4px 10px;border-radius:20px;font-size:11px;font-weight: 500;background:${statusBg};color:${statusColor};border:1px solid ${statusBorder};">
               ${statusLabel}
             </div>
             ${harvestLine}
@@ -553,7 +553,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
 
       // Tooltip for labels — Permanent when zoomed in
       if (showLabels) {
-        layer.bindTooltip(`<div style="font-weight:900;font-size:11px;">${plotId}</div>`, {
+        layer.bindTooltip(`<div style="font-weight: 500;font-size:11px;">${plotId}</div>`, {
           permanent: true, direction: 'center', className: 'plot-label-tooltip'
         });
       }
@@ -562,7 +562,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
       layer.bindPopup(`
         <div style="font-family: 'Inter', sans-serif; min-width: 230px; padding: 12px; background: #ffffff; border-radius: 12px;">
           <div style="background: #3F8432; padding: 10px 12px; border-radius: 8px; margin: -12px -12px 10px -12px;">
-            <div style="font-size: 14px; font-weight: 900; color: white;">Plot ${plotId}</div>
+            <div style="font-size: 14px; font-weight: 500; color: white;">Plot ${plotId}</div>
             <div style="font-size: 11px; color: #F3F8EF; margin-top: 2px;">Block: ${codeBloc} &nbsp;·&nbsp; Site: ${siteId} (#${plotNb})</div>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; color: #334155;">
@@ -649,7 +649,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
         <div className="map-super-popup__meta">
           {isLoader ? (
             <div className="map-super-popup__meta-row">
-              <span>Loading Clerk ID</span>
+              <span>Loading Role ID</span>
               <strong>{op.clerk_id || 'N/A'}</strong>
             </div>
           ) : (
@@ -665,14 +665,14 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
                 </div>
               )}
               <div className="map-super-popup__meta-row">
-                <span>Harv. Clerk ID</span>
+                <span>Harvester Role ID</span>
                 <strong>{op.clerk_id || 'N/A'}</strong>
               </div>
             </>
           )}
           <div className="map-super-popup__meta-row">
             <span>Operational Role</span>
-            <strong>{isLoader ? (isPicker ? 'Loading Clerk (sacks)' : 'Loading Clerk (bunches)') : (isPicker ? 'Loose Fruit Picker' : 'Harvester (Cutter)')}</strong>
+            <strong>{isLoader ? (isPicker ? 'Loading Role (sacks)' : 'Loading Role (bunches)') : (isPicker ? 'Loose Fruit Picker' : 'Harvester (Cutter)')}</strong>
           </div>
           <div className="map-super-popup__meta-row">
             <span>Activity Time</span>
@@ -724,7 +724,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
                 border: 'none',
                 background: 'none',
                 color: '#0f172a',
-                fontWeight: 600,
+                fontWeight: 400,
                 fontSize: '14px',
                 cursor: 'pointer',
                 marginBottom: '8px',
@@ -786,7 +786,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
           {/* Estate / Location Filter */}
           <div className="filter-group" style={{ flex: '1.5', minWidth: '200px' }}>
             <label className="filter-label">Plantation Location</label>
-            <select className="select-input" value={hiEstate} onChange={e => setHiEstate(e.target.value)} style={{ width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>
+            <select className="select-input" value={hiEstate} onChange={e => setHiEstate(e.target.value)} style={{ width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400, color: '#0f172a' }}>
               <EstateOptions allLabel="All Locations" />
             </select>
           </div>
@@ -798,7 +798,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
               className="select-input"
               value={intervalFilter}
               onChange={e => setIntervalFilter(e.target.value)}
-              style={{ width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600, color: '#0f172a' }}
+              style={{ width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400, color: '#0f172a' }}
             >
               <option value="1">Daily Cycle (24h)</option>
               <option value="3">3-Day Cycle</option>
@@ -820,7 +820,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
                   className="select-input"
                   value={hiStartDate}
                   onChange={e => setHiStartDate(e.target.value)}
-                  style={{ width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600, color: '#0f172a' }}
+                  style={{ width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400, color: '#0f172a' }}
                 />
               </div>
               <div className="filter-group" style={{ flex: '1', minWidth: '150px' }}>
@@ -830,7 +830,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
                   className="select-input"
                   value={hiEndDate}
                   onChange={e => setHiEndDate(e.target.value)}
-                  style={{ width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600, color: '#0f172a' }}
+                  style={{ width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400, color: '#0f172a' }}
                 />
               </div>
             </>
@@ -1036,7 +1036,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
             <option value="">All records</option>
             <option value={ROLES.CUTTER}>Bunches (harvest and loads)</option>
             <option value={ROLES.PICKER}>Loose fruit (picker and loads)</option>
-            <option value={ROLES.L_CLERK}>Loading clerk loads only</option>
+            <option value={ROLES.L_CLERK}>Loading Role loads only</option>
           </select>
         </div>
 
@@ -1082,7 +1082,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
               </Overlay>
             )}
 
-            {/* Harvesting clerk (green) and loading clerk (blue) captures, one clickable layer */}
+            {/* Harvester Role (green) and loading role (blue) captures, one clickable layer */}
             <Overlay checked name="CAPTURES">
               <ClusterMarkers markers={clusterPoints} onMarkerClick={openPoint} />
             </Overlay>
@@ -1103,11 +1103,11 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
             <div className="map-legend__items">
               <div className="map-legend__item">
                 <div className="map-legend__dot map-legend__dot--point" style={{ backgroundColor: '#3F8432' }}></div>
-                <span>Harvesting Clerk Capture</span>
+                <span>Harvester Role Capture</span>
               </div>
               <div className="map-legend__item">
                 <div className="map-legend__dot map-legend__dot--point" style={{ backgroundColor: '#1d4ed8' }}></div>
-                <span>Loading Clerk Capture</span>
+                <span>Loading Role Capture</span>
               </div>
               {/* Ring colour = plot status, same colours and words as the Approval Center */}
               {['DISCREPANCY', 'WAITING_FOR_LOADER', 'WAITING_FOR_RECORDER', 'REJECTED'].map((k, i) => (

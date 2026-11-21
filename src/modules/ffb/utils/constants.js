@@ -3,11 +3,11 @@
 // ============================================================
 
 export const ROLES = Object.freeze({
-  H_CLERK: 'harvesting clerk',
+  H_CLERK: 'harvester role',
   CUTTER:  'cutter',
   CARRIER: 'carrier',
   PICKER:  'picker',
-  L_CLERK: 'loading clerk',
+  L_CLERK: 'loading role',
 });
 
 export const STATUSES = Object.freeze({
@@ -18,25 +18,25 @@ export const STATUSES = Object.freeze({
 
 // Key metric per role: 'count' | 'weight'
 export const ROLE_KEY_METRIC = Object.freeze({
-  'harvesting clerk': 'count',
+  'harvester role': 'count',
   cutter:     'count',
   carrier:    'count',
-  'loading clerk':'count',
+  'loading role':'count',
   picker:     'weight',
   recorder:   null,
 });
 
 export const ROLE_LABELS = Object.freeze({
-  [ROLES.H_CLERK]:  'Harvesting Clerk',
+  [ROLES.H_CLERK]:  'Harvester Role',
   [ROLES.CUTTER]:   'Harvester (Cutter)',
   [ROLES.CARRIER]:  'Carrier',
   [ROLES.PICKER]:   'Loose Fruit Picker',
-  [ROLES.L_CLERK]:  'Loading Clerk',
+  [ROLES.L_CLERK]:  'Loading Role',
 });
 
 export const SOURCE_LABELS = Object.freeze({
-  harvesting_clerk_record: 'Harvesting Clerk',
-  loading_clerk_record:    'Loading Clerk (FFB)',
+  harvesting_clerk_record: 'Harvester Role',
+  loading_clerk_record:    'Loading Role (FFB)',
 });
 
 export const VIEWS = Object.freeze({

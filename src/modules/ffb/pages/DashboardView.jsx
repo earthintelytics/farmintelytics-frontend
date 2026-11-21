@@ -270,7 +270,7 @@ export function DashboardView() {
           <p style={{ fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#3F8432', marginBottom: '4px' }}>
             FarmIntelytics Harvest Suite
           </p>
-          <h1 className="view-title" style={{ margin: 0 }}>Harvest Command Center</h1>
+          <h1 className="view-title" style={{ margin: 0 }}>Overview</h1>
           <p className="view-subtitle" style={{ marginTop: '4px' }}>
             Estate-wide harvest output, AI bunch verification, and loose fruit tonnage
           </p>
@@ -300,7 +300,7 @@ export function DashboardView() {
             </select>
           </div>
           <div className="filter-group">
-            <label className="filter-label" style={{ fontSize: '11px', color: '#64748B', fontWeight: 500 }}>Crew Role</label>
+            <label className="filter-label" style={{ fontSize: '11px', color: '#64748B', fontWeight: 500 }}>Workers Role</label>
             <select
               className="select-input"
               style={{ width: '168px', height: '36px', borderRadius: '8px', borderColor: '#E2E8F0', fontSize: '13px', fontWeight: 400 }}

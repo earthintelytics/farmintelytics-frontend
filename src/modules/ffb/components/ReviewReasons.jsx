@@ -6,7 +6,7 @@ import { useRecorderPattern } from '../utils/recorderPatterns';
 // The nine scoring checks (backend/api/utils/validation_engine), in plain words, with what the
 // supervisor should look at when one loses points.
 const CHECKS = {
-  reconciliation: { name: 'Loading match', weight: 1.5, todo: 'Compare with the loading clerk photos; recount the platform if it is short.' },
+  reconciliation: { name: 'Loading match', weight: 1.5, todo: 'Compare with the loading role photos; recount the platform if it is short.' },
   duplicate: { name: 'Duplicate', weight: 1.5, todo: 'Open the other record on this plot and compare the two photos.' },
   spatial_grid: { name: 'GPS on plot edge', weight: 1, todo: 'Check the plot on the map; ask the clerk where the platform was.' },
   temporal: { name: 'Timing', weight: 1, todo: 'Check the times of this worker’s records.' },

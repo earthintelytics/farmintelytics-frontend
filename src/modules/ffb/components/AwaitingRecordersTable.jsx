@@ -11,7 +11,7 @@ const SORTS = {
   amount: { label: 'Most loaded', fn: (a, b) => (b.mode === 'picker' ? b.loader_weight - a.loader_weight : b.loader_count - a.loader_count) }
 };
 const TABS = [['harvester', 'Harvester'], ['picker', 'Picker']];
-// "a, b" -> ['a', 'b']. Recorders are the harvesting (recording) clerks, not the loading clerks.
+// "a, b" -> ['a', 'b']. Recorders are the harvesting (recording) operators, not the loading roles.
 const ids = (list) => String(list || '').split(',').map(x => x.trim()).filter(Boolean);
 
 // Open button colour = the plot's status colour (same as the map and the summary cards).
@@ -26,7 +26,7 @@ function waitingFor(iso) {
 }
 
 /**
- * Plot-days where the loading clerk has synced but no harvest record exists yet.
+ * Plot-days where the loading role has synced but no harvest record exists yet.
  * Harvester (bunches) and Picker (kg) work are separate tabs; 10 rows per page.
  */
 export function AwaitingRecordersTable({ rows, onOpen }) {
@@ -68,7 +68,7 @@ export function AwaitingRecordersTable({ rows, onOpen }) {
                 color: tab === key ? '#FFFFFF' : '#334155'
               }}
             >
-              {label} <span style={{ opacity: 0.8, fontWeight: 600 }}>({counts[key]})</span>
+              {label} <span style={{ opacity: 0.8, fontWeight: 400 }}>({counts[key]})</span>
             </button>
           ))}
         </div>
@@ -86,14 +86,14 @@ export function AwaitingRecordersTable({ rows, onOpen }) {
             <tr>
               <th style={th}>Plot</th>
               <th style={th}>Date</th>
-              <th style={{ ...th, ...num }} title="Recorded by the harvesting clerks">{picker ? 'Kg harvested' : 'Harvested'}</th>
+              <th style={{ ...th, ...num }} title="Recorded by the harvester roles">{picker ? 'Kg harvested' : 'Harvested'}</th>
               {!picker && <th style={{ ...th, ...num }}>Rotten</th>}
               {!picker && <th style={{ ...th, ...num }}>Unripe</th>}
-              <th style={{ ...th, ...num }} title="Recorded by the loading clerks">{picker ? 'Kg loaded' : 'Loaded'}</th>
-              <th style={{ ...th, ...num }} title="Harvesting clerk records (one per scan). Only the bunch totals have to balance, not the number of scans.">Harvest records</th>
-              <th style={{ ...th, ...num }} title="Loading clerk records (one per scan).">Load records</th>
-              <th style={th}>Harv. Clerk ID</th>
-              <th style={th}>Loading Clerk ID</th>
+              <th style={{ ...th, ...num }} title="Recorded by the loading roles">{picker ? 'Kg loaded' : 'Loaded'}</th>
+              <th style={{ ...th, ...num }} title="Harvester Role records (one per scan). Only the bunch totals have to balance, not the number of scans.">Harvest records</th>
+              <th style={{ ...th, ...num }} title="Loading Role records (one per scan).">Load records</th>
+              <th style={th}>Harvester Role ID</th>
+              <th style={th}>Loading Role ID</th>
               <th style={th}>Last load</th>
               <th style={th}>Waiting</th>
               <th style={th} />
@@ -113,7 +113,7 @@ export function AwaitingRecordersTable({ rows, onOpen }) {
                 <td style={{ ...td, ...num, fontWeight: 500, color: '#1d4ed8' }}>{picker ? `${p.loader_weight ?? 0} kg` : (p.loader_count ?? 0)}</td>
                 <td style={{ ...td, ...num }}>{p.harvester_records ?? 0}</td>
                 <td style={{ ...td, ...num }}>{p.loader_records ?? (p.loads || 0)}</td>
-                {/* Clerk ID lists wrap so the Open button stays on screen */}
+                {/* Operator ID lists wrap so the Open button stays on screen */}
                 <td style={{ ...td, whiteSpace: 'normal', minWidth: '120px' }}>{ids(p.harvesting_clerk_ids).join(', ') || '—'}</td>
                 <td style={{ ...td, whiteSpace: 'normal', minWidth: '120px' }}>{ids(p.loading_clerk_ids).join(', ') || '—'}</td>
                 <td style={td}>{fmtTime(p.last_load_time)}</td>

@@ -23,7 +23,7 @@ function RecorderCoaching() {
   }, [days, estate]);
 
   const rows = data?.recorders || [];
-  const select = { height: '40px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600 };
+  const select = { height: '40px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400 };
 
   return (
     <div style={{ marginBottom: '32px' }}>
@@ -68,7 +68,7 @@ function RecorderCoaching() {
               const l = LEVEL[r.level] || LEVEL.ok;
               return (
                 <tr key={r.clerk_id} style={{ borderTop: '1px solid #f1f5f9', fontSize: '14px' }}>
-                  <td style={{ padding: '14px 16px', fontWeight: 500 }}>{r.clerk_name || '—'} <span style={{ color: '#0f172a', fontWeight: 600 }}>({r.clerk_id})</span></td>
+                  <td style={{ padding: '14px 16px', fontWeight: 500 }}>{r.clerk_name || '—'} <span style={{ color: '#0f172a', fontWeight: 400 }}>({r.clerk_id})</span></td>
                   <td style={{ padding: '14px 16px' }}>{fmtNumber(r.records)}</td>
                   <td style={{ padding: '14px 16px' }}>{fmtNumber(r.typed_differs)} ({Math.round(r.differs_share * 100)}%)</td>
                   <td style={{ padding: '14px 16px' }}>{fmtNumber(r.typed_higher)} ({Math.round(r.higher_share * 100)}%)</td>

@@ -137,6 +137,7 @@ export const API = (() => {
   // --- Tenant Settings & App Connection ---
   const fetchSettings = () => _get('/settings', {}, { ttl: 60000 });
   const fetchAppConnection = () => _get('/app-connection', {}, { noCache: true });
+  const regenerateAccessCode = () => _post('/app-connection/regenerate-code', {});
 
   // --- Dashboard ---
   const fetchDashboardCards = (filters = {}) =>
@@ -548,15 +549,15 @@ export const API = (() => {
     _patch(`/employees/${encodeURIComponent(employeeId)}/status?worker_status=${encodeURIComponent(workerStatus)}`, {});
 
   const bulkUpdateWorkerStatus = (employeeIds, workerStatus) =>
-    _post('/employees/bulk-status', { employee_ids: employeeIds, worker_status: workerStatus });
+    _post('/workforce/bulk-status', { employee_ids: employeeIds, worker_status: workerStatus });
 
-  const bulkCreateEmployees = (employees) => _post('/employees/bulk', { employees });
+  const bulkCreateEmployees = (employees) => _post('/workforce/bulk', { employees });
 
   async function uploadEmployeeCSV(file, onProgress) {
     if (onProgress) onProgress(30);
     const fd = new FormData();
     fd.append('file', file);
-    const res = await fetch(_fullUrl('/employees/upload-csv'), {
+    const res = await fetch(_fullUrl('/workforce/upload-csv'), {
       method: 'POST',
       headers: authHeaders(),
       body: fd,
@@ -610,14 +611,14 @@ export const API = (() => {
   const fetchAlertHistory = (params = {}) => _get('/alerts/history', params, { noCache: true });
   const deleteAlertHistory = (ids) => _post('/alerts/history/delete', { ids });
 
-  // Stubs for portal-level user list controls (org credentials are managed in FarmIntelytics Admin)
-  const fetchUsers = async () => [];
-  const createUser = async () => ({ message: 'Manage org logins under FarmIntelytics Admin -> Credentials.' });
-  const toggleUserStatus = async () => ({});
-  const updateUserAccess = async () => ({});
-  const resetUserPassword = async () => ({});
-  const deleteUser = async () => ({});
-  const clearEmployees = async () => ({});
+  // --- Tenant Portal Users & Workforce Reset ---
+  const fetchUsers = () => _get('/portal-users', {}, { noCache: true });
+  const createUser = (payload) => _post('/portal-users', payload);
+  const toggleUserStatus = (id, status) => _patch(`/portal-users/${id}`, { status });
+  const updateUserAccess = (id, payload) => _patch(`/portal-users/${id}`, payload);
+  const resetUserPassword = (id, password) => _post(`/portal-users/${id}/reset-password`, { password });
+  const deleteUser = (id) => _delete(`/portal-users/${id}`);
+  const clearEmployees = (backup = true) => _post('/workforce/clear', { backup: Boolean(backup) });
   const logout = () => invalidateCache();
 
   return {
@@ -627,6 +628,7 @@ export const API = (() => {
     resolveImageUrl,
     fetchSettings,
     fetchAppConnection,
+    regenerateAccessCode,
     fetchAllAnalytics,
     fetchDashboardCards,
     fetchMainChart,

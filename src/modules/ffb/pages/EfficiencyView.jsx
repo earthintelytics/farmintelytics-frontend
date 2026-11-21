@@ -57,8 +57,8 @@ export function EfficiencyView() {
   const TABS = [
     { id: 'harvesters', label: 'Cutter Rank', icon: Users },
     { id: 'pickers', label: 'Picker Rank', icon: TrendingUp },
-    { id: 'loaders', label: 'Loading Clerk Rank', icon: Truck },
-    { id: 'recorders', label: 'Harvesting Clerk Rank', icon: ClipboardCheck },
+    { id: 'loaders', label: 'Loading Role Rank', icon: Truck },
+    { id: 'recorders', label: 'Harvester Role Rank', icon: ClipboardCheck },
     { id: 'contractors', label: 'Contractor Efficiency', icon: Building2 },
   ];
 
@@ -498,7 +498,7 @@ export function EfficiencyView() {
           </div>
         )}
 
-        {/* --- Sub-Page: Loading Clerk Rank --- */}
+        {/* --- Sub-Page: Loading Role Rank --- */}
         {activeTab === 'loaders' && (
           <div className="tab-content view-fade-in">
             <div className="sub-page-header" style={{ marginBottom: '16px' }}>
@@ -506,12 +506,12 @@ export function EfficiencyView() {
                 <Search size={18} />
                 <input 
                   type="text" 
-                  placeholder="Search loading clerks by name or ID..." 
+                  placeholder="Search loading roles by name or ID..." 
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className="results-count">{filteredLoaders.length} Loading Clerks Indexed</div>
+              <div className="results-count">{filteredLoaders.length} Loading Roles Indexed</div>
             </div>
 
             {/* Entries selector bar */}
@@ -551,7 +551,7 @@ export function EfficiencyView() {
                 <tbody>
                   {paginatedLoaders.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="plot-empty-state">No loading clerk records found.</td>
+                      <td colSpan={4} className="plot-empty-state">No loading role records found.</td>
                     </tr>
                   ) : (
                     paginatedLoaders.map((w, i) => {
@@ -561,7 +561,7 @@ export function EfficiencyView() {
                           <td className="plot-cell" style={{ fontWeight: 500 }}>{actualIdx + 1}</td>
                           <td className="plot-cell">
                             <div style={{ fontWeight: 500, color: '#1e293b' }}>{w.name}</div>
-                            <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>{w.id}</div>
+                            <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>{w.id}</div>
                           </td>
                           <td className="plot-cell plot-cell--num" style={{ fontWeight: 500, color: 'var(--clr-brand-secondary)' }}>{w.plotCount}</td>
                           <td className="plot-cell plot-cell--num" style={{ fontWeight: 750 }}>{fmtNumber(w.bunches)}</td>
@@ -629,7 +629,7 @@ export function EfficiencyView() {
           </div>
         )}
 
-        {/* --- Sub-Page: Harvesting Clerk Rank --- */}
+        {/* --- Sub-Page: Harvester Role Rank --- */}
         {activeTab === 'recorders' && (
           <div className="tab-content view-fade-in">
             <div className="sub-page-header" style={{ marginBottom: '16px' }}>
@@ -637,12 +637,12 @@ export function EfficiencyView() {
                 <Search size={18} />
                 <input 
                   type="text" 
-                  placeholder="Search harvesting clerks by name or ID..." 
+                  placeholder="Search harvester roles by name or ID..." 
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
                 />
               </div>
-              <div className="results-count">{filteredRecorders.length} Harvesting Clerks Indexed</div>
+              <div className="results-count">{filteredRecorders.length} Harvester Roles Indexed</div>
             </div>
 
             {/* Entries selector bar */}
@@ -682,7 +682,7 @@ export function EfficiencyView() {
                 <tbody>
                   {paginatedRecorders.length === 0 ? (
                     <tr>
-                      <td colSpan={4} className="plot-empty-state">No harvesting clerk records found.</td>
+                      <td colSpan={4} className="plot-empty-state">No harvester role records found.</td>
                     </tr>
                   ) : (
                     paginatedRecorders.map((w, i) => {
@@ -692,7 +692,7 @@ export function EfficiencyView() {
                           <td className="plot-cell" style={{ fontWeight: 500 }}>{actualIdx + 1}</td>
                           <td className="plot-cell">
                             <div style={{ fontWeight: 500, color: '#1e293b' }}>{w.name}</div>
-                            <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>{w.id}</div>
+                            <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>{w.id}</div>
                           </td>
                           <td className="plot-cell plot-cell--num" style={{ fontWeight: 500, color: 'var(--clr-brand-primary)' }}>{w.ops}</td>
                           <td className="plot-cell plot-cell--num" style={{ fontWeight: 750 }}>{w.plotCount}</td>
@@ -806,14 +806,14 @@ export function EfficiencyView() {
 
         <style>{`
         .tab-navigation { display: flex; gap: 12px; background: #f1f5f9; padding: 6px; border-radius: 14px; border: 1px solid #e2e8f0; }
-        .tab-btn { display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 800; color: #64748b; transition: all 0.2s; background: transparent; border: none; cursor: pointer; }
+        .tab-btn { display: flex; align-items: center; gap: 10px; padding: 10px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; color: #64748b; transition: all 0.2s; background: transparent; border: none; cursor: pointer; }
         .tab-btn:hover { color: #0f172a; background: rgba(255,255,255,0.5); }
         .tab-btn--active { background: white; color: var(--clr-brand-primary); box-shadow: 0 4px 12px -2px rgba(0,0,0,0.08); }
         
         .sub-page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 20px 32px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; }
         .search-bar { display: flex; align-items: center; gap: 12px; background: #f8fafc; padding: 0 16px; border-radius: 12px; width: 400px; border: 1px solid #e2e8f0; }
-        .search-bar input { border: none; background: transparent; height: 48px; width: 100%; font-size: 15px; font-weight: 600; color: #0f172a; outline: none; }
-        .results-count { font-size: 13px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .search-bar input { border: none; background: transparent; height: 48px; width: 100%; font-size: 15px; font-weight: 400; color: #0f172a; outline: none; }
+        .results-count { font-size: 13px; font-weight: 500; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
         
         .rank-grid { background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 28px; box-shadow: none; }
         .sub-section-title { font-size: 16px; font-weight: 500; color: #0f172a; margin-bottom: 20px; }
@@ -830,25 +830,25 @@ export function EfficiencyView() {
         .perf-card--indigo::after { background: #6366f1; }
         .perf-card__header { display: flex; justify-content: space-between; align-items: center; }
         .perf-card__icon { padding: 12px; background: #f8fafc; border-radius: 12px; color: #1e293b; display: flex; align-items: center; justify-content: center; }
-        .perf-card__badge { font-size: 9px; font-weight: 900; background: #0f172a; color: white; padding: 5px 10px; border-radius: 40px; letter-spacing: 0.1em; }
-        .perf-card__title { font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; }
-        .perf-card__name { font-size: 22px; font-weight: 900; color: #0f172a; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .perf-card__id { font-size: 13px; font-weight: 700; color: #94a3b8; }
+        .perf-card__badge { font-size: 9px; font-weight: 500; background: #0f172a; color: white; padding: 5px 10px; border-radius: 40px; letter-spacing: 0.1em; }
+        .perf-card__title { font-size: 11px; font-weight: 500; color: #64748b; text-transform: uppercase; }
+        .perf-card__name { font-size: 22px; font-weight: 500; color: #0f172a; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .perf-card__id { font-size: 13px; font-weight: 500; color: #94a3b8; }
         .perf-card__footer { display: flex; align-items: center; gap: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9; margin-top: auto; position: relative; }
         .perf-card__action { margin-left: auto; color: #cbd5e1; transition: color 0.2s; }
         .perf-card:hover .perf-card__action { color: var(--clr-brand-primary); }
         .perf-stat { display: flex; flex-direction: column; }
-        .perf-stat__val { font-size: 20px; font-weight: 900; color: #0f172a; }
-        .perf-stat__lbl { font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; }
+        .perf-stat__val { font-size: 20px; font-weight: 500; color: #0f172a; }
+        .perf-stat__lbl { font-size: 10px; font-weight: 500; color: #94a3b8; text-transform: uppercase; }
         
         .perf-section { background: white; border-radius: 24px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.01); }
         .perf-section__header { padding: 24px 32px; background: #fafafa; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
-        .perf-section__title { font-size: 18px; font-weight: 900; display: flex; align-items: center; gap: 12px; color: #0f172a; }
-        .section-link { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; color: var(--clr-brand-primary); background: transparent; border: none; cursor: pointer; }
+        .perf-section__title { font-size: 18px; font-weight: 500; display: flex; align-items: center; gap: 12px; color: #0f172a; }
+        .section-link { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--clr-brand-primary); background: transparent; border: none; cursor: pointer; }
         .section-link:hover { text-decoration: underline; }
 
         .perf-table { width: 100%; border-collapse: collapse; }
-        .perf-table th { font-size: 11px; font-weight: 900; color: #94a3b8; padding: 0 0 16px 0; text-align: left; text-transform: uppercase; border-bottom: 2px solid #f1f5f9; }
+        .perf-table th { font-size: 11px; font-weight: 500; color: #94a3b8; padding: 0 0 16px 0; text-align: left; text-transform: uppercase; border-bottom: 2px solid #f1f5f9; }
         .perf-table td { padding: 16px 4px; vertical-align: middle; }
         .perf-table--large td { padding: 24px 8px; }
         
@@ -856,18 +856,18 @@ export function EfficiencyView() {
         .perf-row-elegant { border-bottom: 1px solid #f8fafc; transition: all 0.2s; }
         .perf-row-elegant:hover { background: #f8fafc; }
         
-        .status-pill { padding: 6px 12px; border-radius: 40px; font-size: 11px; font-weight: 900; border: 1px solid #e2e8f0; color: #64748b; }
+        .status-pill { padding: 6px 12px; border-radius: 40px; font-size: 11px; font-weight: 500; border: 1px solid #e2e8f0; color: #64748b; }
         .status-pill--high { border-color: var(--clr-brand-primary); color: var(--clr-brand-primary); background: rgba(3, 67, 33, 0.05); }
         
-        .rank-idx { width: 28px; height: 28px; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 900; font-size: 12px; }
+        .rank-idx { width: 28px; height: 28px; background: #f1f5f9; color: #64748b; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 500; font-size: 12px; }
         .rank-idx--top-1 { background: #fef3c7; color: #92400e; }
         .rank-idx--top-2 { background: #f1f5f9; color: #475569; }
         .rank-idx--top-3 { background: #fff7ed; color: #c2410c; }
-        .rank-idx--large { width: 40px; height: 40px; background: #f1f5f9; color: #475569; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 900; font-size: 16px; }
+        .rank-idx--large { width: 40px; height: 40px; background: #f1f5f9; color: #475569; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-weight: 500; font-size: 16px; }
         
-        .perf-name--sm { font-size: 15px; font-weight: 800; color: #1e293b; line-height: 1.2; }
-        .perf-uid--sm { font-size: 12px; font-weight: 600; color: #94a3b8; }
-        .perf-sub-label { font-size: 11px; font-weight: 900; color: #475569; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; }
+        .perf-name--sm { font-size: 15px; font-weight: 500; color: #1e293b; line-height: 1.2; }
+        .perf-uid--sm { font-size: 12px; font-weight: 400; color: #94a3b8; }
+        .perf-sub-label { font-size: 11px; font-weight: 500; color: #475569; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; }
       `}</style>
       </div>
     </div>

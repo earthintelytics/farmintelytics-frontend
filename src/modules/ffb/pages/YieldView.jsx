@@ -31,20 +31,20 @@ ChartJS.register(
 
 export function YieldView() {
   const { plotTrends, plotPredictions, filters, updateFilters, resetFilters } = useAppContext();
-  
+
   const data = useMemo(() => {
     // 1. Process Historical Data
     const timeline = (plotPredictions.historical || []).map(p => ({
-        date: p.date,
-        ffb: p.ffb || 0,
-        weight: p.weight || 0
+      date: p.date,
+      ffb: p.ffb || 0,
+      weight: p.weight || 0
     }));
 
     // 2. Process Predictions
     const futureData = (plotPredictions.predictions || []).map(p => ({
-        date: p.date,
-        ffb: p.ffb || 0,
-        weight: p.weight || 0
+      date: p.date,
+      ffb: p.ffb || 0,
+      weight: p.weight || 0
     }));
 
     // 3. Totals (from plotTrends for accurate filtered cards)
@@ -52,9 +52,9 @@ export function YieldView() {
     let totalWeight = 0;
     const plotCount = new Set();
     (plotTrends.items || plotTrends || []).forEach(p => {
-        totalFFB += (p.total_harvested_count || 0);
-        totalWeight += (p.total_weight_kg || 0);
-        if (p.plot_id) plotCount.add(p.plot_id);
+      totalFFB += (p.total_harvested_count || 0);
+      totalWeight += (p.total_weight_kg || 0);
+      if (p.plot_id) plotCount.add(p.plot_id);
     });
 
     return {
@@ -145,15 +145,15 @@ export function YieldView() {
       </div>
 
       {data.timeline.length === 0 ? (
-        <div style={{ marginBottom: '24px', padding: '16px 20px', background: '#F8FAFC', borderRadius: '12px', color: '#0f172a', fontWeight: 600 }}>
+        <div style={{ marginBottom: '24px', padding: '16px 20px', background: '#F8FAFC', borderRadius: '12px', color: '#0f172a', fontWeight: 400 }}>
           No harvest records match these filters. Change the dates or the estate, or press Reset.
         </div>
       ) : !forecastReady ? (
-        <div style={{ marginBottom: '24px', padding: '16px 20px', background: '#FFFBEB', borderRadius: '12px', color: '#92400E', fontWeight: 600 }}>
+        <div style={{ marginBottom: '24px', padding: '16px 20px', background: '#FFFBEB', borderRadius: '12px', color: '#92400E', fontWeight: 400 }}>
           No forecast yet. A forecast needs at least {minDays} days with harvest records and this view has {historyDays}. The lines below show what was harvested so far.
         </div>
       ) : (
-        <div style={{ marginBottom: '24px', fontSize: '13px', color: '#0f172a', fontWeight: 600 }}>
+        <div style={{ marginBottom: '24px', fontSize: '13px', color: '#0f172a', fontWeight: 400 }}>
           The dashed part is an estimate for the next 7 days: a straight line fitted on the latest 28 days with records. Treat it as a guide, not a promise.
         </div>
       )}
@@ -211,7 +211,7 @@ export function YieldView() {
               />
             </div>
             <button className="btn btn--outline" onClick={resetFilters} style={{ height: '40px', borderRadius: '8px', fontWeight: 500, padding: '0 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-               <RotateCcw size={16} /> RESET
+              <RotateCcw size={16} /> RESET
             </button>
           </div>
         </div>

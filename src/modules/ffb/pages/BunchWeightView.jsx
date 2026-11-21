@@ -147,7 +147,7 @@ export function BunchWeightView({ onBack }) {
                 border: 'none',
                 background: 'none',
                 color: '#0f172a',
-                fontWeight: 600,
+                fontWeight: 400,
                 fontSize: '14px',
                 cursor: 'pointer',
                 marginBottom: '8px',
@@ -167,7 +167,7 @@ export function BunchWeightView({ onBack }) {
         {/* Estate / Location Filter */}
         <div className="filter-group" style={{ flex: '1.2', minWidth: '160px' }}>
           <label className="filter-label" style={{ fontSize: '11px', fontWeight: 750, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Plantation Location</label>
-          <select className="select-input" value={estate} onChange={e => setEstate(e.target.value)} style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600, color: '#0f172a' }}>
+          <select className="select-input" value={estate} onChange={e => setEstate(e.target.value)} style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400, color: '#0f172a' }}>
             <option value="">All Farms</option>
             <option value="Main Estate">Main Estate</option>
             <option value="Extension 1">Extension 1</option>
@@ -187,7 +187,7 @@ export function BunchWeightView({ onBack }) {
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
               placeholder="e.g. MA-01"
-              style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', paddingLeft: '36px', fontSize: '14px', fontWeight: 600, color: '#0f172a' }}
+              style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', paddingLeft: '36px', fontSize: '14px', fontWeight: 400, color: '#0f172a' }}
             />
             <datalist id="plot-ids">
               {uniquePlotIds.map(id => <option key={id} value={id} />)}
@@ -203,7 +203,7 @@ export function BunchWeightView({ onBack }) {
             className="select-input"
             value={startDate}
             onChange={e => setStartDate(e.target.value)}
-            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600, color: '#0f172a' }}
+            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400, color: '#0f172a' }}
           />
         </div>
 
@@ -215,7 +215,7 @@ export function BunchWeightView({ onBack }) {
             className="select-input"
             value={endDate}
             onChange={e => setEndDate(e.target.value)}
-            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600, color: '#0f172a' }}
+            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400, color: '#0f172a' }}
           />
         </div>
 

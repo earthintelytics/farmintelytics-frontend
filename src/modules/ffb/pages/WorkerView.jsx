@@ -53,7 +53,7 @@ const HARVESTER_COLS = [
   },
   {
     key: 'worker_name', header: 'Cutter Name', defaultVisible: false, filterKey: 'worker_name', isName: true,
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 600 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 400 },
     render: row => row.worker_name || '—'
   },
   {
@@ -63,7 +63,7 @@ const HARVESTER_COLS = [
   },
   {
     key: 'carried_by', header: 'Carrier Name', defaultVisible: false, filterKey: 'carried_by', isName: true,
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 600 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 400 },
     render: row => {
       const selfCarried = !row.carrier_id || row.carrier_id === row.worker_id;
       return selfCarried
@@ -73,7 +73,7 @@ const HARVESTER_COLS = [
   },
   {
     key: 'contractor', header: 'Contractor', defaultVisible: true, filterKey: 'contractor',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 600 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 400 },
     render: row => row.contractor || '—'
   },
   {
@@ -83,17 +83,17 @@ const HARVESTER_COLS = [
   },
   {
     key: 'manual_count', header: 'Reported FFB', defaultVisible: true, filterKey: 'manual_count', isNum: true,
-    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 600 },
+    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 400 },
     render: row => (row.manual_count ?? 0).toLocaleString('en-NG')
   },
   {
     key: 'rotten', header: 'Rotten', defaultVisible: true, filterKey: 'rotten', isNum: true,
-    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 600 },
+    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 400 },
     render: row => row.rotten_count ?? 0
   },
   {
     key: 'unripe', header: 'Unripe', defaultVisible: true, filterKey: 'unripe', isNum: true,
-    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 600 },
+    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 400 },
     render: row => row.unripe_count ?? 0
   },
   {
@@ -111,12 +111,12 @@ const HARVESTER_COLS = [
     tdClass: 'worker-cell worker-cell--num', tdStyle: { textAlign: 'center' }
   },
   {
-    key: 'recorder_name', header: 'Harv. Clerk ID', defaultVisible: false, filterKey: 'recorder_name',
+    key: 'recorder_name', header: 'Harvester Role ID', defaultVisible: false, filterKey: 'recorder_name',
     thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.recorder_name || ''}>{row.recorder_id || '—'}</span>
   },
   {
-    key: 'loader', header: 'Loading Clerk ID', defaultVisible: false, filterKey: 'loader',
+    key: 'loader', header: 'Loading Role ID', defaultVisible: false, filterKey: 'loader',
     thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.loader_name || ''}>{row.loader_id || '—'}</span>
   },
@@ -146,12 +146,12 @@ const PICKER_COLS = [
   },
   {
     key: 'worker_name', header: 'Picker Name', defaultVisible: false, filterKey: 'worker_name', isName: true,
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 600 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 400 },
     render: row => row.worker_name || '—'
   },
   {
     key: 'contractor', header: 'Contractor', defaultVisible: true, filterKey: 'contractor',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 600 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 400 },
     render: row => row.contractor || '—'
   },
   {
@@ -160,12 +160,12 @@ const PICKER_COLS = [
     render: row => formatWeightCell(row.weight_kg)
   },
   {
-    key: 'recorder_name', header: 'Harv. Clerk ID', defaultVisible: false, filterKey: 'recorder_name',
+    key: 'recorder_name', header: 'Harvester Role ID', defaultVisible: false, filterKey: 'recorder_name',
     thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.recorder_name || ''}>{row.recorder_id || '—'}</span>
   },
   {
-    key: 'loader', header: 'Loading Clerk ID', defaultVisible: false, filterKey: 'loader',
+    key: 'loader', header: 'Loading Role ID', defaultVisible: false, filterKey: 'loader',
     thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.loader_name || ''}>{row.loader_id || '—'}</span>
   },
@@ -504,7 +504,7 @@ export function WorkerView() {
         <div>
           <h1 className="view-title" style={{ margin: 0, fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
             <User size={26} strokeWidth={1.5} color="var(--clr-brand-primary)" />
-            Crew Performance
+            Workers Performance
           </h1>
           <p className="view-subtitle worker-view__subtitle" style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#0f172a' }}>
             Daily field performance records, bunch counts, and weight verifications for Harvester, Picker, and Carrier teams.
@@ -579,7 +579,7 @@ export function WorkerView() {
           <input 
             type="date" 
             className="date-input" 
-            style={{ width: '100%', height: '40px', borderRadius: '8px', padding: '0 10px', border: '1px solid #cbd5e1', fontSize: '12px', fontWeight: 600 }} 
+            style={{ width: '100%', height: '40px', borderRadius: '8px', padding: '0 10px', border: '1px solid #cbd5e1', fontSize: '12px', fontWeight: 400 }} 
             value={filters.dateRange?.from || ''} 
             onChange={e => { updateFilters({ dateRange: { ...filters.dateRange, from: e.target.value } }); setCurrentPage(1); }} 
           />
@@ -593,7 +593,7 @@ export function WorkerView() {
           <input 
             type="date" 
             className="date-input" 
-            style={{ width: '100%', height: '40px', borderRadius: '8px', padding: '0 10px', border: '1px solid #cbd5e1', fontSize: '12px', fontWeight: 600 }} 
+            style={{ width: '100%', height: '40px', borderRadius: '8px', padding: '0 10px', border: '1px solid #cbd5e1', fontSize: '12px', fontWeight: 400 }} 
             value={filters.dateRange?.to || ''} 
             onChange={e => { updateFilters({ dateRange: { ...filters.dateRange, to: e.target.value } }); setCurrentPage(1); }} 
           />

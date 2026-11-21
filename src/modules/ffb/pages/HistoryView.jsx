@@ -56,7 +56,7 @@ export function HistoryView() {
               <div className="timeline-date-header" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                 <span className="timeline-date-dot" style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'var(--clr-brand-primary)' }}></span>
                 <span className="timeline-date-label" style={{ fontWeight: 500, fontSize: '15px', color: 'var(--text-main)' }}>{fmtDate(dateKey)}</span>
-                <span className="timeline-date-count" style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>{items.length} activities</span>
+                <span className="timeline-date-count" style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>{items.length} activities</span>
               </div>
               
               <div className="timeline-items" style={{ display: 'flex', flexDirection: 'column', gap: '16px', paddingLeft: '6px', borderLeft: '2px solid var(--border-subtle)', marginLeft: '5px' }}>
@@ -65,7 +65,7 @@ export function HistoryView() {
                     <div className="timeline-content" style={{ background: 'white', border: '1px solid var(--border-subtle)', borderRadius: '12px', padding: '20px', boxShadow: 'var(--shadow-panel)' }}>
                       <div className="timeline-header" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                         <span className="timeline-role" style={{ fontWeight: 500, fontSize: '13px', color: 'var(--clr-brand-primary)', textTransform: 'capitalize' }}>{fmtRole(op.role)}</span>
-                        <span className="timeline-time" style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>{fmtDateTime(op.created_at)}</span>
+                        <span className="timeline-time" style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 400 }}>{fmtDateTime(op.created_at)}</span>
                         <div dangerouslySetInnerHTML={{ __html: fmtStatusBadge(op.data_status) }} />
                       </div>
                       

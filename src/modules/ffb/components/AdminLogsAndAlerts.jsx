@@ -630,7 +630,7 @@ export function AdminLogsAndAlerts({ section }) {
                     borderRadius: '8px',
                     border: '1.5px solid #CBD5E1',
                     fontSize: '13px',
-                    fontWeight: 600,
+                    fontWeight: 400,
                     outline: 'none'
                   }}
                 />
@@ -817,7 +817,7 @@ export function AdminLogsAndAlerts({ section }) {
                           </td>
 
                           {/* Timestamp */}
-                          <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '12px', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                          <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '12px', fontWeight: 400, whiteSpace: 'nowrap' }}>
                             {formattedTime}
                           </td>
 
@@ -905,7 +905,7 @@ export function AdminLogsAndAlerts({ section }) {
               flexWrap: 'wrap',
               gap: '12px'
             }}>
-              <div style={{ fontSize: '13px', color: '#0f172a', fontWeight: 600 }}>
+              <div style={{ fontSize: '13px', color: '#0f172a', fontWeight: 400 }}>
                 Showing <strong>{logs.length > 0 ? (page - 1) * pageSize + 1 : 0}</strong> - <strong>{Math.min(page * pageSize, totalLogs)}</strong> of <strong>{totalLogs}</strong> logs
               </div>
 
@@ -1130,7 +1130,7 @@ export function AdminLogsAndAlerts({ section }) {
                       borderRadius: '6px',
                       border: '1.5px solid #CBD5E1',
                       fontSize: '13px',
-                      fontWeight: 600,
+                      fontWeight: 400,
                       outline: 'none'
                     }}
                   />
@@ -1218,7 +1218,7 @@ export function AdminLogsAndAlerts({ section }) {
                 <Mail size={20} style={{ color: '#3F8432' }} />
                 <div>
                   <span style={{ fontSize: '16px', fontWeight: 500, color: '#000000' }}>Registered Alert Recipients</span>
-                  <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 600 }}>Emails configured to receive automatic system alerts</div>
+                  <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 400 }}>Emails configured to receive automatic system alerts</div>
                 </div>
               </div>
               <span style={{
@@ -1346,7 +1346,7 @@ export function AdminLogsAndAlerts({ section }) {
           }}>
             <div>
               <div style={{ fontSize: '15px', fontWeight: 500, color: '#000000' }}>Alert Notifications Dispatch Audit Trail</div>
-              <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 600 }}>History of all automated and manual alerts triggered by the engine</div>
+              <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 400 }}>History of all automated and manual alerts triggered by the engine</div>
             </div>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <button
@@ -1458,7 +1458,7 @@ export function AdminLogsAndAlerts({ section }) {
                             style={{ cursor: 'pointer' }}
                           />
                         </td>
-                        <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>
+                        <td style={{ padding: '12px 16px', color: '#0f172a', fontSize: '12px', fontWeight: 400 }}>
                           {formattedTime}
                         </td>
                         <td style={{ padding: '12px 16px' }}>
@@ -1503,7 +1503,7 @@ export function AdminLogsAndAlerts({ section }) {
             borderTop: '2px solid #E2E8F0',
             background: '#F8FAFC'
           }}>
-            <div style={{ fontSize: '12px', color: '#0f172a', fontWeight: 600 }}>
+            <div style={{ fontSize: '12px', color: '#0f172a', fontWeight: 400 }}>
               Total Alerts Logged: <strong>{historyTotal}</strong>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -1753,7 +1753,7 @@ export function AdminLogsAndAlerts({ section }) {
                       borderRadius: '6px',
                       border: '1.5px solid #CBD5E1',
                       fontSize: '13px',
-                      fontWeight: 600,
+                      fontWeight: 400,
                       outline: 'none'
                     }}
                   />
@@ -1774,7 +1774,7 @@ export function AdminLogsAndAlerts({ section }) {
                       borderRadius: '6px',
                       border: '1.5px solid #CBD5E1',
                       fontSize: '13px',
-                      fontWeight: 600,
+                      fontWeight: 400,
                       outline: 'none'
                     }}
                   />

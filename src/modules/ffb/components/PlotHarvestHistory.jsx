@@ -24,7 +24,7 @@ function weekStart(iso) {
 }
 
 /**
- * One plot's approved harvest over time (approved harvesting clerk records only): bunches per day split
+ * One plot's approved harvest over time (approved harvester role records only): bunches per day split
  * into ripe, unripe and rotten (the bar is the harvested count), and picker kg.
  * Long ranges are shown per week.
  */
@@ -116,7 +116,7 @@ export function PlotHarvestHistory({ plotId }) {
     const s = series[items[0]?.dataIndex];
     return s ? `Harvested: ${s.harvested} bunches` : '';
   };
-  const inputStyle = { height: '32px', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0 8px', fontSize: '12px', fontWeight: 600, color: '#0f172a', minWidth: 0, background: 'white' };
+  const inputStyle = { height: '32px', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '0 8px', fontSize: '12px', fontWeight: 400, color: '#0f172a', minWidth: 0, background: 'white' };
 
   return (
     <div className="plot-harvest-history">
@@ -125,7 +125,7 @@ export function PlotHarvestHistory({ plotId }) {
           <div style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Approved harvest{weekly ? ' (per week)' : ''}
           </div>
-          <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>Approved harvesting clerk records only</div>
+          <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 400 }}>Approved harvester role records only</div>
         </div>
         <select aria-label="History range" value={preset} onChange={e => setPreset(e.target.value)} style={inputStyle}>
           {PRESETS.map(([v, t]) => <option key={v} value={v}>{t}</option>)}
@@ -143,7 +143,7 @@ export function PlotHarvestHistory({ plotId }) {
       ) : error ? (
         <div style={{ fontSize: '12px', color: '#b91c1c', padding: '12px 0' }}>{error}</div>
       ) : days.length === 0 ? (
-        <div style={{ border: '1px dashed #cbd5e1', borderRadius: '10px', padding: '18px 14px', textAlign: 'center', color: '#0f172a', fontSize: '12px', fontWeight: 600 }}>
+        <div style={{ border: '1px dashed #cbd5e1', borderRadius: '10px', padding: '18px 14px', textAlign: 'center', color: '#0f172a', fontSize: '12px', fontWeight: 400 }}>
           No approved harvest for this plot in this range.
           <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>Records waiting for approval are not counted. Try a longer range.</div>
         </div>

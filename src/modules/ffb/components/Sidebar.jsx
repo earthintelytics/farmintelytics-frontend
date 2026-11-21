@@ -126,15 +126,15 @@ export function Sidebar({ isCollapsed, onBack, onSignOut }) {
     {
       label: 'Overview',
       items: [
-        { path: '/', label: 'Harvest Command', icon: <LayoutDashboard size={16} strokeWidth={1.5} />, end: true },
-        { path: '/map', label: 'Estate Map', icon: <Map size={16} strokeWidth={1.5} /> },
+        { path: '/', label: 'Overview', icon: <LayoutDashboard size={16} strokeWidth={1.5} />, end: true },
+        { path: '/map', label: 'Geointelytics', icon: <Map size={16} strokeWidth={1.5} /> },
       ],
     },
     {
       label: 'Verification & Pay',
       items: [
         { path: '/approval', label: 'Verification Queue', icon: <CheckSquare size={16} strokeWidth={1.5} /> },
-        { path: '/approved-workers', label: 'Approved Crew', icon: <UserCheck size={16} strokeWidth={1.5} />, end: true },
+        { path: '/approved-workers', label: 'Approved Workers', icon: <UserCheck size={16} strokeWidth={1.5} />, end: true },
         { path: '/approved-workers/monthly-settlement', label: 'Pay Cycles', icon: <CalendarCheck size={15} strokeWidth={1.5} />, child: true },
       ],
     },
@@ -142,11 +142,11 @@ export function Sidebar({ isCollapsed, onBack, onSignOut }) {
       label: 'Analytics',
       items: [
         { path: '/plots', label: 'Block Performance', icon: <Grid size={16} strokeWidth={1.5} /> },
-        { path: '/workers', label: 'Crew Performance', icon: <Users size={16} strokeWidth={1.5} /> },
+        { path: '/workers', label: 'Workers Performance', icon: <Users size={16} strokeWidth={1.5} /> },
         { path: '/yield', label: 'Yield Forecast', icon: <TrendingUp size={16} strokeWidth={1.5} /> },
         { path: '/efficiency', label: 'Efficiency Ranks', icon: <ClipboardList size={16} strokeWidth={1.5} /> },
         { path: '/audit-quality', label: 'AI Quality Audit', icon: <BrainCircuit size={16} strokeWidth={1.5} /> },
-        { path: '/harvest', label: 'Clerk Records', icon: <SearchCheck size={16} strokeWidth={1.5} /> },
+        { path: '/harvest', label: 'Worker Records', icon: <SearchCheck size={16} strokeWidth={1.5} /> },
       ],
     },
     {
@@ -155,6 +155,13 @@ export function Sidebar({ isCollapsed, onBack, onSignOut }) {
         { path: '/mobile-app', label: 'Field App & QR', icon: <Smartphone size={16} strokeWidth={1.5} /> },
         { path: '/admin', label: 'Admin & Alerts', icon: <Shield size={16} strokeWidth={1.5} /> },
         { path: '/methodology', label: 'Validation Rules', icon: <BookOpen size={16} strokeWidth={1.5} /> },
+      ],
+    },
+    {
+      label: 'Support',
+      items: [
+        { path: '/help', label: 'Help Guide', icon: <HelpCircle size={16} strokeWidth={1.5} />, end: true },
+        { path: '/help/common-questions', label: 'FAQ', icon: <MessageCircleQuestion size={16} strokeWidth={1.5} /> },
       ],
     },
   ];
@@ -281,51 +288,30 @@ export function Sidebar({ isCollapsed, onBack, onSignOut }) {
         </div>
       </nav>
 
-      {/* Single Compact Footer Row */}
-      <div
-        className="sidebar-help"
-        style={{
-          padding: '8px 10px',
-          borderTop: '1px solid #E2E8F0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: '4px',
-          flexShrink: 0,
-        }}
-      >
-        <NavLink
-          to="/help"
-          end
-          className={({ isActive }) => `sidebar-nav-btn ${isActive ? 'sidebar-nav-btn--active' : ''}`}
-          style={{ borderRadius: '7px', justifyContent: 'center', flex: 1, padding: '6px 6px' }}
-          title="Help Guide"
+      {/* Compact Sign Out Footer */}
+      {onSignOut && (
+        <div
+          className="sidebar-help"
+          style={{
+            padding: '8px 10px',
+            borderTop: '1px solid #E2E8F0',
+            display: 'flex',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
         >
-          <HelpCircle size={15} strokeWidth={1.5} />
-          <span style={{ fontSize: '12px' }}>Help</span>
-        </NavLink>
-        <NavLink
-          to="/help/common-questions"
-          className={({ isActive }) => `sidebar-nav-btn ${isActive ? 'sidebar-nav-btn--active' : ''}`}
-          style={{ borderRadius: '7px', justifyContent: 'center', flex: 1, padding: '6px 6px' }}
-          title="Frequently Asked Questions"
-        >
-          <MessageCircleQuestion size={15} strokeWidth={1.5} />
-          <span style={{ fontSize: '12px' }}>FAQ</span>
-        </NavLink>
-        {onSignOut && (
           <button
             type="button"
             onClick={onSignOut}
             className="sidebar-nav-btn"
-            style={{ borderRadius: '7px', border: 'none', background: 'transparent', justifyContent: 'center', flex: 1, padding: '6px 6px', cursor: 'pointer', color: '#DC2626' }}
+            style={{ borderRadius: '7px', border: 'none', background: 'transparent', width: '100%', padding: '7px 10px', cursor: 'pointer', color: '#DC2626', justifyContent: 'flex-start', gap: '8px' }}
             title="Sign Out"
           >
             <LogOut size={15} strokeWidth={1.5} color="#DC2626" />
-            <span style={{ fontSize: '12px', color: '#DC2626' }}>Exit</span>
+            <span style={{ fontSize: '12.5px', fontWeight: 500, color: '#DC2626' }}>Sign Out</span>
           </button>
-        )}
-      </div>
+        </div>
+      )}
     </aside>
   );
 }

@@ -290,22 +290,12 @@ export function AdminView() {
   // Load employees from backend
   const loadEmployees = useCallback(async () => {
     setEmployeesLoading(true);
-    const start = Date.now();
     try {
       const res = await API.fetchEmployees('ALL');
-      // Unknown roles are never part of the worker directory.
-      setEmployees((res?.items || []).filter(e => roleGroup(e.function)));
+      setEmployees(res?.items || []);
       setLastRefreshTime(fmtDateTime(new Date()));
-      const elapsed = Date.now() - start;
-      if (elapsed < 800) {
-        await new Promise(r => setTimeout(r, 800 - elapsed));
-      }
     } catch (err) {
-      console.error('Failed to load employees for worker directory', err);
-      const elapsed = Date.now() - start;
-      if (elapsed < 800) {
-        await new Promise(r => setTimeout(r, 800 - elapsed));
-      }
+      console.error('Failed to load employees for workforce directory', err);
     } finally {
       setEmployeesLoading(false);
     }
@@ -320,31 +310,16 @@ export function AdminView() {
     return () => clearInterval(interval);
   }, [autoRefreshEnabled, loadEmployees]);
 
-  // Protect the route
-  useEffect(() => {
-    const session = localStorage.getItem('fi_ffb_admin_session');
-    if (!session) navigate('/admin-login');
-  }, [navigate]);
-
   // Load users from backend
   const loadUsers = useCallback(async () => {
     setIsLoadingUsers(true);
     setUserApiError('');
-    const start = Date.now();
     try {
       const data = await API.fetchUsers();
-      const filtered = (Array.isArray(data) ? data : []).filter(u => u.role !== 'Super Admin');
+      const filtered = (Array.isArray(data) ? data : []).filter(u => u && u.email && u.role !== 'Super Admin');
       setUsers(filtered);
-      const elapsed = Date.now() - start;
-      if (elapsed < 800) {
-        await new Promise(r => setTimeout(r, 800 - elapsed));
-      }
     } catch (err) {
       setUserApiError('Failed to load users: ' + (err.message || 'Unknown error'));
-      const elapsed = Date.now() - start;
-      if (elapsed < 800) {
-        await new Promise(r => setTimeout(r, 800 - elapsed));
-      }
     } finally {
       setIsLoadingUsers(false);
     }
@@ -354,12 +329,6 @@ export function AdminView() {
     loadUsers();
     loadEmployees();
   }, [loadUsers, loadEmployees]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('fi_ffb_admin_session');
-    API.logout();
-    navigate('/admin-login');
-  };
 
   // Status Dropdown Handlers
   const handleStatusSelectChange = (empId, newStatus) => {
@@ -662,66 +631,32 @@ export function AdminView() {
   };
 
   const SECTIONS = [
-    { group: 'Workers', items: [
-      { key: 'badges', label: 'Worker Directory', icon: <Users size={17} />, count: employees.length },
+    { group: 'Workforce', items: [
+      { key: 'badges', label: 'Workforce Directory', icon: <Users size={15} />, count: employees.length },
+      { key: 'sync', label: 'Upload Workforce', icon: <UploadCloud size={15} /> },
     ] },
     { group: 'Access', items: [
-      { key: 'identities', label: 'Users & Roles', icon: <Key size={17} />, count: users.length },
+      { key: 'identities', label: 'Portal Users', icon: <Key size={15} />, count: users.length },
     ] },
-    { group: 'System', items: [
-      { key: 'sync', label: 'Sync Employee CSV', icon: <UploadCloud size={17} /> },
-      { key: 'logs', label: 'System Logs Viewer', icon: <Terminal size={17} /> },
-      { key: 'recipients', label: 'Email Alerting & Recipients', icon: <Mail size={17} /> },
-      { key: 'history', label: 'Alert Dispatch History', icon: <Calendar size={17} /> },
+    { group: 'Alerts & Logs', items: [
+      { key: 'logs', label: 'System Logs', icon: <Terminal size={15} /> },
+      { key: 'recipients', label: 'Email Alerts', icon: <Mail size={15} /> },
+      { key: 'history', label: 'Alert History', icon: <Calendar size={15} /> },
     ] },
   ];
-  const sectionTitle = SECTIONS.flatMap(g => g.items).find(i => i.key === activeTab)?.label || 'Worker Directory';
+  const allTabs = SECTIONS.flatMap(g => g.items);
+  const sectionTitle = allTabs.find(i => i.key === activeTab)?.label || 'Workforce Directory';
 
   return (
-    <div className="admin-shell">
-      <aside className="admin-sidebar" aria-label="Admin sections">
-        <div className="admin-sidebar__brand">
-          <img src={LOGO_ICON} alt="FarmIntelytics" className="admin-sidebar__logo" />
-          <span>FarmIntelytics Admin</span>
-        </div>
-        <nav className="admin-sidebar__nav">
-          {SECTIONS.map(g => (
-            <div key={g.group} className="admin-sidebar__group">
-              <div className="admin-sidebar__group-title">{g.group}</div>
-              {g.items.map(item => (
-                <button
-                  key={item.key}
-                  type="button"
-                  className={`admin-sidebar__item ${activeTab === item.key ? 'admin-sidebar__item--active' : ''}`}
-                  onClick={() => handleTabChange(item.key)}
-                  aria-current={activeTab === item.key ? 'page' : undefined}
-                >
-                  {item.icon}
-                  <span className="admin-sidebar__label">{item.label}</span>
-                  {item.count !== undefined && <span className="admin-sidebar__count">{item.count}</span>}
-                </button>
-              ))}
-            </div>
-          ))}
-          <div className="admin-sidebar__group">
-            <div className="admin-sidebar__group-title">Portal</div>
-            <button type="button" className="admin-sidebar__item" onClick={() => navigate('/approved-workers/monthly-settlement')}>
-              <UserCheck size={17} /><span className="admin-sidebar__label">Monthly Settlement</span>
-            </button>
-            <button type="button" className="admin-sidebar__item" onClick={() => navigate('/')}>
-              <LayoutGrid size={17} /><span className="admin-sidebar__label">Operations Dashboard</span>
-            </button>
-          </div>
-        </nav>
-      </aside>
-
-      <div className="view-fade-in admin-view admin-content" style={{
-        padding: '32px 40px',
-        background: '#FFFFFF',
-        minHeight: '100vh',
-        color: '#000000',
-        fontFamily: 'inherit'
-      }}>
+    <div className="view-fade-in admin-view" style={{
+      padding: '8px 4px 32px',
+      background: 'transparent',
+      minHeight: 'calc(100vh - 96px)',
+      color: '#000000',
+      fontFamily: 'inherit',
+      width: '100%',
+      boxSizing: 'border-box'
+    }}>
 
       {/* ========================================================================= */}
       {/* TOP HEADER                                                                */}
@@ -732,27 +667,26 @@ export function AdminView() {
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: '12px',
-        marginBottom: '28px',
+        marginBottom: '16px',
         width: '100%',
         boxSizing: 'border-box'
       }}>
         {/* Left: where you are */}
         <div>
-          <div style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            Admin &rsaquo; {sectionTitle}
+          <div style={{ fontSize: '11px', fontWeight: 500, color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Admin &amp; Alerts &rsaquo; {sectionTitle}
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 500, color: '#000000', margin: '4px 0 0 0' }}>{sectionTitle}</h1>
+          <h1 style={{ fontSize: '22px', fontWeight: 500, color: '#000000', margin: '2px 0 0 0' }}>{sectionTitle}</h1>
         </div>
 
         {/* Right Top Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-          {/* Green Refresh Button with Last Refresh Time */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
           <button
             onClick={() => { loadEmployees(); loadUsers(); }}
             disabled={employeesLoading || isLoadingUsers}
             style={{
-              height: '42px',
-              padding: '0 16px',
+              height: '38px',
+              padding: '0 14px',
               background: '#3F8432',
               color: '#FFFFFF',
               border: 'none',
@@ -763,23 +697,65 @@ export function AdminView() {
               alignItems: 'center',
               gap: '8px',
               cursor: (employeesLoading || isLoadingUsers) ? 'not-allowed' : 'pointer',
-              opacity: (employeesLoading || isLoadingUsers) ? 0.9 : 1,
-              transition: 'all 0.2s ease'
+              opacity: (employeesLoading || isLoadingUsers) ? 0.85 : 1,
             }}
-            title={`Last refreshed at ${lastRefreshTime}. Click to refresh all data from PostgreSQL.`}
+            title={`Last refreshed at ${lastRefreshTime}`}
           >
-            <RefreshCw size={15} className={(employeesLoading || isLoadingUsers) ? 'spin' : ''} />
+            <RefreshCw size={14} className={(employeesLoading || isLoadingUsers) ? 'spin' : ''} />
             <span>{(employeesLoading || isLoadingUsers) ? 'Refreshing' : `Refresh (${lastRefreshTime})`}</span>
           </button>
-
-          <button
-            className="btn btn--ghost"
-            onClick={handleLogout}
-            style={{ height: '42px', color: '#DC2626', fontWeight: 500, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <LogOut size={16} /> Logout
-          </button>
         </div>
+      </div>
+
+      {/* Horizontal Admin Sub-Navigation Bar */}
+      <div style={{
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: '6px',
+        padding: '6px',
+        background: '#FFFFFF',
+        border: '1px solid #E2E8F0',
+        borderRadius: '10px',
+        marginBottom: '20px',
+      }}>
+        {allTabs.map(item => {
+          const isActive = activeTab === item.key;
+          return (
+            <button
+              key={item.key}
+              type="button"
+              onClick={() => handleTabChange(item.key)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '7px',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                border: 'none',
+                background: isActive ? '#3F8432' : 'transparent',
+                color: isActive ? '#FFFFFF' : '#334155',
+                fontSize: '13px',
+                fontWeight: 500,
+                cursor: 'pointer',
+                transition: 'all 0.15s ease',
+              }}
+            >
+              {item.icon}
+              <span>{item.label}</span>
+              {item.count !== undefined && (
+                <span style={{
+                  fontSize: '11px',
+                  padding: '1px 6px',
+                  borderRadius: '999px',
+                  background: isActive ? 'rgba(255,255,255,0.22)' : '#F1F5F9',
+                  color: isActive ? '#FFFFFF' : '#475569',
+                }}>
+                  {item.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
       </div>
 
       
@@ -1719,14 +1695,14 @@ export function AdminView() {
               <UploadCloud size={22} style={{ color: '#3F8432' }} />
               Employee Database Ingestion & Sync
             </h2>
-            <p style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600, margin: '4px 0 0 0' }}>
+            <p style={{ color: '#0f172a', fontSize: '13px', fontWeight: 400, margin: '4px 0 0 0' }}>
               Select an upload path to ingest records with multi-sheet workbook parsing, header mapping, and 2-step verification.
             </p>
           </div>
 
           {/* Dual Ingestion Launchpad Cards - Clean Black & White */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '24px' }}>
-            {/* Path 1: Field Clerks & Counters */}
+            {/* Path 1: Field Supervisors & Roles & Counters */}
             <div 
               onClick={() => { setUploadModalType('clerks'); setUploadModalOpen(true); }}
               style={{
@@ -1749,13 +1725,13 @@ export function AdminView() {
               </div>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#0F172A' }}>
-                  Upload Field Clerks (.xlsx, .csv)
+                  Upload Field Supervisors &amp; Roles (.xlsx, .csv)
                 </div>
-                <div style={{ fontSize: '12px', color: '#0f172a', marginTop: '4px', lineHeight: 1.5, fontWeight: 600 }}>
-                  Ingest Recording Clerks (Recorders) and Loading Clerks (Counters) with multi-sheet selector and column mapping.
+                <div style={{ fontSize: '12px', color: '#475569', marginTop: '4px', lineHeight: 1.5, fontWeight: 400 }}>
+                  Ingest Harvester Role and Loading Role accounts with multi-sheet selector and column mapping.
                 </div>
                 <div style={{ marginTop: '10px', fontSize: '12px', fontWeight: 500, color: '#3F8432', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  Launch Clerks Header Mapper <ArrowRight size={14} />
+                  Launch Roles Header Mapper <ArrowRight size={14} />
                 </div>
               </div>
             </div>
@@ -1785,7 +1761,7 @@ export function AdminView() {
                 <div style={{ fontSize: '16px', fontWeight: 500, color: '#0F172A' }}>
                   Upload Farm Workers & Harvesters (.xlsx, .csv)
                 </div>
-                <div style={{ fontSize: '12px', color: '#0f172a', marginTop: '4px', lineHeight: 1.5, fontWeight: 600 }}>
+                <div style={{ fontSize: '12px', color: '#0f172a', marginTop: '4px', lineHeight: 1.5, fontWeight: 400 }}>
                   Ingest Cutters, Carriers, Loose Fruit Pickers, and Loaders with 5-row live data preview and header mapping.
                 </div>
                 <div style={{ marginTop: '10px', fontSize: '12px', fontWeight: 500, color: '#3F8432', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -1827,10 +1803,10 @@ export function AdminView() {
               <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#0F172A', margin: '0 0 10px 0' }}>
                 Ingestion System Standards:
               </h3>
-              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: '#0f172a', lineHeight: 1.8, fontWeight: 600 }}>
+              <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: '#334155', lineHeight: 1.8, fontWeight: 400 }}>
                 <li><strong>Supported Formats:</strong> Excel workbooks (<code>.xlsx</code>, <code>.xls</code>) and standard CSV (<code>.csv</code>).</li>
-                <li><strong>Multi-Sheet Parsing:</strong> Automatically detects and switches between sheets like <code>Cutters & Carrier</code> and <code>Counter & recorder</code>.</li>
-                <li><strong>Role Mapping:</strong> roles are stored as Cutter, Carrier, Picker, Loading Clerk or Harvesting Clerk; unknown roles are skipped.</li>
+                <li><strong>Multi-Sheet Parsing:</strong> Supports workbooks with separate sheets for field workers and Harvester Role / Loading Role rosters.</li>
+                <li><strong>Role Mapping:</strong> Roles map cleanly to Cutter, Carrier, Picker, Harvester Role, or Loading Role.</li>
                 <li><strong>Active / Inactive Status:</strong> Optional status column mapping updates existing worker status across all tables.</li>
               </ul>
             </div>
@@ -1936,7 +1912,7 @@ export function AdminView() {
                   value={newUser.sendTo}
                   onChange={(e) => setNewUser({ ...newUser, sendTo: e.target.value })}
                 />
-                <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 600, marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 400, marginTop: '4px' }}>
                   The login email and password are emailed here. Leave blank to send to the account email above.
                 </div>
               </div>
@@ -1955,20 +1931,17 @@ export function AdminView() {
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Estate Access</label>
-                <select
-                  className="select-input"
-                  style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 500, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Division / Block Scope (Optional)</label>
+                <input
+                  type="text"
+                  className="search-input"
+                  style={{ width: '100%', height: '42px', border: '1px solid #CBD5E1', fontWeight: 400, color: '#000000', borderRadius: '6px', padding: '0 12px', boxSizing: 'border-box' }}
+                  placeholder="Leave blank for All Divisions"
                   value={newUser.estate}
                   onChange={(e) => setNewUser({ ...newUser, estate: e.target.value })}
-                >
-                  <option value="">All Estates</option>
-                  <option value="Main Estate">Main Estate only</option>
-                  <option value="Extension 1">Extension 1 only</option>
-                  <option value="Extension 2">Extension 2 only</option>
-                </select>
-                <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 600, marginTop: '4px' }}>
-                  A user limited to one estate sees only that estate on every page, table, map and export.
+                />
+                <div style={{ fontSize: '11px', color: '#64748B', fontWeight: 400, marginTop: '4px' }}>
+                  Optional label or division restriction for this user account.
                 </div>
               </div>
 
@@ -2223,18 +2196,15 @@ export function AdminView() {
               </select>
             </div>
             <div style={{ marginBottom: '22px' }}>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Estate Access</label>
-              <select
-                className="select-input"
-                style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 500, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Division / Block Scope (Optional)</label>
+              <input
+                type="text"
+                className="search-input"
+                style={{ width: '100%', height: '42px', border: '1px solid #CBD5E1', fontWeight: 400, color: '#000000', borderRadius: '6px', padding: '0 12px', boxSizing: 'border-box' }}
+                placeholder="Leave blank for All Divisions"
                 value={editAccess.estate}
                 onChange={(e) => setEditAccess({ ...editAccess, estate: e.target.value })}
-              >
-                <option value="">All Estates</option>
-                <option value="Main Estate">Main Estate only</option>
-                <option value="Extension 1">Extension 1 only</option>
-                <option value="Extension 2">Extension 2 only</option>
-              </select>
+              />
             </div>
             <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 500, color: '#0F172A', marginBottom: '18px', cursor: 'pointer' }}>
               <input type="checkbox" checked={editAccess.notify} onChange={(e) => setEditAccess({ ...editAccess, notify: e.target.checked })} />
@@ -2265,7 +2235,6 @@ export function AdminView() {
         onConfirm={confirmModalState.onConfirm}
         onCancel={closeConfirmModal}
       />
-    </div>
     </div>
   );
 }

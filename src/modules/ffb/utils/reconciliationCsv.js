@@ -16,8 +16,8 @@ export const RECONCILIATION_EXPORT_COLS = [
   { key: 'variance', header: 'Variance' },
   { key: 'unit', header: 'Unit' },
   { key: 'status', header: 'Status' },
-  { key: 'harvesting_clerk_ids', header: 'Harv. Clerk ID' },
-  { key: 'loading_clerk_ids', header: 'Loading Clerk ID' },
+  { key: 'harvesting_clerk_ids', header: 'Harvester Role ID' },
+  { key: 'loading_clerk_ids', header: 'Loading Role ID' },
 ];
 
 const csvCell = (v) => {

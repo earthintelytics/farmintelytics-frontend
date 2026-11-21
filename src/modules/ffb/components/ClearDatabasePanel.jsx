@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { AlertTriangle, Trash2, Download, Lock, X, Loader2 } from 'lucide-react';
+import { AlertTriangle, Trash2, Download, X, Loader2 } from 'lucide-react';
 import { API } from '../services/api';
 
 function downloadCsv(filename, content) {
@@ -15,26 +15,22 @@ function downloadCsv(filename, content) {
 }
 
 /**
- * Danger zone for the Sync tab: clears the worker directory (employee table).
- * Step 1 asks whether to back up first; step 2 requires the admin's password.
- * The backend re-verifies the password and Super Admin role before deleting.
+ * Danger zone for the Sync tab: clears the tenant's workforce directory (employee table).
  */
 export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
   const [open, setOpen] = useState(false);
-  const [step, setStep] = useState(1); // 1 = backup choice, 2 = password
+  const [step, setStep] = useState(1); // 1 = backup choice, 2 = confirm phrase
   const [backup, setBackup] = useState(true);
-  const [password, setPassword] = useState('');
+  const [confirmText, setConfirmText] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-
-  const adminEmail = localStorage.getItem('fi_ffb_admin_email') || '';
 
   const close = () => {
     if (busy) return;
     setOpen(false);
     setStep(1);
     setBackup(true);
-    setPassword('');
+    setConfirmText('');
     setError('');
   };
 
@@ -45,19 +41,19 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
 
   const handleClear = async (e) => {
     e.preventDefault();
-    if (!password) {
-      setError('Enter your password to confirm.');
+    if (confirmText.trim().toUpperCase() !== 'CLEAR') {
+      setError('Type CLEAR to confirm.');
       return;
     }
     setBusy(true);
     setError('');
     try {
-      const res = await API.clearEmployees(adminEmail, password, backup);
+      const res = await API.clearEmployees(backup);
       if (backup && res?.backup_csv != null) {
-        downloadCsv(res.backup_filename || 'fi_ffb_workers_backup.csv', res.backup_csv);
+        downloadCsv(res.backup_filename || 'farmintelytics-ffb-workforce-backup.csv', res.backup_csv);
       }
       showToast?.(
-        `Worker directory cleared: ${res?.deleted ?? 0} records deleted${backup ? ' (backup downloaded)' : ''}.`,
+        `Workforce directory cleared: ${res?.deleted ?? 0} records deleted${backup ? ' (backup downloaded)' : ''}.`,
         'success'
       );
       setBusy(false);
@@ -76,21 +72,20 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
 
   return (
     <>
-      <div style={{ marginTop: '24px', background: '#FFFFFF', border: '1.5px solid #FCA5A5', borderRadius: '12px', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
+      <div style={{ marginTop: '24px', background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flex: '1 1 320px' }}>
-          <div style={{ background: 'transparent', color: '#DC2626', width: '44px', height: '44px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ background: '#FEF2F2', color: '#DC2626', width: '44px', height: '44px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             <AlertTriangle size={22} />
           </div>
           <div>
-            <div style={{ fontSize: '16px', fontWeight: 500, color: '#991B1B' }}>Danger Zone · Clear Worker Directory</div>
-            <div style={{ fontSize: '12px', color: '#0f172a', fontWeight: 600, marginTop: '4px', lineHeight: 1.6 }}>
-              Permanently deletes all {employeeCount} worker and clerk records so you can re-upload a fresh list.
-              Harvest and loading records are not touched. Super Admin only; your password is required.
+            <div style={{ fontSize: '16px', fontWeight: 500, color: '#991B1B' }}>Danger Zone · Clear Workforce Directory</div>
+            <div style={{ fontSize: '12px', color: '#475569', fontWeight: 400, marginTop: '4px', lineHeight: 1.6 }}>
+              Permanently deletes all {employeeCount} field worker and operator records for this organisation so you can upload a fresh roster. Harvest and loading logs are never touched.
             </div>
           </div>
         </div>
         <button onClick={() => setOpen(true)} style={{ ...btn, background: '#DC2626', color: '#FFFFFF', border: 'none' }}>
-          <Trash2 size={16} /> Clear Database
+          <Trash2 size={16} /> Clear Directory
         </button>
       </div>
 
@@ -104,7 +99,7 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
           <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '28px', maxWidth: '460px', width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', border: '1px solid #E2E8F0' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <h3 id="clear-db-title" style={{ fontSize: '18px', fontWeight: 500, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <AlertTriangle size={22} color="#DC2626" /> Clear worker directory
+                <AlertTriangle size={22} color="#DC2626" /> Clear workforce directory
               </h3>
               <button onClick={close} aria-label="Close" disabled={busy} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#0f172a' }}>
                 <X size={20} />
@@ -114,13 +109,13 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
             {step === 1 && (
               <>
                 <p style={{ fontSize: '14px', color: '#0f172a', lineHeight: 1.6, margin: '0 0 20px 0' }}>
-                  This deletes <strong>all {employeeCount} records</strong> in the worker directory. Do you want to download a backup first?
+                  This deletes <strong>all {employeeCount} records</strong> in your workforce directory. Do you want to download a CSV backup first?
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   <button onClick={() => chooseBackup(true)} style={{ ...btn, background: '#3F8432', color: '#FFFFFF', border: 'none' }}>
                     <Download size={16} /> Yes, back up then clear
                   </button>
-                  <button onClick={() => chooseBackup(false)} style={{ ...btn, background: '#FFFFFF', color: '#991B1B', border: '1.5px solid #FCA5A5' }}>
+                  <button onClick={() => chooseBackup(false)} style={{ ...btn, background: '#FFFFFF', color: '#991B1B', border: '1px solid #FCA5A5' }}>
                     No, clear without backup
                   </button>
                   <button onClick={close} style={{ ...btn, background: '#FFFFFF', color: '#0f172a', border: '1px solid #CBD5E1' }}>
@@ -134,23 +129,20 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
               <form onSubmit={handleClear}>
                 <p style={{ fontSize: '14px', color: '#0f172a', lineHeight: 1.6, margin: '0 0 16px 0' }}>
                   {backup
-                    ? 'A backup CSV will download, then all records will be deleted.'
-                    : 'All records will be deleted with no backup.'}{' '}
-                  Enter the password for <strong>{adminEmail || 'your account'}</strong> to confirm.
+                    ? 'A backup CSV will download, then all workforce records will be deleted.'
+                    : 'All workforce records will be deleted with no backup.'}{' '}
+                  Type <strong>CLEAR</strong> below to confirm.
                 </p>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#0F172A', marginBottom: '6px' }}>Password</label>
-                <div style={{ position: 'relative' }}>
-                  <Lock size={16} color="#64748B" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
-                  <input
-                    type="password"
-                    autoFocus
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    disabled={busy}
-                    style={{ width: '100%', boxSizing: 'border-box', height: '42px', padding: '0 12px 0 36px', borderRadius: '8px', border: '1.5px solid #CBD5E1', fontSize: '14px' }}
-                  />
-                </div>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#0F172A', marginBottom: '6px' }}>Confirmation</label>
+                <input
+                  type="text"
+                  autoFocus
+                  placeholder="Type CLEAR"
+                  value={confirmText}
+                  onChange={(e) => setConfirmText(e.target.value)}
+                  disabled={busy}
+                  style={{ width: '100%', boxSizing: 'border-box', height: '42px', padding: '0 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px' }}
+                />
                 {error && (
                   <div role="alert" style={{ marginTop: '10px', fontSize: '13px', fontWeight: 500, color: '#991B1B', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: '8px', padding: '8px 12px' }}>
                     {error}
@@ -160,9 +152,9 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
                   <button type="button" onClick={() => setStep(1)} disabled={busy} style={{ ...btn, background: '#FFFFFF', color: '#0f172a', border: '1px solid #CBD5E1' }}>
                     Back
                   </button>
-                  <button type="submit" disabled={busy || !password} style={{ ...btn, background: '#DC2626', color: '#FFFFFF', border: 'none', opacity: busy || !password ? 0.6 : 1 }}>
+                  <button type="submit" disabled={busy || confirmText.trim().toUpperCase() !== 'CLEAR'} style={{ ...btn, background: '#DC2626', color: '#FFFFFF', border: 'none', opacity: busy || confirmText.trim().toUpperCase() !== 'CLEAR' ? 0.6 : 1 }}>
                     {busy ? <Loader2 size={16} style={{ animation: 'spin 1s linear infinite' }} /> : <Trash2 size={16} />}
-                    {backup ? 'Back up & clear' : 'Clear database'}
+                    {backup ? 'Back up & clear' : 'Clear directory'}
                   </button>
                 </div>
               </form>

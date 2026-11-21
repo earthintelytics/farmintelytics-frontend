@@ -19,7 +19,7 @@ export function FaqView() {
       <div style={{ position: 'relative', margin: '24px 0' }}>
         <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }}><Search size={16} /></span>
         <input type="text" className="select-input" placeholder="Search the questions" value={query} onChange={e => setQuery(e.target.value)}
-          style={{ width: '100%', height: '44px', border: '1px solid #cbd5e1', borderRadius: '10px', paddingLeft: '40px', fontSize: '14px', fontWeight: 600, boxSizing: 'border-box' }} />
+          style={{ width: '100%', height: '44px', border: '1px solid #cbd5e1', borderRadius: '10px', paddingLeft: '40px', fontSize: '14px', fontWeight: 400, boxSizing: 'border-box' }} />
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>

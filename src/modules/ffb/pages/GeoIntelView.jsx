@@ -283,7 +283,7 @@ export function GeoIntelView() {
     plotLayersRef.current.set(id, layer);
     if (showLabels) {
       const block = feature.properties?.CodeBloc;
-      layer.bindTooltip(`<div style="font-weight:900;font-size:11px;">${id}${block ? ` (${block})` : ''}</div>`, {
+      layer.bindTooltip(`<div style="font-weight: 500;font-size:11px;">${id}${block ? ` (${block})` : ''}</div>`, {
         permanent: true, direction: 'center', className: 'plot-label-tooltip',
       });
     }
@@ -343,7 +343,7 @@ export function GeoIntelView() {
   ];
 
   const selectedFeature = selectedPlot && !selectedPlot.startsWith('?') ? featureById.get(selectedPlot) : null;
-  const inputStyle = { width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600, color: '#0f172a' };
+  const inputStyle = { width: '100%', height: '42px', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400, color: '#0f172a' };
 
   return (
     <div className="view-container view-fade-in map-view geo-intel" style={{ padding: '20px 32px 0', display: 'flex', flexDirection: 'column', fontFamily: "'Inter', sans-serif" }}>
@@ -469,7 +469,7 @@ export function GeoIntelView() {
 
         {/* Legend (the reconciliation legend doubles as a status filter) */}
         <div className="geo-intel__legend" style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 1000, background: 'white', border: '1px solid #e2e8f0',
-          borderRadius: 0, padding: '8px 10px', fontSize: '12px', fontWeight: 600, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', maxWidth: '240px' }}>
+          borderRadius: 0, padding: '8px 10px', fontSize: '12px', fontWeight: 400, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', maxWidth: '240px' }}>
           <div style={{ fontSize: '10px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
             {lens === 'reconciliation' ? 'Show status' : 'Legend'}
           </div>
@@ -585,7 +585,7 @@ function PlotPanel({ lens, plotId, query, feature, lastEver, harvestedInPeriod, 
                     {!kg && r.harvester_rotten ? <> · Rotten <b>{r.harvester_rotten}</b></> : null}
                   </div>
                   <div style={{ fontSize: '12px', color: '#0f172a', marginTop: '2px', overflowWrap: 'anywhere' }}>
-                    Harv. Clerk: {r.harvesting_clerk_ids || '—'} · Loading Clerk: {r.loading_clerk_ids || '—'}
+                    Harvester Role: {r.harvesting_clerk_ids || '—'} · Loading Role: {r.loading_clerk_ids || '—'}
                   </div>
                   <button type="button" onClick={() => onOpen(r)}
                     style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', border: 'none', background: '#3F8432', color: 'white',

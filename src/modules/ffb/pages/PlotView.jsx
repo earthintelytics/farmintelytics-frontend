@@ -275,7 +275,7 @@ export function PlotView() {
             <h1 className="view-title" style={{ margin: 0 }}>Block Performance</h1>
             <p className="view-subtitle plot-view__subtitle" style={{ margin: '4px 0 0 0' }}>Daily block-level aggregation for harvested and loaded volumes, quality signals, and verification status.</p>
           </div>
-          <button 
+          <button
             className="btn btn--outline"
             onClick={() => setActiveSubpage('bunch-weight')}
             style={{
@@ -347,7 +347,7 @@ export function PlotView() {
           <input
             type="date"
             className="date-input"
-            style={{ width: '100%', height: '40px', borderRadius: '8px', padding: '0 10px', border: '1px solid #cbd5e1', fontSize: '12px', fontWeight: 600 }}
+            style={{ width: '100%', height: '40px', borderRadius: '8px', padding: '0 10px', border: '1px solid #cbd5e1', fontSize: '12px', fontWeight: 400 }}
             value={filters.dateRange.from || ''}
             onChange={e => updateFilters({ dateRange: { ...filters.dateRange, from: e.target.value || null } })}
           />
@@ -359,24 +359,24 @@ export function PlotView() {
           <input
             type="date"
             className="date-input"
-            style={{ width: '100%', height: '40px', borderRadius: '8px', padding: '0 10px', border: '1px solid #cbd5e1', fontSize: '12px', fontWeight: 600 }}
+            style={{ width: '100%', height: '40px', borderRadius: '8px', padding: '0 10px', border: '1px solid #cbd5e1', fontSize: '12px', fontWeight: 400 }}
             value={filters.dateRange.to || ''}
             onChange={e => updateFilters({ dateRange: { ...filters.dateRange, to: e.target.value || null } })}
           />
         </div>
 
         {/* 5. Reset Button */}
-        <button 
-          className="btn btn--outline" 
-          onClick={resetFilters} 
+        <button
+          className="btn btn--outline"
+          onClick={resetFilters}
           style={{ height: '40px', padding: '0 16px', fontWeight: 500, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', whiteSpace: 'nowrap', flexShrink: 0 }}
         >
           <RotateCcw size={14} /> RESET
         </button>
 
         {/* 6. Export CSV Button */}
-        <button 
-          className="btn btn--primary" 
+        <button
+          className="btn btn--primary"
           onClick={isViewer ? undefined : () => setExportModalOpen(true)}
           disabled={isViewer}
           title={isViewer ? 'Viewer accounts cannot export CSV from the portal' : 'Export CSV'}
@@ -465,8 +465,8 @@ export function PlotView() {
       <div className="table-entries-bar">
         <div className="table-entries-bar__left">
           Show
-          <select 
-            value={pageSize} 
+          <select
+            value={pageSize}
             onChange={e => {
               setPageSize(Number(e.target.value));
               setCurrentPage(1);
@@ -489,15 +489,15 @@ export function PlotView() {
           <table className="plot-records-table" aria-label="Plot aggregate records">
             <thead>
               <tr>
-                <th>Date<br/><input type="text" placeholder="Filter..." value={colFilters.date || ''} onChange={e => updateColFilter('date', e.target.value)} className="col-filter-input" /></th>
-                <th>Plot ID<br/><input type="text" placeholder="Filter..." value={colFilters.plot_id || ''} onChange={e => updateColFilter('plot_id', e.target.value)} className="col-filter-input" /></th>
-                <th className="plot-cell--num">Harvested FFB<br/><input type="text" placeholder="Filter..." value={colFilters.harvCount || ''} onChange={e => updateColFilter('harvCount', e.target.value)} className="col-filter-input" /></th>
-                <th className="plot-cell--num">Loaded FFB<br/><input type="text" placeholder="Filter..." value={colFilters.loadCount || ''} onChange={e => updateColFilter('loadCount', e.target.value)} className="col-filter-input" /></th>
-                <th className="plot-cell--num">Rotten<br/><input type="text" placeholder="Filter..." value={colFilters.rotten || ''} onChange={e => updateColFilter('rotten', e.target.value)} className="col-filter-input" /></th>
-                <th className="plot-cell--num">Harvested Weight (kg)<br/><input type="text" placeholder="Filter..." value={colFilters.harvWeight || ''} onChange={e => updateColFilter('harvWeight', e.target.value)} className="col-filter-input" /></th>
-                <th className="plot-cell--num">Loaded Weight (kg)<br/><input type="text" placeholder="Filter..." value={colFilters.loadWeight || ''} onChange={e => updateColFilter('loadWeight', e.target.value)} className="col-filter-input" /></th>
-                <th className="plot-cell--num">Duration<br/><input type="text" placeholder="Filter..." value={colFilters.duration || ''} onChange={e => updateColFilter('duration', e.target.value)} className="col-filter-input" /></th>
-                <th className="plot-cell--num" style={{ textAlign: 'center' }}>Difference<br/><input type="text" placeholder="Filter..." value={colFilters.difference || ''} onChange={e => updateColFilter('difference', e.target.value)} className="col-filter-input" /></th>
+                <th>Date<br /><input type="text" placeholder="Filter..." value={colFilters.date || ''} onChange={e => updateColFilter('date', e.target.value)} className="col-filter-input" /></th>
+                <th>Plot ID<br /><input type="text" placeholder="Filter..." value={colFilters.plot_id || ''} onChange={e => updateColFilter('plot_id', e.target.value)} className="col-filter-input" /></th>
+                <th className="plot-cell--num">Harvested FFB<br /><input type="text" placeholder="Filter..." value={colFilters.harvCount || ''} onChange={e => updateColFilter('harvCount', e.target.value)} className="col-filter-input" /></th>
+                <th className="plot-cell--num">Loaded FFB<br /><input type="text" placeholder="Filter..." value={colFilters.loadCount || ''} onChange={e => updateColFilter('loadCount', e.target.value)} className="col-filter-input" /></th>
+                <th className="plot-cell--num">Rotten<br /><input type="text" placeholder="Filter..." value={colFilters.rotten || ''} onChange={e => updateColFilter('rotten', e.target.value)} className="col-filter-input" /></th>
+                <th className="plot-cell--num">Harvested Weight (kg)<br /><input type="text" placeholder="Filter..." value={colFilters.harvWeight || ''} onChange={e => updateColFilter('harvWeight', e.target.value)} className="col-filter-input" /></th>
+                <th className="plot-cell--num">Loaded Weight (kg)<br /><input type="text" placeholder="Filter..." value={colFilters.loadWeight || ''} onChange={e => updateColFilter('loadWeight', e.target.value)} className="col-filter-input" /></th>
+                <th className="plot-cell--num">Duration<br /><input type="text" placeholder="Filter..." value={colFilters.duration || ''} onChange={e => updateColFilter('duration', e.target.value)} className="col-filter-input" /></th>
+                <th className="plot-cell--num" style={{ textAlign: 'center' }}>Difference<br /><input type="text" placeholder="Filter..." value={colFilters.difference || ''} onChange={e => updateColFilter('difference', e.target.value)} className="col-filter-input" /></th>
               </tr>
             </thead>
             <tbody>

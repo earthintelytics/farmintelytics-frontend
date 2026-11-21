@@ -23,7 +23,7 @@ import { normalizeWorkerStatus } from '../utils/workerStatus';
 export { normalizeWorkerStatus };
 
 
-// Clerk IDs look like HAC30148 / CL00038; worker IDs are numeric.
+// Operator IDs look like HAC30148 / CL00038; worker IDs are numeric.
 const looksLikeEmployeeId = (v) => /^[A-Za-z]{0,4}\d{3,}$/.test(String(v || '').trim());
 
 export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = 'workers', showToast }) {
@@ -142,7 +142,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
       const initialMap = {};
       const usedHeaders = new Set();
 
-      // Special rule: For clerks (Recorders & Counters), CONTRACTOR column holds the Employee IDs (e.g. HAC30148, CL00038)
+      // Special rule: For operators (Recorders & Counters), CONTRACTOR column holds the Employee IDs (e.g. HAC30148, CL00038)
       const contractorH = headers.find(h => /^contractor$/i.test(h.trim()));
       const hasExplicitEmpId = headers.some(h => /^(employee_?id|staff_?id|worker_?id)$/i.test(h.trim()));
       const contractorIdx = contractorH ? headers.indexOf(contractorH) : -1;
@@ -193,7 +193,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
         }
       });
 
-      // Fallback for Clerks: if operation column exists, map to function
+      // Fallback for Operators: if operation column exists, map to function
       if (isClerks && !initialMap.function) {
         const opCol = headers.find(h => /operation/i.test(h));
         if (opCol && !usedHeaders.has(opCol)) initialMap.function = opCol;
@@ -238,8 +238,8 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
       let rawRole = getVal('function');
 
       if (isClerks) {
-        if (/counter/i.test(rawRole)) rawRole = 'Loading Clerk';
-        else if (/recorder/i.test(rawRole)) rawRole = 'Recording Clerk';
+        if (/counter/i.test(rawRole)) rawRole = 'Loading Role';
+        else if (/recorder/i.test(rawRole)) rawRole = 'Harvester Role';
       }
 
       const rawStatus = getVal('worker_status');
@@ -343,8 +343,8 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
 
         let role = getVal('function');
         if (isClerks) {
-          if (/counter/i.test(role)) role = 'Loading Clerk';
-          else if (/recorder/i.test(role)) role = 'Recording Clerk';
+          if (/counter/i.test(role)) role = 'Loading Role';
+          else if (/recorder/i.test(role)) role = 'Harvester Role';
         }
         // Role conversion and unknown-role skipping happen on the backend.
 
@@ -469,10 +469,10 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <h2 style={{ fontSize: '18px', fontWeight: 500, color: '#0F172A', margin: 0 }}>
-                {isClerks ? 'Upload Field Clerks' : 'Upload Farm Workers & Harvesters'}
+                {isClerks ? 'Upload Field Supervisors & Roles' : 'Upload Farm Workers & Harvesters'}
               </h2>
             </div>
-            <p style={{ fontSize: '13px', color: '#0f172a', margin: '4px 0 0 0', fontWeight: 600 }}>
+            <p style={{ fontSize: '13px', color: '#0f172a', margin: '4px 0 0 0', fontWeight: 400 }}>
               {step === 1 
                 ? 'Step 1 of 2: Select file, sheet, and map column headers.'
                 : 'Step 2 of 2: Review mapped data preview before synchronizing to database.'}
@@ -839,7 +839,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
           alignItems: 'center',
           background: '#FFFFFF'
         }}>
-          <div style={{ fontSize: '13px', color: '#0f172a', fontWeight: 600 }}>
+          <div style={{ fontSize: '13px', color: '#0f172a', fontWeight: 400 }}>
             {sheetData.length > 0 ? (
               <span>Mapping <strong>{sheetData.length} records</strong> from sheet: <strong style={{ color: '#3F8432' }}>{selectedSheet}</strong></span>
             ) : (

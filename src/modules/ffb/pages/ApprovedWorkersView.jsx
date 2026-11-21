@@ -42,7 +42,7 @@ const HARVESTER_COLS = [
   },
   {
     key: 'carrier_name', header: 'Carrier Name', defaultVisible: false, filterKey: 'carried_by', isName: true,
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 600 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 400 },
     render: row => {
       const selfCarried = !row.carrier_id || row.carrier_id === row.h_worker_id;
       return selfCarried
@@ -52,7 +52,7 @@ const HARVESTER_COLS = [
   },
   {
     key: 'contractor', header: 'Contractor', defaultVisible: true, filterKey: 'contractor',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 600 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 400 },
     render: row => row.contractor
   },
   {
@@ -75,12 +75,12 @@ const HARVESTER_COLS = [
     render: row => fmtNumber(row.h_unripe_count)
   },
   {
-    key: 'harv_clerk', header: 'Harv. Clerk ID', defaultVisible: false, filterKey: 'recorder_name',
+    key: 'harv_clerk', header: 'Harvester Role ID', defaultVisible: false, filterKey: 'recorder_name',
     tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.recorder_name || ''}>{row.harvesting_clerk_id || '—'}</span>
   },
   {
-    key: 'loading_clerk', header: 'Loading Clerk ID', defaultVisible: false, filterKey: 'loader_name',
+    key: 'loading_clerk', header: 'Loading Role ID', defaultVisible: false, filterKey: 'loader_name',
     tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.loader_name || ''}>{row.loader_id || '—'}</span>
   },
@@ -110,7 +110,7 @@ const PICKER_COLS = [
   },
   {
     key: 'contractor', header: 'Contractor', defaultVisible: true, filterKey: 'contractor',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 600 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 400 },
     render: row => row.contractor
   },
   {
@@ -119,12 +119,12 @@ const PICKER_COLS = [
     render: row => (row.h_weight_kg > 0 ? `${fmtNumber(row.h_weight_kg)} kg` : '—')
   },
   {
-    key: 'harv_clerk', header: 'Harv. Clerk ID', defaultVisible: false, filterKey: 'recorder_name',
+    key: 'harv_clerk', header: 'Harvester Role ID', defaultVisible: false, filterKey: 'recorder_name',
     tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.recorder_name || ''}>{row.harvesting_clerk_id || '—'}</span>
   },
   {
-    key: 'loading_clerk', header: 'Loading Clerk ID', defaultVisible: false, filterKey: 'loader_name',
+    key: 'loading_clerk', header: 'Loading Role ID', defaultVisible: false, filterKey: 'loader_name',
     tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.loader_name || ''}>{row.loader_id || '—'}</span>
   },
@@ -443,7 +443,7 @@ export function ApprovedWorkersView() {
       <div className="view-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
           <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <UserCheck size={26} strokeWidth={1.5} style={{ color: '#3F8432' }} /> Approved Crew Ledger
+            <UserCheck size={26} strokeWidth={1.5} style={{ color: '#3F8432' }} /> Approved Workers Ledger
           </h1>
           <p className="view-subtitle" style={{ color: 'var(--text-muted)' }}>Historical register of all successfully approved and matched harvesting records.</p>
         </div>
@@ -537,7 +537,7 @@ export function ApprovedWorkersView() {
               type="text"
               className="select-input"
               placeholder="e.g. John Cutter"
-              style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', paddingLeft: '36px', fontSize: '14px', fontWeight: 600 }}
+              style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', paddingLeft: '36px', fontSize: '14px', fontWeight: 400 }}
               value={filters.search}
               onChange={e => setFilters({ ...filters, search: e.target.value })}
             />
@@ -551,7 +551,7 @@ export function ApprovedWorkersView() {
             type="text"
             className="select-input"
             placeholder="e.g. EST1-A1.1"
-            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600 }}
+            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400 }}
             value={filters.plot}
             onChange={e => setFilters({ ...filters, plot: e.target.value })}
           />
@@ -564,7 +564,7 @@ export function ApprovedWorkersView() {
             type="text"
             className="select-input"
             placeholder="e.g. Team A"
-            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600 }}
+            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400 }}
             value={filters.team}
             onChange={e => setFilters({ ...filters, team: e.target.value })}
           />
@@ -577,7 +577,7 @@ export function ApprovedWorkersView() {
             type="text"
             className="select-input"
             placeholder="e.g. Direct Workforce"
-            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600 }}
+            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400 }}
             value={filters.contractor}
             onChange={e => setFilters({ ...filters, contractor: e.target.value })}
           />
@@ -589,7 +589,7 @@ export function ApprovedWorkersView() {
           <input
             type="date"
             className="select-input"
-            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600 }}
+            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400 }}
             value={filters.from}
             onChange={e => setFilters({ ...filters, from: e.target.value })}
           />
@@ -601,7 +601,7 @@ export function ApprovedWorkersView() {
           <input
             type="date"
             className="select-input"
-            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600 }}
+            style={{ width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 400 }}
             value={filters.to}
             onChange={e => setFilters({ ...filters, to: e.target.value })}
           />

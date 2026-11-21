@@ -12,7 +12,21 @@ export default function FfbAppConnection({ tenantSlug }) {
   const [qrImg, setQrImg] = useState('');
   const [copied, setCopied] = useState('');
   const [loading, setLoading] = useState(true);
+  const [regenerating, setRegenerating] = useState(false);
   const [err, setErr] = useState('');
+
+  const handleRegenerateCode = async () => {
+    setRegenerating(true);
+    setErr('');
+    try {
+      await ffbCall('/app-connection/regenerate-code', { method: 'POST', tenantSlug });
+      await load();
+    } catch (e) {
+      setErr(e.message || 'Could not regenerate organisation code.');
+    } finally {
+      setRegenerating(false);
+    }
+  };
 
   const load = async () => {
     setLoading(true);
@@ -51,7 +65,7 @@ export default function FfbAppConnection({ tenantSlug }) {
       type="button"
       onClick={() => copyText(id, value)}
       disabled={!value}
-      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-light)] bg-white text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40"
+      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-light)] bg-white text-xs font-normal text-gray-700 hover:bg-gray-50 disabled:opacity-40"
     >
       {copied === id ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
       {copied === id ? 'Copied' : label}
@@ -64,7 +78,7 @@ export default function FfbAppConnection({ tenantSlug }) {
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-2xl font-semibold text-[var(--text-main)]">Field App &amp; Organisation Link</h1>
+          <h1 className="font-display text-2xl font-normal text-[var(--text-main)]">Field App &amp; Organisation Link</h1>
           <p className="text-sm text-[var(--text-muted)]">
             Verified web portal link, Android APK download, Setup QR code, and active field devices bound strictly to your estate.
           </p>
@@ -73,7 +87,7 @@ export default function FfbAppConnection({ tenantSlug }) {
           type="button"
           onClick={load}
           disabled={loading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border-light)] bg-white text-xs font-semibold hover:bg-gray-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--border-light)] bg-white text-xs font-normal hover:bg-gray-50"
         >
           <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
           Refresh Status
@@ -102,12 +116,28 @@ export default function FfbAppConnection({ tenantSlug }) {
                   <CheckCircle2 size={12} strokeWidth={1.5} /> Connected &amp; Tenant-Isolated
                 </div>
                 <h2 className="font-display text-xl font-medium text-gray-900 truncate">{pack.display_name || pack.company_id}</h2>
-                <div className="flex flex-wrap items-center gap-2 mt-1">
-                  <p className="text-xs text-gray-600 font-mono">
-                    Project / Organisation Code: <span className="font-semibold text-[#2D6A2C] bg-[#F3F8EF] px-2 py-0.5 rounded">{pack.company_id}</span>
+                <div className="flex flex-wrap items-center gap-2 mt-1.5">
+                  <p className="text-xs text-gray-700 font-mono">
+                    Organisation Access Code:{' '}
+                    <span className="font-normal text-[#2D6A2C] bg-[#F3F8EF] px-2.5 py-1 rounded-md text-sm tracking-wider">
+                      {pack.access_code || pack.company_id}
+                    </span>
                   </p>
-                  <CopyBtn id="code" value={pack.company_id} label="Copy Project Code" />
+                  <CopyBtn id="code" value={pack.access_code || pack.company_id} label="Copy Access Code" />
+                  <button
+                    type="button"
+                    onClick={handleRegenerateCode}
+                    disabled={regenerating}
+                    className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-gray-200 bg-white text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-40"
+                    title="Generate a new unique organisation access code"
+                  >
+                    <RefreshCw size={12} className={regenerating ? 'animate-spin' : ''} />
+                    {regenerating ? 'Rotating...' : 'New Code'}
+                  </button>
                 </div>
+                <p className="text-[11px] text-gray-500 mt-1">
+                  Send this code to your field team. Entering it on first launch locks the mobile app exclusively to <strong>{pack.display_name || pack.company_id}</strong> before Worker Role sign-in.
+                </p>
               </div>
             </div>
 
@@ -131,12 +161,12 @@ export default function FfbAppConnection({ tenantSlug }) {
               <div className="bg-white rounded-2xl border border-[var(--border-light)] p-5 space-y-4">
                 <div className="flex items-center gap-2">
                   <ShieldCheck size={18} className="text-[var(--brand-primary)]" />
-                  <h3 className="font-display text-base font-semibold">Dedicated Client Portal &amp; App Endpoints</h3>
+                  <h3 className="font-display text-base font-normal">Dedicated Client Portal &amp; App Endpoints</h3>
                 </div>
 
                 <div className="space-y-3 text-xs">
                   <div className="p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-light)]">
-                    <p className="text-[11px] font-semibold text-[var(--text-muted)] mb-1">Direct Client FFB Portal URL</p>
+                    <p className="text-[11px] font-normal text-[var(--text-muted)] mb-1">Direct Client FFB Portal URL</p>
                     <div className="flex items-center justify-between gap-2">
                       <code className="font-mono text-gray-900 break-all">{pack.portal_url}</code>
                       <div className="flex items-center gap-1.5 shrink-0">
@@ -157,7 +187,7 @@ export default function FfbAppConnection({ tenantSlug }) {
                   </div>
 
                   <div className="p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-light)]">
-                    <p className="text-[11px] font-semibold text-[var(--text-muted)] mb-1">Dedicated Sign-In URL (Bookmark for Managers)</p>
+                    <p className="text-[11px] font-normal text-[var(--text-muted)] mb-1">Dedicated Sign-In URL (Bookmark for Managers)</p>
                     <div className="flex items-center justify-between gap-2">
                       <code className="font-mono text-gray-900 break-all">{pack.login_url}</code>
                       <CopyBtn id="login" value={pack.login_url} />
@@ -172,7 +202,7 @@ export default function FfbAppConnection({ tenantSlug }) {
                           Version <span className="font-mono">{pack.latest_apk_version || '—'}</span>
                         </p>
                         <p className="text-[11px] text-[var(--text-muted)]">
-                          Install this APK on estate tablets/phones, scan the Setup QR or enter your Project Code to unlock Clerk Login.
+                          Install this APK on estate tablets/phones, enter the Organisation Access Code or scan the Setup QR to unlock Harvester Role &amp; Loading Role sign-in.
                         </p>
                       </div>
                       {pack.apk_download_url ? (
@@ -200,24 +230,24 @@ export default function FfbAppConnection({ tenantSlug }) {
                 <div className="px-5 py-4 border-b border-[var(--border-light)] flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <TabletSmartphone size={17} className="text-[var(--brand-primary)]" />
-                    <h3 className="font-display text-base font-semibold">Verified Connected Field Devices</h3>
+                    <h3 className="font-display text-base font-normal">Verified Connected Field Devices</h3>
                   </div>
                   <span className="text-xs text-[var(--text-muted)]">{devices.length} device stream(s)</span>
                 </div>
 
                 {devices.length === 0 ? (
                   <div className="p-6 text-center text-xs text-[var(--text-muted)]">
-                    No mobile syncs recorded for <span className="font-mono font-semibold">{pack.company_id}</span> yet. Once a clerk scans a Setup QR and syncs field bunches, their device ID appears here.
+                    No mobile syncs recorded for <span className="font-mono font-normal">{pack.display_name || pack.company_id}</span> yet. Once a field operator connects with your Organisation Access Code and syncs field bunches, their device ID appears here.
                   </div>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-left text-xs">
                       <thead className="bg-[var(--bg-subtle)] text-[var(--text-muted)] border-b border-[var(--border-light)]">
                         <tr>
-                          <th className="px-4 py-2.5 font-semibold">Device ID</th>
-                          <th className="px-4 py-2.5 font-semibold">Clerk ID</th>
-                          <th className="px-4 py-2.5 font-semibold">Synced Scans</th>
-                          <th className="px-4 py-2.5 font-semibold">Last Sync</th>
+                          <th className="px-4 py-2.5 font-normal">Device ID</th>
+                          <th className="px-4 py-2.5 font-normal">Worker ID</th>
+                          <th className="px-4 py-2.5 font-normal">Synced Scans</th>
+                          <th className="px-4 py-2.5 font-normal">Last Sync</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-100">
@@ -225,7 +255,7 @@ export default function FfbAppConnection({ tenantSlug }) {
                           <tr key={`${d.device_id}-${d.clerk_id}-${idx}`}>
                             <td className="px-4 py-2.5 font-mono font-medium text-gray-900">{d.device_id}</td>
                             <td className="px-4 py-2.5 font-mono text-gray-700">{d.clerk_id || '—'}</td>
-                            <td className="px-4 py-2.5 font-semibold text-gray-900">{d.scans}</td>
+                            <td className="px-4 py-2.5 font-normal text-gray-900">{d.scans}</td>
                             <td className="px-4 py-2.5 text-gray-600">
                               {d.last_sync_at ? new Date(d.last_sync_at).toLocaleString() : '—'}
                             </td>
@@ -246,7 +276,7 @@ export default function FfbAppConnection({ tenantSlug }) {
               <div>
                 <h3 className="font-display text-base font-medium">1-Scan Device Setup QR</h3>
                 <p className="text-xs text-[var(--text-muted)] mt-1">
-                  Open <strong>FarmIntelytics FFB</strong> on the phone, scan this Setup QR or enter Project Code <strong className="font-mono">{pack.company_id}</strong> to unlock Clerk Login for <strong>{pack.display_name || pack.company_id}</strong>.
+                  Open <strong>FarmIntelytics FFB</strong> on the phone, enter Access Code <strong className="font-mono">{pack.access_code || pack.company_id}</strong> or scan this Setup QR to unlock role sign-in for <strong>{pack.display_name || pack.company_id}</strong>.
                 </p>
               </div>
               {qrImg ? (

@@ -103,7 +103,7 @@ export function ApprovalView() {
   const [pickerExceptions, setPickerExceptions] = useState([]);   // picker (kg) plot-days, for the waiting table
   const [individualRecords, setIndividualRecords] = useState([]);
   // Plot view: records already approved (automatically or by a supervisor). Shown read-only so the
-  // harvesting clerk's data and photos are always visible, but they need no action.
+  // harvester role's data and photos are always visible, but they need no action.
   const [approvedPlotRecords, setApprovedPlotRecords] = useState([]);
   const [totalIndividualCount, setTotalIndividualCount] = useState(0);
   const totalPages = Math.max(1, Math.ceil(totalIndividualCount / pageSize));
@@ -516,7 +516,7 @@ export function ApprovalView() {
               setSelectedLoaderImageIdx(0);
               setLightbox({
                 url: imageUrl,
-                title: `${op.recorder_name || op.harvesting_clerk_id} (Harvesting Clerk) - Plot ${op.plot_id}`,
+                title: `${op.recorder_name || op.harvesting_clerk_id} (Harvester Role) - Plot ${op.plot_id}`,
                 type: 'harvester',
                 harvesterUrl: imageUrl,
                 // the load this record pairs with first, then the other loads of the plot
@@ -534,9 +534,9 @@ export function ApprovalView() {
         <div className="review-card__body">
           <div className="review-card__identity">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              {/* The card belongs to the harvesting clerk who made the record (like the loading clerk cards). */}
+              {/* The card belongs to the harvester role who made the record (like the loading role cards). */}
               <h3 className="review-card__name" style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span>{op.recorder_name || 'Harvesting Clerk'}{op.harvesting_clerk_id && <span className="card-person-id"> ({op.harvesting_clerk_id})</span>}</span>
+                <span>{op.recorder_name || 'Harvester Role'}{op.harvesting_clerk_id && <span className="card-person-id"> ({op.harvesting_clerk_id})</span>}</span>
                 {op.is_duplicate && (
                   <span style={{
                     padding: '2px 8px',
@@ -704,7 +704,7 @@ export function ApprovalView() {
     );
   }, [localChanges, userRole, handleSelectPlotAndDate, loaderImages, harvestPairs, openMapAudit]);
 
-  // Loading clerk card (plot view, right column of the paired table).
+  // Loading Role card (plot view, right column of the paired table).
   const renderLoaderCard = (load) => {
     const loadImg = API.resolveImageUrl(load.image_url); // no photo -> empty
     return (
@@ -726,7 +726,7 @@ export function ApprovalView() {
                                     const pairedHarvest = [...filteredIndividualRecords, ...approvedPlotRecords].find(r => r.id === load.paired_id);
                                     setLightbox({
                                       url: loadImg,
-                                      title: `${load.worker_name} (Loading Clerk) - Plot ${localFilters.plot}`,
+                                      title: `${load.worker_name} (Loading Role) - Plot ${localFilters.plot}`,
                                       type: 'loader',
                                       harvesterUrl: pairedHarvest ? API.resolveImageUrl(pairedHarvest.image_url) : null,
                                       harvesterName: pairedHarvest ? (pairedHarvest.recorder_name || pairedHarvest.harvesting_clerk_id) : null,
@@ -734,7 +734,7 @@ export function ApprovalView() {
                                     });
                                   }}
                                 >
-                                  {loadImg && <img src={loadImg} alt="Loading clerk photo" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; }} />}
+                                  {loadImg && <img src={loadImg} alt="Loading Role photo" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => { e.target.style.display = 'none'; }} />}
                                 </div>
 
                                 {/* Details */}
@@ -747,7 +747,7 @@ export function ApprovalView() {
                                       </span>
                                     )}
                                   </div>
-                                  <div style={{ color: '#0f172a', fontWeight: 600 }}>
+                                  <div style={{ color: '#0f172a', fontWeight: 400 }}>
                                     {['picker', 'loose fruit picker'].includes(String(load.role || '').toLowerCase()) ? 'Picker sacks' : 'Harvested bunches'}
                                   </div>
                                   <div>Load scan: <strong style={{ color: '#0f172a' }}>{load.time ? `${fmtDate(load.time)} · ${fmtTime(load.time)}` : '—'}</strong></div>
@@ -786,7 +786,7 @@ export function ApprovalView() {
       <div className="view-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
         <div>
           <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 500 }}>Verification Queue</h1>
-          <p className="view-subtitle" style={{ color: 'var(--text-muted)' }}>Reconcile harvesting clerk submissions against haulage and loading clerk records.</p>
+          <p className="view-subtitle" style={{ color: 'var(--text-muted)' }}>Reconcile harvester role submissions against haulage and loading role records.</p>
         </div>
 
         {/* View Mode Tabs */}
@@ -1007,7 +1007,7 @@ export function ApprovalView() {
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                               <h3 style={{ fontSize: '15px', fontWeight: 950, color: '#0f172a', margin: 0 }}>Plot {activePlotInfo.plot_id} Summary</h3>
-                              <span style={{ fontSize: '11px', color: '#0f172a', fontWeight: 600 }}>Date: {fmtDate(activePlotInfo.work_date)}</span>
+                              <span style={{ fontSize: '11px', color: '#0f172a', fontWeight: 400 }}>Date: {fmtDate(activePlotInfo.work_date)}</span>
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <div style={{
@@ -1072,7 +1072,7 @@ export function ApprovalView() {
                                   Bunches are scanned and loaded on a platform. Each row compares what was harvested on a platform with what was loaded from it.
                                   {plotMatched && off > 0 ? (
                                     <> The plot total balances, so every record of this plot passed the Loading match and is approved.
-                                      {' '}{off} of {total} platforms differ only because the loading clerk scanned a nearby platform when collecting the bunches. No action needed.</>
+                                      {' '}{off} of {total} platforms differ only because the loading role scanned a nearby platform when collecting the bunches. No action needed.</>
                                   ) : (
                                     <> {off} of {total} platforms don't balance.
                                       {' '}A harvest record on a balanced platform passes the Loading match even when the plot total is off.</>
@@ -1137,7 +1137,7 @@ export function ApprovalView() {
                                             <td style={{ padding: '5px 10px' }}>
                                               <div style={{ fontWeight: 500 }}>{picker ? `${c.loader_weight} kg` : c.loader_count}</div>
                                               {c.load_workers ? (
-                                                <div style={{ fontSize: '10px', color: '#0f172a' }} title="Loading Clerk ID(s)">
+                                                <div style={{ fontSize: '10px', color: '#0f172a' }} title="Loading Role ID(s)">
                                                   Clerk: {c.load_workers}
                                                 </div>
                                               ) : isHarvOnly ? (
@@ -1169,7 +1169,7 @@ export function ApprovalView() {
                                       <div>
                                         <strong>{plotMatched ? 'Why platforms differ:' : 'Investigation clue:'}</strong> extra bunches were harvested at <code>{list(extra)}</code> and
                                         {' '}loaded at <code>{list(short)}</code>. {plotMatched
-                                          ? 'The totals cancel out: the loading clerk collected them from a nearby platform.'
+                                          ? 'The totals cancel out: the loading role collected them from a nearby platform.'
                                           : 'Check whether bunches were collected while standing at or scanning a nearby platform code.'}
                                       </div>
                                     </div>
@@ -1193,18 +1193,18 @@ export function ApprovalView() {
                               come first, then approved ones; loads without a harvest record come last. */}
                           <div className="plot-pair-table__head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div>
-                              Harvesting clerk records ({filteredIndividualRecords.length + approvedPlotRecords.length})
+                              Harvester Role records ({filteredIndividualRecords.length + approvedPlotRecords.length})
                               <span style={{ fontWeight: 500, color: '#0f172a', textTransform: 'none', letterSpacing: 0 }}>
                                 {' '}· {filteredIndividualRecords.filter(r => decidedStatus(r) !== 'error').length} waiting for review{filteredIndividualRecords.some(r => decidedStatus(r) === 'error') ? ` · ${filteredIndividualRecords.filter(r => decidedStatus(r) === 'error').length} rejected` : ''} · {approvedPlotRecords.length} approved
                               </span>
                             </div>
-                            <span style={{ fontSize: '11px', color: '#0f172a', display: 'inline-flex', alignItems: 'center', gap: '4px', textTransform: 'none', fontWeight: 600 }}>
+                            <span style={{ fontSize: '11px', color: '#0f172a', display: 'inline-flex', alignItems: 'center', gap: '4px', textTransform: 'none', fontWeight: 400 }}>
                               <ArrowUpDown size={13} /> Platform → Count
                             </span>
                           </div>
                           <div className="plot-pair-table__head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <div>Loading clerk records{plotDrilldown ? ` (${plotDrilldown.loaders?.length || 0})` : ''}</div>
-                            <span style={{ fontSize: '11px', color: '#0f172a', display: 'inline-flex', alignItems: 'center', gap: '4px', textTransform: 'none', fontWeight: 600 }}>
+                            <div>Loading Role records{plotDrilldown ? ` (${plotDrilldown.loaders?.length || 0})` : ''}</div>
+                            <span style={{ fontSize: '11px', color: '#0f172a', display: 'inline-flex', alignItems: 'center', gap: '4px', textTransform: 'none', fontWeight: 400 }}>
                               <ArrowUpDown size={13} /> Platform → Count
                             </span>
                           </div>
@@ -1258,16 +1258,16 @@ export function ApprovalView() {
                             });
                             loads.filter(l => !used.has(l.id)).forEach(l => { left.push(null); right.push(renderLoaderCard(l)); });
                             const emptyLeft = activePlotInfo?.status === 'WAITING_FOR_RECORDER'
-                              ? 'Awaiting harvesting clerk records: the loads are on the right; once the harvesting clerk syncs, the plot reconciles here.'
-                              : 'No harvesting clerk records for this plot and date.';
+                              ? 'Awaiting harvester role records: the loads are on the right; once the harvester role syncs, the plot reconciles here.'
+                              : 'No harvester role records for this plot and date.';
                             const emptyRight = loadingDrilldown ? 'Loading…'
                               : drilldownFailed ? (
-                                <span>Could not load the loading clerk records.{' '}
+                                <span>Could not load the loading role records.{' '}
                                   <button type="button" className="btn btn--ghost" style={{ height: '28px', padding: '0 10px', fontWeight: 500 }}
                                     onClick={() => setDrilldownTry(t => t + 1)}>Retry</button>
                                 </span>
                               )
-                              : 'No loading clerk records synced for this plot and date yet.';
+                              : 'No loading role records synced for this plot and date yet.';
                             const rows = Math.max(left.length, right.length, 1);
                             const hasLeft = left.some(Boolean);
                             const hasRight = right.some(Boolean);
@@ -1461,7 +1461,7 @@ export function ApprovalView() {
               {/* Right Column: Loader Image */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
                 <div style={{ color: 'white', marginBottom: '10px', fontSize: '16px', fontWeight: 500, background: 'rgba(0,0,0,0.6)', padding: '6px 16px', borderRadius: '20px', border: '1px solid #334155', display: 'flex', gap: '10px', alignItems: 'center' }}>
-                  <span>Loading Clerk Photos</span>
+                  <span>Loading Role Photos</span>
                   {lightbox.loaderUrls && lightbox.loaderUrls.length > 1 && (
                     <select
                       value={selectedLoaderImageIdx}
@@ -1478,7 +1478,7 @@ export function ApprovalView() {
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', width: '100%' }}>
                   {lightbox.loaderUrls?.[selectedLoaderImageIdx] && <img
                     src={lightbox.loaderUrls[selectedLoaderImageIdx]}
-                    alt="Loading clerk photo"
+                    alt="Loading Role photo"
                     style={{
                       maxWidth: '100%',
                       maxHeight: '100%',
@@ -1523,7 +1523,7 @@ export function ApprovalView() {
                 }}
                 onClick={(e) => { e.stopPropagation(); setLightboxCompare(!lightboxCompare); }}
               >
-                {lightboxCompare ? 'Single View' : (lightbox.type === 'loader' ? 'Compare with Harvester' : 'Compare with Loading Clerk')}
+                {lightboxCompare ? 'Single View' : (lightbox.type === 'loader' ? 'Compare with Harvester' : 'Compare with Loading Role')}
               </button>
             )}
 
