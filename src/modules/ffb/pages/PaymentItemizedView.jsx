@@ -185,11 +185,11 @@ export function PaymentItemizedView() {
     <section className="view payment-view view-fade-in" style={{ padding: '32px' }}>
       <div className="view-header" style={{ marginBottom: '32px' }}>
         <div>
-          <button className="btn btn--ghost btn--sm" onClick={() => navigate('/payout')} style={{ marginBottom: '12px', paddingLeft: 0, fontWeight: 800 }}>
+          <button className="btn btn--ghost btn--sm" onClick={() => navigate('/payout')} style={{ marginBottom: '12px', paddingLeft: 0, fontWeight: 500 }}>
             <ArrowLeft size={16} /> BACK TO SUMMARY
           </button>
-          <h1 className="view-title" style={{ fontSize: '28px', fontWeight: 900, letterSpacing: '-0.02em' }}>
-            <Filter size={24} style={{ marginRight: 12, verticalAlign: '-4px', color: '#034321' }} />
+          <h1 className="view-title" style={{ fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em' }}>
+            <Filter size={24} style={{ marginRight: 12, verticalAlign: '-4px', color: '#3F8432' }} />
             Itemized Payout Breakdown
           </h1>
           <p className="view-subtitle" style={{ opacity: 0.6 }}>Granular view of every approved harvest and collection record.</p>
@@ -220,14 +220,14 @@ export function PaymentItemizedView() {
             <input
               type="text"
               placeholder="Search worker, plot..."
-              style={{ width: '100%', height: '40px', paddingLeft: '40px', borderRadius: '10px', border: '1px solid #cbd5e1', fontWeight: 700, fontSize: '14px' }}
+              style={{ width: '100%', height: '40px', paddingLeft: '40px', borderRadius: '10px', border: '1px solid #cbd5e1', fontWeight: 500, fontSize: '14px' }}
               value={filters.search}
               onChange={(e) => setFilters((f) => ({ ...f, search: e.target.value }))}
             />
           </div>
 
           <select 
-            style={{ flex: 1, height: '40px', borderRadius: '10px', border: '1px solid #cbd5e1', fontWeight: 700, padding: '0 12px', fontSize: '13px' }}
+            style={{ flex: 1, height: '40px', borderRadius: '10px', border: '1px solid #cbd5e1', fontWeight: 500, padding: '0 12px', fontSize: '13px' }}
             value={filters.role} 
             onChange={(e) => setFilters((f) => ({ ...f, role: e.target.value }))}
           >
@@ -238,7 +238,7 @@ export function PaymentItemizedView() {
           </select>
 
           <select 
-            style={{ flex: 1, height: '40px', borderRadius: '10px', border: '1px solid #cbd5e1', fontWeight: 700, padding: '0 12px', fontSize: '13px' }}
+            style={{ flex: 1, height: '40px', borderRadius: '10px', border: '1px solid #cbd5e1', fontWeight: 500, padding: '0 12px', fontSize: '13px' }}
             value={filters.status} 
             onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
           >
@@ -249,12 +249,12 @@ export function PaymentItemizedView() {
 
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: '#f8fafc', padding: '0 12px', borderRadius: '10px', border: '1px solid #cbd5e1', height: '40px' }}>
             <Calendar size={14} style={{ opacity: 0.4 }} />
-            <input type="date" style={{ border: 'none', background: 'transparent', fontWeight: 700, fontSize: '12px' }} value={filters.from} onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))} />
+            <input type="date" style={{ border: 'none', background: 'transparent', fontWeight: 500, fontSize: '12px' }} value={filters.from} onChange={(e) => setFilters((f) => ({ ...f, from: e.target.value }))} />
             <span style={{ opacity: 0.2 }}>→</span>
-            <input type="date" style={{ border: 'none', background: 'transparent', fontWeight: 700, fontSize: '12px' }} value={filters.to} onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))} />
+            <input type="date" style={{ border: 'none', background: 'transparent', fontWeight: 500, fontSize: '12px' }} value={filters.to} onChange={(e) => setFilters((f) => ({ ...f, to: e.target.value }))} />
           </div>
 
-          <button className="btn btn--outline" onClick={resetFilters} style={{ height: '40px', borderRadius: '10px', fontWeight: 800 }}>
+          <button className="btn btn--outline" onClick={resetFilters} style={{ height: '40px', borderRadius: '10px', fontWeight: 500 }}>
             RESET
           </button>
         </div>
@@ -284,29 +284,29 @@ export function PaymentItemizedView() {
               )}
               {filteredVisible.map((e) => (
                 <tr key={e.id} className={e._paid ? 'row-paid' : ''}>
-                  <td style={{ padding: '20px', fontWeight: 900, color: '#034321' }}>{e.date_from || '—'}</td>
+                  <td style={{ padding: '20px', fontWeight: 500, color: '#3F8432' }}>{e.date_from || '—'}</td>
                   <td>
                     <div className="worker-cell">
-                      <span className="worker-name" style={{ fontWeight: 800, fontSize: '15px' }}>{e.worker_name || '—'}</span>
-                      <span className="worker-id" style={{ fontSize: '11px', opacity: 0.5, fontWeight: 700 }}>{e.worker_id}</span>
+                      <span className="worker-name" style={{ fontWeight: 500, fontSize: '15px' }}>{e.worker_name || '—'}</span>
+                      <span className="worker-id" style={{ fontSize: '11px', opacity: 0.5, fontWeight: 500 }}>{e.worker_id}</span>
                     </div>
                   </td>
-                  <td style={{ fontWeight: 700, color: '#0f172a' }}>{fmtRole(e._role) || e._role}</td>
-                  <td style={{ fontWeight: 700 }}>{e.plot_id || '—'}</td>
+                  <td style={{ fontWeight: 500, color: '#0f172a' }}>{fmtRole(e._role) || e._role}</td>
+                  <td style={{ fontWeight: 500 }}>{e.plot_id || '—'}</td>
                   <td>
                     <div className="pay-breakdown" style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       {e._breakdown.filter((b) => b.qty > 0).map((b) => (
-                        <span key={b.label} className={`pay-chip pay-chip--${b.label.toLowerCase()}`} style={{ fontSize: '11px', fontWeight: 900, borderRadius: '6px' }}>
+                        <span key={b.label} className={`pay-chip pay-chip--${b.label.toLowerCase()}`} style={{ fontSize: '11px', fontWeight: 500, borderRadius: '6px' }}>
                           {b.label}: {fmtNumber(b.qty)} × {NGN(b.rate)}
                         </span>
                       ))}
                     </div>
                   </td>
-                  <td className="num" style={{ fontWeight: 900, color: '#0f172a', fontSize: '16px' }}>{NGN(e._amount)}</td>
+                  <td className="num" style={{ fontWeight: 500, color: '#0f172a', fontSize: '16px' }}>{NGN(e._amount)}</td>
                   <td style={{ 
-                    background: e._paid ? '#E8F2E5' : '#f1f5f9', 
-                    color: e._paid ? '#034321' : '#475569', 
-                    fontWeight: 800,
+                    background: e._paid ? '#F3F8EF' : '#f1f5f9', 
+                    color: e._paid ? '#3F8432' : '#475569', 
+                    fontWeight: 500,
                     textAlign: 'center'
                   }}>
                     <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', justifyContent: 'center' }}>
@@ -318,7 +318,7 @@ export function PaymentItemizedView() {
                     <button
                       className={`btn btn--sm ${e._paid ? 'btn--ghost' : 'btn--outline'}`}
                       onClick={() => togglePaid(e)}
-                      style={{ borderRadius: '10px', fontWeight: 800 }}
+                      style={{ borderRadius: '10px', fontWeight: 500 }}
                     >
                       {e._paid ? 'MARK UNPAID' : 'MARK PAID'}
                     </button>

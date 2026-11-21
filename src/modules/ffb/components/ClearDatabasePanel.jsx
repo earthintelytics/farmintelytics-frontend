@@ -70,7 +70,7 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
   };
 
   const btn = {
-    height: '42px', padding: '0 18px', borderRadius: '8px', fontWeight: 900, fontSize: '13px',
+    height: '42px', padding: '0 18px', borderRadius: '8px', fontWeight: 500, fontSize: '13px',
     cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px'
   };
 
@@ -82,7 +82,7 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
             <AlertTriangle size={22} />
           </div>
           <div>
-            <div style={{ fontSize: '16px', fontWeight: 900, color: '#991B1B' }}>Danger Zone · Clear Worker Directory</div>
+            <div style={{ fontSize: '16px', fontWeight: 500, color: '#991B1B' }}>Danger Zone · Clear Worker Directory</div>
             <div style={{ fontSize: '12px', color: '#0f172a', fontWeight: 600, marginTop: '4px', lineHeight: 1.6 }}>
               Permanently deletes all {employeeCount} worker and clerk records so you can re-upload a fresh list.
               Harvest and loading records are not touched. Super Admin only; your password is required.
@@ -103,7 +103,7 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
         >
           <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '28px', maxWidth: '460px', width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.2)', border: '1px solid #E2E8F0' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-              <h3 id="clear-db-title" style={{ fontSize: '18px', fontWeight: 900, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h3 id="clear-db-title" style={{ fontSize: '18px', fontWeight: 500, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <AlertTriangle size={22} color="#DC2626" /> Clear worker directory
               </h3>
               <button onClick={close} aria-label="Close" disabled={busy} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#0f172a' }}>
@@ -117,7 +117,7 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
                   This deletes <strong>all {employeeCount} records</strong> in the worker directory. Do you want to download a backup first?
                 </p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  <button onClick={() => chooseBackup(true)} style={{ ...btn, background: '#034321', color: '#FFFFFF', border: 'none' }}>
+                  <button onClick={() => chooseBackup(true)} style={{ ...btn, background: '#3F8432', color: '#FFFFFF', border: 'none' }}>
                     <Download size={16} /> Yes, back up then clear
                   </button>
                   <button onClick={() => chooseBackup(false)} style={{ ...btn, background: '#FFFFFF', color: '#991B1B', border: '1.5px solid #FCA5A5' }}>
@@ -138,7 +138,7 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
                     : 'All records will be deleted with no backup.'}{' '}
                   Enter the password for <strong>{adminEmail || 'your account'}</strong> to confirm.
                 </p>
-                <label style={{ display: 'block', fontSize: '12px', fontWeight: 800, color: '#0F172A', marginBottom: '6px' }}>Password</label>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 500, color: '#0F172A', marginBottom: '6px' }}>Password</label>
                 <div style={{ position: 'relative' }}>
                   <Lock size={16} color="#64748B" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
                   <input
@@ -152,7 +152,7 @@ export function ClearDatabasePanel({ employeeCount, onCleared, showToast }) {
                   />
                 </div>
                 {error && (
-                  <div role="alert" style={{ marginTop: '10px', fontSize: '13px', fontWeight: 700, color: '#991B1B', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: '8px', padding: '8px 12px' }}>
+                  <div role="alert" style={{ marginTop: '10px', fontSize: '13px', fontWeight: 500, color: '#991B1B', background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: '8px', padding: '8px 12px' }}>
                     {error}
                   </div>
                 )}

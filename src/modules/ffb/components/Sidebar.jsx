@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NavLink, useLocation } from '../utils/portalRouter';
 import { LOGO_ICON } from '../utils/icons';
+import OrgLogo from '../../../components/OrgLogo';
 import { API } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import { useRefreshTick } from '../hooks/useRefreshTick';
@@ -29,6 +30,12 @@ import {
 
 const ISSUES_POLL_MS = 60_000;
 
+function formatOrgTitle(rawName, slug) {
+  if (rawName && rawName.trim()) return rawName.trim().replace(/_/g, ' ');
+  const s = String(slug || 'Enterprise FFB').replace(/[_-]+/g, ' ').trim();
+  return s.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 function usePendingIssues(tenantSlug) {
   const [pending, setPending] = useState(null);
   const tick = useRefreshTick();
@@ -54,7 +61,7 @@ function usePendingIssues(tenantSlug) {
 function IssueBadge({ count, collapsed }) {
   if (!count) return null;
   const text = count > 99 ? '99+' : String(count);
-  const title = `${count} plot${count === 1 ? '' : 's'} with issues (pending, mismatch or rejected)`;
+  const title = `${count} block${count === 1 ? '' : 's'} needing review`;
   if (collapsed) {
     return (
       <span
@@ -62,15 +69,24 @@ function IssueBadge({ count, collapsed }) {
         aria-label={title}
         style={{
           position: 'absolute',
-          top: '6px',
-          left: '30px',
-          width: '10px',
-          height: '10px',
-          borderRadius: '50%',
+          top: '3px',
+          left: '24px',
+          minWidth: '16px',
+          height: '15px',
+          padding: '0 4px',
+          borderRadius: '5px',
           background: '#DC2626',
-          border: '2px solid #FFFFFF',
+          color: '#FFFFFF',
+          fontSize: '10px',
+          fontWeight: 500,
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          lineHeight: 1,
         }}
-      />
+      >
+        {text}
+      </span>
     );
   }
   return (
@@ -78,14 +94,15 @@ function IssueBadge({ count, collapsed }) {
       title={title}
       aria-label={title}
       style={{
-        minWidth: '22px',
-        height: '22px',
-        padding: '0 7px',
-        borderRadius: '11px',
-        background: '#DC2626',
-        color: '#FFFFFF',
-        fontSize: '12px',
-        fontWeight: 800,
+        minWidth: '20px',
+        height: '18px',
+        padding: '0 5px',
+        borderRadius: '5px',
+        background: '#FEF2F2',
+        color: '#DC2626',
+        border: '1px solid #E2E8F0',
+        fontSize: '10.5px',
+        fontWeight: 500,
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -102,106 +119,210 @@ export function Sidebar({ isCollapsed, onBack, onSignOut }) {
   const pendingIssues = usePendingIssues(tenantSlug);
   const userRole = getRole();
 
-  const orgTitle = tenantMeta?.display_name || tenantSlug || 'Enterprise FFB';
-  const orgLogo = tenantMeta?.logo_url || LOGO_ICON;
+  const orgTitle = formatOrgTitle(tenantMeta?.display_name, tenantSlug);
+  const logoVersion = tenantMeta?.has_logo ? '1' : '';
 
-  const NAV_ITEMS = [
-    { path: '/', label: 'Dashboard', icon: <LayoutDashboard size={20} />, end: true },
-    { path: '/map', label: 'Geospatial Intel', icon: <Map size={20} /> },
-    { path: '/approval', label: 'Approval Center', icon: <CheckSquare size={20} /> },
-    { path: '/approved-workers', label: 'Approved Workers', icon: <UserCheck size={20} />, end: true },
-    { path: '/approved-workers/monthly-settlement', label: 'Monthly Settlement', icon: <CalendarCheck size={17} />, child: true },
-    { path: '/plots', label: 'Plot Analytics', icon: <Grid size={20} /> },
-    { path: '/workers', label: 'Worker Analytics', icon: <Users size={20} /> },
-    { path: '/yield', label: 'Yield Intelligence', icon: <TrendingUp size={20} /> },
-    { path: '/efficiency', label: 'Personnel Board', icon: <ClipboardList size={20} /> },
-    { path: '/audit-quality', label: 'Audit Quality', icon: <BrainCircuit size={20} /> },
-    { path: '/harvest', label: 'Clerk Lookup', icon: <SearchCheck size={20} /> },
-    { path: '/mobile-app', label: 'Field App & QR', icon: <Smartphone size={20} /> },
-    { path: '/admin', label: 'Admin & Alerts', icon: <Shield size={20} /> },
-    { path: '/methodology', label: 'Rules & Methodology', icon: <BookOpen size={20} /> },
+  const NAV_GROUPS = [
+    {
+      label: 'Overview',
+      items: [
+        { path: '/', label: 'Harvest Command', icon: <LayoutDashboard size={16} strokeWidth={1.5} />, end: true },
+        { path: '/map', label: 'Estate Map', icon: <Map size={16} strokeWidth={1.5} /> },
+      ],
+    },
+    {
+      label: 'Verification & Pay',
+      items: [
+        { path: '/approval', label: 'Verification Queue', icon: <CheckSquare size={16} strokeWidth={1.5} /> },
+        { path: '/approved-workers', label: 'Approved Crew', icon: <UserCheck size={16} strokeWidth={1.5} />, end: true },
+        { path: '/approved-workers/monthly-settlement', label: 'Pay Cycles', icon: <CalendarCheck size={15} strokeWidth={1.5} />, child: true },
+      ],
+    },
+    {
+      label: 'Analytics',
+      items: [
+        { path: '/plots', label: 'Block Performance', icon: <Grid size={16} strokeWidth={1.5} /> },
+        { path: '/workers', label: 'Crew Performance', icon: <Users size={16} strokeWidth={1.5} /> },
+        { path: '/yield', label: 'Yield Forecast', icon: <TrendingUp size={16} strokeWidth={1.5} /> },
+        { path: '/efficiency', label: 'Efficiency Ranks', icon: <ClipboardList size={16} strokeWidth={1.5} /> },
+        { path: '/audit-quality', label: 'AI Quality Audit', icon: <BrainCircuit size={16} strokeWidth={1.5} /> },
+        { path: '/harvest', label: 'Clerk Records', icon: <SearchCheck size={16} strokeWidth={1.5} /> },
+      ],
+    },
+    {
+      label: 'Field & System',
+      items: [
+        { path: '/mobile-app', label: 'Field App & QR', icon: <Smartphone size={16} strokeWidth={1.5} /> },
+        { path: '/admin', label: 'Admin & Alerts', icon: <Shield size={16} strokeWidth={1.5} /> },
+        { path: '/methodology', label: 'Validation Rules', icon: <BookOpen size={16} strokeWidth={1.5} /> },
+      ],
+    },
   ];
+
+  const fallbackLogo = (
+    <img
+      src={LOGO_ICON}
+      alt={orgTitle}
+      style={{
+        height: '32px',
+        width: '32px',
+        objectFit: 'contain',
+        borderRadius: '8px',
+        border: '1px solid #E2E8F0',
+        background: '#FFFFFF',
+        padding: '2px',
+        flexShrink: 0,
+      }}
+    />
+  );
 
   return (
     <aside id="sidebar" role="complementary" aria-label="Main navigation sidebar" className={isCollapsed ? 'sidebar--collapsed' : ''}>
-      <div
-        className="sidebar-header"
-        style={{ height: '104px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '18px' }}
-      >
-        <div style={{ background: 'white', padding: '6px', borderRadius: '10px' }}>
-          <img src={orgLogo} alt={orgTitle} style={{ height: '34px', width: 'auto', objectFit: 'contain' }} />
+      {/* Compact Brand Header + Pinned Back to Portal */}
+      <div style={{ borderBottom: '1px solid #E2E8F0', padding: '12px 14px 10px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <OrgLogo
+            tenant={tenantSlug}
+            version={logoVersion}
+            className="w-8 h-8 rounded-lg shrink-0"
+            fallback={fallbackLogo}
+          />
+          <div className="sidebar-brand-text" style={{ minWidth: 0, flex: 1 }}>
+            <span
+              className="sidebar-brand-name"
+              style={{
+                fontSize: '13.5px',
+                fontWeight: 500,
+                color: '#0F172A',
+                display: 'block',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {orgTitle}
+            </span>
+            <span className="sidebar-brand-sub" style={{ fontSize: '10px', color: '#3F8432', fontWeight: 500 }}>
+              FarmIntelytics FFB
+            </span>
+          </div>
         </div>
-        <div className="sidebar-brand-text" style={{ textAlign: 'center', maxWidth: '100%' }}>
-          <span className="sidebar-brand-name" style={{ fontSize: '15px', letterSpacing: '0.04em', display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-            {orgTitle}
-          </span>
-          <span className="sidebar-brand-sub" style={{ opacity: 0.75, fontSize: '11px' }}>Earthintelytics FFB</span>
-        </div>
+
+        {onBack && (
+          <button
+            type="button"
+            onClick={onBack}
+            style={{
+              marginTop: '10px',
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 10px',
+              borderRadius: '7px',
+              border: '1px solid #E2E8F0',
+              background: '#F8FAFC',
+              color: '#334155',
+              fontSize: '12px',
+              fontWeight: 500,
+              cursor: 'pointer',
+            }}
+          >
+            <ArrowLeft size={14} strokeWidth={1.5} color="#3F8432" />
+            <span>Back to Services</span>
+          </button>
+        )}
       </div>
 
+      {/* Categorized Navigation */}
       <nav className="sidebar-nav" role="navigation" aria-label="Main navigation">
-        <ul className="sidebar-nav-list" id="sidebarNavList" style={{ padding: '0 12px' }}>
-          {NAV_ITEMS.filter((item) => {
-            if (item.path === '/efficiency' && userRole === 'View') return false;
-            if (item.child && !isManager()) return false;
-            if (item.path === '/admin' && !isManager()) return false;
-            return true;
-          }).map((item) => {
-            const isRestricted = item.path === '/approval' && userRole === 'View';
+        <div style={{ padding: '0 10px' }}>
+          {NAV_GROUPS.map((group) => {
+            const visibleItems = group.items.filter((item) => {
+              if (item.path === '/efficiency' && userRole === 'View') return false;
+              if (item.child && !isManager()) return false;
+              if (item.path === '/admin' && !isManager()) return false;
+              return true;
+            });
+            if (!visibleItems.length) return null;
             return (
-              <li className="sidebar-nav-item" key={item.path} style={{ marginBottom: '2px' }}>
-                <NavLink
-                  to={item.path}
-                  end={item.end}
-                  className={({ isActive }) =>
-                    `sidebar-nav-btn ${isActive ? 'sidebar-nav-btn--active' : ''} ${item.child && !isCollapsed ? 'sidebar-nav-btn--child' : ''}`
-                  }
-                  style={{ borderRadius: '10px', margin: '2px 0', transition: 'all 0.2s ease', position: 'relative' }}
-                  aria-label={`Navigate to ${item.label}`}
-                >
-                  <span className="nav-icon" style={{ fontSize: '20px' }}>{item.icon}</span>
-                  <span className="nav-label" style={{ flex: 1, marginLeft: '4px' }}>{item.label}</span>
-                  {item.path === '/approval' && <IssueBadge count={pendingIssues} collapsed={isCollapsed} />}
-                  {isRestricted && (
-                    <span style={{ fontSize: '9px', opacity: 0.65, textTransform: 'uppercase', background: 'rgba(255,255,255,0.12)', padding: '2px 6px', borderRadius: '4px' }}>
-                      View Only
-                    </span>
-                  )}
-                </NavLink>
-              </li>
+              <div key={group.label} style={{ marginBottom: '4px' }}>
+                {!isCollapsed && <div className="sidebar-group-label">{group.label}</div>}
+                <ul className="sidebar-nav-list" style={{ padding: 0, margin: 0 }}>
+                  {visibleItems.map((item) => {
+                    const isRestricted = item.path === '/approval' && userRole === 'View';
+                    return (
+                      <li className="sidebar-nav-item" key={item.path} style={{ marginBottom: '1px' }}>
+                        <NavLink
+                          to={item.path}
+                          end={item.end}
+                          className={({ isActive }) =>
+                            `sidebar-nav-btn ${isActive ? 'sidebar-nav-btn--active' : ''} ${item.child && !isCollapsed ? 'sidebar-nav-btn--child' : ''}`
+                          }
+                          style={{ borderRadius: '7px', transition: 'background 0.15s ease', position: 'relative' }}
+                          aria-label={`Navigate to ${item.label}`}
+                        >
+                          <span className="nav-icon">{item.icon}</span>
+                          <span className="nav-label" style={{ flex: 1 }}>{item.label}</span>
+                          {item.path === '/approval' && <IssueBadge count={pendingIssues} collapsed={isCollapsed} />}
+                          {isRestricted && (
+                            <span style={{ fontSize: '9px', color: '#64748B', textTransform: 'uppercase', background: '#F8FAFC', border: '1px solid #E2E8F0', padding: '1px 4px', borderRadius: '4px' }}>
+                              View
+                            </span>
+                          )}
+                        </NavLink>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             );
           })}
-        </ul>
+        </div>
       </nav>
 
-      <div className="sidebar-help" style={{ padding: '8px 12px 12px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+      {/* Single Compact Footer Row */}
+      <div
+        className="sidebar-help"
+        style={{
+          padding: '8px 10px',
+          borderTop: '1px solid #E2E8F0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '4px',
+          flexShrink: 0,
+        }}
+      >
         <NavLink
           to="/help"
           end
           className={({ isActive }) => `sidebar-nav-btn ${isActive ? 'sidebar-nav-btn--active' : ''}`}
-          style={{ borderRadius: '10px' }}
+          style={{ borderRadius: '7px', justifyContent: 'center', flex: 1, padding: '6px 6px' }}
+          title="Help Guide"
         >
-          <span className="nav-icon"><HelpCircle size={20} /></span>
-          <span className="nav-label" style={{ flex: 1, marginLeft: '4px' }}>Help</span>
+          <HelpCircle size={15} strokeWidth={1.5} />
+          <span style={{ fontSize: '12px' }}>Help</span>
         </NavLink>
         <NavLink
           to="/help/common-questions"
           className={({ isActive }) => `sidebar-nav-btn ${isActive ? 'sidebar-nav-btn--active' : ''}`}
-          style={{ borderRadius: '10px' }}
+          style={{ borderRadius: '7px', justifyContent: 'center', flex: 1, padding: '6px 6px' }}
+          title="Frequently Asked Questions"
         >
-          <span className="nav-icon"><MessageCircleQuestion size={20} /></span>
-          <span className="nav-label" style={{ flex: 1, marginLeft: '4px' }}>FAQ</span>
+          <MessageCircleQuestion size={15} strokeWidth={1.5} />
+          <span style={{ fontSize: '12px' }}>FAQ</span>
         </NavLink>
-        {onBack && (
-          <button type="button" onClick={onBack} className="sidebar-nav-btn" style={{ borderRadius: '10px', border: 'none', background: 'transparent', width: '100%', cursor: 'pointer' }}>
-            <span className="nav-icon"><ArrowLeft size={20} /></span>
-            <span className="nav-label" style={{ flex: 1, marginLeft: '4px', textAlign: 'left' }}>Back to Portal</span>
-          </button>
-        )}
         {onSignOut && (
-          <button type="button" onClick={onSignOut} className="sidebar-nav-btn" style={{ borderRadius: '10px', border: 'none', background: 'transparent', width: '100%', cursor: 'pointer' }}>
-            <span className="nav-icon"><LogOut size={20} /></span>
-            <span className="nav-label" style={{ flex: 1, marginLeft: '4px', textAlign: 'left' }}>Sign out</span>
+          <button
+            type="button"
+            onClick={onSignOut}
+            className="sidebar-nav-btn"
+            style={{ borderRadius: '7px', border: 'none', background: 'transparent', justifyContent: 'center', flex: 1, padding: '6px 6px', cursor: 'pointer', color: '#DC2626' }}
+            title="Sign Out"
+          >
+            <LogOut size={15} strokeWidth={1.5} color="#DC2626" />
+            <span style={{ fontSize: '12px', color: '#DC2626' }}>Exit</span>
           </button>
         )}
       </div>

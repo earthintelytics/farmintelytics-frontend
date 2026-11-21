@@ -442,24 +442,24 @@ export function PaymentAggregationView() {
                 <tr key={w.worker_id}>
                   <td>
                     <div className="worker-cell">
-                      <span className="worker-name" style={{ fontWeight: 800 }}>{w.worker_name}</span>
+                      <span className="worker-name" style={{ fontWeight: 500 }}>{w.worker_name}</span>
                       <span className="worker-id">{w.worker_id}</span>
                     </div>
                   </td>
                   <td>
                     {[...w.roles].map(r => (
-                        <div key={r} style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>{fmtRole(r) || r}</div>
+                        <div key={r} style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a' }}>{fmtRole(r) || r}</div>
                     ))}
                   </td>
                   <td className="num">{fmtNumber(w.entries)}</td>
                   <td className="num">
                     {w.ffbCount > 0 ? (
-                      <div style={{ fontWeight: 800 }}>{fmtNumber(w.ffbCount)} <span style={{ fontSize: '11px', opacity: 0.5 }}>bunch</span></div>
+                      <div style={{ fontWeight: 500 }}>{fmtNumber(w.ffbCount)} <span style={{ fontSize: '11px', opacity: 0.5 }}>bunch</span></div>
                     ) : <span className="muted">—</span>}
                   </td>
                   <td className="num">
                     {w.lfWeight > 0 ? (
-                      <div style={{ fontWeight: 800, color: '#f97316' }}>{fmtNumber(w.lfWeight)} <span style={{ fontSize: '11px', opacity: 0.5 }}>kg</span></div>
+                      <div style={{ fontWeight: 500, color: '#f97316' }}>{fmtNumber(w.lfWeight)} <span style={{ fontSize: '11px', opacity: 0.5 }}>kg</span></div>
                     ) : <span className="muted">—</span>}
                   </td>
                   <td className="num strong" style={{ fontSize: '15px' }}>{NGN(w.owed)}</td>
@@ -470,7 +470,7 @@ export function PaymentAggregationView() {
                       className="btn btn--sm btn--primary"
                       disabled={w.unpaid === 0}
                       onClick={() => markWorkerPaid(w.worker_id)}
-                      style={{ borderRadius: '8px', fontWeight: 800 }}
+                      style={{ borderRadius: '8px', fontWeight: 500 }}
                     >
                       MARK ALL PAID
                     </button>

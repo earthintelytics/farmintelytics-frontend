@@ -148,7 +148,7 @@ export const API = (() => {
     });
 
   const fetchMainChart = (filters = {}) =>
-    _get('/analytics/dashboard/main_chart', {
+    _get('/analytics/dashboard/main-chart', {
       estate: filters.estate || undefined,
       worker_role: filters.role || undefined,
       start_date: filters.dateRange?.from || undefined,
@@ -156,7 +156,7 @@ export const API = (() => {
     });
 
   const fetchHarvestedBunches = (filters = {}) =>
-    _get('/analytics/dashboard/harvested_bunches', {
+    _get('/analytics/dashboard/harvested-bunches', {
       estate: filters.estate || undefined,
       worker_role: filters.role || undefined,
       start_date: filters.dateRange?.from || undefined,
@@ -164,7 +164,7 @@ export const API = (() => {
     });
 
   const fetchPickFruit = (filters = {}) =>
-    _get('/analytics/dashboard/pick_fruit', {
+    _get('/analytics/dashboard/pick-fruit', {
       estate: filters.estate || undefined,
       worker_role: filters.role || undefined,
       start_date: filters.dateRange?.from || undefined,
@@ -173,7 +173,7 @@ export const API = (() => {
 
   // --- Plots ---
   const fetchPlotCards = (filters = {}) =>
-    _get('/analytics/plot_analytics_advanced/cards', {
+    _get('/analytics/plots/cards', {
       estate: filters.estate || undefined,
       plot_id: filters.plot || filters.search || undefined,
       start_date: filters.dateRange?.from || undefined,
@@ -181,7 +181,7 @@ export const API = (() => {
     });
 
   const fetchPlotProductionTrend = (filters = {}) =>
-    _get('/analytics/plot_analytics_advanced/production_trend', {
+    _get('/analytics/plots/production-trend', {
       estate: filters.estate || undefined,
       plot_id: filters.plot || filters.search || undefined,
       start_date: filters.dateRange?.from || undefined,
@@ -189,7 +189,7 @@ export const API = (() => {
     });
 
   const fetchProductionPredictions = (filters = {}) =>
-    _get('/analytics/plot_analytics_advanced/production_predictions', {
+    _get('/analytics/plots/production-predictions', {
       estate: filters.estate || undefined,
       plot_id: filters.plot || filters.search || undefined,
       start_date: filters.dateRange?.from || undefined,
@@ -197,7 +197,7 @@ export const API = (() => {
     });
 
   const fetchPlotTable = (filters = {}) =>
-    _get('/analytics/plot_analytics_advanced/table', {
+    _get('/analytics/plots/table', {
       estate: filters.estate || undefined,
       plot_id: filters.plot || filters.search || undefined,
       start_date: filters.dateRange?.from || undefined,
@@ -207,7 +207,7 @@ export const API = (() => {
     });
 
   const fetchPlotComparison = (filters = {}) =>
-    _get('/analytics/plot_analytics_advanced/comparison', {
+    _get('/analytics/plots/comparison', {
       estate: filters.estate || undefined,
       plot_id: filters.plot || filters.search || undefined,
       start_date: filters.dateRange?.from || undefined,
@@ -216,7 +216,7 @@ export const API = (() => {
 
   // --- Workers & Efficiency ---
   const fetchWorkerCards = (filters = {}) =>
-    _get('/analytics/worker_analytics_advanced/cards', {
+    _get('/analytics/workers/cards', {
       estate: filters.estate || undefined,
       plot_id: filters.plot || undefined,
       team: filters.team || undefined,
@@ -230,7 +230,7 @@ export const API = (() => {
 
   const fetchWorkerTable = (filters = {}) =>
     _get(
-      '/analytics/worker_analytics_advanced/table',
+      '/analytics/workers/table',
       {
         estate: filters.estate || undefined,
         plot_id: filters.plot || undefined,
@@ -249,7 +249,7 @@ export const API = (() => {
     );
 
   const fetchEfficiencyRanks = (filters = {}) =>
-    _get('/analytics/worker_analytics_advanced/efficiency', {
+    _get('/analytics/workers/efficiency', {
       plot_id: filters.plot || filters.search || undefined,
       estate: filters.estate || undefined,
       worker_role: filters.role || undefined,
@@ -260,7 +260,7 @@ export const API = (() => {
 
   // --- Payouts ---
   const fetchPayoutSummary = (filters = {}) =>
-    _get('/analytics/payout_analytics/summary', {
+    _get('/analytics/payouts/summary', {
       estate: filters.estate || undefined,
       team: filters.team || undefined,
       worker_id: filters.worker_id || filters.search || undefined,
@@ -270,7 +270,7 @@ export const API = (() => {
     });
 
   const fetchPayoutAnalytics = (filters = {}) =>
-    _get('/analytics/payout_analytics/', {
+    _get('/analytics/payouts/', {
       estate: filters.estate || undefined,
       team: filters.team || undefined,
       worker_id: filters.worker_id || filters.search || undefined,
@@ -541,22 +541,22 @@ export const API = (() => {
   // --- Workforce / Employees ---
   const fetchEmployees = (filtersOrStatus = 'ALL') => {
     const p = typeof filtersOrStatus === 'string' ? { status: filtersOrStatus === 'ALL' ? undefined : filtersOrStatus } : filtersOrStatus;
-    return _get('/employee_records/', p, { noCache: true });
+    return _get('/employees/', p, { noCache: true });
   };
 
   const toggleWorkerStatus = (employeeId, workerStatus) =>
-    _patch(`/employee_records/${encodeURIComponent(employeeId)}/status?worker_status=${encodeURIComponent(workerStatus)}`, {});
+    _patch(`/employees/${encodeURIComponent(employeeId)}/status?worker_status=${encodeURIComponent(workerStatus)}`, {});
 
   const bulkUpdateWorkerStatus = (employeeIds, workerStatus) =>
-    _post('/employee_records/bulk-status', { employee_ids: employeeIds, worker_status: workerStatus });
+    _post('/employees/bulk-status', { employee_ids: employeeIds, worker_status: workerStatus });
 
-  const bulkCreateEmployees = (employees) => _post('/employee_records/bulk', { employees });
+  const bulkCreateEmployees = (employees) => _post('/employees/bulk', { employees });
 
   async function uploadEmployeeCSV(file, onProgress) {
     if (onProgress) onProgress(30);
     const fd = new FormData();
     fd.append('file', file);
-    const res = await fetch(_fullUrl('/employee_records/upload-csv'), {
+    const res = await fetch(_fullUrl('/employees/upload-csv'), {
       method: 'POST',
       headers: authHeaders(),
       body: fd,

@@ -122,7 +122,7 @@ export function PlotHarvestHistory({ plotId }) {
     <div className="plot-harvest-history">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
         <div>
-          <div style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+          <div style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
             Approved harvest{weekly ? ' (per week)' : ''}
           </div>
           <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>Approved harvesting clerk records only</div>

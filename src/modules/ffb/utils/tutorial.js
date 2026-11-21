@@ -3,7 +3,7 @@
 
 export const TOUR_STEPS = [
   {
-    key: 'welcome', who: 'all', title: 'Welcome to Earthintelytics FFB Analytics',
+    key: 'welcome', who: 'all', title: 'Welcome to FarmIntelytics FFB Analytics',
     body: (u) => [
       'This portal shows what is harvested, where it was harvested and who did the work.',
       `You are signed in as ${u.role}.`,

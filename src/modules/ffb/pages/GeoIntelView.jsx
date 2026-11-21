@@ -333,7 +333,7 @@ export function GeoIntelView() {
 
   // ── Six KPI cards (square), always shown; a click switches to the view the card belongs to ──
   const KPIS = [
-    { label: 'Harvested', value: counts.harvested, color: '#034321', lens: 'interval' },
+    { label: 'Harvested', value: counts.harvested, color: '#3F8432', lens: 'interval' },
     { label: 'No Harvest', value: counts.notHarvested, color: '#dc2626', lens: 'interval' },
     { label: RECON_STATUS.RECONCILED.label, value: counts.recon.RECONCILED, color: RECON_STATUS.RECONCILED.dark, lens: 'reconciliation' },
     { label: RECON_STATUS.DISCREPANCY.label, value: counts.recon.DISCREPANCY, color: RECON_STATUS.DISCREPANCY.color, lens: 'reconciliation' },
@@ -356,8 +356,8 @@ export function GeoIntelView() {
         <div role="tablist" aria-label="Map view" className="geo-intel__lenses" style={{ display: 'inline-flex', gap: '4px', padding: '4px', background: '#f1f5f9', border: '1px solid #e2e8f0', borderRadius: '10px', flexWrap: 'wrap', height: '42px', boxSizing: 'border-box' }}>
           {LENSES.map(l => (
             <button key={l.key} type="button" role="tab" aria-selected={lens === l.key} onClick={() => setLens(l.key)} title={l.subtitle}
-              style={{ border: 'none', borderRadius: '9px', padding: '0 14px', fontSize: '13px', fontWeight: 800, cursor: 'pointer',
-                background: lens === l.key ? 'white' : 'transparent', color: lens === l.key ? '#034321' : '#64748b',
+              style={{ border: 'none', borderRadius: '9px', padding: '0 14px', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
+                background: lens === l.key ? 'white' : 'transparent', color: lens === l.key ? '#3F8432' : '#64748b',
                 boxShadow: lens === l.key ? '0 1px 3px rgba(0,0,0,0.1)' : 'none' }}>
               {l.label}
             </button>
@@ -426,7 +426,7 @@ export function GeoIntelView() {
               borderColor: isViewer ? '#94a3b8' : '#3F8432', 
               cursor: isViewer ? 'not-allowed' : 'pointer',
               opacity: isViewer ? 0.7 : 1,
-              fontWeight: 800,
+              fontWeight: 500,
               display: 'inline-flex', alignItems: 'center', gap: '6px'
             }}
           >
@@ -440,7 +440,7 @@ export function GeoIntelView() {
           <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(3px)', zIndex: 1000,
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', pointerEvents: 'none' }}>
             <div className="loader-spinner" style={{ margin: 0 }} />
-            <span style={{ fontWeight: 700, color: 'var(--clr-brand-primary)' }}>Loading plots...</span>
+            <span style={{ fontWeight: 500, color: 'var(--clr-brand-primary)' }}>Loading plots...</span>
           </div>
         )}
 
@@ -470,7 +470,7 @@ export function GeoIntelView() {
         {/* Legend (the reconciliation legend doubles as a status filter) */}
         <div className="geo-intel__legend" style={{ position: 'absolute', top: '12px', left: '12px', zIndex: 1000, background: 'white', border: '1px solid #e2e8f0',
           borderRadius: 0, padding: '8px 10px', fontSize: '12px', fontWeight: 600, boxShadow: '0 2px 8px rgba(0,0,0,0.08)', maxWidth: '240px' }}>
-          <div style={{ fontSize: '10px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
+          <div style={{ fontSize: '10px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>
             {lens === 'reconciliation' ? 'Show status' : 'Legend'}
           </div>
           {lens === 'interval' && [['#5AA041', '#3F8432', 'Harvested in period'], ['#f87171', '#dc2626', 'No harvest in period']].map(([fill, stroke, t]) => (
@@ -484,7 +484,7 @@ export function GeoIntelView() {
               <button key={s.key} type="button" aria-pressed={on} title={on ? `Hide ${s.label}` : `Show ${s.label}`}
                 onClick={() => setShownStatuses(prev => { const n = new Set(prev); if (n.has(s.key)) n.delete(s.key); else n.add(s.key); return n; })}
                 style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'none', border: 'none', padding: '3px 0', cursor: 'pointer',
-                  fontSize: '12px', fontWeight: 700, color: on ? '#0f172a' : '#94a3b8', textAlign: 'left', width: '100%' }}>
+                  fontSize: '12px', fontWeight: 500, color: on ? '#0f172a' : '#94a3b8', textAlign: 'left', width: '100%' }}>
                 <span style={{ width: '12px', height: '12px', borderRadius: 0, flexShrink: 0, background: on ? s.color : 'transparent', border: `2px solid ${s.color}` }} />
                 <span style={{ textDecoration: on ? 'none' : 'line-through' }}>{s.label}</span>
               </button>
@@ -530,7 +530,7 @@ function PlotPanel({ lens, plotId, query, feature, lastEver, harvestedInPeriod, 
         display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ padding: '14px 16px', background: 'white', color: '#0f172a', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: '16px', fontWeight: 900, overflowWrap: 'anywhere' }}>{plotId ? `Plot ${plotId}` : `No plot matches "${query}"`}</div>
+          <div style={{ fontSize: '16px', fontWeight: 500, overflowWrap: 'anywhere' }}>{plotId ? `Plot ${plotId}` : `No plot matches "${query}"`}</div>
           {plotId && (
             <div style={{ fontSize: '12px', color: '#0f172a', marginTop: '2px' }}>
               Block {p.CodeBloc || '—'} · {p.AreaHa ? `${p.AreaHa} ha` : 'area —'}{p.YOP ? ` · planted ${p.YOP}` : ''}
@@ -548,13 +548,13 @@ function PlotPanel({ lens, plotId, query, feature, lastEver, harvestedInPeriod, 
           {lens === 'interval' && (<>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
             <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '10px' }}>
-              <div style={{ fontSize: '10px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase' }}>Last harvested</div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a', marginTop: '4px' }}>{lastEver ? fmtDateTime(lastEver) : 'Never recorded'}</div>
+              <div style={{ fontSize: '10px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>Last harvested</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: '#0f172a', marginTop: '4px' }}>{lastEver ? fmtDateTime(lastEver) : 'Never recorded'}</div>
               {ago !== null && <div style={{ fontSize: '12px', color: '#0f172a' }}>{ago === 0 ? 'today' : `${ago} day${ago === 1 ? '' : 's'} ago`}</div>}
             </div>
-            <div style={{ background: harvestedInPeriod ? '#E8F2E5' : '#fff1f2', border: `1px solid ${harvestedInPeriod ? '#5AA041' : '#fca5a5'}`, borderRadius: '10px', padding: '10px' }}>
-              <div style={{ fontSize: '10px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase' }}>This period</div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: harvestedInPeriod ? '#034321' : '#b91c1c', marginTop: '4px' }}>
+            <div style={{ background: harvestedInPeriod ? '#F3F8EF' : '#fff1f2', border: `1px solid ${harvestedInPeriod ? '#5AA041' : '#fca5a5'}`, borderRadius: '10px', padding: '10px' }}>
+              <div style={{ fontSize: '10px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>This period</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: harvestedInPeriod ? '#3F8432' : '#b91c1c', marginTop: '4px' }}>
                 {harvestedInPeriod ? 'Harvested' : 'No harvest'}
               </div>
             </div>
@@ -565,7 +565,7 @@ function PlotPanel({ lens, plotId, query, feature, lastEver, harvestedInPeriod, 
 
           {lens === 'reconciliation' && (
           <div>
-            <div style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '6px' }}>
               Harvested vs loaded ({rows.length} plot-day{rows.length === 1 ? '' : 's'})
             </div>
             {rows.length === 0 && <div style={{ fontSize: '13px', color: '#0f172a' }}>No harvest or loading recorded in this period.</div>}
@@ -576,7 +576,7 @@ function PlotPanel({ lens, plotId, query, feature, lastEver, harvestedInPeriod, 
                 <div key={`${r.work_date}-${r.mode}`} style={{ border: '1px solid #e2e8f0', borderRadius: '10px', padding: '10px', marginBottom: '8px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                     <strong style={{ fontSize: '13px' }}>{fmtDate(r.work_date)} · {kg ? 'Picker' : 'Harvester'}</strong>
-                    <span style={{ fontSize: '11px', fontWeight: 800, color: s?.color || '#475569', border: `1px solid ${s?.color || '#cbd5e1'}`, borderRadius: '999px', padding: '2px 8px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 500, color: s?.color || '#475569', border: `1px solid ${s?.color || '#cbd5e1'}`, borderRadius: '999px', padding: '2px 8px' }}>
                       {RECON_STATUS_TEXT[r.status] || r.status}
                     </span>
                   </div>
@@ -588,8 +588,8 @@ function PlotPanel({ lens, plotId, query, feature, lastEver, harvestedInPeriod, 
                     Harv. Clerk: {r.harvesting_clerk_ids || '—'} · Loading Clerk: {r.loading_clerk_ids || '—'}
                   </div>
                   <button type="button" onClick={() => onOpen(r)}
-                    style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', border: 'none', background: '#034321', color: 'white',
-                      borderRadius: '8px', padding: '7px 12px', fontSize: '12px', fontWeight: 800, cursor: 'pointer' }}>
+                    style={{ marginTop: '8px', display: 'inline-flex', alignItems: 'center', gap: '6px', border: 'none', background: '#3F8432', color: 'white',
+                      borderRadius: '8px', padding: '7px 12px', fontSize: '12px', fontWeight: 500, cursor: 'pointer' }}>
                     Open in Approval Center <ExternalLink size={13} />
                   </button>
                 </div>

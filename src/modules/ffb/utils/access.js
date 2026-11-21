@@ -9,17 +9,19 @@ const read = (key) => {
 export function normalizePortalRole(raw) {
   const r = String(raw || '').trim().toLowerCase();
   if (!r) return 'View';
-  if (['super admin', 'superadmin', 'owner', 'team'].includes(r)) return 'Super Admin';
-  if (['admin', 'manager', 'edit'].includes(r)) return 'Manager';
+  if (['super admin', 'superadmin', 'super_admin', 'org_admin', 'tenant_admin', 'owner', 'team'].includes(r)) {
+    return 'Super Admin';
+  }
+  if (['admin', 'manager', 'edit', 'editor'].includes(r)) return 'Manager';
   return 'View';
 }
 
 export const getRole = () => {
+  if (read('fi_admin_token')) return 'Super Admin';
   const ffbRole = read('fi_ffb_role');
   if (ffbRole) return normalizePortalRole(ffbRole);
   const fiRole = read('fi_role');
   if (fiRole) return normalizePortalRole(fiRole);
-  if (!read('fi_token') && read('fi_admin_token')) return 'Super Admin';
   return 'View';
 };
 

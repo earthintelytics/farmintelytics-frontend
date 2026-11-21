@@ -21,7 +21,7 @@ const EXPORT_COLS = [
   { key: 'rotten', header: 'Rotten' }, { key: 'kg', header: 'Loose Fruit (kg)' }, { key: 'status', header: 'Month Status' },
 ];
 
-const label = { fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' };
+const label = { fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' };
 const input = { width: '100%', height: '42px', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '0 12px', fontSize: '14px', fontWeight: 600 };
 
 const fmtWhen = (iso) => {
@@ -129,15 +129,15 @@ export function SettlementView() {
     <div className="view-container view-fade-in settlement-view" style={{ padding: '32px', display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
       <div className="view-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '16px', flexWrap: 'wrap', marginBottom: '24px' }}>
         <div>
-          <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CalendarCheck size={28} style={{ color: '#034321' }} /> Monthly Settlement
+          <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <CalendarCheck size={28} style={{ color: '#3F8432' }} /> Monthly Settlement
           </h1>
           <p className="view-subtitle" style={{ marginTop: '6px', maxWidth: '720px' }}>
             Every approved record of the pay month, added up per worker and per role. A pay month runs from the 27th to the 26th and a record
             counts in the month it was approved. Someone who worked as Cutter and as Carrier has a line for each role. Payment is worked out in the ERP.
           </p>
         </div>
-        <div style={{ textAlign: 'right', fontSize: '13px', fontWeight: 800, color: '#034321' }}>
+        <div style={{ textAlign: 'right', fontSize: '13px', fontWeight: 500, color: '#3F8432' }}>
           {scope || 'All Estates'}
         </div>
       </div>
@@ -176,22 +176,22 @@ export function SettlementView() {
           </div>
         </div>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <button className="btn btn--outline" onClick={reset} style={{ height: '42px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '10px' }}>
+          <button className="btn btn--outline" onClick={reset} style={{ height: '42px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '10px' }}>
             <RotateCcw size={15} /> Reset
           </button>
           <button className="btn btn--primary" onClick={() => setExportOpen(true)} disabled={!data || loading}
-            style={{ height: '42px', fontWeight: 800, fontSize: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            style={{ height: '42px', fontWeight: 500, fontSize: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Download size={15} /> Export CSV
           </button>
           {isSuperAdmin && current && (current.locked ? (
             <button className="btn btn--outline" disabled={busy} onClick={() => setConfirmLock('unlock')} title="Work this month out again from the approved records"
-              style={{ height: '42px', fontWeight: 800, fontSize: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              style={{ height: '42px', fontWeight: 500, fontSize: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Unlock size={15} /> Reopen Month
             </button>
           ) : (
             <button className="btn btn--outline" disabled={busy || !current.closed} onClick={() => setConfirmLock('lock')}
               title={current.closed ? 'Save this month as it is now' : 'A month can be locked after its 26th'}
-              style={{ height: '42px', fontWeight: 800, fontSize: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              style={{ height: '42px', fontWeight: 500, fontSize: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <Lock size={15} /> Lock Month
             </button>
           ))}
@@ -200,14 +200,14 @@ export function SettlementView() {
 
       {/* Month status */}
       {data && (
-        <div style={{ marginBottom: '20px', fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>
+        <div style={{ marginBottom: '20px', fontSize: '14px', fontWeight: 500, color: '#0f172a' }}>
           {data.locked
             ? <>Locked{data.locked_at ? ` on ${fmtWhen(data.locked_at)}` : ''}{data.locked_by ? ` by ${data.locked_by}` : ''}. These are the saved figures of the month.</>
             : <>Open. The figures change as records are approved until the month is locked.</>}
         </div>
       )}
 
-      {error && <div style={{ marginBottom: '16px', color: '#b91c1c', fontWeight: 700 }}>{error}</div>}
+      {error && <div style={{ marginBottom: '16px', color: '#b91c1c', fontWeight: 500 }}>{error}</div>}
 
       <div style={{ marginBottom: '16px', fontSize: '13px', color: '#0f172a' }}>
         Loose fruit picked by a cutter and carrier together is shared by weight: 40% to the cutter and 60% to the carrier. The same person keeps 100%.
@@ -222,13 +222,13 @@ export function SettlementView() {
           }}>
             <div style={{
               width: '52px', height: '52px', borderRadius: '14px', flex: '0 0 52px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-              background: 'transparent', color: c.danger ? '#DC2626' : '#034321'
+              background: 'transparent', color: c.danger ? '#DC2626' : '#3F8432'
             }}>{c.icon}</div>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontSize: '30px', fontWeight: 900, lineHeight: 1.1, color: c.danger ? '#DC2626' : '#0F172A' }}>
-                {c.value} <span style={{ fontSize: '13px', fontWeight: 700, color: c.danger ? '#B91C1C' : '#64748B' }}>{c.unit}</span>
+              <div style={{ fontSize: '30px', fontWeight: 500, lineHeight: 1.1, color: c.danger ? '#DC2626' : '#0F172A' }}>
+                {c.value} <span style={{ fontSize: '13px', fontWeight: 500, color: c.danger ? '#B91C1C' : '#64748B' }}>{c.unit}</span>
               </div>
-              <div style={{ fontSize: '12px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '6px', color: c.danger ? '#B91C1C' : '#0F172A' }}>{c.label}</div>
+              <div style={{ fontSize: '12px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '6px', color: c.danger ? '#B91C1C' : '#0F172A' }}>{c.label}</div>
               <div style={{ fontSize: '12px', fontWeight: 600, marginTop: '2px', color: c.danger ? '#B91C1C' : '#64748B' }}>{c.sub}</div>
             </div>
           </div>
@@ -246,7 +246,7 @@ export function SettlementView() {
         {loading && !data ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', gap: '12px', padding: '40px' }}>
             <div className="loader-spinner"></div>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Adding up the month...</span>
+            <span style={{ fontSize: '14px', fontWeight: 500, color: '#0f172a' }}>Adding up the month...</span>
           </div>
         ) : (
           <div style={{ overflowX: 'auto', flex: 1 }}>
@@ -266,16 +266,16 @@ export function SettlementView() {
                   const picker = r.role === 'Picker';
                   return (
                     <tr key={`${r.worker_id}-${r.role}-${i}`}>
-                      <td className="worker-cell" style={{ fontWeight: 700 }}>{r.worker_id}</td>
-                      <td className="worker-cell" style={{ fontWeight: 800 }}>{r.worker_name || '—'}</td>
-                      <td className="worker-cell" style={{ fontWeight: 800, color: 'var(--clr-brand-primary)' }}>{r.role}</td>
+                      <td className="worker-cell" style={{ fontWeight: 500 }}>{r.worker_id}</td>
+                      <td className="worker-cell" style={{ fontWeight: 500 }}>{r.worker_name || '—'}</td>
+                      <td className="worker-cell" style={{ fontWeight: 500, color: 'var(--clr-brand-primary)' }}>{r.role}</td>
                       <td className="worker-cell">{r.estate}</td>
                       <td className="worker-cell">{r.contractor || '—'}</td>
                       <td className="worker-cell worker-cell--num">{fmtNumber(r.records)}</td>
-                      <td className="worker-cell worker-cell--num" style={{ fontWeight: 700 }}>{picker ? '—' : fmtNumber(r.bunches)}</td>
+                      <td className="worker-cell worker-cell--num" style={{ fontWeight: 500 }}>{picker ? '—' : fmtNumber(r.bunches)}</td>
                       <td className="worker-cell worker-cell--num">{picker ? '—' : fmtNumber(r.unripe)}</td>
                       <td className="worker-cell worker-cell--num">{picker ? '—' : fmtNumber(r.rotten)}</td>
-                      <td className="worker-cell worker-cell--num" style={{ fontWeight: 700 }}>{picker ? fmtNumber(r.kg) : '—'}</td>
+                      <td className="worker-cell worker-cell--num" style={{ fontWeight: 500 }}>{picker ? fmtNumber(r.kg) : '—'}</td>
                     </tr>
                   );
                 })}
@@ -287,7 +287,7 @@ export function SettlementView() {
 
       <div className="pagination-bar" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '10px', padding: '16px 0' }}>
         <button className="pg-btn" disabled={page <= 1} onClick={() => { setPage(page - 1); scrollPageTop(); }}><ChevronLeft size={14} /> Prev</button>
-        <span style={{ fontSize: '13px', fontWeight: 700 }}>Page {page} of {totalPages}</span>
+        <span style={{ fontSize: '13px', fontWeight: 500 }}>Page {page} of {totalPages}</span>
         <button className="pg-btn" disabled={page >= totalPages} onClick={() => { setPage(page + 1); scrollPageTop(); }}>Next <ChevronRight size={14} /></button>
       </div>
 

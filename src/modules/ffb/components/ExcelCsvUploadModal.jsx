@@ -468,7 +468,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
         }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <h2 style={{ fontSize: '18px', fontWeight: 900, color: '#0F172A', margin: 0 }}>
+              <h2 style={{ fontSize: '18px', fontWeight: 500, color: '#0F172A', margin: 0 }}>
                 {isClerks ? 'Upload Field Clerks' : 'Upload Farm Workers & Harvesters'}
               </h2>
             </div>
@@ -521,7 +521,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                       <UploadCloud size={32} />
                     </div>
                     <div>
-                      <div style={{ fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+                      <div style={{ fontSize: '15px', fontWeight: 500, color: '#0F172A' }}>
                         Select an Excel (.xlsx, .xls) or CSV (.csv) file
                       </div>
                       <div style={{ fontSize: '12px', color: '#0f172a', marginTop: '4px' }}>
@@ -529,9 +529,9 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                       </div>
                     </div>
                     <label style={{
-                      background: '#034321',
+                      background: '#3F8432',
                       color: '#FFFFFF',
-                      fontWeight: 800,
+                      fontWeight: 500,
                       fontSize: '13px',
                       padding: '10px 22px',
                       borderRadius: '8px',
@@ -556,7 +556,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                         <FileSpreadsheet size={24} />
                       </div>
                       <div style={{ textAlign: 'left' }}>
-                        <div style={{ fontSize: '14px', fontWeight: 900, color: '#0F172A' }}>{fileName}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 500, color: '#0F172A' }}>{fileName}</div>
                         <div style={{ fontSize: '12px', color: '#0f172a' }}>
                           {sheetData.length} data rows found {sheetNames.length > 1 ? `(${sheetNames.length} sheets in workbook)` : ''}
                         </div>
@@ -566,18 +566,18 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       {sheetNames.length > 1 && (
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a' }}>Sheet:</span>
+                          <span style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a' }}>Sheet:</span>
                           <select
                             value={selectedSheet}
                             onChange={(e) => handleSheetChange(e.target.value)}
                             style={{
                               padding: '8px 12px',
                               borderRadius: '8px',
-                              border: '1.5px solid #034321',
+                              border: '1.5px solid #3F8432',
                               background: '#FFFFFF',
-                              fontWeight: 800,
+                              fontWeight: 500,
                               fontSize: '13px',
-                              color: '#034321'
+                              color: '#3F8432'
                             }}
                           >
                             {sheetNames.map(s => (
@@ -593,7 +593,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                         border: '1px solid #CBD5E1',
                         background: '#FFFFFF',
                         fontSize: '12px',
-                        fontWeight: 800,
+                        fontWeight: 500,
                         color: '#0F172A',
                         cursor: 'pointer'
                       }}>
@@ -611,7 +611,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
               </div>
 
               {parseError && (
-                <div style={{ background: '#F8FAFC', border: '1.5px solid #CBD5E1', borderRadius: '8px', padding: '12px 16px', color: '#0F172A', fontSize: '13px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div style={{ background: '#F8FAFC', border: '1.5px solid #CBD5E1', borderRadius: '8px', padding: '12px 16px', color: '#0F172A', fontSize: '13px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <AlertCircle size={16} /> {parseError}
                 </div>
               )}
@@ -627,7 +627,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <span style={{ fontSize: '12px', fontWeight: 800, color: '#034321', border: '1px solid #BBF7D0', padding: '4px 10px', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 500, color: '#3F8432', border: '1px solid #BBF7D0', padding: '4px 10px', borderRadius: '6px' }}>
                         {Object.values(fieldMapping).filter(Boolean).length} of {SYSTEM_FIELDS.length} Fields Mapped
                       </span>
                     </div>
@@ -643,7 +643,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                       borderBottom: '2px solid #E2E8F0',
                       padding: '12px 18px',
                       fontSize: '12px',
-                      fontWeight: 900,
+                      fontWeight: 500,
                       color: '#0F172A',
                       textTransform: 'uppercase',
                       letterSpacing: '0.04em'
@@ -672,19 +672,19 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                           >
                             {/* Column 1: System Field */}
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingRight: '12px' }}>
-                              <span style={{ fontSize: '13px', fontWeight: 800, color: '#0F172A' }}>
+                              <span style={{ fontSize: '13px', fontWeight: 500, color: '#0F172A' }}>
                                 {field.label}
                               </span>
                               {isMapped ? (
-                                <span style={{ fontSize: '11px', color: '#034321', fontWeight: 800, display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '4px' }}>
+                                <span style={{ fontSize: '11px', color: '#3F8432', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '3px', padding: '2px 8px', borderRadius: '4px' }}>
                                   <Check size={12} /> Mapped
                                 </span>
                               ) : field.required ? (
-                                <span style={{ fontSize: '11px', color: '#B91C1C', fontWeight: 800, background: '#FEE2E2', padding: '2px 8px', borderRadius: '4px' }}>
+                                <span style={{ fontSize: '11px', color: '#B91C1C', fontWeight: 500, background: '#FEE2E2', padding: '2px 8px', borderRadius: '4px' }}>
                                   Required
                                 </span>
                               ) : (
-                                <span style={{ fontSize: '11px', color: '#0f172a', fontWeight: 700, background: '#F1F5F9', padding: '2px 8px', borderRadius: '4px' }}>
+                                <span style={{ fontSize: '11px', color: '#0f172a', fontWeight: 500, background: '#F1F5F9', padding: '2px 8px', borderRadius: '4px' }}>
                                   Optional
                                 </span>
                               )}
@@ -699,10 +699,10 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                                   width: '100%',
                                   padding: '8px 12px',
                                   borderRadius: '8px',
-                                  border: isMapped ? '1.5px solid #034321' : '1.5px solid #CBD5E1',
+                                  border: isMapped ? '1.5px solid #3F8432' : '1.5px solid #CBD5E1',
                                   background: '#FFFFFF',
                                   fontSize: '13px',
-                                  fontWeight: 700,
+                                  fontWeight: 500,
                                   color: fieldMapping[field.key] ? '#0F172A' : '#64748B',
                                   cursor: 'pointer'
                                 }}
@@ -729,7 +729,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
               <div style={{ background: '#FFFFFF', border: '1px solid #E2E8F0', borderRadius: '12px', padding: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
                   <div>
-                    <h3 style={{ fontSize: '15px', fontWeight: 900, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <h3 style={{ fontSize: '15px', fontWeight: 500, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
                       <Table size={18} color="#0F172A" /> Ingestion Preview (First 5 Rows)
                     </h3>
                     <p style={{ margin: '4px 0 0 0', fontSize: '12px', color: '#0f172a' }}>
@@ -737,15 +737,15 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                     </p>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '12px', color: '#034321', fontWeight: 900, background: 'transparent', border: 'none', padding: '4px 10px', borderRadius: '6px' }}>
+                    <span style={{ fontSize: '12px', color: '#3F8432', fontWeight: 500, background: 'transparent', border: 'none', padding: '4px 10px', borderRadius: '6px' }}>
                       {activeDetectedCount} Active
                     </span>
                     {inactiveDetectedCount > 0 && (
-                      <span style={{ fontSize: '12px', color: '#0F172A', fontWeight: 900, background: '#F1F5F9', border: '1px solid #CBD5E1', padding: '4px 10px', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '12px', color: '#0F172A', fontWeight: 500, background: '#F1F5F9', border: '1px solid #CBD5E1', padding: '4px 10px', borderRadius: '6px' }}>
                         {inactiveDetectedCount} Inactive
                       </span>
                     )}
-                    <span style={{ fontSize: '12px', color: '#0F172A', fontWeight: 800, background: '#F8FAFC', border: '1px solid #CBD5E1', padding: '4px 10px', borderRadius: '6px' }}>
+                    <span style={{ fontSize: '12px', color: '#0F172A', fontWeight: 500, background: '#F8FAFC', border: '1px solid #CBD5E1', padding: '4px 10px', borderRadius: '6px' }}>
                       {sheetData.length} Total Records
                     </span>
                   </div>
@@ -764,7 +764,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                   alignItems: 'center',
                   gap: '8px'
                 }}>
-                  <CheckCircle2 size={16} color="#034321" style={{ flexShrink: 0 }} />
+                  <CheckCircle2 size={16} color="#3F8432" style={{ flexShrink: 0 }} />
                   <span>
                     <strong>Status Rule:</strong> All personnel default to <strong>Active</strong>. Only records explicitly indicated as <em>Inactive / Deactivated / Suspended / Left</em> will be set to Inactive.
                   </span>
@@ -774,21 +774,21 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                     <thead>
                       <tr style={{ background: '#F8FAFC', borderBottom: '2px solid #E2E8F0', textAlign: 'left' }}>
-                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 900 }}>EMP ID</th>
-                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 900 }}>FULL NAME</th>
-                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 900 }}>ASSIGNED ROLE</th>
-                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 900 }}>DIVISION</th>
-                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 900 }}>CONTRACTOR</th>
-                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 900 }}>STATUS</th>
+                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 500 }}>EMP ID</th>
+                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 500 }}>FULL NAME</th>
+                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 500 }}>ASSIGNED ROLE</th>
+                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 500 }}>DIVISION</th>
+                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 500 }}>CONTRACTOR</th>
+                        <th style={{ padding: '10px 14px', color: '#0F172A', fontWeight: 500 }}>STATUS</th>
                       </tr>
                     </thead>
                     <tbody>
                       {previewRows.map((r, i) => (
                         <tr key={i} style={{ borderBottom: '1px solid #E2E8F0', background: i % 2 === 0 ? '#FFFFFF' : '#F8FAFC' }}>
-                          <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontWeight: 900, color: '#0F172A' }}>
+                          <td style={{ padding: '10px 14px', fontFamily: 'monospace', fontWeight: 500, color: '#0F172A' }}>
                             #{r.employee_id || 'MISSING'}
                           </td>
-                          <td style={{ padding: '10px 14px', fontWeight: 800, color: '#0F172A' }}>
+                          <td style={{ padding: '10px 14px', fontWeight: 500, color: '#0F172A' }}>
                             {[r.first_name, r.last_name].filter(Boolean).join(' ') || 'MISSING NAME'}
                           </td>
                           <td style={{ padding: '10px 14px' }}>
@@ -796,7 +796,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                               padding: '3px 8px',
                               borderRadius: '4px',
                               fontSize: '11px',
-                              fontWeight: 800,
+                              fontWeight: 500,
                               background: '#F1F5F9',
                               color: '#0F172A',
                               border: '1px solid #CBD5E1'
@@ -804,16 +804,16 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                               {r.function}
                             </span>
                           </td>
-                          <td style={{ padding: '10px 14px', color: '#0f172a', fontWeight: 700 }}>{r.division}</td>
-                          <td style={{ padding: '10px 14px', color: '#0f172a', fontWeight: 700 }}>{r.contractor}</td>
+                          <td style={{ padding: '10px 14px', color: '#0f172a', fontWeight: 500 }}>{r.division}</td>
+                          <td style={{ padding: '10px 14px', color: '#0f172a', fontWeight: 500 }}>{r.contractor}</td>
                           <td style={{ padding: '10px 14px' }}>
                             <span style={{
                               padding: '2px 8px',
                               borderRadius: '4px',
                               fontSize: '11px',
-                              fontWeight: 800,
-                              background: r.worker_status === 'Active' ? '#E8F2E5' : '#F1F5F9',
-                              color: r.worker_status === 'Active' ? '#034321' : '#475569',
+                              fontWeight: 500,
+                              background: r.worker_status === 'Active' ? '#F3F8EF' : '#F1F5F9',
+                              color: r.worker_status === 'Active' ? '#3F8432' : '#475569',
                               border: `1px solid ${r.worker_status === 'Active' ? '#BBF7D0' : '#CBD5E1'}`
                             }}>
                               {r.worker_status}
@@ -841,7 +841,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
         }}>
           <div style={{ fontSize: '13px', color: '#0f172a', fontWeight: 600 }}>
             {sheetData.length > 0 ? (
-              <span>Mapping <strong>{sheetData.length} records</strong> from sheet: <strong style={{ color: '#034321' }}>{selectedSheet}</strong></span>
+              <span>Mapping <strong>{sheetData.length} records</strong> from sheet: <strong style={{ color: '#3F8432' }}>{selectedSheet}</strong></span>
             ) : (
               <span>Please select a file to begin header mapping.</span>
             )}
@@ -858,7 +858,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                     border: '1px solid #CBD5E1',
                     background: '#FFFFFF',
                     color: '#0F172A',
-                    fontWeight: 800,
+                    fontWeight: 500,
                     fontSize: '13px',
                     cursor: 'pointer'
                   }}
@@ -873,9 +873,9 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                     padding: '9px 22px',
                     borderRadius: '8px',
                     border: 'none',
-                    background: sheetData.length > 0 && fieldMapping.employee_id ? '#034321' : '#94A3B8',
+                    background: sheetData.length > 0 && fieldMapping.employee_id ? '#3F8432' : '#94A3B8',
                     color: '#FFFFFF',
-                    fontWeight: 900,
+                    fontWeight: 500,
                     fontSize: '13px',
                     cursor: sheetData.length > 0 && fieldMapping.employee_id ? 'pointer' : 'not-allowed',
                     display: 'flex',
@@ -896,7 +896,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                     border: '1px solid #CBD5E1',
                     background: '#FFFFFF',
                     color: '#0F172A',
-                    fontWeight: 800,
+                    fontWeight: 500,
                     fontSize: '13px',
                     cursor: 'pointer',
                     display: 'flex',
@@ -914,9 +914,9 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
                     padding: '9px 24px',
                     borderRadius: '8px',
                     border: 'none',
-                    background: '#034321',
+                    background: '#3F8432',
                     color: '#FFFFFF',
-                    fontWeight: 900,
+                    fontWeight: 500,
                     fontSize: '13px',
                     cursor: isSubmitting ? 'not-allowed' : 'pointer',
                     display: 'flex',

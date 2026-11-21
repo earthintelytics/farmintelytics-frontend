@@ -122,7 +122,7 @@ export default function ExportColumnsModal({
         </div>
 
         <div className="export-modal-toolbar">
-          <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>
+          <span style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a' }}>
             Quick Selection:
           </span>
           <div style={{ display: 'flex', gap: '8px' }}>
@@ -162,7 +162,7 @@ export default function ExportColumnsModal({
                 />
                 <span style={{ flex: 1 }}>{col.header}</span>
                 {isRestricted && (
-                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#94a3b8', fontWeight: 700 }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#94a3b8', fontWeight: 500 }}>
                     <Lock size={11} /> Locked
                   </span>
                 )}
@@ -179,7 +179,7 @@ export default function ExportColumnsModal({
             <button
               type="button"
               className="btn btn--outline"
-              style={{ height: '38px', padding: '0 16px', fontSize: '13px', borderRadius: '8px', fontWeight: 700 }}
+              style={{ height: '38px', padding: '0 16px', fontSize: '13px', borderRadius: '8px', fontWeight: 500 }}
               onClick={onClose}
             >
               Cancel
@@ -189,7 +189,7 @@ export default function ExportColumnsModal({
               className="btn btn--primary"
               disabled={selectedCols.size === 0}
               style={{
-                height: '38px', padding: '0 18px', fontSize: '13px', borderRadius: '8px', fontWeight: 800,
+                height: '38px', padding: '0 18px', fontSize: '13px', borderRadius: '8px', fontWeight: 500,
                 display: 'flex', alignItems: 'center', gap: '8px',
                 opacity: selectedCols.size === 0 ? 0.5 : 1,
                 cursor: selectedCols.size === 0 ? 'not-allowed' : 'pointer'

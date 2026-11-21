@@ -10,9 +10,9 @@ export function FaqView() {
 
   return (
     <div className="view-container view-fade-in" style={{ padding: '32px', maxWidth: '900px' }}>
-      <div style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Help &rsaquo; Common Questions</div>
-      <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
-        <MessageCircleQuestion size={28} style={{ color: '#034321' }} /> Common Questions
+      <div style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Help &rsaquo; Common Questions</div>
+      <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
+        <MessageCircleQuestion size={28} style={{ color: '#3F8432' }} /> Common Questions
       </h1>
       <p className="view-subtitle" style={{ marginTop: '6px' }}>Short answers to what people ask most.</p>
 
@@ -27,7 +27,7 @@ export function FaqView() {
         {items.map((f, n) => (
           <div key={f.q} style={{ border: '1px solid #E2E8F0', borderRadius: '12px', background: '#FFFFFF' }}>
             <button onClick={() => setOpen(open === n ? -1 : n)} aria-expanded={open === n}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '16px 18px', border: 'none', background: 'transparent', cursor: 'pointer', textAlign: 'left', fontSize: '15px', fontWeight: 800, color: '#0F172A' }}>
+              style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', padding: '16px 18px', border: 'none', background: 'transparent', cursor: 'pointer', textAlign: 'left', fontSize: '15px', fontWeight: 500, color: '#0F172A' }}>
               {f.q}
               <ChevronDown size={18} style={{ flex: '0 0 auto', transform: open === n ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
             </button>

@@ -185,7 +185,7 @@ export function PlotView() {
     return {
       labels: subset.map(p => p.plot_id),
       datasets: [
-        { label: 'Harvested', data: subset.map(p => p.harvCount), backgroundColor: '#034321', borderRadius: 4, barThickness: 16 },
+        { label: 'Harvested', data: subset.map(p => p.harvCount), backgroundColor: '#3F8432', borderRadius: 4, barThickness: 16 },
         { label: 'Loaded', data: subset.map(p => p.loadCount), backgroundColor: '#f97316', borderRadius: 4, barThickness: 16 },
       ]
     };
@@ -207,7 +207,7 @@ export function PlotView() {
       datasets: [{
         label: 'Daily Production (FFB)',
         data: data.map(d => d.total_harvested_count),
-        borderColor: '#034321',
+        borderColor: '#3F8432',
         backgroundColor: 'rgba(3, 67, 33, 0.1)',
         borderWidth: 3,
         fill: true,
@@ -272,8 +272,8 @@ export function PlotView() {
       <div className="view-header" style={{ marginBottom: '24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <div>
-            <h1 className="view-title" style={{ margin: 0 }}>Plot Analytics Dashboard</h1>
-            <p className="view-subtitle plot-view__subtitle" style={{ margin: '4px 0 0 0' }}>Daily plot-level aggregation for harvested and loaded volumes, quality signals, and verification status.</p>
+            <h1 className="view-title" style={{ margin: 0 }}>Block Performance</h1>
+            <p className="view-subtitle plot-view__subtitle" style={{ margin: '4px 0 0 0' }}>Daily block-level aggregation for harvested and loaded volumes, quality signals, and verification status.</p>
           </div>
           <button 
             className="btn btn--outline"
@@ -284,7 +284,7 @@ export function PlotView() {
               gap: '8px',
               padding: '10px 20px',
               fontSize: '13px',
-              fontWeight: 800,
+              fontWeight: 500,
               borderRadius: '10px',
               border: '1px solid var(--clr-brand-primary)',
               backgroundColor: 'transparent',
@@ -315,7 +315,7 @@ export function PlotView() {
       }}>
         {/* 1. Search Plot */}
         <div className="filter-group" style={{ flex: '2 1 240px', minWidth: '180px' }}>
-          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}>Search Plot</label>
+          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>Search Plot</label>
           <div style={{ position: 'relative', width: '100%' }}>
             <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.5 }}>{ICONS.search}</span>
             <input
@@ -335,15 +335,15 @@ export function PlotView() {
 
         {/* 2. Plantation Location */}
         <div className="filter-group" style={{ flex: '1.2 1 160px', minWidth: '140px' }}>
-          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}>Plantation Location</label>
-          <select className="select-input" style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }} value={filters.estate || ''} onChange={(e) => updateFilters({ estate: e.target.value || null })}>
+          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>Plantation Location</label>
+          <select className="select-input" style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 500 }} value={filters.estate || ''} onChange={(e) => updateFilters({ estate: e.target.value || null })}>
             <EstateOptions allLabel="All Farms" />
           </select>
         </div>
 
         {/* 3. Start Date */}
         <div className="filter-group" style={{ flex: '1 1 140px', minWidth: '130px' }}>
-          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}>Start Date</label>
+          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>Start Date</label>
           <input
             type="date"
             className="date-input"
@@ -355,7 +355,7 @@ export function PlotView() {
 
         {/* 4. End Date */}
         <div className="filter-group" style={{ flex: '1 1 140px', minWidth: '130px' }}>
-          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}>End Date</label>
+          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>End Date</label>
           <input
             type="date"
             className="date-input"
@@ -369,7 +369,7 @@ export function PlotView() {
         <button 
           className="btn btn--outline" 
           onClick={resetFilters} 
-          style={{ height: '40px', padding: '0 16px', fontWeight: 800, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', whiteSpace: 'nowrap', flexShrink: 0 }}
+          style={{ height: '40px', padding: '0 16px', fontWeight: 500, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', whiteSpace: 'nowrap', flexShrink: 0 }}
         >
           <RotateCcw size={14} /> RESET
         </button>
@@ -381,7 +381,7 @@ export function PlotView() {
           disabled={isViewer}
           title={isViewer ? 'Viewer accounts cannot export CSV from the portal' : 'Export CSV'}
           style={{
-            padding: '0 20px', height: '40px', fontWeight: 900, fontSize: '12px', borderRadius: '8px',
+            padding: '0 20px', height: '40px', fontWeight: 500, fontSize: '12px', borderRadius: '8px',
             display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap', flexShrink: 0,
             background: isViewer ? '#94a3b8' : undefined,
             borderColor: isViewer ? '#94a3b8' : undefined,
@@ -413,7 +413,7 @@ export function PlotView() {
                   {kpi.unit ? <span className="wkpi-unit">{kpi.unit}</span> : null}
                 </div>
                 <div className="wkpi-label">{kpi.label}</div>
-                {kpi.note && <div className="wkpi-sub" style={{ fontSize: '10px', opacity: 0.6, fontWeight: 700, textTransform: 'uppercase', marginTop: '2px' }}>{kpi.note}</div>}
+                {kpi.note && <div className="wkpi-sub" style={{ fontSize: '10px', opacity: 0.6, fontWeight: 500, textTransform: 'uppercase', marginTop: '2px' }}>{kpi.note}</div>}
               </div>
             </div>
           </div>
@@ -429,8 +429,8 @@ export function PlotView() {
             </div>
             <div style={{ display: 'flex', gap: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '10px', height: '10px', background: '#034321', borderRadius: '50%' }}></div>
-                <span style={{ fontSize: '13px', fontWeight: 800 }}>Harvested</span>
+                <div style={{ width: '10px', height: '10px', background: '#3F8432', borderRadius: '50%' }}></div>
+                <span style={{ fontSize: '13px', fontWeight: 500 }}>Harvested</span>
               </div>
             </div>
           </div>
@@ -447,12 +447,12 @@ export function PlotView() {
             </div>
             <div style={{ display: 'flex', gap: '20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '10px', height: '10px', background: '#034321', borderRadius: '50%' }}></div>
-                <span style={{ fontSize: '13px', fontWeight: 800 }}>Harvested</span>
+                <div style={{ width: '10px', height: '10px', background: '#3F8432', borderRadius: '50%' }}></div>
+                <span style={{ fontSize: '13px', fontWeight: 500 }}>Harvested</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div style={{ width: '10px', height: '10px', background: '#f97316', borderRadius: '50%' }}></div>
-                <span style={{ fontSize: '13px', fontWeight: 800 }}>Loaded</span>
+                <span style={{ fontSize: '13px', fontWeight: 500 }}>Loaded</span>
               </div>
             </div>
           </div>
@@ -513,7 +513,7 @@ export function PlotView() {
                   let diffTone = 'neutral';
                   if (diff > 50) { diffColor = '#be123c'; diffBg = '#fff1f2'; diffTone = 'high'; }
                   else if (diff > 10) { diffColor = '#92400e'; diffBg = '#fef3c7'; diffTone = 'medium'; }
-                  else { diffColor = '#034321'; diffBg = '#E8F2E5'; diffTone = 'low'; }
+                  else { diffColor = '#3F8432'; diffBg = '#F3F8EF'; diffTone = 'low'; }
 
                   return (
                     <tr
@@ -521,14 +521,14 @@ export function PlotView() {
                       className="plot-row"
                     >
                       <td className="plot-cell" style={{ color: '#000', fontSize: '14px' }}>{row.date}</td>
-                      <td className="plot-cell"><span style={{ color: '#000', fontWeight: 900, fontSize: '16px' }}>{row.plot_id}</span></td>
-                      <td className="plot-cell plot-cell--num" style={{ color: '#000', fontWeight: 900, fontSize: '16px' }}>{fmtNumber(row.harvCount)}</td>
-                      <td className="plot-cell plot-cell--num" style={{ color: '#000', fontWeight: 800, fontSize: '16px' }}>{fmtNumber(row.loadCount)}</td>
-                      <td className="plot-cell plot-cell--num" style={{ color: '#000', fontSize: '16px', fontWeight: 800 }}>{fmtNumber(row.rotten)}</td>
-                      <td className="plot-cell plot-cell--num" style={{ color: '#000', fontWeight: 900, fontSize: '16px' }}>{fmtNumber(row.harvWeight)} kg</td>
+                      <td className="plot-cell"><span style={{ color: '#000', fontWeight: 500, fontSize: '16px' }}>{row.plot_id}</span></td>
+                      <td className="plot-cell plot-cell--num" style={{ color: '#000', fontWeight: 500, fontSize: '16px' }}>{fmtNumber(row.harvCount)}</td>
+                      <td className="plot-cell plot-cell--num" style={{ color: '#000', fontWeight: 500, fontSize: '16px' }}>{fmtNumber(row.loadCount)}</td>
+                      <td className="plot-cell plot-cell--num" style={{ color: '#000', fontSize: '16px', fontWeight: 500 }}>{fmtNumber(row.rotten)}</td>
+                      <td className="plot-cell plot-cell--num" style={{ color: '#000', fontWeight: 500, fontSize: '16px' }}>{fmtNumber(row.harvWeight)} kg</td>
                       <td className="plot-cell plot-cell--num" style={{ color: '#000', fontSize: '15px' }}>{fmtNumber(row.loadWeight)} kg</td>
                       <td className="plot-cell plot-cell--num" style={{ color: '#000', fontSize: '14px' }}>{fmtNumber(row.duration)} min</td>
-                      <td className="plot-cell plot-cell--num" style={{ textAlign: 'center', background: diffBg, color: diffColor, fontWeight: 700 }}>
+                      <td className="plot-cell plot-cell--num" style={{ textAlign: 'center', background: diffBg, color: diffColor, fontWeight: 500 }}>
                         {diff}
                       </td>
                     </tr>

@@ -43,12 +43,12 @@ const HARVESTER_COLS = [
   },
   {
     key: 'plot', header: 'Plot', defaultVisible: true, filterKey: 'plot',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => row.plot_id || '—'
   },
   {
     key: 'worker_id', header: 'Cutter ID', defaultVisible: true, filterKey: 'worker_id',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => row.worker_id
   },
   {
@@ -58,7 +58,7 @@ const HARVESTER_COLS = [
   },
   {
     key: 'carrier_id', header: 'Carrier ID', defaultVisible: true, filterKey: 'carrier_id',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => (!row.carrier_id || row.carrier_id === row.worker_id ? row.worker_id : row.carrier_id)
   },
   {
@@ -78,7 +78,7 @@ const HARVESTER_COLS = [
   },
   {
     key: 'ai_count', header: 'FFB (AI)', defaultVisible: true, filterKey: 'ai_count', isNum: true,
-    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 700, color: 'var(--clr-brand-primary)' },
+    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 500, color: 'var(--clr-brand-primary)' },
     render: row => (row.ai_count ?? 0).toLocaleString('en-NG')
   },
   {
@@ -103,7 +103,7 @@ const HARVESTER_COLS = [
       const diff = Math.abs(row.difference || 0);
       const diffColor = diff > 10 ? '#be123c' : diff > 2 ? '#92400e' : 'var(--clr-brand-primary)';
       return (
-        <span style={{ color: diffColor, fontWeight: 700 }}>
+        <span style={{ color: diffColor, fontWeight: 500 }}>
           {row.difference > 0 ? `+${row.difference}` : row.difference}
         </span>
       );
@@ -112,12 +112,12 @@ const HARVESTER_COLS = [
   },
   {
     key: 'recorder_name', header: 'Harv. Clerk ID', defaultVisible: false, filterKey: 'recorder_name',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.recorder_name || ''}>{row.recorder_id || '—'}</span>
   },
   {
     key: 'loader', header: 'Loading Clerk ID', defaultVisible: false, filterKey: 'loader',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.loader_name || ''}>{row.loader_id || '—'}</span>
   },
   {
@@ -136,12 +136,12 @@ const PICKER_COLS = [
   },
   {
     key: 'plot', header: 'Plot', defaultVisible: true, filterKey: 'plot',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => row.plot_id || '—'
   },
   {
     key: 'worker_id', header: 'Picker ID', defaultVisible: true, filterKey: 'worker_id',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => row.worker_id
   },
   {
@@ -156,17 +156,17 @@ const PICKER_COLS = [
   },
   {
     key: 'weight', header: 'Weight (kg)', defaultVisible: true, filterKey: 'weight', isNum: true,
-    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 700 },
+    thClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 500 },
     render: row => formatWeightCell(row.weight_kg)
   },
   {
     key: 'recorder_name', header: 'Harv. Clerk ID', defaultVisible: false, filterKey: 'recorder_name',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.recorder_name || ''}>{row.recorder_id || '—'}</span>
   },
   {
     key: 'loader', header: 'Loading Clerk ID', defaultVisible: false, filterKey: 'loader',
-    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    thClass: '', tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.loader_name || ''}>{row.loader_id || '—'}</span>
   },
   {
@@ -465,7 +465,7 @@ export function WorkerView() {
     const avgApprRate = totalRecords > 0 ? Math.min(100, Math.round((recs.approved / totalRecords) * 100)) : 0;
 
     const n = (v) => v.toLocaleString('en-NG');
-    const GREEN = '#034321', AMBER = '#b45309', SLATE = '#475569';
+    const GREEN = '#3F8432', AMBER = '#b45309', SLATE = '#475569';
     return [
       { label: 'Approved Records', value: n(recs.approved), color: GREEN },
       { label: 'Approved FFB', value: n(ffb.approved), color: GREEN },
@@ -502,9 +502,9 @@ export function WorkerView() {
       {/* Top Header */}
       <div className="view-header" style={{ marginBottom: '20px' }}>
         <div>
-          <h1 className="view-title" style={{ margin: 0, fontSize: '28px', fontWeight: 900, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <User size={30} color="var(--clr-brand-primary)" />
-            Individual Worker Analytics
+          <h1 className="view-title" style={{ margin: 0, fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <User size={26} strokeWidth={1.5} color="var(--clr-brand-primary)" />
+            Crew Performance
           </h1>
           <p className="view-subtitle worker-view__subtitle" style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#0f172a' }}>
             Daily field performance records, bunch counts, and weight verifications for Harvester, Picker, and Carrier teams.
@@ -520,7 +520,7 @@ export function WorkerView() {
       }}>
         {/* 1. Search Worker / Carrier / Plot */}
         <div className="filter-group" style={{ flex: '2 1 240px', minWidth: '180px' }}>
-          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}>
+          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>
             Search Worker
           </label>
           <div style={{ position: 'relative', width: '100%' }}>
@@ -541,12 +541,12 @@ export function WorkerView() {
 
         {/* 2. Plantation Location */}
         <div className="filter-group" style={{ flex: '1.2 1 160px', minWidth: '140px' }}>
-          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}>
+          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>
             Plantation Location
           </label>
           <select 
             className="select-input" 
-            style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }} 
+            style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 500 }} 
             value={filters.estate || ''} 
             onChange={(e) => { updateFilters({ estate: e.target.value || null }); setCurrentPage(1); }}
           >
@@ -556,12 +556,12 @@ export function WorkerView() {
 
         {/* 3. Validation Status */}
         <div className="filter-group" style={{ flex: '1.1 1 130px', minWidth: '120px' }}>
-          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}>
+          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>
             Validation Status
           </label>
           <select 
             className="select-input" 
-            style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 700 }} 
+            style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '13px', fontWeight: 500 }} 
             value={filters.status || ''} 
             onChange={e => { updateFilters({ status: e.target.value || null }); setCurrentPage(1); }}
           >
@@ -573,7 +573,7 @@ export function WorkerView() {
 
         {/* 4. Start Date */}
         <div className="filter-group" style={{ flex: '1 1 140px', minWidth: '130px' }}>
-          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}>
+          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>
             Start Date
           </label>
           <input 
@@ -587,7 +587,7 @@ export function WorkerView() {
 
         {/* 5. End Date */}
         <div className="filter-group" style={{ flex: '1 1 140px', minWidth: '130px' }}>
-          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 900, color: '#0f172a', textTransform: 'uppercase' }}>
+          <label className="filter-label" style={{ marginBottom: '6px', display: 'block', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>
             End Date
           </label>
           <input 
@@ -602,7 +602,7 @@ export function WorkerView() {
         {/* 6. Reset Button */}
         <button 
           className="btn btn--outline" 
-          style={{ height: '40px', padding: '0 16px', fontWeight: 800, borderRadius: '8px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0 }} 
+          style={{ height: '40px', padding: '0 16px', fontWeight: 500, borderRadius: '8px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', flexShrink: 0 }} 
           onClick={handleClearAll}
         >
           <RotateCcw size={14} /> RESET
@@ -616,7 +616,7 @@ export function WorkerView() {
             disabled
             title="Viewer accounts cannot export CSV from the portal"
             style={{
-              height: '40px', padding: '0 18px', fontWeight: 900, fontSize: '12px', borderRadius: '8px',
+              height: '40px', padding: '0 18px', fontWeight: 500, fontSize: '12px', borderRadius: '8px',
               display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap', flexShrink: 0,
               background: '#94a3b8', borderColor: '#94a3b8', cursor: 'not-allowed', opacity: 0.7
             }}
@@ -630,7 +630,7 @@ export function WorkerView() {
             onClick={openExportModal}
             title="Select columns to export CSV"
             style={{
-              height: '40px', padding: '0 18px', fontWeight: 900, fontSize: '12px', borderRadius: '8px',
+              height: '40px', padding: '0 18px', fontWeight: 500, fontSize: '12px', borderRadius: '8px',
               display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap', flexShrink: 0,
               cursor: 'pointer', boxShadow: '0 2px 8px rgba(3, 67, 33, 0.2)'
             }}
@@ -660,7 +660,7 @@ export function WorkerView() {
                 borderRadius: '7px',
                 padding: '8px 16px',
                 fontSize: '13px',
-                fontWeight: 800,
+                fontWeight: 500,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
                 background: roleTab === key ? 'var(--clr-brand-primary)' : 'transparent',
@@ -728,7 +728,7 @@ export function WorkerView() {
                         />
                         <span style={{ flex: 1 }}>{col.header}</span>
                         {isRestricted && (
-                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#94a3b8', fontWeight: 700 }}>
+                          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#94a3b8', fontWeight: 500 }}>
                             <Lock size={11} /> Locked
                           </span>
                         )}

@@ -96,7 +96,7 @@ const OrgFfbSetup = ({ org }) => {
         const url = await QRCode.toDataURL(provRes.qr_payload, {
           width: 160,
           margin: 1,
-          color: { dark: '#034321', light: '#FFFFFF' },
+          color: { dark: '#3F8432', light: '#FFFFFF' },
         });
         setQrImg(url);
       }
@@ -240,15 +240,15 @@ const OrgFfbSetup = ({ org }) => {
         </div>
       </div>
 
-      {/* Shared Estate Boundary & Platform Edge Fishnet Preview */}
+      {/* Dedicated FFB Estate Boundary & Platform Edge Fishnet Preview */}
       <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold text-[#034321] flex items-center gap-1.5">
-              <Layers size={15} /> Shared Estate Boundary &amp; Platform Edge Fishnet
+            <p className="text-sm font-semibold text-[#2D6A2C] flex items-center gap-1.5">
+              <Layers size={15} /> Dedicated FFB Estate Boundary &amp; Platform Edge Fishnet
             </p>
             <p className="text-xs text-gray-500 mt-0.5">
-              Single source of truth used by the mobile app offline geofence, FFB portal map, satellite analytics, and {settings.edge_band_m}m × {settings.grid_segment_m}m platform edge cells.
+              Dedicated to FarmIntelytics FFB (not auto-copied from satellite monitoring). Powers the mobile app offline geofence, FFB portal map, and {settings.edge_band_m}m × {settings.grid_segment_m}m platform edge cells.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-2">
@@ -265,14 +265,14 @@ const OrgFfbSetup = ({ org }) => {
         <div className="flex items-center justify-between text-xs text-gray-600">
           <div className="flex items-center gap-4">
             <span className="inline-flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm inline-block bg-[#034321]" /> Estate Plots ({boundaryData?.plot_count ?? 0})
+              <span className="w-3 h-3 rounded-sm inline-block bg-[#2D6A2C]" /> Estate Plots ({boundaryData?.plot_count ?? 0})
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="w-3 h-3 rounded-sm inline-block bg-[#5AA041]" /> Platform Edge Fishnet ({boundaryData?.cell_count ?? counts.grid_cells})
             </span>
           </div>
           <label className="inline-flex items-center gap-1.5 cursor-pointer font-medium text-gray-700">
-            <input type="checkbox" checked={showPlatforms} onChange={(e) => setShowPlatforms(e.target.checked)} className="accent-[#034321]" />
+            <input type="checkbox" checked={showPlatforms} onChange={(e) => setShowPlatforms(e.target.checked)} className="accent-[#3F8432]" />
             Show platform cells
           </label>
         </div>
@@ -284,7 +284,7 @@ const OrgFfbSetup = ({ org }) => {
               {plotsGeoJson?.features?.length > 0 && (
                 <GeoJSON
                   data={plotsGeoJson}
-                  style={{ color: '#034321', weight: 2, fillColor: '#3F8432', fillOpacity: 0.16 }}
+                  style={{ color: '#2D6A2C', weight: 2, fillColor: '#3F8432', fillOpacity: 0.16 }}
                   onEachFeature={(f, layer) => {
                     const pid = f.properties?.Plot_ID || f.properties?.plot_id || f.properties?.unique_id || '';
                     if (pid) layer.bindTooltip(String(pid), { sticky: true });
@@ -302,7 +302,7 @@ const OrgFfbSetup = ({ org }) => {
           ) : (
             <div className="h-full flex flex-col items-center justify-center text-xs text-gray-500 gap-1">
               <MapIcon size={24} className="text-gray-400" />
-              <span>No estate boundary uploaded yet. Upload a .geojson file above or complete org onboarding.</span>
+              <span>No FFB boundary uploaded yet. Upload your dedicated FFB estate .geojson file above.</span>
             </div>
           )}
         </div>
@@ -352,7 +352,7 @@ const OrgFfbSetup = ({ org }) => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
             {SHIELD_LAYERS.map((l) => (
               <div key={l.id} className="rounded-lg border border-gray-200 bg-gray-50/70 p-2.5 text-xs">
-                <p className="font-semibold text-[#034321]">{l.id} · {l.name}</p>
+                <p className="font-semibold text-[#2D6A2C]">{l.id} · {l.name}</p>
                 <p className="text-gray-600 mt-0.5 leading-snug">{l.desc}</p>
               </div>
             ))}
@@ -364,7 +364,7 @@ const OrgFfbSetup = ({ org }) => {
       <div className="rounded-xl border border-gray-200 bg-white p-4 flex items-center justify-between gap-4">
         <div>
           <p className="text-sm font-semibold text-gray-800">Workforce Roster (CSV / Excel)</p>
-          <p className="text-xs text-gray-500 mt-0.5">Columns: employee_id, first_name, last_name, function, division, team, contractor.</p>
+          <p className="text-xs text-gray-500 mt-0.5">Columns: Employee ID, First Name, Last Name, Function, Division, Team, Contractor.</p>
         </div>
         <div>
           <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={uploadWorkforce} />
@@ -399,23 +399,33 @@ const OrgFfbSetup = ({ org }) => {
 
       {/* Direct Org Portal & App Connection */}
       {prov && (
-        <div className="rounded-xl border border-[#5AA041] bg-[#E8F2E5] p-4 flex items-center justify-between gap-4">
+        <div className="rounded-xl border border-gray-200 bg-[#F3F8EF] p-4 flex items-center justify-between gap-4">
           <div className="space-y-1.5 min-w-0">
-            <p className="text-sm font-semibold text-[#034321] flex items-center gap-1.5"><Link2 size={14} /> Direct Org Portal &amp; App Connection</p>
-            <p className="text-xs font-mono text-gray-800 truncate">{prov.portal_url}</p>
+            <p className="text-sm font-semibold text-[#2D6A2C] flex items-center gap-1.5"><Link2 size={14} /> Direct Org Portal &amp; App Connection</p>
+            <p className="text-xs text-gray-800">
+              Project / Organisation Code: <span className="font-mono font-semibold text-[#2D6A2C] bg-white px-2 py-0.5 rounded border border-gray-200">{org.schema_name}</span>
+            </p>
+            <p className="text-xs font-mono text-gray-700 truncate">{prov.portal_url}</p>
             <p className="text-[11px] text-gray-700">
               Active AI Model: <strong className="font-mono">{prov.active_ml_model?.version || 'Bundled default'}</strong>
             </p>
-            <div className="flex items-center gap-2 pt-1">
+            <div className="flex flex-wrap items-center gap-2 pt-1">
               <button
                 type="button"
-                onClick={() => { navigator.clipboard?.writeText(prov.login_url); setCopied(true); setTimeout(() => setCopied(false), 1800); }}
+                onClick={() => { navigator.clipboard?.writeText(org.schema_name); setCopied('code'); setTimeout(() => setCopied(false), 1800); }}
                 className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-gray-300 text-xs font-semibold text-gray-800"
               >
-                {copied ? <Check size={12} /> : <Copy size={12} />} {copied ? 'Copied login link' : 'Copy org login link'}
+                {copied === 'code' ? <Check size={12} /> : <Copy size={12} />} {copied === 'code' ? 'Copied project code' : 'Copy project code'}
+              </button>
+              <button
+                type="button"
+                onClick={() => { navigator.clipboard?.writeText(prov.login_url); setCopied('login'); setTimeout(() => setCopied(false), 1800); }}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-gray-300 text-xs font-semibold text-gray-800"
+              >
+                {copied === 'login' ? <Check size={12} /> : <Copy size={12} />} {copied === 'login' ? 'Copied login link' : 'Copy org login link'}
               </button>
               {prov.apk_download_url && (
-                <a href={prov.apk_download_url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#034321] underline">
+                <a href={prov.apk_download_url} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[#2D6A2C] underline">
                   Download APK ({prov.latest_apk_version || 'Latest'})
                 </a>
               )}
@@ -425,7 +435,7 @@ const OrgFfbSetup = ({ org }) => {
         </div>
       )}
 
-      <Note>Mobile clerks scan the Setup QR above or sign in with Org Code <span className="font-mono font-semibold">{org.schema_name}</span> on the universal <strong>Earthintelytics FFB</strong> APK.</Note>
+      <Note>On first launch of <strong>FarmIntelytics FFB</strong>, clerks scan the Setup QR above or enter Project Code <span className="font-mono font-semibold">{org.schema_name}</span> to validate and unlock Clerk Login.</Note>
     </div>
   );
 };

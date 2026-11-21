@@ -22,22 +22,22 @@ const HARVESTER_COLS = [
   },
   {
     key: 'plot', header: 'Plot', defaultVisible: true, filterKey: 'plot',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 800, color: 'var(--clr-brand-primary)' },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500, color: 'var(--clr-brand-primary)' },
     render: row => row.h_plot_id
   },
   {
     key: 'worker_id', header: 'Cutter ID', defaultVisible: true, filterKey: 'worker_id',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => row.h_worker_id
   },
   {
     key: 'worker_name', header: 'Cutter Name', defaultVisible: false, filterKey: 'worker_name', isName: true,
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 800 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => row.worker_name
   },
   {
     key: 'carrier_id', header: 'Carrier ID', defaultVisible: true, filterKey: 'carrier_id',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => (!row.carrier_id || row.carrier_id === row.h_worker_id ? row.h_worker_id : row.carrier_id)
   },
   {
@@ -57,7 +57,7 @@ const HARVESTER_COLS = [
   },
   {
     key: 'total_count', header: 'Total Count', defaultVisible: true, filterKey: 'total_count',
-    numClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 700 },
+    numClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 500 },
     render: row => (
       <span title={row.count_source ? `${row.count_source === 'typed' ? 'Typed' : 'AI'} count confirmed (typed ${row.h_total_count}, AI ${row.h_ai_detected_count})` : undefined}>
         {fmtNumber(row.pay_count ?? row.h_total_count)}
@@ -66,22 +66,22 @@ const HARVESTER_COLS = [
   },
   {
     key: 'rotten', header: 'Rotten FFB', defaultVisible: true, filterKey: 'rotten',
-    numClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 800, color: '#dc2626' },
+    numClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 500, color: '#dc2626' },
     render: row => fmtNumber(row.h_rotten_count)
   },
   {
     key: 'unripe', header: 'Unripe FFB', defaultVisible: true, filterKey: 'unripe',
-    numClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 800, color: '#d97706' },
+    numClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 500, color: '#d97706' },
     render: row => fmtNumber(row.h_unripe_count)
   },
   {
     key: 'harv_clerk', header: 'Harv. Clerk ID', defaultVisible: false, filterKey: 'recorder_name',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.recorder_name || ''}>{row.harvesting_clerk_id || '—'}</span>
   },
   {
     key: 'loading_clerk', header: 'Loading Clerk ID', defaultVisible: false, filterKey: 'loader_name',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.loader_name || ''}>{row.loader_id || '—'}</span>
   },
 ];
@@ -95,17 +95,17 @@ const PICKER_COLS = [
   },
   {
     key: 'plot', header: 'Plot', defaultVisible: true, filterKey: 'plot',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 800, color: 'var(--clr-brand-primary)' },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500, color: 'var(--clr-brand-primary)' },
     render: row => row.h_plot_id
   },
   {
     key: 'worker_id', header: 'Picker ID', defaultVisible: true, filterKey: 'worker_id',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => row.h_worker_id
   },
   {
     key: 'worker_name', header: 'Picker Name', defaultVisible: false, filterKey: 'worker_name', isName: true,
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 800 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => row.worker_name
   },
   {
@@ -115,17 +115,17 @@ const PICKER_COLS = [
   },
   {
     key: 'weight', header: 'Weight (kg)', defaultVisible: true, filterKey: 'weight',
-    numClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 800, color: '#7c3aed' },
+    numClass: 'worker-cell--num', tdClass: 'worker-cell worker-cell--num', tdStyle: { fontWeight: 500, color: '#7c3aed' },
     render: row => (row.h_weight_kg > 0 ? `${fmtNumber(row.h_weight_kg)} kg` : '—')
   },
   {
     key: 'harv_clerk', header: 'Harv. Clerk ID', defaultVisible: false, filterKey: 'recorder_name',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.recorder_name || ''}>{row.harvesting_clerk_id || '—'}</span>
   },
   {
     key: 'loading_clerk', header: 'Loading Clerk ID', defaultVisible: false, filterKey: 'loader_name',
-    tdClass: 'worker-cell', tdStyle: { fontWeight: 700 },
+    tdClass: 'worker-cell', tdStyle: { fontWeight: 500 },
     render: row => <span title={row.loader_name || ''}>{row.loader_id || '—'}</span>
   },
 ];
@@ -442,8 +442,8 @@ export function ApprovedWorkersView() {
       {/* Header */}
       <div className="view-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
         <div>
-          <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <UserCheck size={28} style={{ color: '#034321' }} /> Approved Workers
+          <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <UserCheck size={26} strokeWidth={1.5} style={{ color: '#3F8432' }} /> Approved Crew Ledger
           </h1>
           <p className="view-subtitle" style={{ color: 'var(--text-muted)' }}>Historical register of all successfully approved and matched harvesting records.</p>
         </div>
@@ -458,8 +458,8 @@ export function ApprovedWorkersView() {
               <img src={WORKER_ICON} alt="Approved Batches" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div>
-              <div style={{ fontSize: '38px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>{fmtNumber(kpis.totalApproved)}</div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>APPROVED BATCHES</div>
+              <div style={{ fontSize: '38px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>{fmtNumber(kpis.totalApproved)}</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>APPROVED BATCHES</div>
             </div>
           </div>
         </div>
@@ -471,10 +471,10 @@ export function ApprovedWorkersView() {
               <img src={FFB_ICON} alt="Harvested Bunches" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div>
-              <div style={{ fontSize: '38px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>
-                {fmtNumber(kpis.totalCountFFB)} <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase' }}>FFB</span>
+              <div style={{ fontSize: '38px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>
+                {fmtNumber(kpis.totalCountFFB)} <span style={{ fontSize: '14px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>FFB</span>
               </div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>HARVESTED BUNCHES</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>HARVESTED BUNCHES</div>
             </div>
           </div>
         </div>
@@ -486,10 +486,10 @@ export function ApprovedWorkersView() {
               <img src={WEIGHT_ICON} alt="Loose Fruit" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div>
-              <div style={{ fontSize: '38px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>
-                {fmtNumber(Number(kpis.totalWeight).toFixed(1))} <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase' }}>KG</span>
+              <div style={{ fontSize: '38px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>
+                {fmtNumber(Number(kpis.totalWeight).toFixed(1))} <span style={{ fontSize: '14px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>KG</span>
               </div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>LOOSE FRUIT WEIGHT</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>LOOSE FRUIT WEIGHT</div>
             </div>
           </div>
         </div>
@@ -501,10 +501,10 @@ export function ApprovedWorkersView() {
               <img src={UNRIPE_ICON} alt="Unripe FFB" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div>
-              <div style={{ fontSize: '38px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>
-                {fmtNumber(kpis.totalUnripe || 0)} <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase' }}>FFB</span>
+              <div style={{ fontSize: '38px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>
+                {fmtNumber(kpis.totalUnripe || 0)} <span style={{ fontSize: '14px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>FFB</span>
               </div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>UNRIPE FFB</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>UNRIPE FFB</div>
             </div>
           </div>
         </div>
@@ -516,10 +516,10 @@ export function ApprovedWorkersView() {
               <img src={ROTTEN_ICON} alt="Rotten FFB" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
             </div>
             <div>
-              <div style={{ fontSize: '38px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>
-                {fmtNumber(kpis.totalRotten || 0)} <span style={{ fontSize: '14px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase' }}>FFB</span>
+              <div style={{ fontSize: '38px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>
+                {fmtNumber(kpis.totalRotten || 0)} <span style={{ fontSize: '14px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase' }}>FFB</span>
               </div>
-              <div style={{ fontSize: '13px', fontWeight: 800, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>ROTTEN FFB</div>
+              <div style={{ fontSize: '13px', fontWeight: 500, color: '#000000', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: '6px' }}>ROTTEN FFB</div>
             </div>
           </div>
         </div>
@@ -530,7 +530,7 @@ export function ApprovedWorkersView() {
 
         {/* Search */}
         <div style={{ flex: '1.5', minWidth: '200px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Search Worker / Role</label>
+          <label style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Search Worker / Role</label>
           <div style={{ position: 'relative', width: '100%' }}>
             <span style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }}><Search size={16} /></span>
             <input
@@ -546,7 +546,7 @@ export function ApprovedWorkersView() {
 
         {/* Plot ID */}
         <div style={{ flex: '1', minWidth: '130px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Plot ID</label>
+          <label style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Plot ID</label>
           <input
             type="text"
             className="select-input"
@@ -559,7 +559,7 @@ export function ApprovedWorkersView() {
 
         {/* Team */}
         <div style={{ flex: '1', minWidth: '130px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Team</label>
+          <label style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Team</label>
           <input
             type="text"
             className="select-input"
@@ -572,7 +572,7 @@ export function ApprovedWorkersView() {
 
         {/* Contractor */}
         <div style={{ flex: '1', minWidth: '140px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Contractor</label>
+          <label style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Contractor</label>
           <input
             type="text"
             className="select-input"
@@ -585,7 +585,7 @@ export function ApprovedWorkersView() {
 
         {/* Start Date */}
         <div style={{ flex: '0.8', minWidth: '130px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Start Date</label>
+          <label style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>Start Date</label>
           <input
             type="date"
             className="select-input"
@@ -597,7 +597,7 @@ export function ApprovedWorkersView() {
 
         {/* End Date */}
         <div style={{ flex: '0.8', minWidth: '130px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>End Date</label>
+          <label style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>End Date</label>
           <input
             type="date"
             className="select-input"
@@ -609,7 +609,7 @@ export function ApprovedWorkersView() {
 
         {/* Action Buttons */}
         <div style={{ display: 'flex', gap: '10px', minWidth: '220px', alignItems: 'center' }}>
-          <button className="btn btn--outline" onClick={handleReset} style={{ height: '42px', flex: 1, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', borderRadius: '10px' }}>
+          <button className="btn btn--outline" onClick={handleReset} style={{ height: '42px', flex: 1, fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', borderRadius: '10px' }}>
             <RotateCcw size={15} /> Reset
           </button>
 
@@ -620,7 +620,7 @@ export function ApprovedWorkersView() {
               disabled
               title="Viewer accounts cannot export CSV from the portal"
               style={{
-                height: '42px', flex: 1.2, fontWeight: 800, fontSize: '12px', borderRadius: '10px',
+                height: '42px', flex: 1.2, fontWeight: 500, fontSize: '12px', borderRadius: '10px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                 background: '#94a3b8', borderColor: '#94a3b8', cursor: 'not-allowed', opacity: 0.7
               }}
@@ -634,7 +634,7 @@ export function ApprovedWorkersView() {
               onClick={openExportModal}
               title="Select columns to export CSV"
               style={{
-                height: '42px', flex: 1.2, fontWeight: 800, fontSize: '12px', borderRadius: '10px',
+                height: '42px', flex: 1.2, fontWeight: 500, fontSize: '12px', borderRadius: '10px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px',
                 cursor: 'pointer'
               }}
@@ -655,7 +655,7 @@ export function ApprovedWorkersView() {
               aria-selected={roleTab === key}
               onClick={() => { setRoleTab(key); setCurrentPage(1); }}
               style={{
-                border: 'none', borderRadius: '7px', padding: '8px 16px', fontSize: '13px', fontWeight: 800, cursor: 'pointer',
+                border: 'none', borderRadius: '7px', padding: '8px 16px', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
                 background: roleTab === key ? 'var(--clr-brand-primary)' : 'transparent',
                 color: roleTab === key ? '#FFFFFF' : '#334155'
               }}
@@ -710,7 +710,7 @@ export function ApprovedWorkersView() {
                       />
                       <span style={{ flex: 1 }}>{col.header}</span>
                       {isRestricted && (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#94a3b8', fontWeight: 700 }}>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: '#94a3b8', fontWeight: 500 }}>
                           <Lock size={11} /> Locked
                         </span>
                       )}
@@ -770,7 +770,7 @@ export function ApprovedWorkersView() {
         {loading && records.length === 0 ? (
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', gap: '12px', padding: '40px' }}>
             <div className="loader-spinner"></div>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>Fetching Data...</span>
+            <span style={{ fontSize: '14px', fontWeight: 500, color: '#0f172a' }}>Fetching Data...</span>
           </div>
         ) : (
           <div style={{ overflowX: 'auto', flex: 1 }}>

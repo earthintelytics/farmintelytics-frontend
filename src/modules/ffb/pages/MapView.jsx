@@ -382,7 +382,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
   // Worker-capture pins are not shown on this map (only harvester QA and loader capture).
   const allMarkers       = useMemo(() => [...harvesterMarkers, ...loaderMarkers], [harvesterMarkers, loaderMarkers]);
   const clusterPoints    = useMemo(() => [
-    ...harvesterMarkers.map(o => ({ ...o, _color: '#034321' })),
+    ...harvesterMarkers.map(o => ({ ...o, _color: '#3F8432' })),
     ...loaderMarkers.map(o => ({ ...o, _color: '#1d4ed8' })),
   ], [harvesterMarkers, loaderMarkers]);
   const openPoint = useCallback((op) => { setRotation(0); setSelectedOp(op); }, []);
@@ -502,8 +502,8 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
       // API already returns only plots harvested in the interval, so trust the data
       const isHarvestedInInterval = !!last_harvested_at;
 
-      const statusColor  = isHarvestedInInterval ? '#034321' : '#dc2626';
-      const statusBg     = isHarvestedInInterval ? '#E8F2E5' : '#fff1f2';
+      const statusColor  = isHarvestedInInterval ? '#3F8432' : '#dc2626';
+      const statusBg     = isHarvestedInInterval ? '#F3F8EF' : '#fff1f2';
       const statusBorder = isHarvestedInInterval ? '#5AA041' : '#fca5a5';
       const statusLabel  = isHarvestedInInterval ? 'Harvested in Interval' : 'No Harvest in Interval';
       const harvestLine  = last_harvested_at
@@ -512,7 +512,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
 
       layer.bindPopup(`
         <div style="font-family:'Inter',sans-serif;min-width:200px;padding:0;border-radius:12px;overflow:hidden;">
-          <div style="background:#034321;padding:12px 14px;">
+          <div style="background:#3F8432;padding:12px 14px;">
             <div style="font-size:13px;font-weight:900;color:white;letter-spacing:0.01em;">Plot ${plot_id || '—'}</div>
             <div style="font-size:11px;color:#94a3b8;margin-top:2px;">Site: ${site_id || '—'} &nbsp;·&nbsp; #${plot_number || '—'}</div>
           </div>
@@ -529,10 +529,10 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
 
   const geoJsonStyle = useCallback(() => {
     return {
-      color: '#034321',
+      color: '#3F8432',
       weight: 2,
       fillOpacity: 0.15,
-      fillColor: '#034321',
+      fillColor: '#3F8432',
       dashArray: showLabels ? '0' : '3',
     };
   }, [showLabels]);
@@ -561,9 +561,9 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
       // Popup for plot info
       layer.bindPopup(`
         <div style="font-family: 'Inter', sans-serif; min-width: 230px; padding: 12px; background: #ffffff; border-radius: 12px;">
-          <div style="background: #034321; padding: 10px 12px; border-radius: 8px; margin: -12px -12px 10px -12px;">
+          <div style="background: #3F8432; padding: 10px 12px; border-radius: 8px; margin: -12px -12px 10px -12px;">
             <div style="font-size: 14px; font-weight: 900; color: white;">Plot ${plotId}</div>
-            <div style="font-size: 11px; color: #E8F2E5; margin-top: 2px;">Block: ${codeBloc} &nbsp;·&nbsp; Site: ${siteId} (#${plotNb})</div>
+            <div style="font-size: 11px; color: #F3F8EF; margin-top: 2px;">Block: ${codeBloc} &nbsp;·&nbsp; Site: ${siteId} (#${plotNb})</div>
           </div>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px; color: #334155;">
             <div><span style="color: #64748b;">Crop:</span> <strong style="color: #0f172a;">${crop}</strong></div>
@@ -589,7 +589,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
       <div className="map-super-popup">
         <div className="map-super-popup__header">
           <div className="map-super-popup__title-wrap">
-            <div className="map-super-popup__icon" style={{ background: isPicker ? '#fff7ed' : '#E8F2E5', color: isPicker ? '#f97316' : '#034321', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+            <div className="map-super-popup__icon" style={{ background: isPicker ? '#fff7ed' : '#F3F8EF', color: isPicker ? '#f97316' : '#3F8432', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
               <Zap size={18} />
             </div>
             <div>
@@ -600,7 +600,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end', paddingRight: '28px' }}>
             {imageUrl && <button
               onClick={(e) => { e.stopPropagation(); setRotation(r => (r + 90) % 360); }}
-              style={{ background: '#f1f5f9', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '10px', fontWeight: 900, display: 'flex', alignItems: 'center', gap: '4px' }}
+              style={{ background: '#f1f5f9', border: 'none', borderRadius: '4px', padding: '4px 8px', cursor: 'pointer', fontSize: '10px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}
             >
               <RotateCcw size={12} /> ROTATE
             </button>}
@@ -626,7 +626,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
           </div>}
         </div>
 
-        <div className="map-super-popup__metrics" style={{ borderLeftColor: isPicker ? '#f97316' : '#3F8432' }}>
+        <div className="map-super-popup__metrics" style={{ border: '1px solid #E2E8F0' }}>
           {isPicker ? (
             <div className="map-super-popup__metric map-super-popup__metric--accent">
               <div className="map-super-popup__metric-label">{isLoader ? 'Loaded Weight' : 'Operational Weight'}</div>
@@ -637,10 +637,10 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
               <div className="map-super-popup__metric-label">{isLoader ? 'Loaded' : 'Bunches'}</div>
               <div className="map-super-popup__metric-value" style={{ color: '#3F8432' }}>
                 {fmtNumber(op.typed_count != null ? bunchCount(op.ai_count, op.typed_count, op.approved_count).main : op.total_count || 0)} Bunches
-                {bunchCount(op.ai_count, op.typed_count, op.approved_count).typed != null && <span style={{ fontSize: '12px', color: '#0f172a', fontWeight: 700 }}> (typed {bunchCount(op.ai_count, op.typed_count, op.approved_count).typed})</span>}
+                {bunchCount(op.ai_count, op.typed_count, op.approved_count).typed != null && <span style={{ fontSize: '12px', color: '#0f172a', fontWeight: 500 }}> (typed {bunchCount(op.ai_count, op.typed_count, op.approved_count).typed})</span>}
               </div>
               {countFlag(op.ai_count, op.typed_count, op.approved_count) && (
-                <div style={{ fontSize: '11.5px', fontWeight: 800, color: RECON_STATUS.DISCREPANCY.dark, marginTop: '2px' }}>{countFlag(op.ai_count, op.typed_count, op.approved_count)}: held for a supervisor</div>
+                <div style={{ fontSize: '11.5px', fontWeight: 500, color: RECON_STATUS.DISCREPANCY.dark, marginTop: '2px' }}>{countFlag(op.ai_count, op.typed_count, op.approved_count)}: held for a supervisor</div>
               )}
             </div>
           )}
@@ -743,7 +743,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
 
             <div className="kpi-card" style={{ minWidth: '160px' }}>
               <div>
-                <div style={{ fontSize: '28px', fontWeight: 900, color: '#14532d', lineHeight: 1 }}>
+                <div style={{ fontSize: '28px', fontWeight: 500, color: '#14532d', lineHeight: 1 }}>
                   {hiPlotsGeoJson?.features
                     ? hiPlotsGeoJson.features.filter(f => {
                         if (hiEstate) {
@@ -754,7 +754,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
                       }).length
                     : '—'}
                 </div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#034321', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 500, color: '#3F8432', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px' }}>
                   Harvested
                 </div>
               </div>
@@ -762,7 +762,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
 
             <div className="kpi-card" style={{ minWidth: '160px' }}>
               <div>
-                <div style={{ fontSize: '28px', fontWeight: 900, color: '#7f1d1d', lineHeight: 1 }}>
+                <div style={{ fontSize: '28px', fontWeight: 500, color: '#7f1d1d', lineHeight: 1 }}>
                   {hiPlotsGeoJson?.features
                     ? hiPlotsGeoJson.features.filter(f => {
                         if (hiEstate) {
@@ -773,7 +773,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
                       }).length
                     : '—'}
                 </div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#991b1b', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', fontWeight: 500, color: '#991b1b', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '4px' }}>
                   No Harvest
                 </div>
               </div>
@@ -869,7 +869,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
               gap: '12px'
             }}>
               <div className="loader-spinner" style={{ margin: 0 }}></div>
-              <span style={{ fontWeight: 700, color: 'var(--clr-brand-primary)' }}>Query Loading...</span>
+              <span style={{ fontWeight: 500, color: 'var(--clr-brand-primary)' }}>Query Loading...</span>
             </div>
           )}
           <MapContainer preferCanvas center={CONFIG.MAP.CENTER} zoom={CONFIG.MAP.ZOOM} maxZoom={CONFIG.MAP.MAX_ZOOM} zoomControl={false} style={{ height: '100%', width: '100%', background: '#f8fafc' }} whenReady={() => setMapReady(true)}>
@@ -964,7 +964,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
             gap: '8px',
             padding: '12px 24px',
             fontSize: '14px',
-            fontWeight: 800,
+            fontWeight: 500,
             borderRadius: '12px',
             border: '1px solid var(--clr-brand-primary)',
             backgroundColor: 'transparent',
@@ -1102,7 +1102,7 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
             {legendOpen && (<>
             <div className="map-legend__items">
               <div className="map-legend__item">
-                <div className="map-legend__dot map-legend__dot--point" style={{ backgroundColor: '#034321' }}></div>
+                <div className="map-legend__dot map-legend__dot--point" style={{ backgroundColor: '#3F8432' }}></div>
                 <span>Harvesting Clerk Capture</span>
               </div>
               <div className="map-legend__item">
@@ -1112,12 +1112,12 @@ export function MapView({ mode = 'full', embedded = false } = {}) {
               {/* Ring colour = plot status, same colours and words as the Approval Center */}
               {['DISCREPANCY', 'WAITING_FOR_LOADER', 'WAITING_FOR_RECORDER', 'REJECTED'].map((k, i) => (
                 <div key={k} className="map-legend__item" style={i === 0 ? { marginTop: '6px', borderTop: '1px solid #eee', paddingTop: '6px' } : undefined}>
-                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#034321', border: `2.5px solid ${RECON_STATUS[k].color}` }}></div>
-                  <span style={{ color: RECON_STATUS[k].dark, fontWeight: 700 }}>{RECON_STATUS[k].label}</span>
+                  <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#3F8432', border: `2.5px solid ${RECON_STATUS[k].color}` }}></div>
+                  <span style={{ color: RECON_STATUS[k].dark, fontWeight: 500 }}>{RECON_STATUS[k].label}</span>
                 </div>
               ))}
               <div className="map-legend__item">
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#034321', border: '2px solid #ffffff', boxShadow: '0 0 0 1px #cbd5e1' }}></div>
+                <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#3F8432', border: '2px solid #ffffff', boxShadow: '0 0 0 1px #cbd5e1' }}></div>
                 <span>{RECON_STATUS.RECONCILED.label}</span>
               </div>
             </div>

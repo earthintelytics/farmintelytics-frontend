@@ -40,10 +40,10 @@ export function HistoryView() {
         </div>
         <input type="date" className="date-input" style={{ width: '150px', height: '38px' }} value={filters.dateRange.from || ''} onChange={e => updateFilters({ dateRange: { ...filters.dateRange, from: e.target.value || null } })} />
         <input type="date" className="date-input" style={{ width: '150px', height: '38px' }} value={filters.dateRange.to || ''} onChange={e => updateFilters({ dateRange: { ...filters.dateRange, to: e.target.value || null } })} />
-        <button className="btn btn--ghost btn--sm" style={{ fontWeight: 700, color: 'var(--clr-brand-secondary)' }} onClick={resetFilters}>Clear</button>
+        <button className="btn btn--ghost btn--sm" style={{ fontWeight: 500, color: 'var(--clr-brand-secondary)' }} onClick={resetFilters}>Clear</button>
       </div>
 
-      <div style={{ marginBottom: '20px', fontWeight: 800, fontSize: '13px', color: 'var(--text-muted)' }}>
+      <div style={{ marginBottom: '20px', fontWeight: 500, fontSize: '13px', color: 'var(--text-muted)' }}>
         {filteredData.length} activities
       </div>
 
@@ -55,7 +55,7 @@ export function HistoryView() {
             <div key={dateKey} className="timeline-group" style={{ marginBottom: '32px' }}>
               <div className="timeline-date-header" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
                 <span className="timeline-date-dot" style={{ width: '12px', height: '12px', borderRadius: '50%', background: 'var(--clr-brand-primary)' }}></span>
-                <span className="timeline-date-label" style={{ fontWeight: 800, fontSize: '15px', color: 'var(--text-main)' }}>{fmtDate(dateKey)}</span>
+                <span className="timeline-date-label" style={{ fontWeight: 500, fontSize: '15px', color: 'var(--text-main)' }}>{fmtDate(dateKey)}</span>
                 <span className="timeline-date-count" style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>{items.length} activities</span>
               </div>
               
@@ -64,31 +64,31 @@ export function HistoryView() {
                   <div key={op.id} className="timeline-item" style={{ position: 'relative', paddingLeft: '24px' }}>
                     <div className="timeline-content" style={{ background: 'white', border: '1px solid var(--border-subtle)', borderRadius: '12px', padding: '20px', boxShadow: 'var(--shadow-panel)' }}>
                       <div className="timeline-header" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                        <span className="timeline-role" style={{ fontWeight: 800, fontSize: '13px', color: 'var(--clr-brand-primary)', textTransform: 'capitalize' }}>{fmtRole(op.role)}</span>
+                        <span className="timeline-role" style={{ fontWeight: 500, fontSize: '13px', color: 'var(--clr-brand-primary)', textTransform: 'capitalize' }}>{fmtRole(op.role)}</span>
                         <span className="timeline-time" style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: 600 }}>{fmtDateTime(op.created_at)}</span>
                         <div dangerouslySetInnerHTML={{ __html: fmtStatusBadge(op.data_status) }} />
                       </div>
                       
                       <div className="timeline-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(130px, 1fr))', gap: '16px' }}>
                         <div className="timeline-field">
-                          <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Plot</div>
-                          <div style={{ fontWeight: 700, fontSize: '13px' }}>Block {op.plot_id || '—'}</div>
+                          <div style={{ fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Plot</div>
+                          <div style={{ fontWeight: 500, fontSize: '13px' }}>Block {op.plot_id || '—'}</div>
                         </div>
                         <div className="timeline-field">
-                          <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Harvester</div>
-                          <div style={{ fontWeight: 700, fontSize: '13px' }}>{op.worker_id || '—'}</div>
+                          <div style={{ fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Harvester</div>
+                          <div style={{ fontWeight: 500, fontSize: '13px' }}>{op.worker_id || '—'}</div>
                         </div>
                         <div className="timeline-field">
-                          <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Count</div>
-                          <div style={{ fontWeight: 700, fontSize: '13px' }}>{fmtNumber(op.total_count)}</div>
+                          <div style={{ fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Count</div>
+                          <div style={{ fontWeight: 500, fontSize: '13px' }}>{fmtNumber(op.total_count)}</div>
                         </div>
                         <div className="timeline-field">
-                          <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Weight</div>
-                          <div style={{ fontWeight: 700, fontSize: '13px' }}>{fmtNumber(op.weight_kg)} kg</div>
+                          <div style={{ fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Weight</div>
+                          <div style={{ fontWeight: 500, fontSize: '13px' }}>{fmtNumber(op.weight_kg)} kg</div>
                         </div>
                         <div className="timeline-field">
-                          <div style={{ fontSize: '10px', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Damaged</div>
-                          <div style={{ fontWeight: 700, fontSize: '13px', color: op.rotten_count > 0 ? 'var(--clr-error)' : 'inherit' }}>{fmtNumber(op.rotten_count)}</div>
+                          <div style={{ fontSize: '10px', fontWeight: 500, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '4px' }}>Damaged</div>
+                          <div style={{ fontWeight: 500, fontSize: '13px', color: op.rotten_count > 0 ? 'var(--clr-error)' : 'inherit' }}>{fmtNumber(op.rotten_count)}</div>
                         </div>
                       </div>
                     </div>

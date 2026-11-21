@@ -23,6 +23,7 @@ import { SMALLHOLDER_SERVICES, resolveModule, moduleName } from '../../modules/r
 import { DATASET_DEFINITIONS, datasetsForScope } from '../../modules/data/datasetDefinitions';
 import { copyText } from '../../utils/copyText';
 import { getCssToken } from '../../utils/tokens';
+import { ADMIN_API_BASE } from '../../services/apiBase';
 
 /**
  * Onboard an organisation — one flow, dynamic by design (docs/FINDINGS.md,
@@ -158,6 +159,9 @@ const Onboarding = () => {
   // 3. Estates
   const [estates, setEstates] = useState(() => (draftValue('estates', null) || [blankEstate()]).map((e) => ({ ...blankEstate(), ...e, key: e.key || blankEstate().key })));
   const [grouped, setGrouped] = useState(() => draftValue('grouped', false)); // neighbouring sub-farms processed as one site
+  const [ffbBoundaryFile, setFfbBoundaryFile] = useState(null);
+  const [ffbBoundaryInfo, setFfbBoundaryInfo] = useState(null);
+  const [ffbBoundaryError, setFfbBoundaryError] = useState(null);
   // 4. Blocks and filters
   const [propOptions, setPropOptions] = useState([]);
   const [loadingProps, setLoadingProps] = useState(false);
@@ -285,6 +289,21 @@ const Onboarding = () => {
       }
       created.push(farm); boundaries.push(boundary);
       setDone(d => ({ ...d, org, farms: [...created], boundaries: [...boundaries] })); // keep progress if a later estate fails
+    }
+    if (services.includes('ffb-counter') && ffbBoundaryFile) {
+      const ffbAdminBase = ADMIN_API_BASE.replace(/\/admin\/?$/, '/admin/ffb');
+      const token = localStorage.getItem('fi_admin_token');
+      const fd = new FormData();
+      fd.append('file', ffbBoundaryFile);
+      const res = await fetch(`${ffbAdminBase}/${org.schema_name}/boundary`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        body: fd,
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        throw new Error(d.detail || d.message || `Dedicated FFB boundary upload failed (${res.status})`);
+      }
     }
     setLoadingProps(true);
     setStep(3);
@@ -483,14 +502,50 @@ const Onboarding = () => {
               <h2 className="text-lg font-semibold text-gray-900">Estates</h2>
               <p className="text-sm text-gray-500 mt-1">Add every estate {company.company_name} wants monitored, each with its own boundary file. Estates can be in different places.</p>
               {services.includes('ffb-counter') && (
-                <div className="mt-3 rounded-xl border border-[#5AA041] bg-[#E8F2E5] px-4 py-3 text-xs text-[#034321] space-y-1">
-                  <p className="font-semibold">FFB Counter Shared Boundary &amp; Default 9-Layer Shield Rules</p>
-                  <p>
-                    The estate GeoJSON boundary you upload below is shared automatically across satellite processing, the FFB web portal map, the offline mobile app geofence, and 8m × 8m platform edge fishnet generation.
-                  </p>
-                  <p>
-                    Default rules applied: 3-Layer reconciliation, auto-approve &ge; 80, auto-reject &lt; 50, +2 manual stepper cap, 15m geofence buffer, pitch lock (38–52° portrait / 28–44° landscape), 60 km/h teleport check, and 26th settlement cutoff. Edit any rule under Organisations → FFB Setup.
-                  </p>
+                <div className="mt-3 rounded-xl border border-gray-200 bg-[#F3F8EF] px-4 py-3 text-xs text-gray-800 space-y-2.5">
+                  <div className="space-y-1">
+                    <p className="font-semibold text-[#2D6A2C]">Dedicated FFB Estate Boundary (Separate from Farm Monitoring)</p>
+                    <p>
+                      FarmIntelytics FFB does not auto-copy the crop monitoring boundary above. Upload a dedicated FFB GeoJSON boundary below (optional now — or set it up anytime under <strong>Organisations → FFB Setup</strong>) to enable mobile offline geofencing and 8m × 8m platform edge fishnet cells.
+                    </p>
+                    <p className="text-gray-600">
+                      Default Shield rules applied: 3-Layer reconciliation, auto-approve &ge; 80, auto-reject &lt; 50, +2 manual stepper cap, 15m geofence buffer, pitch lock (38–52° portrait / 28–44° landscape), 60 km/h teleport check, and 26th settlement cutoff.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    <label className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-300 bg-white text-xs font-medium text-gray-800 cursor-pointer hover:bg-gray-50">
+                      <UploadCloud size={14} className="text-[#3F8432]" />
+                      <span>{ffbBoundaryFile ? ffbBoundaryFile.name : 'Upload dedicated FFB boundary (.geojson)'}</span>
+                      <input
+                        type="file"
+                        accept=".geojson,.json,application/geo+json"
+                        className="hidden"
+                        onChange={(ev) => {
+                          const f = ev.target.files?.[0] || null;
+                          if (!f) {
+                            setFfbBoundaryFile(null); setFfbBoundaryInfo(null); setFfbBoundaryError(null);
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onload = (rev) => {
+                            let g;
+                            try { g = JSON.parse(rev.target.result); } catch { g = null; }
+                            const chk = boundaryCheck(g, f.size);
+                            if (chk.error) {
+                              setFfbBoundaryFile(null); setFfbBoundaryInfo(null); setFfbBoundaryError(chk.error);
+                            } else {
+                              setFfbBoundaryFile(f); setFfbBoundaryError(null);
+                              setFfbBoundaryInfo(`${chk.polygons} polygon${chk.polygons > 1 ? 's' : ''}`);
+                            }
+                          };
+                          reader.readAsText(f);
+                        }}
+                      />
+                    </label>
+                    {ffbBoundaryInfo && !ffbBoundaryError && <span className="text-xs text-[#2D6A2C] font-medium">FFB boundary ready ({ffbBoundaryInfo})</span>}
+                    {ffbBoundaryError && <span className="text-xs text-red-700 font-medium">{ffbBoundaryError}</span>}
+                    {!ffbBoundaryFile && !ffbBoundaryError && <span className="text-[11px] text-gray-500">Skipped? Remember to upload the FFB boundary under Organisations → FFB Setup.</span>}
+                  </div>
                 </div>
               )}
             </div>

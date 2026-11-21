@@ -163,7 +163,7 @@ export function AdminView() {
 
   const generateRandomPassword = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
-    let pass = 'Earthintelytics#';
+    let pass = 'FarmIntelytics#';
     for (let i = 0; i < 6; i++) {
       pass += chars.charAt(Math.floor(Math.random() * chars.length));
     }
@@ -193,7 +193,7 @@ export function AdminView() {
     setResetSuccessMsg('');
     try {
       await API.resetUserPassword(resetModalUser.id, newPassword.trim());
-      setResetSuccessMsg(`✓ Password for ${resetModalUser.email} reset successfully!`);
+      setResetSuccessMsg(`Password for ${resetModalUser.email} reset successfully.`);
       setTimeout(() => {
         setShowResetPasswordModal(false);
         setResetModalUser(null);
@@ -647,8 +647,8 @@ export function AdminView() {
       return <ArrowUpDown size={12} style={{ color: '#000000', marginLeft: '4px' }} />;
     }
     return sortDirection === 'asc' 
-      ? <ArrowUp size={12} style={{ color: '#034321', marginLeft: '4px', strokeWidth: 3 }} />
-      : <ArrowDown size={12} style={{ color: '#034321', marginLeft: '4px', strokeWidth: 3 }} />;
+      ? <ArrowUp size={12} style={{ color: '#3F8432', marginLeft: '4px', strokeWidth: 3 }} />
+      : <ArrowDown size={12} style={{ color: '#3F8432', marginLeft: '4px', strokeWidth: 3 }} />;
   };
 
   const formatDate = (dateStr) => {
@@ -681,8 +681,8 @@ export function AdminView() {
     <div className="admin-shell">
       <aside className="admin-sidebar" aria-label="Admin sections">
         <div className="admin-sidebar__brand">
-          <img src={LOGO_ICON} alt="Earthintelytics" className="admin-sidebar__logo" />
-          <span>Earthintelytics Admin</span>
+          <img src={LOGO_ICON} alt="FarmIntelytics" className="admin-sidebar__logo" />
+          <span>FarmIntelytics Admin</span>
         </div>
         <nav className="admin-sidebar__nav">
           {SECTIONS.map(g => (
@@ -738,10 +738,10 @@ export function AdminView() {
       }}>
         {/* Left: where you are */}
         <div>
-          <div style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          <div style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Admin &rsaquo; {sectionTitle}
           </div>
-          <h1 style={{ fontSize: '24px', fontWeight: 900, color: '#000000', margin: '4px 0 0 0' }}>{sectionTitle}</h1>
+          <h1 style={{ fontSize: '24px', fontWeight: 500, color: '#000000', margin: '4px 0 0 0' }}>{sectionTitle}</h1>
         </div>
 
         {/* Right Top Actions */}
@@ -753,11 +753,11 @@ export function AdminView() {
             style={{
               height: '42px',
               padding: '0 16px',
-              background: '#034321',
+              background: '#3F8432',
               color: '#FFFFFF',
               border: 'none',
               borderRadius: '8px',
-              fontWeight: 900,
+              fontWeight: 500,
               fontSize: '13px',
               display: 'flex',
               alignItems: 'center',
@@ -775,7 +775,7 @@ export function AdminView() {
           <button
             className="btn btn--ghost"
             onClick={handleLogout}
-            style={{ height: '42px', color: '#DC2626', fontWeight: 900, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
+            style={{ height: '42px', color: '#DC2626', fontWeight: 500, fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}
           >
             <LogOut size={16} /> Logout
           </button>
@@ -798,15 +798,15 @@ export function AdminView() {
           }}>
             <div className="wkpi-card" style={{ background: '#FFFFFF', padding: '20px 24px', borderRadius: '12px', border: '1px solid #E2E8F0', boxShadow: 'var(--shadow-panel)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <div style={{ background: 'transparent', color: '#034321', width: '52px', height: '52px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                <div style={{ background: 'transparent', color: '#3F8432', width: '52px', height: '52px', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Users size={26} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '32px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>{employees.length}</div>
-                  <div style={{ fontSize: '12px', color: '#000000', fontWeight: 800, marginTop: '5px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '32px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>{employees.length}</div>
+                  <div style={{ fontSize: '12px', color: '#000000', fontWeight: 500, marginTop: '5px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     TOTAL FIELD WORKERS
                   </div>
-                  <div style={{ fontSize: '10.5px', color: '#0f172a', fontWeight: 700, textTransform: 'uppercase', marginTop: '2px' }}>
+                  <div style={{ fontSize: '10.5px', color: '#0f172a', fontWeight: 500, textTransform: 'uppercase', marginTop: '2px' }}>
                     {activeWorkersCount} Active Registered
                   </div>
                 </div>
@@ -819,11 +819,11 @@ export function AdminView() {
                   <Scissors size={26} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '32px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>{totalCutters}</div>
-                  <div style={{ fontSize: '12px', color: '#000000', fontWeight: 800, marginTop: '5px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '32px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>{totalCutters}</div>
+                  <div style={{ fontSize: '12px', color: '#000000', fontWeight: 500, marginTop: '5px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     HARVESTERS / CUTTERS
                   </div>
-                  <div style={{ fontSize: '10.5px', color: '#0f172a', fontWeight: 700, textTransform: 'uppercase', marginTop: '2px' }}>
+                  <div style={{ fontSize: '10.5px', color: '#0f172a', fontWeight: 500, textTransform: 'uppercase', marginTop: '2px' }}>
                     Bunch Cutters
                   </div>
                 </div>
@@ -836,11 +836,11 @@ export function AdminView() {
                   <Truck size={26} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '32px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>{totalCarriers}</div>
-                  <div style={{ fontSize: '12px', color: '#000000', fontWeight: 800, marginTop: '5px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '32px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>{totalCarriers}</div>
+                  <div style={{ fontSize: '12px', color: '#000000', fontWeight: 500, marginTop: '5px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     ACTIVE CARRIERS
                   </div>
-                  <div style={{ fontSize: '10.5px', color: '#0f172a', fontWeight: 700, textTransform: 'uppercase', marginTop: '2px' }}>
+                  <div style={{ fontSize: '10.5px', color: '#0f172a', fontWeight: 500, textTransform: 'uppercase', marginTop: '2px' }}>
                     Field Haulers
                   </div>
                 </div>
@@ -853,11 +853,11 @@ export function AdminView() {
                   <Boxes size={26} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '32px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>{totalPickers + totalLoaders}</div>
-                  <div style={{ fontSize: '12px', color: '#000000', fontWeight: 800, marginTop: '5px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '32px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>{totalPickers + totalLoaders}</div>
+                  <div style={{ fontSize: '12px', color: '#000000', fontWeight: 500, marginTop: '5px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     PICKERS & LOADERS
                   </div>
-                  <div style={{ fontSize: '10.5px', color: '#0f172a', fontWeight: 700, textTransform: 'uppercase', marginTop: '2px' }}>
+                  <div style={{ fontSize: '10.5px', color: '#0f172a', fontWeight: 500, textTransform: 'uppercase', marginTop: '2px' }}>
                     Loose Fruit & Loading
                   </div>
                 </div>
@@ -879,11 +879,11 @@ export function AdminView() {
               flexWrap: 'wrap'
             }}>
               <div>
-                <h2 style={{ fontSize: '17px', fontWeight: 900, color: '#000000', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h2 style={{ fontSize: '17px', fontWeight: 500, color: '#000000', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Users size={18} style={{ color: 'var(--clr-brand-primary)' }} />
                   Worker Directory
                 </h2>
-                <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#000000', fontWeight: 700 }}>
+                <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#000000', fontWeight: 500 }}>
                   Search, verify, adjust operational status, and print offline QR codes.
                 </p>
               </div>
@@ -900,8 +900,8 @@ export function AdminView() {
                       border: 'none',
                       cursor: 'pointer',
                       background: viewMode === 'table' ? '#FFFFFF' : 'transparent',
-                      color: viewMode === 'table' ? '#034321' : '#000000',
-                      fontWeight: 900,
+                      color: viewMode === 'table' ? '#3F8432' : '#000000',
+                      fontWeight: 500,
                       fontSize: '12px',
                       display: 'flex',
                       alignItems: 'center',
@@ -920,8 +920,8 @@ export function AdminView() {
                       border: 'none',
                       cursor: 'pointer',
                       background: viewMode === 'grid' ? '#FFFFFF' : 'transparent',
-                      color: viewMode === 'grid' ? '#034321' : '#000000',
-                      fontWeight: 900,
+                      color: viewMode === 'grid' ? '#3F8432' : '#000000',
+                      fontWeight: 500,
                       fontSize: '12px',
                       display: 'flex',
                       alignItems: 'center',
@@ -947,7 +947,7 @@ export function AdminView() {
                     setQrModalOpen(true);
                   }}
                   disabled={selectedEmpIds.size === 0}
-                  style={{ height: '38px', fontWeight: 900, fontSize: '12px', color: '#000000', border: '2px solid #000000', display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '6px' }}
+                  style={{ height: '38px', fontWeight: 500, fontSize: '12px', color: '#000000', border: '2px solid #000000', display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '6px' }}
                 >
                   <Printer size={15} /> Print Selected ({selectedEmpIds.size})
                 </button>
@@ -958,7 +958,7 @@ export function AdminView() {
                       className="btn btn--outline"
                       onClick={() => handleBulkStatusUpdate('Active')}
                       disabled={statusUpdating}
-                      style={{ height: '38px', color: '#034321', fontWeight: 900, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px', borderRadius: '6px', border: '2px solid #034321', background: '#FFFFFF' }}
+                      style={{ height: '38px', color: '#3F8432', fontWeight: 500, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px', borderRadius: '6px', border: '2px solid #3F8432', background: '#FFFFFF' }}
                     >
                       <UserCheck size={14} /> Set Active ({selectedEmpIds.size})
                     </button>
@@ -967,7 +967,7 @@ export function AdminView() {
                       className="btn btn--outline"
                       onClick={() => handleBulkStatusUpdate('Inactive')}
                       disabled={statusUpdating}
-                      style={{ height: '38px', color: '#0F172A', fontWeight: 900, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px', borderRadius: '6px', border: '1.5px solid #CBD5E1', background: '#F8FAFC' }}
+                      style={{ height: '38px', color: '#0F172A', fontWeight: 500, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px', borderRadius: '6px', border: '1.5px solid #CBD5E1', background: '#F8FAFC' }}
                     >
                       <UserX size={14} /> Set Inactive ({selectedEmpIds.size})
                     </button>
@@ -976,7 +976,7 @@ export function AdminView() {
                       className="btn btn--outline"
                       onClick={() => setSelectedEmpIds(new Set())}
                       title="Untick every selected worker, including ones hidden by filters"
-                      style={{ height: '38px', color: '#DC2626', fontWeight: 900, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px', borderRadius: '6px', border: '2px solid #FCA5A5', background: '#FFFFFF' }}
+                      style={{ height: '38px', color: '#DC2626', fontWeight: 500, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px', borderRadius: '6px', border: '2px solid #FCA5A5', background: '#FFFFFF' }}
                     >
                       <X size={14} /> Clear selection
                     </button>
@@ -997,7 +997,7 @@ export function AdminView() {
                     setQrModalOpen(true);
                   }}
                   disabled={employees.filter(isEligibleForBadge).length === 0}
-                  style={{ height: '38px', fontWeight: 900, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '6px' }}
+                  style={{ height: '38px', fontWeight: 500, fontSize: '12px', display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '6px' }}
                 >
                   <QrCode size={15} /> Print Active QR Codes ({sortedEmployees.filter(isEligibleForBadge).length})
                 </button>
@@ -1021,7 +1021,7 @@ export function AdminView() {
                   type="text"
                   placeholder="Search worker by name or ID..."
                   className="search-input"
-                  style={{ width: '100%', height: '38px', paddingLeft: '36px', fontSize: '13px', fontWeight: 700, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', background: '#FFFFFF' }}
+                  style={{ width: '100%', height: '38px', paddingLeft: '36px', fontSize: '13px', fontWeight: 500, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', background: '#FFFFFF' }}
                   value={employeeSearch}
                   onChange={(e) => setEmployeeSearch(e.target.value)}
                 />
@@ -1074,7 +1074,7 @@ export function AdminView() {
                 <button
                   type="button"
                   onClick={clearFilters}
-                  style={{ height: '38px', padding: '0 14px', fontSize: '12px', fontWeight: 800, color: '#DC2626', background: '#FFFFFF', border: '2px solid #FCA5A5', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
+                  style={{ height: '38px', padding: '0 14px', fontSize: '12px', fontWeight: 500, color: '#DC2626', background: '#FFFFFF', border: '2px solid #FCA5A5', borderRadius: '6px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap' }}
                   title="Clear search and all filters"
                 >
                   <X size={14} /> Clear filters
@@ -1083,7 +1083,7 @@ export function AdminView() {
             </div>
 
             {hiddenSelectedCount > 0 && (
-              <div style={{ padding: '10px 22px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', fontSize: '13px', fontWeight: 700, color: '#000000', background: '#FFFFFF' }}>
+              <div style={{ padding: '10px 22px', borderBottom: '1px solid #E2E8F0', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', fontSize: '13px', fontWeight: 500, color: '#000000', background: '#FFFFFF' }}>
                 <span>
                   {selectedEmpIds.size} worker{selectedEmpIds.size === 1 ? '' : 's'} selected
                   {' '}({hiddenSelectedCount} hidden by the current filters).
@@ -1091,7 +1091,7 @@ export function AdminView() {
                 <button
                   type="button"
                   onClick={() => setSelectedEmpIds(new Set())}
-                  style={{ background: 'none', border: 'none', padding: 0, color: '#DC2626', fontWeight: 900, fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
+                  style={{ background: 'none', border: 'none', padding: 0, color: '#DC2626', fontWeight: 500, fontSize: '13px', cursor: 'pointer', textDecoration: 'underline' }}
                 >
                   Clear selection
                 </button>
@@ -1104,20 +1104,20 @@ export function AdminView() {
               {employeesLoading && employees.length === 0 ? (
                 <div style={{ padding: '70px', textAlign: 'center', color: '#000000' }}>
                   <Loader2 size={32} className="spin" style={{ margin: '0 auto 12px', color: 'var(--clr-brand-primary)' }} />
-                  <p style={{ margin: 0, fontWeight: 900, fontSize: '14px', color: '#000000' }}>Fetching Data...</p>
+                  <p style={{ margin: 0, fontWeight: 500, fontSize: '14px', color: '#000000' }}>Fetching Data...</p>
                 </div>
               ) : sortedEmployees.length === 0 ? (
                 <div style={{ padding: '70px 20px', textAlign: 'center', color: '#000000' }}>
                   <Users size={48} style={{ color: '#000000', margin: '0 auto 14px' }} />
-                  <p style={{ margin: 0, fontWeight: 900, fontSize: '17px', color: '#000000' }}>No matching workers found</p>
-                  <p style={{ margin: '6px 0 18px 0', fontSize: '13px', color: '#000000', fontWeight: 700 }}>
+                  <p style={{ margin: 0, fontWeight: 500, fontSize: '17px', color: '#000000' }}>No matching workers found</p>
+                  <p style={{ margin: '6px 0 18px 0', fontSize: '13px', color: '#000000', fontWeight: 500 }}>
                     {employees.length === 0 ? 'Upload an employee CSV in the Sync tab to populate the database.' : 'Try adjusting your search criteria or status/role filters.'}
                   </p>
                   {employees.length === 0 && (
                     <button
                       className="btn btn--primary"
                       onClick={() => handleTabChange('sync')}
-                      style={{ height: '40px', fontWeight: 900, display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '6px' }}
+                      style={{ height: '40px', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '6px', borderRadius: '6px' }}
                     >
                       <UploadCloud size={15} /> Go to Database Sync
                     </button>
@@ -1172,10 +1172,10 @@ export function AdminView() {
                                 style={{ width: '16px', height: '16px', cursor: 'pointer' }}
                               />
                               <div>
-                                <div style={{ fontSize: '14px', fontWeight: 900, color: '#000000', lineHeight: 1.2 }}>
+                                <div style={{ fontSize: '14px', fontWeight: 500, color: '#000000', lineHeight: 1.2 }}>
                                   {emp.first_name} {emp.last_name}
                                 </div>
-                                <div style={{ fontSize: '12px', fontWeight: 900, color: '#034321', marginTop: '2px' }}>
+                                <div style={{ fontSize: '12px', fontWeight: 500, color: '#3F8432', marginTop: '2px' }}>
                                   #{emp.employee_id}
                                 </div>
                               </div>
@@ -1186,9 +1186,9 @@ export function AdminView() {
                                 padding: '3px 8px',
                                 borderRadius: '6px',
                                 fontSize: '11px',
-                                fontWeight: 900,
+                                fontWeight: 500,
                                 background: 'transparent',
-                                color: isWorkerActive ? '#034321' : '#000000'
+                                color: isWorkerActive ? '#3F8432' : '#000000'
                               }}
                             >
                               {isWorkerActive ? 'Active' : 'Inactive'}
@@ -1220,7 +1220,7 @@ export function AdminView() {
                             />
                           </div>
 
-                          <div style={{ fontSize: '11px', color: '#000000', fontWeight: 800, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                          <div style={{ fontSize: '11px', color: '#000000', fontWeight: 500, display: 'flex', flexDirection: 'column', gap: '4px' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                               <span>Role:</span>
                               <strong style={{ color: '#000000', textTransform: 'uppercase' }}>{roleGroup(emp.function) || emp.function || 'Worker'}</strong>
@@ -1251,12 +1251,12 @@ export function AdminView() {
                             style={{
                               width: '100%',
                               height: '34px',
-                              background: '#034321',
+                              background: '#3F8432',
                               color: '#FFFFFF',
                               border: 'none',
                               borderRadius: '6px',
                               fontSize: '12px',
-                              fontWeight: 900,
+                              fontWeight: 500,
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
@@ -1298,7 +1298,7 @@ export function AdminView() {
 
                         <th 
                           onClick={() => handleSort('employee_id')}
-                          style={{ padding: '12px 16px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
+                          style={{ padding: '12px 16px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
                           title="Sort by Employee ID"
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1309,7 +1309,7 @@ export function AdminView() {
 
                         <th 
                           onClick={() => handleSort('name')}
-                          style={{ padding: '12px 16px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
+                          style={{ padding: '12px 16px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
                           title="Sort by Full Name"
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1320,7 +1320,7 @@ export function AdminView() {
 
                         <th 
                           onClick={() => handleSort('function')}
-                          style={{ padding: '12px 16px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
+                          style={{ padding: '12px 16px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
                           title="Sort by Role"
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1331,7 +1331,7 @@ export function AdminView() {
 
                         <th 
                           onClick={() => handleSort('division')}
-                          style={{ padding: '12px 16px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
+                          style={{ padding: '12px 16px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
                           title="Sort by Team / Division"
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1342,7 +1342,7 @@ export function AdminView() {
 
                         <th 
                           onClick={() => handleSort('contractor')}
-                          style={{ padding: '12px 16px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
+                          style={{ padding: '12px 16px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none' }}
                           title="Sort by Contractor"
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1354,7 +1354,7 @@ export function AdminView() {
                         {/* Date Added Column */}
                         <th 
                           onClick={() => handleSort('date_added')}
-                          style={{ padding: '12px 16px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none', minWidth: '120px' }}
+                          style={{ padding: '12px 16px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none', minWidth: '120px' }}
                           title="Sort by Date Added"
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1365,7 +1365,7 @@ export function AdminView() {
 
                         <th 
                           onClick={() => handleSort('worker_status')}
-                          style={{ padding: '12px 16px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none', minWidth: '180px' }}
+                          style={{ padding: '12px 16px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0', cursor: 'pointer', userSelect: 'none', minWidth: '180px' }}
                           title="Sort by Status"
                         >
                           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -1374,7 +1374,7 @@ export function AdminView() {
                           </div>
                         </th>
 
-                        <th style={{ padding: '12px 20px', fontWeight: 900, color: '#000000', textAlign: 'right' }}>Actions</th>
+                        <th style={{ padding: '12px 20px', fontWeight: 500, color: '#000000', textAlign: 'right' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1390,7 +1390,7 @@ export function AdminView() {
                             key={emp.employee_id || emp.id}
                             style={{
                               borderBottom: '1px solid #E2E8F0',
-                              background: hasPendingChange ? '#F1F5F9' : (isSelected ? '#E8F2E5' : 'transparent'),
+                              background: hasPendingChange ? '#F1F5F9' : (isSelected ? '#F3F8EF' : 'transparent'),
                               transition: 'all 0.15s ease'
                             }}
                           >
@@ -1407,24 +1407,24 @@ export function AdminView() {
                                 style={{ width: '15px', height: '15px', cursor: 'pointer' }}
                               />
                             </td>
-                            <td style={{ padding: '10px 16px', fontWeight: 900, color: '#034321', fontSize: '13px', borderRight: '1px solid #E2E8F0' }}>
+                            <td style={{ padding: '10px 16px', fontWeight: 500, color: '#3F8432', fontSize: '13px', borderRight: '1px solid #E2E8F0' }}>
                               #{emp.employee_id}
                             </td>
-                            <td style={{ padding: '10px 16px', fontWeight: 900, color: '#000000', fontSize: '13px', borderRight: '1px solid #E2E8F0' }}>
+                            <td style={{ padding: '10px 16px', fontWeight: 500, color: '#000000', fontSize: '13px', borderRight: '1px solid #E2E8F0' }}>
                               {emp.first_name} {emp.last_name}
                             </td>
-                            <td style={{ padding: '10px 16px', fontWeight: 800, color: '#000000', textTransform: 'uppercase', fontSize: '12px', borderRight: '1px solid #E2E8F0' }}>
+                            <td style={{ padding: '10px 16px', fontWeight: 500, color: '#000000', textTransform: 'uppercase', fontSize: '12px', borderRight: '1px solid #E2E8F0' }}>
                               {roleGroup(emp.function) || emp.function || 'General Worker'}
                             </td>
-                            <td style={{ padding: '10px 16px', color: '#000000', fontWeight: 800, borderRight: '1px solid #E2E8F0' }}>
+                            <td style={{ padding: '10px 16px', color: '#000000', fontWeight: 500, borderRight: '1px solid #E2E8F0' }}>
                               {emp.team || emp.division || 'Main Estate'}
                             </td>
-                            <td style={{ padding: '10px 16px', color: '#000000', fontWeight: 800, borderRight: '1px solid #E2E8F0' }}>
+                            <td style={{ padding: '10px 16px', color: '#000000', fontWeight: 500, borderRight: '1px solid #E2E8F0' }}>
                               {emp.contractor || 'Direct Staff'}
                             </td>
 
                             {/* Date Added Column */}
-                            <td style={{ padding: '10px 16px', color: '#000000', fontWeight: 800, fontSize: '12px', borderRight: '1px solid #E2E8F0' }}>
+                            <td style={{ padding: '10px 16px', color: '#000000', fontWeight: 500, fontSize: '12px', borderRight: '1px solid #E2E8F0' }}>
                               {formatDate(emp.date_added)}
                             </td>
                             
@@ -1435,9 +1435,9 @@ export function AdminView() {
                                   padding: '4px 10px',
                                   borderRadius: '6px',
                                   fontSize: '12px',
-                                  fontWeight: 900,
+                                  fontWeight: 500,
                                   background: 'transparent',
-                                  color: isWorkerActive ? '#034321' : '#000000',
+                                  color: isWorkerActive ? '#3F8432' : '#000000',
                                   display: 'inline-block'
                                 }}
                               >
@@ -1453,12 +1453,12 @@ export function AdminView() {
                                 }}
                                 style={{
                                   padding: '6px 12px',
-                                  background: '#034321',
+                                  background: '#3F8432',
                                   color: '#FFFFFF',
                                   border: 'none',
                                   borderRadius: '4px',
                                   fontSize: '12px',
-                                  fontWeight: 900,
+                                  fontWeight: 500,
                                   cursor: 'pointer',
                                   display: 'inline-flex',
                                   alignItems: 'center',
@@ -1491,7 +1491,7 @@ export function AdminView() {
                   gap: '12px',
                   fontSize: '13px'
                 }}>
-                  <div style={{ color: '#000000', fontWeight: 800 }}>
+                  <div style={{ color: '#000000', fontWeight: 500 }}>
                     Showing <strong style={{ color: '#000000' }}>
                       {pageSize === 'ALL' ? `1-${sortedEmployees.length}` : `${Math.min((currentPage - 1) * Number(pageSize) + 1, sortedEmployees.length)}-${Math.min(currentPage * Number(pageSize), sortedEmployees.length)}`}
                     </strong> of <strong style={{ color: '#000000' }}>{sortedEmployees.length}</strong> workers
@@ -1499,11 +1499,11 @@ export function AdminView() {
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <span style={{ color: '#000000', fontWeight: 800, fontSize: '12px' }}>Rows:</span>
+                      <span style={{ color: '#000000', fontWeight: 500, fontSize: '12px' }}>Rows:</span>
                       <select
                         value={pageSize}
                         onChange={(e) => setPageSize(e.target.value)}
-                        style={{ padding: '4px 8px', borderRadius: '4px', border: '2px solid #CBD5E1', fontSize: '12px', fontWeight: 800, color: '#000000', background: '#FFFFFF' }}
+                        style={{ padding: '4px 8px', borderRadius: '4px', border: '2px solid #CBD5E1', fontSize: '12px', fontWeight: 500, color: '#000000', background: '#FFFFFF' }}
                       >
                         <option value="25">25</option>
                         <option value="50">50</option>
@@ -1527,14 +1527,14 @@ export function AdminView() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '2px',
-                            fontWeight: 900,
+                            fontWeight: 500,
                             fontSize: '12px'
                           }}
                         >
                           <ChevronLeft size={13} /> Prev
                         </button>
 
-                        <span style={{ fontWeight: 900, color: '#000000', padding: '0 4px', fontSize: '12px' }}>
+                        <span style={{ fontWeight: 500, color: '#000000', padding: '0 4px', fontSize: '12px' }}>
                           {currentPage} / {totalPages}
                         </span>
 
@@ -1551,7 +1551,7 @@ export function AdminView() {
                             display: 'flex',
                             alignItems: 'center',
                             gap: '2px',
-                            fontWeight: 900,
+                            fontWeight: 500,
                             fontSize: '12px'
                           }}
                         >
@@ -1575,11 +1575,11 @@ export function AdminView() {
           {/* User Access Header */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
             <div>
-              <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#000000', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <h2 style={{ fontSize: '20px', fontWeight: 500, color: '#000000', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Key size={22} style={{ color: 'var(--clr-brand-primary)' }} />
                 System Identities & User Access
               </h2>
-              <p style={{ color: '#000000', fontSize: '13px', fontWeight: 800, margin: '2px 0 0 0' }}>
+              <p style={{ color: '#000000', fontSize: '13px', fontWeight: 500, margin: '2px 0 0 0' }}>
                 Manage administrator credentials, authorization roles, and portal passwords.
               </p>
             </div>
@@ -1587,14 +1587,14 @@ export function AdminView() {
             <button
               className="btn btn--primary"
               onClick={() => { setIsAddingUser(true); setFormError(''); }}
-              style={{ height: '42px', padding: '0 20px', fontSize: '13px', fontWeight: 900, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ height: '42px', padding: '0 20px', fontSize: '13px', fontWeight: 500, borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
               <UserPlus size={16} /> Create User
             </button>
           </div>
 
           {userApiError && (
-            <div style={{ background: '#FEF2F2', border: '2px solid #FEE2E2', borderRadius: '8px', padding: '12px 16px', marginBottom: '16px', color: '#991B1B', fontWeight: 900, fontSize: '13px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <div style={{ background: '#FEF2F2', border: '2px solid #FEE2E2', borderRadius: '8px', padding: '12px 16px', marginBottom: '16px', color: '#991B1B', fontWeight: 500, fontSize: '13px', display: 'flex', gap: '8px', alignItems: 'center' }}>
               <AlertCircle size={16} /> {userApiError}
             </div>
           )}
@@ -1608,7 +1608,7 @@ export function AdminView() {
                   type="text"
                   placeholder="Filter users by email..."
                   className="search-input"
-                  style={{ width: '100%', height: '38px', paddingLeft: '36px', fontSize: '13px', fontWeight: 700, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', background: '#FFFFFF' }}
+                  style={{ width: '100%', height: '38px', paddingLeft: '36px', fontSize: '13px', fontWeight: 500, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', background: '#FFFFFF' }}
                   value={userSearch}
                   onChange={(e) => setUserSearch(e.target.value)}
                 />
@@ -1617,7 +1617,7 @@ export function AdminView() {
               <button
                 className="btn btn--outline"
                 onClick={loadUsers}
-                style={{ height: '38px', padding: '0 12px', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 900, fontSize: '12px', color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px' }}
+                style={{ height: '38px', padding: '0 12px', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500, fontSize: '12px', color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px' }}
               >
                 <RefreshCw size={13} className={isLoadingUsers ? 'spin' : ''} /> Refresh
               </button>
@@ -1626,45 +1626,45 @@ export function AdminView() {
             <table className="custom-table" style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', color: '#000000' }}>
               <thead style={{ background: '#FFFFFF' }}>
                 <tr style={{ borderBottom: '2px solid #CBD5E1', textAlign: 'left' }}>
-                  <th style={{ padding: '12px 18px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0' }}>User Email</th>
-                  <th style={{ padding: '12px 18px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0' }}>System Role</th>
-                  <th style={{ padding: '12px 18px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0' }}>Estate</th>
-                  <th style={{ padding: '12px 18px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0' }}>Status</th>
-                  <th style={{ padding: '12px 18px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0' }}>Created Date</th>
-                  <th style={{ padding: '12px 20px', fontWeight: 900, color: '#000000', textAlign: 'right' }}>Actions</th>
+                  <th style={{ padding: '12px 18px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0' }}>User Email</th>
+                  <th style={{ padding: '12px 18px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0' }}>System Role</th>
+                  <th style={{ padding: '12px 18px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0' }}>Estate</th>
+                  <th style={{ padding: '12px 18px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0' }}>Status</th>
+                  <th style={{ padding: '12px 18px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0' }}>Created Date</th>
+                  <th style={{ padding: '12px 20px', fontWeight: 500, color: '#000000', textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {isLoadingUsers ? (
                   <tr><td colSpan={6} style={{ textAlign: 'center', padding: '50px' }}><Loader2 size={24} className="spin" /></td></tr>
                 ) : filteredUsers.length === 0 ? (
-                  <tr><td colSpan={6} style={{ textAlign: 'center', padding: '50px', color: '#000000', fontWeight: 800 }}>No users found.</td></tr>
+                  <tr><td colSpan={6} style={{ textAlign: 'center', padding: '50px', color: '#000000', fontWeight: 500 }}>No users found.</td></tr>
                 ) : (
                   filteredUsers.map(u => (
                     <tr key={u.id} style={{ borderBottom: '1px solid #E2E8F0' }}>
-                      <td style={{ padding: '12px 18px', fontWeight: 900, color: '#000000', borderRight: '1px solid #E2E8F0' }}>{u.email}</td>
+                      <td style={{ padding: '12px 18px', fontWeight: 500, color: '#000000', borderRight: '1px solid #E2E8F0' }}>{u.email}</td>
                       <td style={{ padding: '12px 18px', borderRight: '1px solid #E2E8F0' }}>
-                        <span style={{ fontWeight: 800, fontSize: '13px', color: '#000000' }}>{u.role === 'Edit' ? 'Manager' : u.role}</span>
+                        <span style={{ fontWeight: 500, fontSize: '13px', color: '#000000' }}>{u.role === 'Edit' ? 'Manager' : u.role}</span>
                       </td>
                       <td style={{ padding: '12px 18px', borderRight: '1px solid #E2E8F0' }}>
-                        <span style={{ fontWeight: 800, fontSize: '13px', color: '#000000' }}>{u.estate || 'All Estates'}</span>
+                        <span style={{ fontWeight: 500, fontSize: '13px', color: '#000000' }}>{u.estate || 'All Estates'}</span>
                       </td>
                       <td style={{ padding: '12px 18px', borderRight: '1px solid #E2E8F0' }}>
-                        <span style={{ fontWeight: 900, fontSize: '11px', color: u.status === 'Active' ? '#034321' : '#991B1B' }}>
+                        <span style={{ fontWeight: 500, fontSize: '11px', color: u.status === 'Active' ? '#3F8432' : '#991B1B' }}>
                           {u.status}
                         </span>
                       </td>
-                      <td style={{ padding: '12px 18px', color: '#000000', fontWeight: 800, borderRight: '1px solid #E2E8F0' }}>
+                      <td style={{ padding: '12px 18px', color: '#000000', fontWeight: 500, borderRight: '1px solid #E2E8F0' }}>
                         {formatDate(u.created_at)}
                       </td>
                       <td style={{ padding: '12px 20px', textAlign: 'right' }}>
                         <div style={{ display: 'inline-flex', gap: '8px', alignItems: 'center' }}>
                           <button
                             onClick={() => setEditAccess({ user: u, email: u.email, role: u.role === 'Edit' ? 'Manager' : u.role, estate: u.estate || '', notify: true })}
-                            style={{ padding: '5px 12px', borderRadius: '6px', border: '2px solid #CBD5E1', background: '#FFFFFF', cursor: 'pointer', fontSize: '11px', fontWeight: 900, color: '#000000', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                            style={{ padding: '5px 12px', borderRadius: '6px', border: '2px solid #CBD5E1', background: '#FFFFFF', cursor: 'pointer', fontSize: '11px', fontWeight: 500, color: '#000000', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
                             title="Change this user's role and estate"
                           >
-                            <Edit2 size={13} style={{ color: '#034321' }} /> Edit
+                            <Edit2 size={13} style={{ color: '#3F8432' }} /> Edit
                           </button>
                           <button
                             onClick={() => handleOpenResetPassword(u)}
@@ -1675,7 +1675,7 @@ export function AdminView() {
                               background: '#FFFFFF',
                               cursor: 'pointer',
                               fontSize: '11px',
-                              fontWeight: 900,
+                              fontWeight: 500,
                               color: '#000000',
                               display: 'inline-flex',
                               alignItems: 'center',
@@ -1683,17 +1683,17 @@ export function AdminView() {
                             }}
                             title="Reset password and generate new credentials"
                           >
-                            <Key size={13} style={{ color: '#034321' }} /> Reset Password
+                            <Key size={13} style={{ color: '#3F8432' }} /> Reset Password
                           </button>
                           <button
                             onClick={() => toggleUserStatus(u)}
-                            style={{ padding: '5px 12px', borderRadius: '6px', border: '2px solid #CBD5E1', background: '#FFFFFF', cursor: 'pointer', fontSize: '11px', fontWeight: 900, color: '#000000' }}
+                            style={{ padding: '5px 12px', borderRadius: '6px', border: '2px solid #CBD5E1', background: '#FFFFFF', cursor: 'pointer', fontSize: '11px', fontWeight: 500, color: '#000000' }}
                           >
                             {u.status === 'Active' ? 'Deactivate' : 'Activate'}
                           </button>
                           <button
                             onClick={() => handleDelete(u)}
-                            style={{ padding: '5px 12px', borderRadius: '6px', border: '2px solid #DC2626', background: '#DC2626', color: '#FFFFFF', cursor: 'pointer', fontSize: '11px', fontWeight: 900 }}
+                            style={{ padding: '5px 12px', borderRadius: '6px', border: '2px solid #DC2626', background: '#DC2626', color: '#FFFFFF', cursor: 'pointer', fontSize: '11px', fontWeight: 500 }}
                           >
                             Delete
                           </button>
@@ -1715,8 +1715,8 @@ export function AdminView() {
         <div className="view-fade-in">
           {/* Sync Header */}
           <div style={{ marginBottom: '24px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: 900, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <UploadCloud size={22} style={{ color: '#034321' }} />
+            <h2 style={{ fontSize: '20px', fontWeight: 500, color: '#0F172A', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <UploadCloud size={22} style={{ color: '#3F8432' }} />
               Employee Database Ingestion & Sync
             </h2>
             <p style={{ color: '#0f172a', fontSize: '13px', fontWeight: 600, margin: '4px 0 0 0' }}>
@@ -1741,20 +1741,20 @@ export function AdminView() {
                 boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
                 transition: 'border-color 0.2s ease'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#034321'}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#3F8432'}
               onMouseLeave={(e) => e.currentTarget.style.borderColor = '#CBD5E1'}
             >
               <div style={{ background: '#F1F5F9', color: '#0F172A', padding: '16px', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
                 <FileSpreadsheet size={32} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '16px', fontWeight: 900, color: '#0F172A' }}>
+                <div style={{ fontSize: '16px', fontWeight: 500, color: '#0F172A' }}>
                   Upload Field Clerks (.xlsx, .csv)
                 </div>
                 <div style={{ fontSize: '12px', color: '#0f172a', marginTop: '4px', lineHeight: 1.5, fontWeight: 600 }}>
                   Ingest Recording Clerks (Recorders) and Loading Clerks (Counters) with multi-sheet selector and column mapping.
                 </div>
-                <div style={{ marginTop: '10px', fontSize: '12px', fontWeight: 900, color: '#034321', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div style={{ marginTop: '10px', fontSize: '12px', fontWeight: 500, color: '#3F8432', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   Launch Clerks Header Mapper <ArrowRight size={14} />
                 </div>
               </div>
@@ -1775,20 +1775,20 @@ export function AdminView() {
                 boxShadow: '0 2px 4px rgba(0,0,0,0.04)',
                 transition: 'border-color 0.2s ease'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#034321'}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#3F8432'}
               onMouseLeave={(e) => e.currentTarget.style.borderColor = '#CBD5E1'}
             >
               <div style={{ background: '#F1F5F9', color: '#0F172A', padding: '16px', borderRadius: '12px', border: '1px solid #E2E8F0' }}>
                 <UploadCloud size={32} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '16px', fontWeight: 900, color: '#0F172A' }}>
+                <div style={{ fontSize: '16px', fontWeight: 500, color: '#0F172A' }}>
                   Upload Farm Workers & Harvesters (.xlsx, .csv)
                 </div>
                 <div style={{ fontSize: '12px', color: '#0f172a', marginTop: '4px', lineHeight: 1.5, fontWeight: 600 }}>
                   Ingest Cutters, Carriers, Loose Fruit Pickers, and Loaders with 5-row live data preview and header mapping.
                 </div>
-                <div style={{ marginTop: '10px', fontSize: '12px', fontWeight: 900, color: '#034321', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <div style={{ marginTop: '10px', fontSize: '12px', fontWeight: 500, color: '#3F8432', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   Launch Workers Header Mapper <ArrowRight size={14} />
                 </div>
               </div>
@@ -1804,8 +1804,8 @@ export function AdminView() {
                   <RefreshCw size={20} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '16px', fontWeight: 900, color: '#0F172A' }}>{lastSyncTime}</div>
-                  <div style={{ fontSize: '12px', color: '#0f172a', fontWeight: 700, marginTop: '2px' }}>
+                  <div style={{ fontSize: '16px', fontWeight: 500, color: '#0F172A' }}>{lastSyncTime}</div>
+                  <div style={{ fontSize: '12px', color: '#0f172a', fontWeight: 500, marginTop: '2px' }}>
                     Last Successful Database Sync
                   </div>
                 </div>
@@ -1815,7 +1815,7 @@ export function AdminView() {
                 <button
                   className="btn btn--outline"
                   onClick={() => handleTabChange('badges')}
-                  style={{ flex: 1, height: '42px', fontWeight: 900, color: '#0F172A', border: '1.5px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '8px', background: '#FFFFFF', cursor: 'pointer' }}
+                  style={{ flex: 1, height: '42px', fontWeight: 500, color: '#0F172A', border: '1.5px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '8px', background: '#FFFFFF', cursor: 'pointer' }}
                 >
                   <Users size={15} /> View Worker Directory ({employees.length})
                 </button>
@@ -1824,7 +1824,7 @@ export function AdminView() {
 
             {/* Ingestion Standards & Instructions */}
             <div style={{ background: '#FFFFFF', padding: '24px', borderRadius: '12px', border: '1px solid #E2E8F0', boxShadow: '0 2px 4px rgba(0,0,0,0.04)' }}>
-              <h3 style={{ fontSize: '14px', fontWeight: 900, color: '#0F172A', margin: '0 0 10px 0' }}>
+              <h3 style={{ fontSize: '14px', fontWeight: 500, color: '#0F172A', margin: '0 0 10px 0' }}>
                 Ingestion System Standards:
               </h3>
               <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '12px', color: '#0f172a', lineHeight: 1.8, fontWeight: 600 }}>
@@ -1863,28 +1863,28 @@ export function AdminView() {
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.75)', backdropFilter: 'blur(10px)', zIndex: 10001, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div className="view-fade-in" style={{ background: 'white', width: '460px', maxWidth: '100%', borderRadius: '10px', padding: '28px', boxShadow: 'var(--shadow-modal)', border: '2px solid #E2E8F0' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '18px' }}>
-              <div style={{ background: 'transparent', color: '#034321', width: '44px', height: '44px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <div style={{ background: 'transparent', color: '#3F8432', width: '44px', height: '44px', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <UserPlus size={22} />
               </div>
               <div>
-                <h2 style={{ fontSize: '17px', fontWeight: 900, color: '#000000', margin: 0 }}>Create User</h2>
-                <p style={{ color: '#000000', fontSize: '12px', fontWeight: 800, margin: 0 }}>Set up secure system credentials.</p>
+                <h2 style={{ fontSize: '17px', fontWeight: 500, color: '#000000', margin: 0 }}>Create User</h2>
+                <p style={{ color: '#000000', fontSize: '12px', fontWeight: 500, margin: 0 }}>Set up secure system credentials.</p>
               </div>
             </div>
 
             {formError && (
-              <div style={{ background: '#FEF2F2', border: '2px solid #FEE2E2', borderRadius: '6px', padding: '8px 12px', marginBottom: '14px', color: '#991B1B', fontWeight: 900, fontSize: '12px' }}>
+              <div style={{ background: '#FEF2F2', border: '2px solid #FEE2E2', borderRadius: '6px', padding: '8px 12px', marginBottom: '14px', color: '#991B1B', fontWeight: 500, fontSize: '12px' }}>
                 {formError}
               </div>
             )}
 
             <form onSubmit={handleAddUser}>
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 900, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Email Address</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Email Address</label>
                 <input
                   type="email"
                   className="search-input"
-                  style={{ width: '100%', height: '42px', padding: '0 12px', fontSize: '13px', fontWeight: 700, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px' }}
+                  style={{ width: '100%', height: '42px', padding: '0 12px', fontSize: '13px', fontWeight: 500, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px' }}
                   placeholder="name@ffb.com"
                   required
                   value={newUser.email}
@@ -1894,11 +1894,11 @@ export function AdminView() {
 
               <div style={{ marginBottom: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <label style={{ fontSize: '11px', fontWeight: 900, color: '#000000', textTransform: 'uppercase' }}>Access Password</label>
+                  <label style={{ fontSize: '11px', fontWeight: 500, color: '#000000', textTransform: 'uppercase' }}>Access Password</label>
                   <button
                     type="button"
                     onClick={() => { setNewUser({ ...newUser, password: generateStrongPassword() }); setShowNewUserPassword(true); }}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '6px', border: '1.5px solid #034321', background: '#FFFFFF', color: '#034321', fontSize: '11px', fontWeight: 900, cursor: 'pointer' }}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', padding: '4px 10px', borderRadius: '6px', border: '1.5px solid #3F8432', background: '#FFFFFF', color: '#3F8432', fontSize: '11px', fontWeight: 500, cursor: 'pointer' }}
                   >
                     <Sparkles size={12} /> Generate password
                   </button>
@@ -1908,7 +1908,7 @@ export function AdminView() {
                     type={showNewUserPassword ? 'text' : 'password'}
                     autoComplete="new-password"
                     className="search-input"
-                    style={{ width: '100%', height: '42px', padding: '0 46px 0 12px', fontSize: '13px', fontWeight: 700, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', boxSizing: 'border-box' }}
+                    style={{ width: '100%', height: '42px', padding: '0 46px 0 12px', fontSize: '13px', fontWeight: 500, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', boxSizing: 'border-box' }}
                     placeholder="Enter or generate a password"
                     required
                     value={newUser.password}
@@ -1927,11 +1927,11 @@ export function AdminView() {
               </div>
 
               <div style={{ marginBottom: '14px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 900, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Send login details to</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Send login details to</label>
                 <input
                   type="email"
                   className="search-input"
-                  style={{ width: '100%', height: '42px', padding: '0 12px', fontSize: '13px', fontWeight: 700, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px' }}
+                  style={{ width: '100%', height: '42px', padding: '0 12px', fontSize: '13px', fontWeight: 500, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px' }}
                   placeholder={newUser.email || "person's email address"}
                   value={newUser.sendTo}
                   onChange={(e) => setNewUser({ ...newUser, sendTo: e.target.value })}
@@ -1942,10 +1942,10 @@ export function AdminView() {
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 900, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>System Role</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>System Role</label>
                 <select
                   className="select-input"
-                  style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 800, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
+                  style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 500, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
                   value={newUser.role}
                   onChange={(e) => setNewUser({ ...newUser, role: e.target.value })}
                 >
@@ -1955,10 +1955,10 @@ export function AdminView() {
               </div>
 
               <div style={{ marginBottom: '20px' }}>
-                <label style={{ display: 'block', fontSize: '11px', fontWeight: 900, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Estate Access</label>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Estate Access</label>
                 <select
                   className="select-input"
-                  style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 800, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
+                  style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 500, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
                   value={newUser.estate}
                   onChange={(e) => setNewUser({ ...newUser, estate: e.target.value })}
                 >
@@ -1977,7 +1977,7 @@ export function AdminView() {
                   type="button"
                   className="btn btn--outline"
                   onClick={() => setIsAddingUser(false)}
-                  style={{ flex: 1, height: '42px', fontWeight: 900, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px' }}
+                  style={{ flex: 1, height: '42px', fontWeight: 500, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px' }}
                   disabled={formLoading}
                 >
                   Cancel
@@ -1985,7 +1985,7 @@ export function AdminView() {
                 <button
                   type="submit"
                   className="btn btn--primary"
-                  style={{ flex: 1, height: '42px', fontWeight: 900, borderRadius: '6px' }}
+                  style={{ flex: 1, height: '42px', fontWeight: 500, borderRadius: '6px' }}
                   disabled={formLoading}
                 >
                   {formLoading ? 'Creating...' : 'Create User'}
@@ -2019,8 +2019,8 @@ export function AdminView() {
             boxSizing: 'border-box'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 900, color: '#000000', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Key size={20} style={{ color: '#034321' }} />
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 500, color: '#000000', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Key size={20} style={{ color: '#3F8432' }} />
                 Reset User Password
               </h3>
               <button
@@ -2031,18 +2031,18 @@ export function AdminView() {
               </button>
             </div>
 
-            <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#000000', fontWeight: 800 }}>
-              Generate or assign a new password for: <strong style={{ color: '#034321' }}>{resetModalUser.email}</strong>
+            <p style={{ margin: '0 0 16px 0', fontSize: '13px', color: '#000000', fontWeight: 500 }}>
+              Generate or assign a new password for: <strong style={{ color: '#3F8432' }}>{resetModalUser.email}</strong>
             </p>
 
             {resetErrorMsg && (
-              <div style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#991B1B', padding: '10px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 900, marginBottom: '14px' }}>
+              <div style={{ background: '#FEF2F2', border: '2px solid #FCA5A5', color: '#991B1B', padding: '10px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, marginBottom: '14px' }}>
                 {resetErrorMsg}
               </div>
             )}
 
             {resetSuccessMsg && (
-              <div style={{ background: 'transparent', border: 'none', color: '#034321', padding: '10px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 900, marginBottom: '14px' }}>
+              <div style={{ background: 'transparent', border: 'none', color: '#3F8432', padding: '10px 14px', borderRadius: '6px', fontSize: '12px', fontWeight: 500, marginBottom: '14px' }}>
                 {resetSuccessMsg}
               </div>
             )}
@@ -2050,7 +2050,7 @@ export function AdminView() {
             <form onSubmit={handleResetPasswordSubmit}>
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                  <label style={{ fontSize: '12px', fontWeight: 900, color: '#000000', textTransform: 'uppercase' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 500, color: '#000000', textTransform: 'uppercase' }}>
                     New Password
                   </label>
                   <button
@@ -2062,7 +2062,7 @@ export function AdminView() {
                       borderRadius: '4px',
                       padding: '3px 8px',
                       fontSize: '11px',
-                      fontWeight: 900,
+                      fontWeight: 500,
                       color: '#000000',
                       cursor: 'pointer',
                       display: 'inline-flex',
@@ -2070,7 +2070,7 @@ export function AdminView() {
                       gap: '4px'
                     }}
                   >
-                    <Sparkles size={12} style={{ color: '#034321' }} /> Auto-Generate
+                    <Sparkles size={12} style={{ color: '#3F8432' }} /> Auto-Generate
                   </button>
                 </div>
 
@@ -2086,7 +2086,7 @@ export function AdminView() {
                         height: '42px',
                         padding: '0 40px 0 12px',
                         fontSize: '14px',
-                        fontWeight: 900,
+                        fontWeight: 500,
                         color: '#000000',
                         border: '2px solid #000000',
                         borderRadius: '6px',
@@ -2121,9 +2121,9 @@ export function AdminView() {
                       height: '42px',
                       borderRadius: '6px',
                       border: '2px solid #CBD5E1',
-                      background: copiedPassword ? '#E8F2E5' : '#FFFFFF',
-                      color: copiedPassword ? '#034321' : '#000000',
-                      fontWeight: 900,
+                      background: copiedPassword ? '#F3F8EF' : '#FFFFFF',
+                      color: copiedPassword ? '#3F8432' : '#000000',
+                      fontWeight: 500,
                       fontSize: '12px',
                       cursor: 'pointer',
                       display: 'inline-flex',
@@ -2144,7 +2144,7 @@ export function AdminView() {
                   style={{
                     flex: 1,
                     height: '42px',
-                    fontWeight: 900,
+                    fontWeight: 500,
                     color: '#000000',
                     border: '2px solid #CBD5E1',
                     borderRadius: '6px',
@@ -2160,9 +2160,9 @@ export function AdminView() {
                   style={{
                     flex: 1,
                     height: '42px',
-                    fontWeight: 900,
+                    fontWeight: 500,
                     borderRadius: '6px',
-                    background: '#034321',
+                    background: '#3F8432',
                     color: '#FFFFFF',
                     border: 'none',
                     cursor: 'pointer'
@@ -2194,27 +2194,27 @@ export function AdminView() {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(6px)', zIndex: 999998, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
           <div style={{ background: '#FFFFFF', borderRadius: '16px', padding: '28px', maxWidth: '440px', width: '100%', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '6px' }}>
-              <div style={{ display: 'flex' }}><Edit2 size={22} color="#034321" /></div>
+              <div style={{ display: 'flex' }}><Edit2 size={22} color="#3F8432" /></div>
               <div>
-                <h3 style={{ fontSize: '18px', fontWeight: 900, color: '#0F172A', margin: 0 }}>Edit user</h3>
-                <div style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>Login email, role and estate</div>
+                <h3 style={{ fontSize: '18px', fontWeight: 500, color: '#0F172A', margin: 0 }}>Edit user</h3>
+                <div style={{ fontSize: '13px', fontWeight: 500, color: '#0f172a' }}>Login email, role and estate</div>
               </div>
             </div>
             <div style={{ margin: '20px 0 14px' }}>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 900, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Login Email (ID)</label>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Login Email (ID)</label>
               <input
                 type="email"
                 className="search-input"
-                style={{ width: '100%', height: '42px', padding: '0 12px', fontSize: '13px', fontWeight: 700, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', boxSizing: 'border-box' }}
+                style={{ width: '100%', height: '42px', padding: '0 12px', fontSize: '13px', fontWeight: 500, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', boxSizing: 'border-box' }}
                 value={editAccess.email}
                 onChange={(e) => setEditAccess({ ...editAccess, email: e.target.value })}
               />
             </div>
             <div style={{ marginBottom: '14px' }}>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 900, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>System Role</label>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>System Role</label>
               <select
                 className="select-input"
-                style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 800, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
+                style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 500, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
                 value={editAccess.role}
                 onChange={(e) => setEditAccess({ ...editAccess, role: e.target.value })}
               >
@@ -2223,10 +2223,10 @@ export function AdminView() {
               </select>
             </div>
             <div style={{ marginBottom: '22px' }}>
-              <label style={{ display: 'block', fontSize: '11px', fontWeight: 900, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Estate Access</label>
+              <label style={{ display: 'block', fontSize: '11px', fontWeight: 500, color: '#000000', marginBottom: '4px', textTransform: 'uppercase' }}>Estate Access</label>
               <select
                 className="select-input"
-                style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 800, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
+                style={{ width: '100%', height: '42px', border: '2px solid #CBD5E1', fontWeight: 500, color: '#000000', borderRadius: '6px', padding: '0 10px' }}
                 value={editAccess.estate}
                 onChange={(e) => setEditAccess({ ...editAccess, estate: e.target.value })}
               >
@@ -2236,17 +2236,17 @@ export function AdminView() {
                 <option value="Extension 2">Extension 2 only</option>
               </select>
             </div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 700, color: '#0F172A', marginBottom: '18px', cursor: 'pointer' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 500, color: '#0F172A', marginBottom: '18px', cursor: 'pointer' }}>
               <input type="checkbox" checked={editAccess.notify} onChange={(e) => setEditAccess({ ...editAccess, notify: e.target.checked })} />
               Email the person about this change
             </label>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button type="button" onClick={() => setEditAccess(null)} disabled={savingAccess}
-                style={{ flex: 1, height: '42px', fontWeight: 900, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', background: '#FFFFFF', cursor: 'pointer' }}>
+                style={{ flex: 1, height: '42px', fontWeight: 500, color: '#000000', border: '2px solid #CBD5E1', borderRadius: '6px', background: '#FFFFFF', cursor: 'pointer' }}>
                 Cancel
               </button>
               <button type="button" onClick={saveAccess} disabled={savingAccess}
-                style={{ flex: 1, height: '42px', fontWeight: 900, color: '#FFFFFF', border: 'none', borderRadius: '6px', background: '#034321', cursor: savingAccess ? 'not-allowed' : 'pointer' }}>
+                style={{ flex: 1, height: '42px', fontWeight: 500, color: '#FFFFFF', border: 'none', borderRadius: '6px', background: '#3F8432', cursor: savingAccess ? 'not-allowed' : 'pointer' }}>
                 {savingAccess ? 'Saving...' : 'Save'}
               </button>
             </div>

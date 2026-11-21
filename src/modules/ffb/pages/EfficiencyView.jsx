@@ -203,8 +203,8 @@ export function EfficiencyView() {
               <Award size={32} />
             </div>
             <div>
-              <h1 className="view-title" style={{ fontSize: '36px', fontWeight: 900, letterSpacing: '-0.03em' }}>Operational Efficiency Board</h1>
-              <p className="view-subtitle" style={{ fontSize: '16px', opacity: 0.7 }}>Tracking workforce excellence and operational density across Earthintelytics.</p>
+              <h1 className="view-title" style={{ fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em' }}>Operational Efficiency Board</h1>
+              <p className="view-subtitle" style={{ fontSize: '14px', opacity: 0.75 }}>Tracking workforce excellence and operational density across FarmIntelytics.</p>
             </div>
           </div>
           
@@ -285,14 +285,14 @@ export function EfficiencyView() {
                       const actualIdx = (activePageHarvester - 1) * pageSize + i;
                       return (
                         <tr key={w.id} className="plot-row">
-                          <td className="plot-cell" style={{ fontWeight: 800 }}>{actualIdx + 1}</td>
-                          <td className="plot-cell" style={{ fontWeight: 800, color: '#0f172a' }}>{w.name}</td>
+                          <td className="plot-cell" style={{ fontWeight: 500 }}>{actualIdx + 1}</td>
+                          <td className="plot-cell" style={{ fontWeight: 500, color: '#0f172a' }}>{w.name}</td>
                           <td className="plot-cell">{w.id}</td>
-                          <td className="plot-cell plot-cell--num" style={{ color: 'var(--clr-brand-primary)', fontWeight: 800 }}>{fmtNumber(w.bunches)}</td>
-                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 700 }}>{w.ops}</td>
-                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 700 }}>{(w.bunches / (w.ops || 1)).toFixed(1)}</td>
+                          <td className="plot-cell plot-cell--num" style={{ color: 'var(--clr-brand-primary)', fontWeight: 500 }}>{fmtNumber(w.bunches)}</td>
+                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 500 }}>{w.ops}</td>
+                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 500 }}>{(w.bunches / (w.ops || 1)).toFixed(1)}</td>
                           <td className="plot-cell" style={{ textAlign: 'center' }}>
-                            <span className={`delta-pill ${w.bunches > 100 ? 'delta-pill--low' : 'delta-pill--medium'}`} style={{ color: w.bunches > 100 ? '#3F8432' : '#475569', fontWeight: 800 }}>
+                            <span className={`delta-pill ${w.bunches > 100 ? 'delta-pill--low' : 'delta-pill--medium'}`} style={{ color: w.bunches > 100 ? '#3F8432' : '#475569', fontWeight: 500 }}>
                               {w.bunches > 100 ? 'EXCEPTIONAL' : 'STANDARD'}
                             </span>
                           </td>
@@ -423,14 +423,14 @@ export function EfficiencyView() {
                       const actualIdx = (activePagePicker - 1) * pageSize + i;
                       return (
                         <tr key={w.id} className="plot-row">
-                          <td className="plot-cell" style={{ fontWeight: 800 }}>{actualIdx + 1}</td>
-                          <td className="plot-cell" style={{ fontWeight: 800, color: '#0f172a' }}>{w.name}</td>
+                          <td className="plot-cell" style={{ fontWeight: 500 }}>{actualIdx + 1}</td>
+                          <td className="plot-cell" style={{ fontWeight: 500, color: '#0f172a' }}>{w.name}</td>
                           <td className="plot-cell">{w.id}</td>
-                          <td className="plot-cell plot-cell--num" style={{ color: '#3b82f6', fontWeight: 800 }}>{fmtNumber(w.weight)} kg</td>
-                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 700 }}>{w.ops}</td>
-                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 700 }}>{(w.weight / (w.ops || 1)).toFixed(1)}</td>
+                          <td className="plot-cell plot-cell--num" style={{ color: '#3b82f6', fontWeight: 500 }}>{fmtNumber(w.weight)} kg</td>
+                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 500 }}>{w.ops}</td>
+                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 500 }}>{(w.weight / (w.ops || 1)).toFixed(1)}</td>
                           <td className="plot-cell" style={{ textAlign: 'center' }}>
-                            <span className={`delta-pill ${w.weight > 200 ? 'delta-pill--low' : 'delta-pill--medium'}`} style={{ color: w.weight > 200 ? '#1d4ed8' : '#475569', fontWeight: 800 }}>
+                            <span className={`delta-pill ${w.weight > 200 ? 'delta-pill--low' : 'delta-pill--medium'}`} style={{ color: w.weight > 200 ? '#1d4ed8' : '#475569', fontWeight: 500 }}>
                               {w.weight > 200 ? 'HIGH YIELD' : 'CONSISTENT'}
                             </span>
                           </td>
@@ -558,12 +558,12 @@ export function EfficiencyView() {
                       const actualIdx = (activePageLoader - 1) * pageSize + i;
                       return (
                         <tr key={w.id} className="plot-row">
-                          <td className="plot-cell" style={{ fontWeight: 800 }}>{actualIdx + 1}</td>
+                          <td className="plot-cell" style={{ fontWeight: 500 }}>{actualIdx + 1}</td>
                           <td className="plot-cell">
-                            <div style={{ fontWeight: 800, color: '#1e293b' }}>{w.name}</div>
+                            <div style={{ fontWeight: 500, color: '#1e293b' }}>{w.name}</div>
                             <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>{w.id}</div>
                           </td>
-                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 900, color: 'var(--clr-brand-secondary)' }}>{w.plotCount}</td>
+                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 500, color: 'var(--clr-brand-secondary)' }}>{w.plotCount}</td>
                           <td className="plot-cell plot-cell--num" style={{ fontWeight: 750 }}>{fmtNumber(w.bunches)}</td>
                         </tr>
                       );
@@ -689,12 +689,12 @@ export function EfficiencyView() {
                       const actualIdx = (activePageRecorder - 1) * pageSize + i;
                       return (
                         <tr key={w.id} className="plot-row">
-                          <td className="plot-cell" style={{ fontWeight: 800 }}>{actualIdx + 1}</td>
+                          <td className="plot-cell" style={{ fontWeight: 500 }}>{actualIdx + 1}</td>
                           <td className="plot-cell">
-                            <div style={{ fontWeight: 800, color: '#1e293b' }}>{w.name}</div>
+                            <div style={{ fontWeight: 500, color: '#1e293b' }}>{w.name}</div>
                             <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>{w.id}</div>
                           </td>
-                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 900, color: 'var(--clr-brand-primary)' }}>{w.ops}</td>
+                          <td className="plot-cell plot-cell--num" style={{ fontWeight: 500, color: 'var(--clr-brand-primary)' }}>{w.ops}</td>
                           <td className="plot-cell plot-cell--num" style={{ fontWeight: 750 }}>{w.plotCount}</td>
                         </tr>
                       );
@@ -779,18 +779,18 @@ export function EfficiencyView() {
                   <tbody>
                     {analytics.contractors.map((c, i) => (
                       <tr key={c.name} className="plot-row">
-                        <td className="plot-cell" style={{ fontWeight: 800 }}>{i + 1}</td>
+                        <td className="plot-cell" style={{ fontWeight: 500 }}>{i + 1}</td>
                         <td className="plot-cell">
-                          <div style={{ fontWeight: 800, fontSize: '15px', color: '#0f172a' }}>{c.name}</div>
-                          <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 700 }}>CONTRACTOR PARTNER</div>
+                          <div style={{ fontWeight: 500, fontSize: '15px', color: '#0f172a' }}>{c.name}</div>
+                          <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 500 }}>CONTRACTOR PARTNER</div>
                         </td>
-                        <td className="plot-cell plot-cell--num" style={{ fontWeight: 700 }}>{c.workerCount} Active Staff</td>
-                        <td className="plot-cell plot-cell--num" style={{ fontWeight: 700 }}>{c.records.toLocaleString()} Recs</td>
-                        <td className="plot-cell plot-cell--num" style={{ color: 'var(--clr-brand-primary)', fontWeight: 900, fontSize: '16px' }}>{fmtNumber(c.bunches)}</td>
-                        <td className="plot-cell plot-cell--num" style={{ color: '#3b82f6', fontWeight: 900, fontSize: '16px' }}>{fmtNumber(c.weight)} kg</td>
+                        <td className="plot-cell plot-cell--num" style={{ fontWeight: 500 }}>{c.workerCount} Active Staff</td>
+                        <td className="plot-cell plot-cell--num" style={{ fontWeight: 500 }}>{c.records.toLocaleString()} Recs</td>
+                        <td className="plot-cell plot-cell--num" style={{ color: 'var(--clr-brand-primary)', fontWeight: 500, fontSize: '16px' }}>{fmtNumber(c.bunches)}</td>
+                        <td className="plot-cell plot-cell--num" style={{ color: '#3b82f6', fontWeight: 500, fontSize: '16px' }}>{fmtNumber(c.weight)} kg</td>
                         <td className="plot-cell" style={{ textAlign: 'right', paddingRight: '24px' }}>
                           <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                            <div style={{ fontSize: '14px', fontWeight: 900, color: '#0f172a' }}>{Math.round(c.bunches / (c.records || 1))} B/Ops</div>
+                            <div style={{ fontSize: '14px', fontWeight: 500, color: '#0f172a' }}>{Math.round(c.bunches / (c.records || 1))} B/Ops</div>
                             <div style={{ width: '100px', height: '6px', background: '#e2e8f0', borderRadius: '3px', overflow: 'hidden' }}>
                               <div style={{ width: `${Math.min(100, (c.bunches / 10000) * 100)}%`, height: '100%', background: 'var(--clr-brand-primary)' }}></div>
                             </div>
@@ -815,14 +815,14 @@ export function EfficiencyView() {
         .search-bar input { border: none; background: transparent; height: 48px; width: 100%; font-size: 15px; font-weight: 600; color: #0f172a; outline: none; }
         .results-count { font-size: 13px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
         
-        .rank-grid { background: white; border-radius: 24px; border: 1px solid #e2e8f0; padding: 32px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.02); }
-        .sub-section-title { font-size: 18px; font-weight: 900; color: #0f172a; margin-bottom: 24px; padding-left: 16px; border-left: 4px solid var(--clr-brand-primary); }
+        .rank-grid { background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 28px; box-shadow: none; }
+        .sub-section-title { font-size: 16px; font-weight: 500; color: #0f172a; margin-bottom: 20px; }
 
         .perf-card {
-           background: #ffffff; padding: 24px; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05); display: flex; flex-direction: column; gap: 16px; transition: border-color 0.2s ease, box-shadow 0.2s ease; position: relative; overflow: hidden;
+           background: #ffffff; padding: 20px; border-radius: 12px; border: 1px solid #E2E8F0; box-shadow: 0 1px 2px rgba(15,23,42,0.03); display: flex; flex-direction: column; gap: 14px; transition: border-color 0.2s ease; position: relative; overflow: hidden;
         }
-        .perf-card:hover { border-color: #CBD5E1; box-shadow: 0 2px 4px 0 rgba(0,0,0,0.06); }
-        .perf-card::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 4px; opacity: 0.8; }
+        .perf-card:hover { border-color: #CBD5E1; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }
+        .perf-card::after { display: none; }
         .perf-card--green::after { background: var(--clr-brand-primary); }
         .perf-card--orange::after { background: var(--clr-brand-secondary); }
         .perf-card--blue::after { background: #3b82f6; }

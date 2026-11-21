@@ -79,7 +79,7 @@ export function YieldView() {
       {
         label: 'FFB Bunches (AI)',
         data: [...data.timeline.map(d => d.ffb), ...data.futureData.map(d => d.ffb)],
-        borderColor: '#034321',
+        borderColor: '#3F8432',
         backgroundColor: 'rgba(3, 67, 33, 0.05)',
         borderWidth: 3,
         pointRadius: 4,
@@ -87,7 +87,7 @@ export function YieldView() {
         fill: true,
         segment: {
           borderDash: ctx => ctx.p0DataIndex >= data.timeline.length - 1 ? [8, 4] : undefined,
-          borderColor: ctx => ctx.p0DataIndex >= data.timeline.length - 1 ? 'rgba(3, 67, 33, 0.4)' : '#034321'
+          borderColor: ctx => ctx.p0DataIndex >= data.timeline.length - 1 ? 'rgba(3, 67, 33, 0.4)' : '#3F8432'
         }
       }
     ]
@@ -133,12 +133,12 @@ export function YieldView() {
   };
 
   return (
-    <div className="view-container yield-view view-fade-in" style={{ padding: '32px', fontFamily: "'Roboto', sans-serif" }}>
+    <div className="view-container yield-view view-fade-in" style={{ padding: '32px', fontFamily: "'Inter', sans-serif" }}>
       <div className="view-header" style={{ marginBottom: '32px' }}>
         <div>
-          <h1 className="view-title" style={{ fontSize: '28px', fontWeight: 900, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <TrendingUp size={32} color="#034321" />
-            Yield Trends & Predictions
+          <h1 className="view-title" style={{ fontSize: '28px', fontWeight: 500, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <TrendingUp size={26} strokeWidth={1.5} color="#3F8432" />
+            Yield Forecast
           </h1>
           <p className="view-subtitle" style={{ fontSize: '15px', opacity: 0.5 }}>Strategic production forecasting for FFB Bunches and Loose Fruit collections.</p>
         </div>
@@ -164,21 +164,21 @@ export function YieldView() {
         boxShadow: '0 4px 15px rgba(0,0,0,0.02)', border: '1px solid #e2e8f0'
       }}>
         <div className="filter-group" style={{ width: '180px' }}>
-          <label style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', color: '#0f172a', display: 'block', marginBottom: '8px' }}>Estate</label>
-          <select className="select-input" style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontWeight: 700, padding: '0 12px' }} value={filters.estate || ''} onChange={(e) => updateFilters({ estate: e.target.value || null })}>
+          <label style={{ fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', color: '#0f172a', display: 'block', marginBottom: '8px' }}>Estate</label>
+          <select className="select-input" style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontWeight: 500, padding: '0 12px' }} value={filters.estate || ''} onChange={(e) => updateFilters({ estate: e.target.value || null })}>
             <EstateOptions allLabel="All Regions" />
           </select>
         </div>
 
         <div className="filter-group" style={{ flex: 1 }}>
-          <label style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', color: '#0f172a', display: 'block', marginBottom: '8px' }}>Plot Search</label>
+          <label style={{ fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', color: '#0f172a', display: 'block', marginBottom: '8px' }}>Plot Search</label>
           <div style={{ position: 'relative' }}>
             <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', opacity: 0.4 }} />
             <input
               type="search"
               list="yield-plot-list"
               className="search-input"
-              style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontWeight: 700, paddingLeft: '40px', fontSize: '14px' }}
+              style={{ width: '100%', height: '40px', borderRadius: '8px', border: '1px solid #cbd5e1', fontWeight: 500, paddingLeft: '40px', fontSize: '14px' }}
               placeholder="Find plot..."
               value={filters.search}
               onChange={e => updateFilters({ search: e.target.value })}
@@ -190,27 +190,27 @@ export function YieldView() {
         </div>
 
         <div className="filter-group">
-          <label style={{ fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', color: '#0f172a', display: 'block', marginBottom: '8px' }}>Timeline Window</label>
+          <label style={{ fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', color: '#0f172a', display: 'block', marginBottom: '8px' }}>Timeline Window</label>
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '10px', top: '13px', fontSize: '10px', fontWeight: 900, opacity: 0.3, zIndex: 1 }}>FROM</span>
+              <span style={{ position: 'absolute', left: '10px', top: '13px', fontSize: '10px', fontWeight: 500, opacity: 0.3, zIndex: 1 }}>FROM</span>
               <input
                 type="date"
-                style={{ height: '40px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0 12px 0 40px', fontWeight: 700, fontSize: '13px' }}
+                style={{ height: '40px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0 12px 0 40px', fontWeight: 500, fontSize: '13px' }}
                 value={filters.dateRange.from || ''}
                 onChange={e => updateFilters({ dateRange: { ...filters.dateRange, from: e.target.value || null } })}
               />
             </div>
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '10px', top: '13px', fontSize: '10px', fontWeight: 900, opacity: 0.3, zIndex: 1 }}>TO</span>
+              <span style={{ position: 'absolute', left: '10px', top: '13px', fontSize: '10px', fontWeight: 500, opacity: 0.3, zIndex: 1 }}>TO</span>
               <input
                 type="date"
-                style={{ height: '40px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0 12px 0 40px', fontWeight: 700, fontSize: '13px' }}
+                style={{ height: '40px', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '0 12px 0 40px', fontWeight: 500, fontSize: '13px' }}
                 value={filters.dateRange.to || ''}
                 onChange={e => updateFilters({ dateRange: { ...filters.dateRange, to: e.target.value || null } })}
               />
             </div>
-            <button className="btn btn--outline" onClick={resetFilters} style={{ height: '40px', borderRadius: '8px', fontWeight: 900, padding: '0 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button className="btn btn--outline" onClick={resetFilters} style={{ height: '40px', borderRadius: '8px', fontWeight: 500, padding: '0 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                <RotateCcw size={16} /> RESET
             </button>
           </div>
@@ -226,7 +226,7 @@ export function YieldView() {
             <div>
               <div className="wkpi-value">{fmtAbbrev(data.totalFFB)}</div>
               <div className="wkpi-label">FFB Bunches (AI) Collected</div>
-              <div className="wkpi-sub" style={{ fontSize: '10px', opacity: 0.6, fontWeight: 700, textTransform: 'uppercase', marginTop: '2px' }}>HARVESTED BUNCHES CAPTURED</div>
+              <div className="wkpi-sub" style={{ fontSize: '10px', opacity: 0.6, fontWeight: 500, textTransform: 'uppercase', marginTop: '2px' }}>HARVESTED BUNCHES CAPTURED</div>
             </div>
           </div>
         </div>
@@ -238,7 +238,7 @@ export function YieldView() {
             <div>
               <div className="wkpi-value">{fmtAbbrev(data.totalWeight)}</div>
               <div className="wkpi-label">Loose Fruit (kg) Collected</div>
-              <div className="wkpi-sub" style={{ fontSize: '10px', opacity: 0.6, fontWeight: 700, textTransform: 'uppercase', marginTop: '2px' }}>TOTAL COLLECTION WEIGHT</div>
+              <div className="wkpi-sub" style={{ fontSize: '10px', opacity: 0.6, fontWeight: 500, textTransform: 'uppercase', marginTop: '2px' }}>TOTAL COLLECTION WEIGHT</div>
             </div>
           </div>
         </div>
@@ -250,7 +250,7 @@ export function YieldView() {
             <div>
               <div className="wkpi-value">{data.plotCount}</div>
               <div className="wkpi-label">Active Harvest Plots</div>
-              <div className="wkpi-sub" style={{ fontSize: '10px', opacity: 0.6, fontWeight: 700, textTransform: 'uppercase', marginTop: '2px' }}>LOCATIONS WITH ACTIVE HARVESTING</div>
+              <div className="wkpi-sub" style={{ fontSize: '10px', opacity: 0.6, fontWeight: 500, textTransform: 'uppercase', marginTop: '2px' }}>LOCATIONS WITH ACTIVE HARVESTING</div>
             </div>
           </div>
         </div>
@@ -260,8 +260,8 @@ export function YieldView() {
         <div style={{ background: '#fff', borderRadius: '24px', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 10px 20px rgba(0,0,0,0.02)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
             <div>
-              <h3 style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Package size={22} color="#034321" />
+              <h3 style={{ fontSize: '20px', fontWeight: 500, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Package size={22} color="#3F8432" />
                 FFB Production & Prediction Trend
               </h3>
               <p style={{ fontSize: '14px', opacity: 0.5, marginTop: '2px' }}>Real-time bunches tracked vs. Estimated Future Data (Dashed).</p>
@@ -275,7 +275,7 @@ export function YieldView() {
         <div style={{ background: '#fff', borderRadius: '24px', padding: '32px', border: '1px solid #e2e8f0', boxShadow: '0 10px 20px rgba(0,0,0,0.02)' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '24px' }}>
             <div>
-              <h3 style={{ fontSize: '20px', fontWeight: 900, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h3 style={{ fontSize: '20px', fontWeight: 500, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Scale size={22} color="#f97316" />
                 Loose Fruit Collection & Prediction Trend
               </h3>

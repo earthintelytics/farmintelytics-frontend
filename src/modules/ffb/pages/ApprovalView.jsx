@@ -543,7 +543,7 @@ export function ApprovalView() {
                     background: '#fffbeb',
                     color: '#d97706',
                     fontSize: '10px',
-                    fontWeight: 900,
+                    fontWeight: 500,
                     borderRadius: '999px',
                     border: '1px solid #fde68a',
                     textTransform: 'uppercase',
@@ -560,7 +560,7 @@ export function ApprovalView() {
           </div>
 
           <div className="review-card__plot-row" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#1d4ed8', fontWeight: 700 }}>
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#1d4ed8', fontWeight: 500 }}>
               <MapPin size={12} /> {fmtPlatform(op.platform_id || op.validation_details?.spatial_grid?.grid_cell_id)}
             </span>
             <span>•</span>
@@ -598,19 +598,19 @@ export function ApprovalView() {
                 <span><strong style={{ color: '#86198f', fontSize: '15px' }}>{op.weight_kg}</strong> kg</span>
               ) : (
                 <>
-                  <span><strong style={{ color: '#034321', fontSize: '15px' }}>{bunchCount(op.ai_count, op.total_count, op.approved_count).main}</strong> bunches{bunchCount(op.ai_count, op.total_count, op.approved_count).typed != null ? ` (typed ${bunchCount(op.ai_count, op.total_count, op.approved_count).typed})` : ''}</span>
+                  <span><strong style={{ color: '#3F8432', fontSize: '15px' }}>{bunchCount(op.ai_count, op.total_count, op.approved_count).main}</strong> bunches{bunchCount(op.ai_count, op.total_count, op.approved_count).typed != null ? ` (typed ${bunchCount(op.ai_count, op.total_count, op.approved_count).typed})` : ''}</span>
                   <span><strong style={{ color: '#d97706', fontSize: '15px' }}>{op.h_rotten_count || 0}</strong> rotten</span>
                   <span><strong style={{ color: '#dc2626', fontSize: '15px' }}>{op.h_unripe_count || 0}</strong> unripe</span>
                 </>
               )}
             </div>
           {!isPicker && countFlag(op.ai_count, op.total_count, op.approved_count) && (
-            <div style={{ fontSize: '12.5px', fontWeight: 800, color: RECON_STATUS.DISCREPANCY.dark, display: 'flex', alignItems: 'center', gap: '5px' }}>
+            <div style={{ fontSize: '12.5px', fontWeight: 500, color: RECON_STATUS.DISCREPANCY.dark, display: 'flex', alignItems: 'center', gap: '5px' }}>
               <AlertTriangle size={13} /> {countFlag(op.ai_count, op.total_count, op.approved_count)}: held for a supervisor
             </div>
           )}
           {!isPicker && confirmedNote(op.count_source, op.ai_count, op.total_count) && (
-            <div style={{ fontSize: '12.5px', fontWeight: 800, color: '#034321' }}>{confirmedNote(op.count_source, op.ai_count, op.total_count)}</div>
+            <div style={{ fontSize: '12.5px', fontWeight: 500, color: '#3F8432' }}>{confirmedNote(op.count_source, op.ai_count, op.total_count)}</div>
           )}
           {/* The load this record pairs with: closest in time on the same plot, day and work type */}
           {(() => {
@@ -634,9 +634,9 @@ export function ApprovalView() {
           })()}
           {readOnly && (
         <div className="review-card__approved" style={{ display: 'flex', flexDirection: 'column', gap: '2px', marginTop: '2px' }}>
-          <span style={{ color: '#034321', fontWeight: 900, fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <span style={{ color: '#3F8432', fontWeight: 500, fontSize: '13px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <CheckCircle size={14} /> {String(op.reviewer_id || '').toLowerCase() === 'system' ? 'Approved automatically' : `Approved by ${op.reviewer_id || 'supervisor'}`}
-            {op.validation_score != null && <span style={{ color: '#0f172a', fontWeight: 700 }}> · Score {op.validation_score}/100</span>}
+            {op.validation_score != null && <span style={{ color: '#0f172a', fontWeight: 500 }}> · Score {op.validation_score}/100</span>}
           </span>
           {/* The system's own note repeats the line above; a supervisor's note is kept. */}
           {op.comment && String(op.reviewer_id || '').toLowerCase() !== 'system' && <span style={{ fontSize: '12px', color: '#0f172a' }}>Note: {op.comment}</span>}
@@ -650,8 +650,8 @@ export function ApprovalView() {
           {isSaved ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: 'auto' }}>
               <div style={{
-                textAlign: 'center', fontSize: '11px', color: currentStatus === 'valid' ? '#034321' : '#991b1b', fontWeight: 900,
-                background: currentStatus === 'valid' ? '#E8F2E5' : '#fee2e2', padding: '6px', borderRadius: '4px',
+                textAlign: 'center', fontSize: '11px', color: currentStatus === 'valid' ? '#3F8432' : '#991b1b', fontWeight: 500,
+                background: currentStatus === 'valid' ? '#F3F8EF' : '#fee2e2', padding: '6px', borderRadius: '4px',
                 textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px'
               }}>
                 {currentStatus === 'valid' ? <CheckCircle size={14} /> : <X size={14} />}
@@ -666,7 +666,7 @@ export function ApprovalView() {
                     [op.id]: { ...prev[op.id], saved: false }
                   }));
                 }}
-                style={{ height: '24px', fontSize: '11px', fontWeight: 800, padding: 0, color: '#0f172a', textDecoration: 'underline' }}
+                style={{ height: '24px', fontSize: '11px', fontWeight: 500, padding: 0, color: '#0f172a', textDecoration: 'underline' }}
               >
                 Change Decision
               </button>
@@ -742,7 +742,7 @@ export function ApprovalView() {
                                   <div className="loader-ref-card__name">
                                     <span>{load.worker_name}{load.worker_id && <span className="card-person-id"> ({load.worker_id})</span>}</span>
                                     {load.is_duplicate && (
-                                      <span style={{ color: '#d97706', fontSize: '11px', fontWeight: 900, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                      <span style={{ color: '#d97706', fontSize: '11px', fontWeight: 500, display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
                                         <AlertTriangle size={11} /> Duplicate
                                       </span>
                                     )}
@@ -760,7 +760,7 @@ export function ApprovalView() {
                                       </div>
                                     );
                                   })()}
-                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#1d4ed8', fontWeight: 700 }}>
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color: '#1d4ed8', fontWeight: 500 }}>
                                     <MapPin size={12} /> {fmtPlatform(load.platform_id)}
                                   </div>
                                   <div style={{ marginTop: 'auto', display: 'flex', gap: '14px', alignItems: 'baseline' }}>
@@ -776,17 +776,17 @@ export function ApprovalView() {
     <div className="view-container view-fade-in approval-view" style={{ padding: '32px', display: 'flex', flexDirection: 'column', minHeight: '100%', overflowY: 'auto' }}>
 
       {errorMsg && (
-        <div role="alert" style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#991B1B', padding: '12px 16px', borderRadius: '10px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', fontSize: '13px', fontWeight: 700 }}>
+        <div role="alert" style={{ background: '#FEF2F2', border: '1px solid #FCA5A5', color: '#991B1B', padding: '12px 16px', borderRadius: '10px', marginBottom: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', fontSize: '13px', fontWeight: 500 }}>
           <span>{errorMsg}</span>
-          <button onClick={() => setErrorMsg('')} aria-label="Dismiss error" style={{ background: 'transparent', border: 'none', color: '#991B1B', fontWeight: 900, fontSize: '16px', cursor: 'pointer' }}>×</button>
+          <button onClick={() => setErrorMsg('')} aria-label="Dismiss error" style={{ background: 'transparent', border: 'none', color: '#991B1B', fontWeight: 500, fontSize: '16px', cursor: 'pointer' }}>×</button>
         </div>
       )}
 
       {/* Title Header */}
       <div className="view-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
         <div>
-          <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 900 }}>Approval Center</h1>
-          <p className="view-subtitle" style={{ color: 'var(--text-muted)' }}>Check harvesting clerk counts against loading clerk records.</p>
+          <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 500 }}>Verification Queue</h1>
+          <p className="view-subtitle" style={{ color: 'var(--text-muted)' }}>Reconcile harvesting clerk submissions against haulage and loading clerk records.</p>
         </div>
 
         {/* View Mode Tabs */}
@@ -795,9 +795,9 @@ export function ApprovalView() {
             className={`btn ${viewMode === 'individual' ? 'btn--primary' : ''}`}
             onClick={() => switchTab('individual')}
             style={{
-              border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 800,
+              border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 500,
               background: viewMode === 'individual' ? 'white' : 'transparent',
-              color: viewMode === 'individual' ? '#034321' : '#64748b',
+              color: viewMode === 'individual' ? '#3F8432' : '#64748b',
               boxShadow: viewMode === 'individual' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
             }}
           >
@@ -808,9 +808,9 @@ export function ApprovalView() {
             className={`btn ${viewMode === 'errors' ? 'btn--primary' : ''}`}
             onClick={() => switchTab('errors')}
             style={{
-              border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 800,
+              border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '13px', fontWeight: 500,
               background: viewMode === 'errors' ? 'white' : 'transparent',
-              color: viewMode === 'errors' ? '#034321' : '#64748b',
+              color: viewMode === 'errors' ? '#3F8432' : '#64748b',
               boxShadow: viewMode === 'errors' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
             }}
           >
@@ -904,7 +904,7 @@ export function ApprovalView() {
             borderColor: userRole === 'View' ? '#94a3b8' : '#3F8432',
             cursor: userRole === 'View' ? 'not-allowed' : 'pointer',
             opacity: userRole === 'View' ? 0.7 : 1,
-            fontWeight: 800, display: 'flex', alignItems: 'center', gap: '6px'
+            fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px'
           }}
         >
           {userRole === 'View' ? <Lock size={14} /> : null} Export CSV
@@ -935,7 +935,7 @@ export function ApprovalView() {
                 (() => {
                   const byStatus = (...st) => plotDaysAll.filter(p => st.includes(p.status)).length;
                   // Card colours come from the shared status palette (same as the map and the Open buttons).
-                  const tone = (t) => ({ bg: `#034321`, fg: t.dark, lb: t.dark });
+                  const tone = (t) => ({ bg: `#3F8432`, fg: t.dark, lb: t.dark });
                   const cards = [
                     { key: 'pending', label: 'Pending', n: byStatus('WAITING_FOR_LOADER', 'WAITING_FOR_RECORDER'), icon: AlertTriangle,
                       ...tone(RECON_STATUS.WAITING_FOR_LOADER), sub: 'Waiting for a clerk to sync' },
@@ -956,8 +956,8 @@ export function ApprovalView() {
                               <Icon size={18} color="white" />
                             </div>
                             <div style={{ minWidth: 0 }}>
-                              <div style={{ fontSize: '22px', fontWeight: 900, color: c.fg, lineHeight: 1 }}>{c.n}</div>
-                              <div style={{ fontSize: '11px', fontWeight: 700, color: c.lb, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '3px' }}>
+                              <div style={{ fontSize: '22px', fontWeight: 500, color: c.fg, lineHeight: 1 }}>{c.n}</div>
+                              <div style={{ fontSize: '11px', fontWeight: 500, color: c.lb, textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '3px' }}>
                                 {c.label}{c.key !== 'rejected' ? ` plot${c.n === 1 ? '' : 's'}` : ''}
                               </div>
                               <div style={{ fontSize: '11.5px', color: '#0f172a', marginTop: '2px', overflowWrap: 'anywhere' }}>{c.sub}</div>
@@ -978,7 +978,7 @@ export function ApprovalView() {
             {loading && (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1, flexDirection: 'column', gap: '12px' }}>
                 <div className="loader-spinner"></div>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--text-muted)' }}>Fetching Data...</span>
+                <span style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-muted)' }}>Fetching Data...</span>
               </div>
             )}
 
@@ -1001,7 +1001,7 @@ export function ApprovalView() {
                       {activePlotInfo && (
                         <div style={{
                           display: 'flex', flexDirection: 'column', gap: '12px', padding: '16px',
-                          background: '#034321',
+                          background: '#3F8432',
                           border: '1px solid #cbd5e1', borderRadius: '16px', marginBottom: '16px'
                         }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -1011,7 +1011,7 @@ export function ApprovalView() {
                             </div>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                               <div style={{
-                                padding: '4px 8px', borderRadius: '6px', fontSize: '17px', fontWeight: 900,
+                                padding: '4px 8px', borderRadius: '6px', fontSize: '17px', fontWeight: 500,
                                 background: 'transparent',
                                 color: reconStatus(activePlotInfo.status).dark
                               }}>
@@ -1022,15 +1022,15 @@ export function ApprovalView() {
 
                           <div style={{ display: 'flex', gap: '12px', background: 'white', padding: '10px 14px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
                             <div style={{ flex: 1, textAlign: 'center' }}>
-                              <div style={{ fontSize: '10px', color: '#0f172a', fontWeight: 700, textTransform: 'uppercase' }}>Harvester Total</div>
-                              <div style={{ fontSize: '18px', fontWeight: 900, color: '#034321', marginTop: '2px' }}>
+                              <div style={{ fontSize: '10px', color: '#0f172a', fontWeight: 500, textTransform: 'uppercase' }}>Harvester Total</div>
+                              <div style={{ fontSize: '18px', fontWeight: 500, color: '#3F8432', marginTop: '2px' }}>
                                 {activePlotInfo.mode === 'picker' ? `${activePlotInfo.harvester_weight} kg` : `${activePlotInfo.harvester_count} FFB`}
                               </div>
                             </div>
                             <div style={{ width: '1px', background: '#cbd5e1' }} />
                             <div style={{ flex: 1, textAlign: 'center' }}>
-                              <div style={{ fontSize: '10px', color: '#0f172a', fontWeight: 700, textTransform: 'uppercase' }}>Loaded Total</div>
-                              <div style={{ fontSize: '18px', fontWeight: 900, color: '#1d4ed8', marginTop: '2px' }}>
+                              <div style={{ fontSize: '10px', color: '#0f172a', fontWeight: 500, textTransform: 'uppercase' }}>Loaded Total</div>
+                              <div style={{ fontSize: '18px', fontWeight: 500, color: '#1d4ed8', marginTop: '2px' }}>
                                 {activePlotInfo.mode === 'picker' ? `${activePlotInfo.loader_weight} kg` : `${activePlotInfo.loader_count} FFB`}
                               </div>
                             </div>
@@ -1040,8 +1040,8 @@ export function ApprovalView() {
                           {activePlotInfo.harvester_records > 0 && (() => {
                             const { matched, issues, rejected } = recordIssues(activePlotInfo);
                             return (
-                              <div style={{ fontSize: '13px', fontWeight: 800, color: '#0f172a' }}>
-                                Records: <span style={{ color: '#034321' }}>{matched} matched</span>
+                              <div style={{ fontSize: '13px', fontWeight: 500, color: '#0f172a' }}>
+                                Records: <span style={{ color: '#3F8432' }}>{matched} matched</span>
                                 {' · '}<span style={{ color: issues ? RECON_STATUS.DISCREPANCY.dark : '#64748b' }}>{issues} {issues === 1 ? 'issue' : 'issues'}</span>
                                 {rejected > 0 && <>{' · '}<span style={{ color: RECON_STATUS.REJECTED.dark }}>{rejected} rejected</span></>}
                               </div>
@@ -1103,22 +1103,22 @@ export function ApprovalView() {
                                         return (
                                           <tr key={`${c.grid_cell_id}-${c.mode}`} style={{ borderBottom: '1px solid #f1f5f9' }}>
                                             <td style={{ padding: '5px 10px', whiteSpace: 'nowrap' }}>
-                                              <div style={{ fontWeight: 700, fontFamily: 'monospace', fontSize: '12px', color: '#0f172a' }}>
+                                              <div style={{ fontWeight: 500, fontFamily: 'monospace', fontSize: '12px', color: '#0f172a' }}>
                                                 {platformName}
                                               </div>
                                               <div style={{ marginTop: '1px', lineHeight: 1.2 }}>
                                                 {isBoth && (
-                                                  <span style={{ fontSize: '11px', color: '#3F8432', fontWeight: 700 }}>
+                                                  <span style={{ fontSize: '11px', color: '#3F8432', fontWeight: 500 }}>
                                                     Scanned by both
                                                   </span>
                                                 )}
                                                 {isHarvOnly && (
-                                                  <span style={{ fontSize: '11px', color: '#0284c7', fontWeight: 700 }}>
+                                                  <span style={{ fontSize: '11px', color: '#0284c7', fontWeight: 500 }}>
                                                     Harvester scan only (no load recorded)
                                                   </span>
                                                 )}
                                                 {isLoadOnly && (
-                                                  <span style={{ fontSize: '11px', color: '#b45309', fontWeight: 700 }}>
+                                                  <span style={{ fontSize: '11px', color: '#b45309', fontWeight: 500 }}>
                                                     Loader scan only (no harvest recorded)
                                                   </span>
                                                 )}
@@ -1126,7 +1126,7 @@ export function ApprovalView() {
                                             </td>
                                             <td style={{ padding: '5px 10px' }}>{picker ? 'Picker (kg)' : 'Bunches'}</td>
                                             <td style={{ padding: '5px 10px' }}>
-                                              <div style={{ fontWeight: 700 }}>{picker ? `${c.harvester_weight} kg` : c.harvester_count}</div>
+                                              <div style={{ fontWeight: 500 }}>{picker ? `${c.harvester_weight} kg` : c.harvester_count}</div>
                                               {c.harv_workers && (
                                                 <div style={{ fontSize: '10px', color: '#0f172a' }} title="Harvester ID(s)">
                                                   Worker: {c.harv_workers}
@@ -1135,7 +1135,7 @@ export function ApprovalView() {
                                             </td>
                                             <td style={{ padding: '5px 10px' }}>{picker ? '—' : c.harvester_rotten}</td>
                                             <td style={{ padding: '5px 10px' }}>
-                                              <div style={{ fontWeight: 700 }}>{picker ? `${c.loader_weight} kg` : c.loader_count}</div>
+                                              <div style={{ fontWeight: 500 }}>{picker ? `${c.loader_weight} kg` : c.loader_count}</div>
                                               {c.load_workers ? (
                                                 <div style={{ fontSize: '10px', color: '#0f172a' }} title="Loading Clerk ID(s)">
                                                   Clerk: {c.load_workers}
@@ -1144,10 +1144,10 @@ export function ApprovalView() {
                                                 <div style={{ fontSize: '10px', color: '#94a3b8', fontStyle: 'italic' }}>0 loaded</div>
                                               ) : null}
                                             </td>
-                                            <td style={{ padding: '5px 10px', fontWeight: 800, color: ok ? '#0f172a' : plotMatched ? '#b45309' : (c.variance > 0 ? '#b45309' : '#dc2626') }}>
+                                            <td style={{ padding: '5px 10px', fontWeight: 500, color: ok ? '#0f172a' : plotMatched ? '#b45309' : (c.variance > 0 ? '#b45309' : '#dc2626') }}>
                                               {c.variance > 0 ? `+${c.variance}` : c.variance}
                                             </td>
-                                            <td style={{ padding: '5px 10px', color: ok ? '#034321' : plotMatched ? '#b45309' : '#dc2626', fontWeight: 700 }}>
+                                            <td style={{ padding: '5px 10px', color: ok ? '#3F8432' : plotMatched ? '#b45309' : '#dc2626', fontWeight: 500 }}>
                                               {ok ? 'Balanced' : plotMatched ? (c.variance > 0 ? 'Loaded at a nearby platform' : 'Loaded from a nearby platform') : 'Not balanced'}
                                             </td>
                                           </tr>
@@ -1164,7 +1164,7 @@ export function ApprovalView() {
                                   return (
                                     <div style={{ marginTop: '10px', fontSize: '11.5px', color: '#0f172a', display: 'flex', alignItems: 'flex-start', gap: '6px' }}>
                                       {plotMatched
-                                        ? <CheckCircle size={14} style={{ color: '#034321', flexShrink: 0, marginTop: '2px' }} />
+                                        ? <CheckCircle size={14} style={{ color: '#3F8432', flexShrink: 0, marginTop: '2px' }} />
                                         : <AlertTriangle size={14} style={{ color: '#d97706', flexShrink: 0, marginTop: '2px' }} />}
                                       <div>
                                         <strong>{plotMatched ? 'Why platforms differ:' : 'Investigation clue:'}</strong> extra bunches were harvested at <code>{list(extra)}</code> and
@@ -1194,7 +1194,7 @@ export function ApprovalView() {
                           <div className="plot-pair-table__head" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                             <div>
                               Harvesting clerk records ({filteredIndividualRecords.length + approvedPlotRecords.length})
-                              <span style={{ fontWeight: 700, color: '#0f172a', textTransform: 'none', letterSpacing: 0 }}>
+                              <span style={{ fontWeight: 500, color: '#0f172a', textTransform: 'none', letterSpacing: 0 }}>
                                 {' '}· {filteredIndividualRecords.filter(r => decidedStatus(r) !== 'error').length} waiting for review{filteredIndividualRecords.some(r => decidedStatus(r) === 'error') ? ` · ${filteredIndividualRecords.filter(r => decidedStatus(r) === 'error').length} rejected` : ''} · {approvedPlotRecords.length} approved
                               </span>
                             </div>
@@ -1263,7 +1263,7 @@ export function ApprovalView() {
                             const emptyRight = loadingDrilldown ? 'Loading…'
                               : drilldownFailed ? (
                                 <span>Could not load the loading clerk records.{' '}
-                                  <button type="button" className="btn btn--ghost" style={{ height: '28px', padding: '0 10px', fontWeight: 800 }}
+                                  <button type="button" className="btn btn--ghost" style={{ height: '28px', padding: '0 10px', fontWeight: 500 }}
                                     onClick={() => setDrilldownTry(t => t + 1)}>Retry</button>
                                 </span>
                               )
@@ -1299,7 +1299,7 @@ export function ApprovalView() {
                       >
                         Previous
                       </button>
-                      <span className="pg-ellipsis" style={{ fontSize: '13px', fontWeight: 800, padding: '0 12px' }}>
+                      <span className="pg-ellipsis" style={{ fontSize: '13px', fontWeight: 500, padding: '0 12px' }}>
                         Page {currentPage} of {totalPages}
                       </span>
                       <button
@@ -1346,7 +1346,7 @@ export function ApprovalView() {
         return (
           <div className="note-dialog__backdrop" onClick={close} role="presentation">
             <div className="note-dialog" role="dialog" aria-modal="true" aria-labelledby="note-dialog-title" onClick={(e) => e.stopPropagation()}>
-              <h3 id="note-dialog-title" style={{ margin: 0, fontSize: '16px', fontWeight: 900, color: approve ? '#034321' : '#b91c1c' }}>
+              <h3 id="note-dialog-title" style={{ margin: 0, fontSize: '16px', fontWeight: 500, color: approve ? '#3F8432' : '#b91c1c' }}>
                 {approve ? 'Approve' : 'Reject'} {noteDialog.op.recorder_name || noteDialog.op.harvesting_clerk_id}'s record
               </h3>
               <div style={{ fontSize: '12px', color: '#0f172a', marginTop: '4px' }}>
@@ -1355,12 +1355,12 @@ export function ApprovalView() {
               {needsCount && (
                 <div className="count-choice" role="radiogroup" aria-label="Which count is right" style={{ marginTop: '14px' }}>
                   <div className="review-field-label" style={{ marginBottom: '6px' }}>Which count is right? (required)</div>
-                  <div style={{ fontSize: '12px', color: RECON_STATUS.DISCREPANCY.dark, fontWeight: 800, marginBottom: '8px' }}>{countFlag(nop.ai_count, nop.total_count)}</div>
+                  <div style={{ fontSize: '12px', color: RECON_STATUS.DISCREPANCY.dark, fontWeight: 500, marginBottom: '8px' }}>{countFlag(nop.ai_count, nop.total_count)}</div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {[['typed', `Accept typed (${Number(nop.total_count) || 0})`], ['ai', `Keep AI (${Number(nop.ai_count) || 0})`]].map(([v, label]) => (
                       <button key={v} type="button" role="radio" aria-checked={noteDialog.countChoice === v}
                         className={`btn ${noteDialog.countChoice === v ? 'btn--primary' : 'btn--outline'}`}
-                        style={{ fontWeight: 900 }}
+                        style={{ fontWeight: 500 }}
                         onClick={() => setNoteDialog(d => ({ ...d, countChoice: v }))}>{label}</button>
                     ))}
                   </div>
@@ -1389,7 +1389,7 @@ export function ApprovalView() {
                   className="btn"
                   disabled={!ok}
                   onClick={save}
-                  style={{ background: approve ? '#034321' : '#ef4444', borderColor: approve ? '#034321' : '#ef4444', color: 'white', fontWeight: 900, opacity: ok ? 1 : 0.5 }}
+                  style={{ background: approve ? '#3F8432' : '#ef4444', borderColor: approve ? '#3F8432' : '#ef4444', color: 'white', fontWeight: 500, opacity: ok ? 1 : 0.5 }}
                 >
                   {approve ? <CheckCircle size={14} /> : <X size={14} />} {approve ? 'Approve' : 'Reject'}
                 </button>
@@ -1438,7 +1438,7 @@ export function ApprovalView() {
             <div style={{ display: 'flex', gap: '30px', width: '90%', height: '80%', alignItems: 'center', justifyContent: 'center' }} onClick={(e) => e.stopPropagation()}>
               {/* Left Column: Harvester Image */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
-                <div style={{ color: 'white', marginBottom: '10px', fontSize: '16px', fontWeight: 900, background: 'rgba(0,0,0,0.6)', padding: '6px 16px', borderRadius: '20px', border: '1px solid #334155' }}>
+                <div style={{ color: 'white', marginBottom: '10px', fontSize: '16px', fontWeight: 500, background: 'rgba(0,0,0,0.6)', padding: '6px 16px', borderRadius: '20px', border: '1px solid #334155' }}>
                   Harvester Evidence{lightbox.type === 'loader' && lightbox.harvesterName ? ` · ${lightbox.harvesterName}` : ''}
                 </div>
                 <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden', width: '100%' }}>
@@ -1460,13 +1460,13 @@ export function ApprovalView() {
 
               {/* Right Column: Loader Image */}
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', justifyContent: 'center' }}>
-                <div style={{ color: 'white', marginBottom: '10px', fontSize: '16px', fontWeight: 900, background: 'rgba(0,0,0,0.6)', padding: '6px 16px', borderRadius: '20px', border: '1px solid #334155', display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <div style={{ color: 'white', marginBottom: '10px', fontSize: '16px', fontWeight: 500, background: 'rgba(0,0,0,0.6)', padding: '6px 16px', borderRadius: '20px', border: '1px solid #334155', display: 'flex', gap: '10px', alignItems: 'center' }}>
                   <span>Loading Clerk Photos</span>
                   {lightbox.loaderUrls && lightbox.loaderUrls.length > 1 && (
                     <select
                       value={selectedLoaderImageIdx}
                       onChange={(e) => setSelectedLoaderImageIdx(parseInt(e.target.value, 10))}
-                      style={{ background: '#1e293b', color: 'white', border: '1px solid #475569', borderRadius: '4px', padding: '2px 8px', fontSize: '12px', fontWeight: 800 }}
+                      style={{ background: '#1e293b', color: 'white', border: '1px solid #475569', borderRadius: '4px', padding: '2px 8px', fontSize: '12px', fontWeight: 500 }}
                       onClick={(e) => e.stopPropagation()}
                     >
                       {lightbox.loaderUrls.map((_, idx) => (
@@ -1499,7 +1499,7 @@ export function ApprovalView() {
             display: 'flex', gap: '15px', alignItems: 'center', zIndex: 10001
           }} onClick={(e) => e.stopPropagation()}>
             <div style={{
-              background: 'white', padding: '10px 24px', borderRadius: '99px', fontSize: '15px', fontWeight: 900,
+              background: 'white', padding: '10px 24px', borderRadius: '99px', fontSize: '15px', fontWeight: 500,
               boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
             }}>
               {lightbox.title}
@@ -1514,7 +1514,7 @@ export function ApprovalView() {
                   borderRadius: '99px',
                   padding: '10px 24px',
                   fontSize: '14px',
-                  fontWeight: 900,
+                  fontWeight: 500,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
@@ -1530,7 +1530,7 @@ export function ApprovalView() {
             <button
               style={{
                 background: 'white', color: 'black', border: 'none', borderRadius: '99px',
-                padding: '10px 20px', fontSize: '14px', fontWeight: 900, cursor: 'pointer',
+                padding: '10px 20px', fontSize: '14px', fontWeight: 500, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
               }}
               onClick={(e) => { e.stopPropagation(); setRotation(0); }}
@@ -1539,8 +1539,8 @@ export function ApprovalView() {
             </button>
             <button
               style={{
-                background: '#034321', color: 'white', border: 'none', borderRadius: '99px',
-                padding: '10px 20px', fontSize: '14px', fontWeight: 900, cursor: 'pointer',
+                background: '#3F8432', color: 'white', border: 'none', borderRadius: '99px',
+                padding: '10px 20px', fontSize: '14px', fontWeight: 500, cursor: 'pointer',
                 display: 'flex', alignItems: 'center', gap: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.2)'
               }}
               onClick={(e) => { e.stopPropagation(); setRotation(r => (r + 90) % 360); }}

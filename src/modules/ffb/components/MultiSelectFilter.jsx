@@ -33,14 +33,14 @@ export default function MultiSelectFilter({ label, allLabel, options, selected, 
 
   return (
     <div ref={ref} style={{ display: 'flex', alignItems: 'center', gap: '6px', flex: '1 1 auto', position: 'relative' }}>
-      <span style={{ fontSize: '12px', fontWeight: 900, color: '#000000', whiteSpace: 'nowrap' }}>{label}:</span>
+      <span style={{ fontSize: '12px', fontWeight: 500, color: '#000000', whiteSpace: 'nowrap' }}>{label}:</span>
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
         aria-haspopup="listbox"
         aria-expanded={open}
         style={{
-          width: '100%', minWidth: '150px', height: '38px', fontSize: '12px', fontWeight: 800, color: '#000000',
+          width: '100%', minWidth: '150px', height: '38px', fontSize: '12px', fontWeight: 500, color: '#000000',
           border: `2px solid ${selected.length ? 'var(--clr-brand-primary, #3F8432)' : '#CBD5E1'}`,
           borderRadius: '6px', padding: '0 10px', background: '#FFFFFF', cursor: 'pointer',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px',
@@ -62,18 +62,18 @@ export default function MultiSelectFilter({ label, allLabel, options, selected, 
         >
           <div style={{ display: 'flex', justifyContent: 'space-between', padding: '4px 8px 8px', borderBottom: '1px solid #E2E8F0', marginBottom: '4px' }}>
             <button type="button" onClick={() => onChange(options.map(o => o.value))}
-              style={{ background: 'none', border: 'none', color: 'var(--clr-brand-primary, #3F8432)', fontWeight: 800, fontSize: '12px', cursor: 'pointer', padding: 0 }}>
+              style={{ background: 'none', border: 'none', color: 'var(--clr-brand-primary, #3F8432)', fontWeight: 500, fontSize: '12px', cursor: 'pointer', padding: 0 }}>
               Select all
             </button>
             <button type="button" onClick={() => onChange([])} disabled={selected.length === 0}
-              style={{ background: 'none', border: 'none', color: selected.length ? '#DC2626' : '#94A3B8', fontWeight: 800, fontSize: '12px', cursor: selected.length ? 'pointer' : 'default', padding: 0 }}>
+              style={{ background: 'none', border: 'none', color: selected.length ? '#DC2626' : '#94A3B8', fontWeight: 500, fontSize: '12px', cursor: selected.length ? 'pointer' : 'default', padding: 0 }}>
               Clear
             </button>
           </div>
           <div style={{ maxHeight: '260px', overflowY: 'auto' }}>
             {options.map(o => (
               <label key={o.value}
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '7px 8px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 700, color: '#000000' }}>
+                style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '7px 8px', borderRadius: '6px', cursor: 'pointer', fontSize: '12px', fontWeight: 500, color: '#000000' }}>
                 <input type="checkbox" checked={selected.includes(o.value)} onChange={() => toggle(o.value)}
                   style={{ width: '15px', height: '15px', accentColor: 'var(--clr-brand-primary, #3F8432)', flexShrink: 0 }} />
                 <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }} title={o.label}>{o.label}</span>

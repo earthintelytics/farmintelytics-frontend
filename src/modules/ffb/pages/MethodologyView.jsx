@@ -23,10 +23,10 @@ const C = {
   lineStrong: '#CBD5E1',
   panel: '#FFFFFF', // page is white throughout; borders separate blocks
   white: '#FFFFFF',
-  green: '#034321',
-  greenDark: '#034321',
-  greenSoft: '#E8F2E5',
-  greenTint: '#E8F2E5',
+  green: '#3F8432',
+  greenDark: '#3F8432',
+  greenSoft: '#F3F8EF',
+  greenTint: '#F3F8EF',
   greenLine: '#86EFAC',
   red: '#DC2626',
   amber: '#D97706'
@@ -75,8 +75,8 @@ function SectionShell({ id, number, icon: Icon, title, lead, children }) {
             <Icon size={22} />
           </div>
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontSize: '11px', fontWeight: 900, color: C.green, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Section {number}</div>
-            <h2 style={{ fontSize: '21px', fontWeight: 900, color: C.ink, margin: '2px 0 0 0', lineHeight: 1.25 }}>{title}</h2>
+            <div style={{ fontSize: '11px', fontWeight: 500, color: C.green, letterSpacing: '0.08em', textTransform: 'uppercase' }}>Section {number}</div>
+            <h2 style={{ fontSize: '21px', fontWeight: 500, color: C.ink, margin: '2px 0 0 0', lineHeight: 1.25 }}>{title}</h2>
           </div>
         </div>
         {lead && <p style={{ fontSize: '14px', color: C.body, lineHeight: 1.7, margin: '0 0 22px 0', maxWidth: '900px' }}>{lead}</p>}
@@ -89,11 +89,11 @@ function SectionShell({ id, number, icon: Icon, title, lead, children }) {
 function Card({ title, eyebrow, icon: Icon, children }) {
   return (
     <div className="mth-card" style={{ background: C.panel, padding: '18px 20px', borderRadius: '12px', border: `1px solid ${C.lineStrong}` }}>
-      {eyebrow && <div style={{ fontSize: '11px', fontWeight: 900, color: C.green, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>{eyebrow}</div>}
+      {eyebrow && <div style={{ fontSize: '11px', fontWeight: 500, color: C.green, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '4px' }}>{eyebrow}</div>}
       {title && (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
           {Icon && <Icon size={20} color={C.green} style={{ flexShrink: 0 }} />}
-          <div style={{ fontSize: '15px', fontWeight: 900, color: C.ink, lineHeight: 1.35 }}>{title}</div>
+          <div style={{ fontSize: '15px', fontWeight: 500, color: C.ink, lineHeight: 1.35 }}>{title}</div>
         </div>
       )}
       <div style={{ fontSize: '13px', color: C.muted, lineHeight: 1.65 }}>{children}</div>
@@ -103,7 +103,7 @@ function Card({ title, eyebrow, icon: Icon, children }) {
 
 function Formula({ children }) {
   return (
-    <div style={{ fontFamily: 'monospace', fontSize: '13px', fontWeight: 800, color: C.green, background: C.white, padding: '12px 14px', borderRadius: '8px', border: `1px solid ${C.line}`, overflowX: 'auto', lineHeight: 1.6 }}>
+    <div style={{ fontFamily: 'monospace', fontSize: '13px', fontWeight: 500, color: C.green, background: C.white, padding: '12px 14px', borderRadius: '8px', border: `1px solid ${C.line}`, overflowX: 'auto', lineHeight: 1.6 }}>
       {children}
     </div>
   );
@@ -478,9 +478,9 @@ export default function MethodologyView() {
 
       {/* Header */}
       <div style={{ background: C.white, borderRadius: '16px', padding: '28px 32px', border: `1px solid ${C.line}`, marginBottom: '28px', boxShadow: '0 1px 3px rgba(15,23,42,0.04)' }}>
-        <div style={{ fontSize: '11px', fontWeight: 900, color: C.green, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '6px' }}>Rules & Methodology</div>
-        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 900, color: C.ink, lineHeight: 1.2 }}>
-          Earthintelytics Operational Domain, Business Rules & AI Reconciliation
+        <div style={{ fontSize: '11px', fontWeight: 500, color: C.green, letterSpacing: '0.08em', textTransform: 'uppercase', marginBottom: '6px' }}>Rules & Methodology</div>
+        <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 500, color: C.ink, lineHeight: 1.2 }}>
+          FarmIntelytics Operational Domain, Business Rules & AI Reconciliation
         </h1>
         <p style={{ margin: '10px 0 0 0', color: C.faint, fontSize: '14px', lineHeight: 1.6, fontWeight: 500, maxWidth: '960px' }}>
           How a bunch moves from the plot to the mill, which workers may do what, how duplicates and location fraud are caught, and how the three records are reconciled and scored.
@@ -490,7 +490,7 @@ export default function MethodologyView() {
       <div className="mth-layout">
         {/* Sidebar */}
         <aside className="mth-aside" style={{ background: C.white, borderRadius: '14px', border: `1px solid ${C.line}`, padding: '16px', boxShadow: '0 1px 3px rgba(15,23,42,0.03)' }}>
-          <div style={{ fontSize: '11px', fontWeight: 900, color: C.faint, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px', paddingLeft: '8px' }}>
+          <div style={{ fontSize: '11px', fontWeight: 500, color: C.faint, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '12px', paddingLeft: '8px' }}>
             Contents
           </div>
           <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
@@ -579,44 +579,44 @@ export default function MethodologyView() {
                 </thead>
                 <tbody>
                   <tr>
-                    <td style={{ fontWeight: 900, color: C.ink }}>Cutter</td>
+                    <td style={{ fontWeight: 500, color: C.ink }}>Cutter</td>
                     <td style={{ fontFamily: 'monospace' }}>CUTTER, HARVESTING, AGRIC WORKER</td>
                     <td>Sever bunches from palms.</td>
-                    <td style={{ color: C.green, fontWeight: 800 }}>Carrier</td>
-                    <td style={{ color: C.red, fontWeight: 800 }}>Picker</td>
+                    <td style={{ color: C.green, fontWeight: 500 }}>Carrier</td>
+                    <td style={{ color: C.red, fontWeight: 500 }}>Picker</td>
                   </tr>
                   <tr>
-                    <td style={{ fontWeight: 900, color: C.ink }}>Carrier</td>
+                    <td style={{ fontWeight: 500, color: C.ink }}>Carrier</td>
                     <td style={{ fontFamily: 'monospace' }}>CARRIER</td>
                     <td>Haul bunches from rows to the Platform.</td>
-                    <td style={{ color: C.green, fontWeight: 800 }}>Picker</td>
-                    <td style={{ color: C.red, fontWeight: 800 }}>Cutter</td>
+                    <td style={{ color: C.green, fontWeight: 500 }}>Picker</td>
+                    <td style={{ color: C.red, fontWeight: 500 }}>Cutter</td>
                   </tr>
                   <tr>
-                    <td style={{ fontWeight: 900, color: C.ink }}>Picker</td>
+                    <td style={{ fontWeight: 500, color: C.ink }}>Picker</td>
                     <td style={{ fontFamily: 'monospace' }}>LOOSE FRUIT PICKER, PICKER</td>
                     <td>Gather loose fruit, weighed in kg.</td>
-                    <td style={{ color: C.green, fontWeight: 800 }}>Carrier</td>
-                    <td style={{ color: C.red, fontWeight: 800 }}>Cutter</td>
+                    <td style={{ color: C.green, fontWeight: 500 }}>Carrier</td>
+                    <td style={{ color: C.red, fontWeight: 500 }}>Cutter</td>
                   </tr>
                   <tr>
-                    <td style={{ fontWeight: 900, color: C.ink }}>Loading Clerk</td>
+                    <td style={{ fontWeight: 500, color: C.ink }}>Loading Clerk</td>
                     <td style={{ fontFamily: 'monospace' }}>COUNTER</td>
                     <td>Sign in to the APK; verify truck loading.</td>
                     <td>—</td>
-                    <td style={{ color: C.red, fontWeight: 800 }}>Any field slot</td>
+                    <td style={{ color: C.red, fontWeight: 500 }}>Any field slot</td>
                   </tr>
                   <tr>
-                    <td style={{ fontWeight: 900, color: C.ink }}>Harvesting Clerk</td>
+                    <td style={{ fontWeight: 500, color: C.ink }}>Harvesting Clerk</td>
                     <td style={{ fontFamily: 'monospace' }}>RECORDER</td>
                     <td>Sign in to the APK; record harvests and AI counts.</td>
                     <td>—</td>
-                    <td style={{ color: C.red, fontWeight: 800 }}>Any field slot</td>
+                    <td style={{ color: C.red, fontWeight: 500 }}>Any field slot</td>
                   </tr>
                   <tr>
-                    <td style={{ fontWeight: 900, color: C.red }}>Unknown</td>
+                    <td style={{ fontWeight: 500, color: C.red }}>Unknown</td>
                     <td style={{ fontFamily: 'monospace' }}>FFB LOADER, Headman, Headperson, Headwoman, FIELD HAND, PRUNNING, Tapping</td>
-                    <td colSpan={3} style={{ color: C.red, fontWeight: 800 }}>Skipped at upload. Not stored, no badge, cannot sign in.</td>
+                    <td colSpan={3} style={{ color: C.red, fontWeight: 500 }}>Skipped at upload. Not stored, no badge, cannot sign in.</td>
                   </tr>
                 </tbody>
               </table>
@@ -629,22 +629,22 @@ export default function MethodologyView() {
             <div className="mth-grid-2">
               <Card title="Rule 1 · Cutters are never Pickers">
                 Cutters are paid per bunch by quality (ripe, unripe, rotten). Mixing their counts with loose-fruit weight would contaminate both pay bases.
-                <div style={{ marginTop: '8px', fontSize: '12px', color: C.red, fontWeight: 800 }}>Enforced by validateAndSetPicker()</div>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: C.red, fontWeight: 500 }}>Enforced by validateAndSetPicker()</div>
               </Card>
               <Card title="Rule 2 · Pickers are never Cutters">
                 Picking is weighed in kg; cutting needs climbing and cutting qualifications and equipment.
-                <div style={{ marginTop: '8px', fontSize: '12px', color: C.red, fontWeight: 800 }}>Enforced by validateAndSetCutter()</div>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: C.red, fontWeight: 500 }}>Enforced by validateAndSetCutter()</div>
               </Card>
               <Card title="Rule 3 · Anyone in the field can carry">
                 On small plots or short-staffed days a Cutter may carry their own bunches, and Pickers may help carry.
-                <div style={{ marginTop: '8px', fontSize: '12px', color: C.green, fontWeight: 800 }}>validateAndSetCarrier() accepts Cutter, Carrier and Picker</div>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: C.green, fontWeight: 500 }}>validateAndSetCarrier() accepts Cutter, Carrier and Picker</div>
               </Card>
               <Card title="Rule 4 · Active status & ID format">
                 Every worker is downloaded to the APK, but only <code>worker_status = 'Active'</code> workers can be recorded: an inactive worker's card shows <strong>INACTIVE / BLOCKED</strong> and cannot be confirmed. IDs keep their letters (<code>HAC30071</code>) when typed or scanned from a badge QR; only records from old phones that sent the digits (<code>30071</code>) are matched to the full ID.
               </Card>
               <Card title="Rule 5 · Loose fruit picked together is shared 40 / 60">
                 After saving a bunch record the clerk can tap <strong>Record Loose Fruit</strong>: the cutter and carrier who worked together weigh the loose fruit they picked up. The weight is shared by kg, <strong>40% to the cutter and 60% to the carrier</strong>. If the cutter and carrier are the same person, that person keeps 100%. Monthly Settlement, the worker leaderboard and the payout figures all use this one rule; plot and estate totals still show the full weight.
-                <div style={{ marginTop: '8px', fontSize: '12px', color: C.green, fontWeight: 800 }}>fi_ffb_loose_fruit_shares() in the database</div>
+                <div style={{ marginTop: '8px', fontSize: '12px', color: C.green, fontWeight: 500 }}>fi_ffb_loose_fruit_shares() in the database</div>
               </Card>
             </div>
           </SectionShell>
@@ -727,7 +727,7 @@ export default function MethodologyView() {
             </Card>
 
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 900, color: C.ink, margin: '0 0 10px 0' }}>Plot status decision rules (<code>plot_validation_summary</code>)</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 500, color: C.ink, margin: '0 0 10px 0' }}>Plot status decision rules (<code>plot_validation_summary</code>)</h3>
               <div style={{ overflowX: 'auto', border: `1px solid ${C.line}`, borderRadius: '12px' }}>
                 <table className="mth-table">
                   <thead>
@@ -735,22 +735,22 @@ export default function MethodologyView() {
                   </thead>
                   <tbody>
                     <tr>
-                      <td style={{ fontWeight: 900, color: C.green }}>CLEAN</td>
+                      <td style={{ fontWeight: 500, color: C.green }}>CLEAN</td>
                       <td style={{ fontFamily: 'monospace' }}>Harvested count = Loaded count + Rotten<br />OR pending_count = 0</td>
                       <td>Auto-passed; eligible for fast-track approval.</td>
                     </tr>
                     <tr>
-                      <td style={{ fontWeight: 900, color: C.green }}>CLEAN (weight fallback)</td>
+                      <td style={{ fontWeight: 500, color: C.green }}>CLEAN (weight fallback)</td>
                       <td style={{ fontFamily: 'monospace' }}>Loaded count = 0 AND loaded weight &gt; 0 AND<br />|H_weight − L_weight| ≤ max(50kg, 5% × H_weight)</td>
                       <td>Reconciled by weight tolerance; auto-passed.</td>
                     </tr>
                     <tr>
-                      <td style={{ fontWeight: 900, color: C.amber }}>INCOMPLETE</td>
+                      <td style={{ fontWeight: 500, color: C.amber }}>INCOMPLETE</td>
                       <td style={{ fontFamily: 'monospace' }}>Harvesting clerk OR loading clerk records missing for plot/date</td>
                       <td>Waiting on the loading or harvesting clerk.</td>
                     </tr>
                     <tr>
-                      <td style={{ fontWeight: 900, color: C.red }}>DISCREPANCY</td>
+                      <td style={{ fontWeight: 500, color: C.red }}>DISCREPANCY</td>
                       <td style={{ fontFamily: 'monospace' }}>Count mismatch OR weight delta &gt; max(50kg, 5%)</td>
                       <td>Team Leader platform recount and supervisor review.</td>
                     </tr>
@@ -772,7 +772,7 @@ export default function MethodologyView() {
             lead="Every harvest record gets a trust score from 0 to 100 as soon as it syncs, and again whenever loading clerk records for its plot arrive. The score decides whether the record is approved automatically, rejected automatically, or sent to a supervisor who must investigate it and write a note."
           >
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 900, color: C.ink, margin: '0 0 10px 0' }}>The formula</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 500, color: C.ink, margin: '0 0 10px 0' }}>The formula</h3>
               <Formula>Score = Σ (check points × weight)&nbsp;&nbsp;·&nbsp;&nbsp;each check gives 0, 3, 5, 7 or 10 points&nbsp;&nbsp;·&nbsp;&nbsp;weights add up to 10, so the best score is 10 × 10 = 100</Formula>
             </div>
 
@@ -785,8 +785,8 @@ export default function MethodologyView() {
                   {SCORE_CHECKS.map(([name, weight, good, bad], i) => (
                     <tr key={name}>
                       <td>{i + 1}</td>
-                      <td style={{ fontWeight: 800, color: C.ink, whiteSpace: 'nowrap' }}>{name}</td>
-                      <td style={{ fontWeight: 800 }}>{weight}</td>
+                      <td style={{ fontWeight: 500, color: C.ink, whiteSpace: 'nowrap' }}>{name}</td>
+                      <td style={{ fontWeight: 500 }}>{weight}</td>
                       <td>{good}</td>
                       <td>{bad}</td>
                     </tr>
@@ -830,7 +830,7 @@ export default function MethodologyView() {
             </Card>
 
             <div>
-              <h3 style={{ fontSize: '15px', fontWeight: 900, color: C.ink, margin: '0 0 10px 0' }}>Worked examples</h3>
+              <h3 style={{ fontSize: '15px', fontWeight: 500, color: C.ink, margin: '0 0 10px 0' }}>Worked examples</h3>
               <div style={{ overflowX: 'auto', border: `1px solid ${C.line}`, borderRadius: '12px' }}>
                 <table className="mth-table">
                   <thead>
@@ -839,10 +839,10 @@ export default function MethodologyView() {
                   <tbody>
                     {SCORE_EXAMPLES.map(([name, what, score, decision, color]) => (
                       <tr key={name}>
-                        <td style={{ fontWeight: 800, color: C.ink, whiteSpace: 'nowrap' }}>{name}</td>
+                        <td style={{ fontWeight: 500, color: C.ink, whiteSpace: 'nowrap' }}>{name}</td>
                         <td>{what}</td>
-                        <td style={{ fontFamily: 'monospace', fontWeight: 800, whiteSpace: 'nowrap' }}>{score}</td>
-                        <td style={{ fontWeight: 900, color }}>{decision}</td>
+                        <td style={{ fontFamily: 'monospace', fontWeight: 500, whiteSpace: 'nowrap' }}>{score}</td>
+                        <td style={{ fontWeight: 500, color }}>{decision}</td>
                       </tr>
                     ))}
                   </tbody>

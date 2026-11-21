@@ -13,15 +13,15 @@ export function PageLoader() {
       color: 'var(--color-text-secondary, #64748b)'
     }}>
       <div style={{
-        width: '44px',
-        height: '44px',
-        border: '3px solid rgba(3, 67, 33, 0.15)',
-        borderTop: '3px solid #034321',
+        width: '40px',
+        height: '40px',
+        border: '2.5px solid #E2E8F0',
+        borderTop: '2.5px solid #3F8432',
         borderRadius: '50%',
         animation: 'spin 0.8s cubic-bezier(0.4, 0, 0.2, 1) infinite'
       }} />
-      <span style={{ fontSize: '13px', fontWeight: 600, letterSpacing: '0.02em' }}>
-        Loading Earthintelytics Portal...
+      <span style={{ fontSize: '13px', fontWeight: 500, letterSpacing: '0.01em' }}>
+        Loading FarmIntelytics Portal...
       </span>
       <style>{`
         @keyframes spin {

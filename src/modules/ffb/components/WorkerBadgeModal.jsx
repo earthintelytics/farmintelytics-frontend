@@ -43,7 +43,7 @@ export function isEligibleForBadge(emp) {
 
 export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
   const { tenantMeta, tenantSlug } = useAppContext();
-  const orgBadgeLabel = (tenantMeta?.display_name || tenantSlug || 'Earthintelytics FFB').toUpperCase();
+  const orgBadgeLabel = (tenantMeta?.display_name || tenantSlug || 'FarmIntelytics FFB').toUpperCase();
   const [printBatchSize, setPrintBatchSize] = useState(24);
   const [printBatchPage, setPrintBatchPage] = useState(1);
   const [printAllMode, setPrintAllMode] = useState(false);
@@ -102,7 +102,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
           }}>
             <X size={28} />
           </div>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 800, color: '#1E293B' }}>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 500, color: '#1E293B' }}>
             QR Badge Not Allowed
           </h3>
           <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: '#64748B', lineHeight: 1.5 }}>
@@ -118,7 +118,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
               border: 'none',
               background: '#0F172A',
               color: '#FFFFFF',
-              fontWeight: 700,
+              fontWeight: 500,
               fontSize: '14px',
               cursor: 'pointer'
             }}
@@ -160,11 +160,11 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
     const origTitle = document.title;
     if (!isBatch && effectiveWorkers.length === 1) {
       const emp = effectiveWorkers[0];
-      document.title = `Earthintelytics_Worker_ID_${emp.employee_id}`;
+      document.title = `FarmIntelytics-Worker-ID-${emp.employee_id}`;
     } else if (isAll) {
-      document.title = `Earthintelytics_Field_Worker_ID_Cards_All_${effectiveWorkers.length}_Records`;
+      document.title = `FarmIntelytics-Field-Worker-ID-Cards_All_${effectiveWorkers.length}_Records`;
     } else {
-      document.title = `Earthintelytics_Worker_ID_Cards_Batch_${printBatchPage}_of_${totalBatchPages}`;
+      document.title = `FarmIntelytics-Worker-ID-Cards_Batch_${printBatchPage}_of_${totalBatchPages}`;
     }
     setPrintAllMode(isAll);
     setTimeout(() => {
@@ -228,7 +228,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                   width: '40px',
                   height: '40px',
                   borderRadius: '8px',
-                  background: '#034321',
+                  background: '#3F8432',
                   color: '#FFFFFF',
                   display: 'flex',
                   alignItems: 'center',
@@ -238,11 +238,11 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                 <QrCode size={22} />
               </div>
               <div>
-                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 900, color: '#000000' }}>
+                <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 500, color: '#000000' }}>
                   {isBatch ? `Worker QR Badges (${effectiveWorkers.length} Active Records)` : 'Worker QR Badge & ID'}
                 </h3>
-                <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#000000', fontWeight: 700 }}>
-                  Official Earthintelytics Field Identification Token
+                <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#000000', fontWeight: 500 }}>
+                  Official FarmIntelytics Field Identification Token
                 </p>
               </div>
             </div>
@@ -280,13 +280,13 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
               flexWrap: 'wrap',
               gap: '10px'
             }}>
-              <span style={{ color: '#000000', fontWeight: 800 }}>
+              <span style={{ color: '#000000', fontWeight: 500 }}>
                 Showing Batch {printBatchPage} of {totalBatchPages} ({previewWorkers.length} cards in this batch):
               </span>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ color: '#000000', fontWeight: 800, fontSize: '12px' }}>Per Batch:</span>
+                  <span style={{ color: '#000000', fontWeight: 500, fontSize: '12px' }}>Per Batch:</span>
                   <select
                     value={printBatchSize}
                     onChange={(e) => {
@@ -299,7 +299,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                       border: '2px solid #CBD5E1',
                       background: '#FFFFFF',
                       color: '#000000',
-                      fontWeight: 800,
+                      fontWeight: 500,
                       fontSize: '12px'
                     }}
                   >
@@ -320,7 +320,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                       border: '2px solid #CBD5E1',
                       background: printBatchPage === 1 ? '#F1F5F9' : '#FFFFFF',
                       color: printBatchPage === 1 ? '#94A3B8' : '#000000',
-                      fontWeight: 900,
+                      fontWeight: 500,
                       fontSize: '12px',
                       cursor: printBatchPage === 1 ? 'not-allowed' : 'pointer',
                       display: 'flex',
@@ -331,7 +331,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                     <ChevronLeft size={14} /> Prev
                   </button>
 
-                  <span style={{ fontWeight: 900, color: '#000000', padding: '0 8px', fontSize: '13px' }}>
+                  <span style={{ fontWeight: 500, color: '#000000', padding: '0 8px', fontSize: '13px' }}>
                     {printBatchPage} / {totalBatchPages}
                   </span>
 
@@ -344,7 +344,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                       border: '2px solid #CBD5E1',
                       background: printBatchPage === totalBatchPages ? '#F1F5F9' : '#FFFFFF',
                       color: printBatchPage === totalBatchPages ? '#94A3B8' : '#000000',
-                      fontWeight: 900,
+                      fontWeight: 500,
                       fontSize: '12px',
                       cursor: printBatchPage === totalBatchPages ? 'not-allowed' : 'pointer',
                       display: 'flex',
@@ -387,7 +387,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                   style={{
                     background: '#FFFFFF',
                     borderRadius: '12px',
-                    border: '2px solid #034321',
+                    border: '2px solid #3F8432',
                     boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
                     overflow: 'hidden',
                     display: 'flex',
@@ -398,7 +398,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                   {/* Clean Top Banner */}
                   <div 
                     style={{
-                      background: '#034321',
+                      background: '#3F8432',
                       padding: '12px 20px',
                       color: '#FFFFFF',
                       display: 'flex',
@@ -407,10 +407,10 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                       borderBottom: '3px solid #F59E0B'
                     }}
                   >
-                    <span style={{ fontWeight: 900, letterSpacing: '0.06em', fontSize: '13px', textTransform: 'uppercase' }}>
+                    <span style={{ fontWeight: 500, letterSpacing: '0.06em', fontSize: '13px', textTransform: 'uppercase' }}>
                       {orgBadgeLabel}
                     </span>
-                    <span style={{ fontSize: '11px', fontWeight: 900, letterSpacing: '0.04em', background: '#F59E0B', color: '#000000', padding: '2px 8px', borderRadius: '4px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: 500, letterSpacing: '0.04em', background: '#F59E0B', color: '#000000', padding: '2px 8px', borderRadius: '4px' }}>
                       OFFICIAL FIELD ID
                     </span>
                   </div>
@@ -423,7 +423,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                         background: '#FFFFFF',
                         padding: '10px',
                         borderRadius: '8px',
-                        border: '2px solid #034321',
+                        border: '2px solid #3F8432',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
@@ -437,23 +437,23 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                         level="H"
                         includeMargin={false}
                       />
-                      <span style={{ fontSize: '9px', fontWeight: 900, color: '#034321', marginTop: '6px', letterSpacing: '0.05em' }}>SCAN TO VERIFY</span>
+                      <span style={{ fontSize: '9px', fontWeight: 500, color: '#3F8432', marginTop: '6px', letterSpacing: '0.05em' }}>SCAN TO VERIFY</span>
                     </div>
 
                     {/* Right: Metadata */}
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', overflow: 'hidden' }}>
                       {workerName && (
-                        <div style={{ fontSize: '18px', fontWeight: 900, color: '#000000', textTransform: 'uppercase', lineHeight: 1.2, letterSpacing: '0.01em' }}>
+                        <div style={{ fontSize: '18px', fontWeight: 500, color: '#000000', textTransform: 'uppercase', lineHeight: 1.2, letterSpacing: '0.01em' }}>
                           {workerName}
                         </div>
                       )}
 
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                        <span style={{ fontSize: '15px', fontWeight: 900, color: '#034321' }}>
+                        <span style={{ fontSize: '15px', fontWeight: 500, color: '#3F8432' }}>
                           ID: #{emp.employee_id}
                         </span>
-                        <span style={{ color: '#CBD5E1', fontWeight: 900 }}>|</span>
-                        <span style={{ fontSize: '13px', fontWeight: 900, color: '#034321', textTransform: 'uppercase' }}>
+                        <span style={{ color: '#CBD5E1', fontWeight: 500 }}>|</span>
+                        <span style={{ fontSize: '13px', fontWeight: 500, color: '#3F8432', textTransform: 'uppercase' }}>
                           ROLE: {roleGroup(emp.function) || emp.function || 'GENERAL WORKER'}
                         </span>
                       </div>
@@ -461,9 +461,9 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                       <div style={{ height: '1.5px', background: '#E2E8F0', margin: '2px 0' }} />
 
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '4px', fontSize: '12px', color: '#000000' }}>
-                        <div>Team: <strong style={{ color: '#000000', fontWeight: 900 }}>{emp.team || '—'}</strong></div>
-                        <div>Division: <strong style={{ color: '#000000', fontWeight: 900 }}>{emp.division || '—'}</strong></div>
-                        <div>Contractor: <strong style={{ color: '#000000', fontWeight: 900 }}>{emp.contractor || 'Direct Staff'}</strong></div>
+                        <div>Team: <strong style={{ color: '#000000', fontWeight: 500 }}>{emp.team || '—'}</strong></div>
+                        <div>Division: <strong style={{ color: '#000000', fontWeight: 500 }}>{emp.division || '—'}</strong></div>
+                        <div>Contractor: <strong style={{ color: '#000000', fontWeight: 500 }}>{emp.contractor || 'Direct Staff'}</strong></div>
                       </div>
                     </div>
                   </div>
@@ -484,13 +484,13 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
               flexShrink: 0
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 800, color: '#000000', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '13px', fontWeight: 500, color: '#000000', flexWrap: 'wrap' }}>
               <label style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 Copies per worker:
                 <select
                   value={copies}
                   onChange={(e) => setCopiesOverride(Number(e.target.value))}
-                  style={{ padding: '4px 8px', borderRadius: '6px', border: '2px solid #CBD5E1', background: '#FFFFFF', color: '#000000', fontWeight: 800, fontSize: '12px' }}
+                  style={{ padding: '4px 8px', borderRadius: '6px', border: '2px solid #CBD5E1', background: '#FFFFFF', color: '#000000', fontWeight: 500, fontSize: '12px' }}
                 >
                   {COPY_OPTIONS.map((n) => (
                     <option key={n} value={n}>{n}{n === autoCopies ? ' (fills the page)' : ''}</option>
@@ -509,7 +509,7 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                 style={{
                   padding: '8px 20px',
                   fontSize: '13px',
-                  fontWeight: 900,
+                  fontWeight: 500,
                   borderRadius: '6px',
                   color: '#000000',
                   border: '2px solid #CBD5E1'
@@ -525,10 +525,10 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                   style={{
                     padding: '8px 18px',
                     fontSize: '13px',
-                    fontWeight: 900,
+                    fontWeight: 500,
                     borderRadius: '6px',
-                    color: '#034321',
-                    border: '2px solid #034321',
+                    color: '#3F8432',
+                    border: '2px solid #3F8432',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '6px'
@@ -545,12 +545,12 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                 style={{
                   padding: '8px 22px',
                   fontSize: '13px',
-                  fontWeight: 900,
+                  fontWeight: 500,
                   borderRadius: '6px',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '6px',
-                  background: '#034321',
+                  background: '#3F8432',
                   color: '#FFFFFF'
                 }}
               >
@@ -583,11 +583,11 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                   return (
                     <div key={key} className="print-card-cutout">
                       {/* Top Header Banner */}
-                      <div style={{ background: '#034321', borderBottom: '2px solid #F59E0B', padding: '2.5mm 4mm', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, height: '10mm', boxSizing: 'border-box' }}>
-                        <span style={{ fontWeight: 900, letterSpacing: '0.04em', fontSize: '8.5pt', textTransform: 'uppercase' }}>
+                      <div style={{ background: '#3F8432', borderBottom: '2px solid #F59E0B', padding: '2.5mm 4mm', color: '#FFFFFF', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0, height: '10mm', boxSizing: 'border-box' }}>
+                        <span style={{ fontWeight: 500, letterSpacing: '0.04em', fontSize: '8.5pt', textTransform: 'uppercase' }}>
                           {orgBadgeLabel}
                         </span>
-                        <span style={{ fontSize: '6.5pt', fontWeight: 900, background: '#F59E0B', color: '#000000', padding: '1.5px 6px', borderRadius: '3px', textTransform: 'uppercase' }}>
+                        <span style={{ fontSize: '6.5pt', fontWeight: 500, background: '#F59E0B', color: '#000000', padding: '1.5px 6px', borderRadius: '3px', textTransform: 'uppercase' }}>
                           FIELD ID
                         </span>
                       </div>
@@ -595,44 +595,44 @@ export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
                       {/* Card Content - Scaled 85.6mm x 63mm Layout */}
                       <div style={{ padding: '3.5mm 4mm', display: 'flex', gap: '4mm', alignItems: 'center', background: '#FFFFFF', height: '53mm', boxSizing: 'border-box', overflow: 'hidden' }}>
                         {/* Left: QR Code Box */}
-                        <div style={{ background: '#FFFFFF', padding: '2mm', borderRadius: '5px', border: '1.2px solid #034321', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ background: '#FFFFFF', padding: '2mm', borderRadius: '5px', border: '1.2px solid #3F8432', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                           <QRCodeSVG
                             value={qrPayload}
                             size={84}
                             level="M"
                             includeMargin={false}
                           />
-                          <span style={{ fontSize: '6pt', fontWeight: 900, color: '#034321', marginTop: '1.5mm', letterSpacing: '0.04em' }}>SCAN VERIFY</span>
+                          <span style={{ fontSize: '6pt', fontWeight: 500, color: '#3F8432', marginTop: '1.5mm', letterSpacing: '0.04em' }}>SCAN VERIFY</span>
                         </div>
 
                         {/* Right: Worker ID Details */}
                         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '2mm', justifyContent: 'center', minWidth: 0, overflow: 'hidden' }}>
                           {workerName && (
-                            <div style={{ fontSize: '11pt', fontWeight: 900, color: '#000000', textTransform: 'uppercase', lineHeight: 1.15, letterSpacing: '0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={workerName}>
+                            <div style={{ fontSize: '11pt', fontWeight: 500, color: '#000000', textTransform: 'uppercase', lineHeight: 1.15, letterSpacing: '0.01em', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={workerName}>
                               {workerName}
                             </div>
                           )}
 
                           <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '8pt', fontWeight: 900, color: '#034321', background: '#E8F2E5', border: '1px solid #86EFAC', padding: '1px 5px', borderRadius: '3px', display: 'inline-block' }}>
+                            <span style={{ fontSize: '8pt', fontWeight: 500, color: '#3F8432', background: '#F3F8EF', border: '1px solid #86EFAC', padding: '1px 5px', borderRadius: '3px', display: 'inline-block' }}>
                               ID: #{emp.employee_id}
                             </span>
-                            <span style={{ fontSize: '7.5pt', fontWeight: 900, color: '#92400E', background: '#FEF3C7', border: '1px solid #F59E0B', padding: '1px 5px', borderRadius: '3px', textTransform: 'uppercase', display: 'inline-block' }}>
+                            <span style={{ fontSize: '7.5pt', fontWeight: 500, color: '#92400E', background: '#FEF3C7', border: '1px solid #F59E0B', padding: '1px 5px', borderRadius: '3px', textTransform: 'uppercase', display: 'inline-block' }}>
                               {roleGroup(emp.function) || emp.function || 'WORKER'}
                             </span>
                           </div>
 
-                          <div style={{ height: '0.5mm', background: '#034321', margin: '0.5mm 0', borderRadius: '0.25mm' }} />
+                          <div style={{ height: '0.5mm', background: '#3F8432', margin: '0.5mm 0', borderRadius: '0.25mm' }} />
 
-                          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.2mm', fontSize: '7.5pt', color: '#000000', fontWeight: 800, lineHeight: 1.25 }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1.2mm', fontSize: '7.5pt', color: '#000000', fontWeight: 500, lineHeight: 1.25 }}>
                             <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              Team: <strong style={{ color: '#000000', fontWeight: 900 }}>{emp.team || '—'}</strong>
+                              Team: <strong style={{ color: '#000000', fontWeight: 500 }}>{emp.team || '—'}</strong>
                             </div>
                             <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              Div: <strong style={{ color: '#000000', fontWeight: 900 }}>{emp.division || '—'}</strong>
+                              Div: <strong style={{ color: '#000000', fontWeight: 500 }}>{emp.division || '—'}</strong>
                             </div>
                             <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                              Contractor: <strong style={{ color: '#000000', fontWeight: 900 }}>{emp.contractor || 'Direct Staff'}</strong>
+                              Contractor: <strong style={{ color: '#000000', fontWeight: 500 }}>{emp.contractor || 'Direct Staff'}</strong>
                             </div>
                           </div>
                         </div>

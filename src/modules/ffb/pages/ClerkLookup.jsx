@@ -8,19 +8,19 @@ import { fmtNumber } from '../utils/formatters';
 // 30 days), and see what each clerk recorded in four tabs: Approved (the default), Pending, Mismatch and Rejected. The
 // server returns totals only (see api/route/public_lookup.py).
 
-const GREEN = '#034321';
+const GREEN = '#3F8432';
 const AMBER = '#B45309';
 const RED = '#B91C1C';
 const SLATE = '#334155';   // Rejected: dark slate, never red, so it cannot be mistaken for a mismatch (same as the dashboard)
 const INK = '#0f172a';
 const TABS = [['approved', 'Approved', GREEN], ['pending', 'Pending', AMBER], ['mismatch', 'Mismatch', RED], ['rejected', 'Rejected', SLATE]];
 
-const label = { fontSize: '12px', fontWeight: 800, color: INK, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: '6px', display: 'block' };
+const label = { fontSize: '12px', fontWeight: 500, color: INK, textTransform: 'uppercase', letterSpacing: '0.02em', marginBottom: '6px', display: 'block' };
 const field = { width: '100%', border: '1px solid #cbd5e1', borderRadius: '10px', padding: '10px 12px', fontSize: '15px', fontWeight: 600, color: INK, background: '#ffffff', fontFamily: 'inherit' };
-const th = { textAlign: 'left', fontSize: '12px', fontWeight: 800, color: INK, textTransform: 'uppercase', letterSpacing: '0.03em', padding: '12px 14px', borderBottom: `2px solid ${INK}` };
+const th = { textAlign: 'left', fontSize: '12px', fontWeight: 500, color: INK, textTransform: 'uppercase', letterSpacing: '0.03em', padding: '12px 14px', borderBottom: `2px solid ${INK}` };
 const num = { textAlign: 'right' };
 const td = { padding: '13px 14px', fontSize: '14px', color: INK, borderBottom: '1px solid #e2e8f0' };
-const quick = { background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '999px', padding: '7px 15px', fontSize: '13px', fontWeight: 700, color: INK, cursor: 'pointer', fontFamily: 'inherit' };
+const quick = { background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '999px', padding: '7px 15px', fontSize: '13px', fontWeight: 500, color: INK, cursor: 'pointer', fontFamily: 'inherit' };
 
 const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 const daysAgo = (n) => { const d = new Date(); d.setDate(d.getDate() - n); return iso(d); };
@@ -57,7 +57,7 @@ const linesOfClerk = (c) => TABS.flatMap(([key, name], order) =>
 
 function PrintedLines({ clerks }) {
   const blocks = clerks.map(c => ({ ...c, all: linesOfClerk(c) })).filter(c => c.all.length > 0);
-  if (blocks.length === 0) return <p style={{ fontSize: '13px', fontWeight: 700 }}>No records on these dates.</p>;
+  if (blocks.length === 0) return <p style={{ fontSize: '13px', fontWeight: 500 }}>No records on these dates.</p>;
   return blocks.map(c => {
     const counts = TABS.map(([, name]) => [name, c.all.filter(l => l.status === name).length]).filter(([, n]) => n > 0);
     return (
@@ -77,7 +77,7 @@ function PrintedLines({ clerks }) {
             {c.all.map((l, i) => (
               <tr key={`${l.status}-${l.time}-${i}`}>
                 <td>{i + 1}</td>
-                <td className="lk-status" style={{ fontWeight: 900 }}><span data-status={l.status}>{l.status}</span></td>
+                <td className="lk-status" style={{ fontWeight: 500 }}><span data-status={l.status}>{l.status}</span></td>
                 <td>{when(l.time)}</td><td>{l.plot || '—'}</td>
                 <td>{l.cutter || '—'}</td><td>{l.carrier || '—'}</td><td>{l.picker || '—'}</td>
                 {LINE_COLS.map(([k]) => <td key={k} className="lk-num">{isZero(l[k]) ? '—' : fmtNumber(l[k])}</td>)}
@@ -102,7 +102,7 @@ function AggTable({ rows, empty, phone, onlyWithRecords }) {
   const pages = Math.max(1, Math.ceil(shown.length / size));
   const current = Math.min(page, pages - 1);
   const pager = { ...quick, minHeight: '40px', padding: '6px 20px' };
-  if (shown.length === 0) return <div style={{ fontSize: '15px', fontWeight: 700, padding: '28px 0' }}>{empty}</div>;
+  if (shown.length === 0) return <div style={{ fontSize: '15px', fontWeight: 500, padding: '28px 0' }}>{empty}</div>;
   return (
     <div className="lk-summary" style={{ overflowX: 'auto' }}>
       <table data-no-tools className="lk-stack" style={{ width: '100%', borderCollapse: 'collapse', minWidth: '620px' }}>
@@ -112,7 +112,7 @@ function AggTable({ rows, empty, phone, onlyWithRecords }) {
         <tbody>
           {shown.map((w, i) => (
             <tr key={w.clerk_id} className={Math.floor(i / size) === current ? undefined : 'lk-pg-hide'}>
-              <td data-label="Clerk" style={td}><span><span style={{ fontWeight: 800 }}>{w.name || 'Clerk'}</span> <span style={{ fontWeight: 600 }}>· {w.clerk_id}</span></span></td>
+              <td data-label="Clerk" style={td}><span><span style={{ fontWeight: 500 }}>{w.name || 'Clerk'}</span> <span style={{ fontWeight: 600 }}>· {w.clerk_id}</span></span></td>
               <td data-label="Plots" data-empty={w.plots?.length ? undefined : '1'} style={td}>{w.plots?.length ? w.plots.join(', ') : '—'}</td>
               <td data-label="Workers" data-empty={isZero(w.workers) ? '1' : undefined} style={{ ...td, ...num, fontWeight: isZero(w.workers) ? 600 : 800 }}>{isZero(w.workers) ? '—' : fmtNumber(w.workers)}</td>
               {NUM_COLS.map(k => (
@@ -127,7 +127,7 @@ function AggTable({ rows, empty, phone, onlyWithRecords }) {
       {pages > 1 && (
         <div className="lk-screen lk-pager" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', marginTop: '16px' }}>
           <button type="button" className="lk-quick" style={{ ...pager, opacity: current === 0 ? 0.4 : 1 }} disabled={current === 0} onClick={() => setPage(current - 1)}>Previous</button>
-          <span style={{ fontSize: '14px', fontWeight: 800 }}>Page {current + 1} of {pages}</span>
+          <span style={{ fontSize: '14px', fontWeight: 500 }}>Page {current + 1} of {pages}</span>
           <button type="button" className="lk-quick" style={{ ...pager, opacity: current >= pages - 1 ? 0.4 : 1 }} disabled={current >= pages - 1} onClick={() => setPage(current + 1)}>Next</button>
         </div>
       )}
@@ -188,7 +188,7 @@ tr.lk-pg-hide { display: none !important; }
   .lk-lines tbody tr:nth-child(even) td { background: #f3f4f6 !important; }   /* every other line in light grey */
   .lk-lines .lk-num { text-align: right !important; white-space: nowrap; }
   .lk-lines td, .lk-lines td *, .lk-lines th * { color: #0f172a !important; }   /* black text only, whatever the portal's table styles say */
-  .lk-lines span[data-status="Approved"] { color: #034321 !important; }
+  .lk-lines span[data-status="Approved"] { color: #3F8432 !important; }
   .lk-lines span[data-status="Pending"] { color: #B45309 !important; }
   .lk-lines span[data-status="Mismatch"] { color: #B91C1C !important; }
   .lk-lines span[data-status="Rejected"] { color: #334155 !important; }
@@ -219,7 +219,7 @@ function Highlight({ text, find }) {
   const t = find.trim().toLowerCase();
   const at = t ? text.toLowerCase().indexOf(t) : -1;
   if (at < 0) return text;
-  return <>{text.slice(0, at)}<span style={{ fontWeight: 900, textDecoration: 'underline' }}>{text.slice(at, at + t.length)}</span>{text.slice(at + t.length)}</>;
+  return <>{text.slice(0, at)}<span style={{ fontWeight: 500, textDecoration: 'underline' }}>{text.slice(at, at + t.length)}</span>{text.slice(at + t.length)}</>;
 }
 
 function ClerkPicker({ options, selected, onChange, status, onOpen, onRetry, onDone }) {
@@ -269,8 +269,8 @@ function ClerkPicker({ options, selected, onChange, status, onOpen, onRetry, onD
 
   const loadingList = status === 'loading';
   const failed = status === 'error';
-  const chip = { display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%', background: '#f1f5f9', borderRadius: '999px', padding: '4px 4px 4px 12px', fontSize: '13px', fontWeight: 700, color: INK };
-  const section = { padding: '10px 14px 6px', fontSize: '11px', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.05em', color: INK, background: '#ffffff' };
+  const chip = { display: 'inline-flex', alignItems: 'center', gap: '4px', maxWidth: '100%', background: '#f1f5f9', borderRadius: '999px', padding: '4px 4px 4px 12px', fontSize: '13px', fontWeight: 500, color: INK };
+  const section = { padding: '10px 14px 6px', fontSize: '11px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.05em', color: INK, background: '#ffffff' };
   const hidden = Math.max(0, selected.length - CHIPS_SHOWN);
   const collapsed = selected.length > CHIPS_SHOWN + 1;   // 3 names fit; from 4, show 2 and "+N more"
   const chips = collapsed ? selected.slice(0, CHIPS_SHOWN) : selected;
@@ -304,13 +304,13 @@ function ClerkPicker({ options, selected, onChange, status, onOpen, onRetry, onD
       {open && (
         <div style={{ position: 'absolute', left: 0, right: 0, top: 'calc(100% + 2px)', zIndex: 20, background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden' }}>
           {failed ? (
-            <div style={{ padding: '16px', fontSize: '14px', fontWeight: 700 }}>
+            <div style={{ padding: '16px', fontSize: '14px', fontWeight: 500 }}>
               Could not load the clerk list. <button type="button" onClick={onRetry} style={{ ...quick, marginLeft: '8px' }}>Try again</button>
             </div>
           ) : (
             <ul id="clerk-list" role="listbox" aria-multiselectable="true" style={{ listStyle: 'none', margin: 0, padding: 0, maxHeight: 'min(320px, 45vh)', overflowY: 'auto' }}>
               {rows.length === 0 && (
-                <li style={{ padding: '16px', fontSize: '14px', fontWeight: 700 }}>{options.length === 0 ? 'No harvesting clerks yet.' : `No clerk called "${text.trim()}".`}</li>
+                <li style={{ padding: '16px', fontSize: '14px', fontWeight: 500 }}>{options.length === 0 ? 'No harvesting clerks yet.' : `No clerk called "${text.trim()}".`}</li>
               )}
               {rows.map((o, i) => {
                 const on = selected.includes(o.clerk_id);
@@ -321,7 +321,7 @@ function ClerkPicker({ options, selected, onChange, status, onOpen, onRetry, onD
                     onMouseDown={(e) => e.preventDefault()} onClick={() => toggle(o.clerk_id)} onMouseEnter={() => setActive(i)}
                     style={{ display: 'flex', alignItems: 'center', gap: '12px', minHeight: '48px', padding: '8px 14px', cursor: 'pointer', fontSize: '15px', color: INK, background: i === active ? '#f1f5f9' : '#ffffff' }}>
                     <span aria-hidden="true" style={{ flex: '0 0 22px', height: '22px', borderRadius: '6px', border: `1.5px solid ${on ? GREEN : '#94a3b8'}`, background: on ? GREEN : '#ffffff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {on && <Check size={14} color="#ffffff" strokeWidth={3} />}
+                      {on && <Check size={14} color="#ffffff" strokeWidth={1.5} />}
                     </span>
                     <span style={{ minWidth: 0, fontWeight: on ? 800 : 600 }}><Highlight text={labelOf(o.clerk_id)} find={text} /></span>
                   </li>,
@@ -426,7 +426,7 @@ export function ClerkLookup() {
   // Print: the browser's print dialog (also saves as PDF) for the open tab. The page title becomes the PDF's file name.
   const printReport = () => {
     const old = document.title;
-    document.title = `Earthintelytics Clerk Lookup ${data.from}${data.from === data.to ? '' : ` to ${data.to}`}`;
+    document.title = `FarmIntelytics Clerk Lookup ${data.from}${data.from === data.to ? '' : ` to ${data.to}`}`;
     const restore = () => { document.title = old; window.removeEventListener('afterprint', restore); };
     window.addEventListener('afterprint', restore);
     window.print();
@@ -436,13 +436,13 @@ export function ClerkLookup() {
   const actionStyle = { ...quick, display: 'inline-flex', alignItems: 'center', gap: '6px', opacity: ready ? 1 : 0.4, cursor: ready ? 'pointer' : 'default' };
 
   return (
-    <div className="lk-root" style={{ minHeight: '100vh', background: '#ffffff', fontFamily: "'Roboto', sans-serif", color: INK }}>
+    <div className="lk-root" style={{ minHeight: '100vh', background: '#ffffff', fontFamily: "'Inter', sans-serif", color: INK }}>
       <style>{PAGE_CSS}</style>
       <div className="lk-page" style={{ maxWidth: '1040px', margin: '0 auto', padding: '40px 20px 72px' }}>
         <header className="lk-screen" style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '28px' }}>
-          <img src={LOGO_ICON} alt="Earthintelytics" style={{ width: '48px' }} />
+          <img src={LOGO_ICON} alt="FarmIntelytics" style={{ width: '48px' }} />
           <div>
-            <h1 className="lk-title" style={{ fontSize: '28px', fontWeight: 900, margin: 0, letterSpacing: '-0.01em' }}>Clerk Lookup</h1>
+            <h1 className="lk-title" style={{ fontSize: '28px', fontWeight: 500, margin: 0, letterSpacing: '-0.01em' }}>Clerk Lookup</h1>
             <p style={{ margin: '4px 0 0', fontSize: '14px', fontWeight: 600 }}>
               Choose one or more harvesting clerks, pick the dates, and see what each clerk recorded.
             </p>
@@ -468,7 +468,7 @@ export function ClerkLookup() {
             </div>
             <button type="submit" disabled={loading} className="lk-submit" style={{
               flex: '0 0 auto', height: '44px', padding: '0 28px', borderRadius: '10px', border: 'none', background: GREEN,
-              color: '#ffffff', fontSize: '15px', fontWeight: 800, cursor: loading ? 'wait' : 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontFamily: 'inherit',
+              color: '#ffffff', fontSize: '15px', fontWeight: 500, cursor: loading ? 'wait' : 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px', fontFamily: 'inherit',
             }}>
               <Search size={18} /> {loading ? 'Searching...' : 'Search'}
             </button>
@@ -487,7 +487,7 @@ export function ClerkLookup() {
           </div>
         </form>
 
-        {error && <div role="alert" className="lk-screen" style={{ margin: '16px 0', fontSize: '14px', fontWeight: 800, color: RED }}>{error}</div>}
+        {error && <div role="alert" className="lk-screen" style={{ margin: '16px 0', fontSize: '14px', fontWeight: 500, color: RED }}>{error}</div>}
 
         {data && (
           <section aria-live="polite" style={{ marginTop: '24px' }}>
@@ -495,7 +495,7 @@ export function ClerkLookup() {
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <img src={LOGO_ICON} alt="" style={{ width: '40px' }} />
                 <div>
-                  <div style={{ fontSize: '20px', fontWeight: 900 }}>Earthintelytics · Clerk Lookup · All statuses</div>
+                  <div style={{ fontSize: '20px', fontWeight: 500 }}>FarmIntelytics · Clerk Lookup · All statuses</div>
                   <div style={{ fontSize: '12px', fontWeight: 600 }}>
                     Period: {data.from === data.to ? data.from : `${data.from} to ${data.to}`} · {data.clerks.length} clerk{data.clerks.length === 1 ? '' : 's'} · Printed {new Date().toLocaleString()}
                   </div>
@@ -510,12 +510,12 @@ export function ClerkLookup() {
                 return (
                   <button key={key} type="button" role="tab" aria-selected={active} className="lk-tab" onClick={() => openTab(key)} style={{
                     display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px', minHeight: '46px', padding: '8px 16px',
-                    borderRadius: '12px', fontFamily: 'inherit', cursor: 'pointer', fontSize: '14px', fontWeight: 800,
+                    borderRadius: '12px', fontFamily: 'inherit', cursor: 'pointer', fontSize: '14px', fontWeight: 500,
                     border: `1.5px solid ${active ? color : '#cbd5e1'}`, background: active ? color : '#ffffff', color: active ? '#ffffff' : INK,
                   }}>
                     <span>{name}</span>
                     <span style={{
-                      minWidth: '26px', padding: '2px 8px', borderRadius: '999px', fontSize: '13px', fontWeight: 900, textAlign: 'center',
+                      minWidth: '26px', padding: '2px 8px', borderRadius: '999px', fontSize: '13px', fontWeight: 500, textAlign: 'center',
                       background: active ? '#ffffff' : '#f1f5f9', color: active ? color : INK,
                     }}>{fmtNumber(clerksIn(data, key))}</span>
                   </button>
@@ -531,16 +531,16 @@ export function ClerkLookup() {
             {/* On paper: each clerk's own table, line by line (the screen keeps the summary above). */}
             <div className="lk-print-only">
               <PrintedLines clerks={data.clerks} />
-              {data.lines_truncated && <p style={{ fontSize: '12px', fontWeight: 700 }}>Only the first 3,000 records are printed. Pick fewer days or fewer clerks.</p>}
+              {data.lines_truncated && <p style={{ fontSize: '12px', fontWeight: 500 }}>Only the first 3,000 records are printed. Pick fewer days or fewer clerks.</p>}
             </div>
 
             {data.not_found.length > 0 && (
-              <div style={{ marginTop: '24px', fontSize: '14px', fontWeight: 700 }}>
+              <div style={{ marginTop: '24px', fontSize: '14px', fontWeight: 500 }}>
                 Not found: {data.not_found.join(', ')}
               </div>
             )}
             {data.truncated && (
-              <div style={{ marginTop: '12px', fontSize: '14px', fontWeight: 700 }}>Showing the first 100 clerks. Search fewer names to see the rest.</div>
+              <div style={{ marginTop: '12px', fontSize: '14px', fontWeight: 500 }}>Showing the first 100 clerks. Search fewer names to see the rest.</div>
             )}
             <p style={{ marginTop: '24px', fontSize: '13px', fontWeight: 600 }}>{data.note}</p>
           </section>

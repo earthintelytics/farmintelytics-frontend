@@ -49,7 +49,7 @@ export function AwaitingRecordersTable({ rows, onOpen }) {
   const picker = tab === 'picker';
 
   const td = { padding: '12px 14px', border: '1px solid #e2e8f0', whiteSpace: 'nowrap', color: '#0f172a' };
-  const th = { padding: '10px 14px', fontSize: '11px', fontWeight: 700, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', whiteSpace: 'nowrap', background: '#FFFFFF', border: '1px solid #e2e8f0' };
+  const th = { padding: '10px 14px', fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: 'left', whiteSpace: 'nowrap', background: '#FFFFFF', border: '1px solid #e2e8f0' };
   const num = { textAlign: 'right' };
 
   return (
@@ -63,7 +63,7 @@ export function AwaitingRecordersTable({ rows, onOpen }) {
               aria-selected={tab === key}
               onClick={() => { setTab(key); setPage(1); }}
               style={{
-                border: 'none', borderRadius: '7px', padding: '7px 14px', fontSize: '13px', fontWeight: 700, cursor: 'pointer',
+                border: 'none', borderRadius: '7px', padding: '7px 14px', fontSize: '13px', fontWeight: 500, cursor: 'pointer',
                 background: tab === key ? 'var(--clr-brand-primary)' : 'transparent',
                 color: tab === key ? '#FFFFFF' : '#334155'
               }}
@@ -105,12 +105,12 @@ export function AwaitingRecordersTable({ rows, onOpen }) {
             ) : shown.map(p => (
               <tr key={`${p.plot_id}-${p.work_date}-${p.mode}`} onClick={() => onOpen(p.plot_id, p.work_date)} style={{ cursor: 'pointer' }}
                   onMouseEnter={e => { e.currentTarget.style.background = '#f8fafc'; }} onMouseLeave={e => { e.currentTarget.style.background = ''; }}>
-                <td style={{ ...td, fontWeight: 700, color: '#0f172a' }}>{p.plot_id}</td>
+                <td style={{ ...td, fontWeight: 500, color: '#0f172a' }}>{p.plot_id}</td>
                 <td style={td}>{fmtDate(p.work_date)}</td>
-                <td style={{ ...td, ...num, fontWeight: 700, color: '#034321' }}>{picker ? `${p.harvester_weight ?? 0} kg` : (p.harvester_count ?? 0)}</td>
+                <td style={{ ...td, ...num, fontWeight: 500, color: '#3F8432' }}>{picker ? `${p.harvester_weight ?? 0} kg` : (p.harvester_count ?? 0)}</td>
                 {!picker && <td style={{ ...td, ...num, color: '#b91c1c' }}>{p.harvester_rotten ?? 0}</td>}
                 {!picker && <td style={{ ...td, ...num, color: '#b45309' }}>{p.harvester_unripe ?? 0}</td>}
-                <td style={{ ...td, ...num, fontWeight: 700, color: '#1d4ed8' }}>{picker ? `${p.loader_weight ?? 0} kg` : (p.loader_count ?? 0)}</td>
+                <td style={{ ...td, ...num, fontWeight: 500, color: '#1d4ed8' }}>{picker ? `${p.loader_weight ?? 0} kg` : (p.loader_count ?? 0)}</td>
                 <td style={{ ...td, ...num }}>{p.harvester_records ?? 0}</td>
                 <td style={{ ...td, ...num }}>{p.loader_records ?? (p.loads || 0)}</td>
                 {/* Clerk ID lists wrap so the Open button stays on screen */}
@@ -122,7 +122,7 @@ export function AwaitingRecordersTable({ rows, onOpen }) {
                   <button
                     type="button"
                     onClick={e => { e.stopPropagation(); onOpen(p.plot_id, p.work_date); }}
-                    style={{ width: '100%', minWidth: '110px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: openColour(p.status), color: '#FFFFFF', border: 'none', borderRadius: '999px', padding: '9px 18px', fontSize: '13px', fontWeight: 800, cursor: 'pointer', textShadow: '0 1px 1px rgba(0,0,0,0.25)' }}
+                    style={{ width: '100%', minWidth: '110px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '4px', background: openColour(p.status), color: '#FFFFFF', border: 'none', borderRadius: '999px', padding: '9px 18px', fontSize: '13px', fontWeight: 500, cursor: 'pointer', textShadow: '0 1px 1px rgba(0,0,0,0.25)' }}
                   >
                     Open <ChevronRight size={14} />
                   </button>

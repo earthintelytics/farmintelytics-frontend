@@ -36,31 +36,31 @@ export function WelcomeTour({ forceOpen = false, onClose }) {
           <X size={20} />
         </button>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'transparent', color: '#034321', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles size={24} /></div>
+          <div style={{ width: '48px', height: '48px', borderRadius: '14px', background: 'transparent', color: '#3F8432', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><Sparkles size={24} /></div>
           <div>
-            <div style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Step {i + 1} of {steps.length}</div>
-            <h2 style={{ fontSize: '21px', fontWeight: 900, color: '#0F172A', margin: 0 }}>{step.title}</h2>
+            <div style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', letterSpacing: '0.06em' }}>Step {i + 1} of {steps.length}</div>
+            <h2 style={{ fontSize: '21px', fontWeight: 500, color: '#0F172A', margin: 0 }}>{step.title}</h2>
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '22px' }}>
           {lines.map((t, n) => <p key={n} style={{ margin: 0, fontSize: '15px', lineHeight: 1.6, color: '#0f172a', fontWeight: n === 0 ? 700 : 500 }}>{t}</p>)}
         </div>
         {step.go && (
-          <button onClick={goThere} style={{ border: 'none', background: 'transparent', color: '#034321', fontWeight: 800, fontSize: '14px', cursor: 'pointer', padding: 0, marginBottom: '20px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <button onClick={goThere} style={{ border: 'none', background: 'transparent', color: '#3F8432', fontWeight: 500, fontSize: '14px', cursor: 'pointer', padding: 0, marginBottom: '20px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             {step.go.label} <ArrowRight size={15} />
           </button>
         )}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
           <div style={{ display: 'flex', gap: '6px' }} aria-hidden="true">
-            {steps.map((s, n) => <span key={s.key} style={{ width: n === i ? '22px' : '8px', height: '8px', borderRadius: '4px', background: n === i ? '#034321' : '#E2E8F0' }} />)}
+            {steps.map((s, n) => <span key={s.key} style={{ width: n === i ? '22px' : '8px', height: '8px', borderRadius: '4px', background: n === i ? '#3F8432' : '#E2E8F0' }} />)}
           </div>
           <div style={{ display: 'flex', gap: '10px' }}>
             {i > 0 && (
-              <button onClick={() => setI(i - 1)} style={{ padding: '10px 16px', borderRadius: '8px', border: '1px solid #CBD5E1', background: '#FFFFFF', color: '#0f172a', fontWeight: 800, fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <button onClick={() => setI(i - 1)} style={{ padding: '10px 16px', borderRadius: '8px', border: '1px solid #CBD5E1', background: '#FFFFFF', color: '#0f172a', fontWeight: 500, fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 <ArrowLeft size={14} /> Back
               </button>
             )}
-            <button onClick={last ? finish : () => setI(i + 1)} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#034321', color: '#FFFFFF', fontWeight: 800, fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <button onClick={last ? finish : () => setI(i + 1)} style={{ padding: '10px 20px', borderRadius: '8px', border: 'none', background: '#3F8432', color: '#FFFFFF', fontWeight: 500, fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               {last ? 'Finish' : 'Next'} {!last && <ArrowRight size={14} />}
             </button>
           </div>

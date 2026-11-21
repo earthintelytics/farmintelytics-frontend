@@ -19,23 +19,8 @@ const BUNCH_WEIGHT_EXPORT_COLS = [
   { key: 'status', header: 'Status' },
 ];
 
-// Premium Simulated Earthintelytics Bunch Weight Dataset
-const BUNCH_WEIGHT_DATA = [
-  { date: '2026-05-18', plotId: 'MA-01', estate: 'Main Estate', batchNo: 'B-260518-A', totalBunches: 124, grossWeight: 2356, avgWeight: 19.0, grade: 'Class A', status: 'Approved' },
-  { date: '2026-05-18', plotId: 'MA-04', estate: 'Main Estate', batchNo: 'B-260518-B', totalBunches: 98, grossWeight: 1782, avgWeight: 18.2, grade: 'Class B', status: 'Approved' },
-  { date: '2026-05-18', plotId: 'EX1-12', estate: 'Extension 1', batchNo: 'B-260518-C', totalBunches: 156, grossWeight: 3120, avgWeight: 20.0, grade: 'Class A', status: 'Approved' },
-  { date: '2026-05-17', plotId: 'EX1-14', estate: 'Extension 1', batchNo: 'B-260517-A', totalBunches: 110, grossWeight: 1980, avgWeight: 18.0, grade: 'Class B', status: 'Approved' },
-  { date: '2026-05-17', plotId: 'EX2-03', estate: 'Extension 2', batchNo: 'B-260517-B', totalBunches: 85, grossWeight: 1445, avgWeight: 17.0, grade: 'Class C', status: 'Pending' },
-  { date: '2026-05-17', plotId: 'MA-02', estate: 'Main Estate', batchNo: 'B-260517-C', totalBunches: 142, grossWeight: 2840, avgWeight: 20.0, grade: 'Class A', status: 'Approved' },
-  { date: '2026-05-16', plotId: 'MA-09', estate: 'Main Estate', batchNo: 'B-260516-A', totalBunches: 115, grossWeight: 2127, avgWeight: 18.5, grade: 'Class B', status: 'Approved' },
-  { date: '2026-05-16', plotId: 'EX1-08', estate: 'Extension 1', batchNo: 'B-260516-B', totalBunches: 130, grossWeight: 2470, avgWeight: 19.0, grade: 'Class A', status: 'Approved' },
-  { date: '2026-05-16', plotId: 'EX2-05', estate: 'Extension 2', batchNo: 'B-260516-C', totalBunches: 92, grossWeight: 1518, avgWeight: 16.5, grade: 'Class C', status: 'Pending' },
-  { date: '2026-05-15', plotId: 'MA-05', estate: 'Main Estate', batchNo: 'B-260515-A', totalBunches: 165, grossWeight: 3382, avgWeight: 20.5, grade: 'Class A', status: 'Approved' },
-  { date: '2026-05-15', plotId: 'EX1-15', estate: 'Extension 1', batchNo: 'B-260515-B', totalBunches: 104, grossWeight: 1924, avgWeight: 18.5, grade: 'Class B', status: 'Approved' },
-  { date: '2026-05-15', plotId: 'EX2-01', estate: 'Extension 2', batchNo: 'B-260515-C', totalBunches: 78, grossWeight: 1287, avgWeight: 16.5, grade: 'Class C', status: 'Approved' },
-  { date: '2026-05-14', plotId: 'MA-07', estate: 'Main Estate', batchNo: 'B-260514-A', totalBunches: 138, grossWeight: 2691, avgWeight: 19.5, grade: 'Class A', status: 'Approved' },
-  { date: '2026-05-14', plotId: 'EX1-10', estate: 'Extension 1', batchNo: 'B-260514-B', totalBunches: 122, grossWeight: 2257, avgWeight: 18.5, grade: 'Class B', status: 'Approved' },
-];
+// Real bunch-weight records are populated from live estate weighbridge / harvest syncs (no hardcoded sample rows).
+const BUNCH_WEIGHT_DATA = [];
 
 export function BunchWeightView({ onBack }) {
   const { userRole } = useAppContext();
@@ -172,7 +157,7 @@ export function BunchWeightView({ onBack }) {
               ← Back to Plot Analytics
             </button>
           )}
-          <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 800, color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '6px' }}>Bunch Weight Audit</h1>
+          <h1 className="view-title" style={{ fontSize: '26px', fontWeight: 500, color: '#0f172a', letterSpacing: '-0.02em', marginBottom: '6px' }}>Bunch Weight Audit</h1>
           <p className="view-subtitle" style={{ fontSize: '14px', color: '#0f172a', fontWeight: 500 }}>Precision tracking of FFB mass, plot density, and crop yield classification metrics.</p>
         </div>
       </div>
@@ -236,7 +221,7 @@ export function BunchWeightView({ onBack }) {
 
         {/* Buttons Action Group */}
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn--outline" onClick={handleReset} style={{ height: '42px', minWidth: '100px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '10px' }}>
+          <button className="btn btn--outline" onClick={handleReset} style={{ height: '42px', minWidth: '100px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '10px' }}>
             <RotateCcw size={15} /> Reset
           </button>
           <button 
@@ -245,7 +230,7 @@ export function BunchWeightView({ onBack }) {
             disabled={isViewer}
             title={isViewer ? 'Viewer accounts cannot export CSV from the portal' : 'Select columns to export CSV'}
             style={{
-              height: '42px', minWidth: '140px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '10px',
+              height: '42px', minWidth: '140px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px', borderRadius: '10px',
               background: isViewer ? '#94a3b8' : undefined,
               borderColor: isViewer ? '#94a3b8' : undefined,
               cursor: isViewer ? 'not-allowed' : 'pointer',
@@ -302,11 +287,11 @@ export function BunchWeightView({ onBack }) {
               filteredPaginatedData.map((row, idx) => (
                 <tr key={idx} className="plot-row">
                   <td className="plot-cell" style={{ fontSize: '13.5px' }}>{row.date}</td>
-                  <td className="plot-cell" style={{ color: 'var(--clr-brand-primary)', fontWeight: 800 }}>{row.plotId}</td>
+                  <td className="plot-cell" style={{ color: 'var(--clr-brand-primary)', fontWeight: 500 }}>{row.plotId}</td>
                   <td className="plot-cell">{row.estate}</td>
-                  <td className="plot-cell plot-cell--num" style={{ fontWeight: 700 }}>{fmtNumber(row.totalBunches)}</td>
-                  <td className="plot-cell plot-cell--num" style={{ color: '#f97316', fontWeight: 800 }}>{row.avgWeight} kg</td>
-                  <td className="plot-cell plot-cell--num" style={{ color: '#1e3a8a', fontWeight: 800 }}>{(row.totalBunches * row.avgWeight / 1000).toFixed(2)} t</td>
+                  <td className="plot-cell plot-cell--num" style={{ fontWeight: 500 }}>{fmtNumber(row.totalBunches)}</td>
+                  <td className="plot-cell plot-cell--num" style={{ color: '#f97316', fontWeight: 500 }}>{row.avgWeight} kg</td>
+                  <td className="plot-cell plot-cell--num" style={{ color: '#1e3a8a', fontWeight: 500 }}>{(row.totalBunches * row.avgWeight / 1000).toFixed(2)} t</td>
                 </tr>
               ))
             )}

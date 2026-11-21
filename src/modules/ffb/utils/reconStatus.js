@@ -4,7 +4,7 @@ export const RECON_STATUS = {
   DISCREPANCY: { label: 'Mismatch', color: '#ef4444', dark: '#b91c1c' },
   WAITING_FOR_LOADER: { label: 'Awaiting Loading Clerk', color: '#facc15', dark: '#eab308' },  // bright yellow
   WAITING_FOR_RECORDER: { label: 'Awaiting Recorders', color: '#a855f7', dark: '#7e22ce' },
-  RECONCILED: { label: 'Matched', color: '#5AA041', dark: '#034321' },
+  RECONCILED: { label: 'Matched', color: '#5AA041', dark: '#3F8432' },
   // Every record decided and a supervisor rejected some (dark slate, never looks like a mismatch)
   REJECTED: { label: 'Rejected', color: '#475569', dark: '#334155' },
 };

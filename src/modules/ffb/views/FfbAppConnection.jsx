@@ -5,6 +5,7 @@ import {
   Cpu, ShieldCheck, RefreshCw, TabletSmartphone, Building2,
 } from 'lucide-react';
 import { ffbCall } from '../api/ffbApi';
+import OrgLogo from '../../../components/OrgLogo';
 
 export default function FfbAppConnection({ tenantSlug }) {
   const [pack, setPack] = useState(null);
@@ -23,7 +24,7 @@ export default function FfbAppConnection({ tenantSlug }) {
         const imgUrl = await QRCode.toDataURL(data.qr_payload, {
           width: 240,
           margin: 2,
-          color: { dark: '#034321', light: '#FFFFFF' },
+          color: { dark: '#3F8432', light: '#FFFFFF' },
         });
         setQrImg(imgUrl);
       } else {
@@ -84,40 +85,42 @@ export default function FfbAppConnection({ tenantSlug }) {
       {pack && (
         <>
           {/* Verified Client Identity Hero */}
-          <div className="bg-[#034321] text-white rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+          <div className="bg-white border border-gray-200 rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-4 min-w-0">
-              {pack.logo_url ? (
-                <img
-                  src={pack.logo_url}
-                  alt={pack.display_name}
-                  className="w-14 h-14 rounded-xl bg-white p-1.5 object-contain shrink-0"
-                />
-              ) : (
-                <div className="w-14 h-14 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
-                  <Building2 size={26} />
-                </div>
-              )}
+              <OrgLogo
+                tenant={pack.company_id}
+                version={pack.logo_url ? '1' : ''}
+                className="w-14 h-14 rounded-xl shrink-0"
+                fallback={
+                  <div className="w-14 h-14 rounded-xl bg-[#F3F8EF] text-[#3F8432] flex items-center justify-center shrink-0">
+                    <Building2 size={24} strokeWidth={1.5} />
+                  </div>
+                }
+              />
               <div className="min-w-0">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-white/15 text-[11px] font-semibold uppercase tracking-wider mb-1">
-                  <CheckCircle2 size={12} /> Connected &amp; Tenant-Isolated
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F3F8EF] text-[#2D6A2C] text-[11px] font-medium uppercase tracking-wider mb-1">
+                  <CheckCircle2 size={12} strokeWidth={1.5} /> Connected &amp; Tenant-Isolated
                 </div>
-                <h2 className="font-display text-xl font-bold truncate">{pack.display_name || pack.company_id}</h2>
-                <p className="text-xs text-white/85 font-mono">
-                  Organisation Code: <span className="font-bold text-white">{pack.company_id}</span>
-                </p>
+                <h2 className="font-display text-xl font-medium text-gray-900 truncate">{pack.display_name || pack.company_id}</h2>
+                <div className="flex flex-wrap items-center gap-2 mt-1">
+                  <p className="text-xs text-gray-600 font-mono">
+                    Project / Organisation Code: <span className="font-semibold text-[#2D6A2C] bg-[#F3F8EF] px-2 py-0.5 rounded">{pack.company_id}</span>
+                  </p>
+                  <CopyBtn id="code" value={pack.company_id} label="Copy Project Code" />
+                </div>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 text-xs">
-              <div className="px-3 py-2 rounded-xl bg-white/10 border border-white/20">
-                <p className="text-[10px] uppercase tracking-wider text-white/75">Active Field Devices</p>
-                <p className="text-base font-bold">{devices.length}</p>
+              <div className="px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200">
+                <p className="text-[10px] uppercase tracking-wider text-gray-500 font-medium">Active Field Devices</p>
+                <p className="text-base font-mono font-medium text-gray-900">{devices.length}</p>
               </div>
-              <div className="px-3 py-2 rounded-xl bg-white/10 border border-white/20">
-                <p className="text-[10px] uppercase tracking-wider text-white/75 flex items-center gap-1">
-                  <Cpu size={11} /> OTA AI Model
+              <div className="px-3.5 py-2.5 rounded-xl bg-gray-50 border border-gray-200">
+                <p className="text-[10px] uppercase tracking-wider text-gray-500 font-medium flex items-center gap-1">
+                  <Cpu size={11} strokeWidth={1.5} /> OTA AI Model
                 </p>
-                <p className="text-base font-bold font-mono">{pack.active_ml_model?.version || 'Bundled'}</p>
+                <p className="text-base font-mono font-medium text-gray-900">{pack.active_ml_model?.version || 'Bundled'}</p>
               </div>
             </div>
           </div>
@@ -143,9 +146,10 @@ export default function FfbAppConnection({ tenantSlug }) {
                             href={pack.portal_url}
                             target="_blank"
                             rel="noreferrer"
-                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[var(--brand-primary)] text-white font-semibold"
+                            style={{ color: '#FFFFFF' }}
+                            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#3F8432] text-white font-medium hover:bg-[#2D6A2C]"
                           >
-                            <ExternalLink size={12} /> Open
+                            <ExternalLink size={12} strokeWidth={1.5} /> Open
                           </a>
                         )}
                       </div>
@@ -161,14 +165,14 @@ export default function FfbAppConnection({ tenantSlug }) {
                   </div>
 
                   <div className="p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-light)]">
-                    <p className="text-[11px] font-semibold text-[var(--text-muted)] mb-1">Earthintelytics FFB Android APK</p>
+                    <p className="text-[11px] font-medium text-[var(--text-muted)] mb-1">FarmIntelytics FFB Android APK</p>
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
-                        <p className="font-semibold text-gray-900">
+                        <p className="font-medium text-gray-900">
                           Version <span className="font-mono">{pack.latest_apk_version || '—'}</span>
                         </p>
                         <p className="text-[11px] text-[var(--text-muted)]">
-                          Install this APK on estate tablets/phones, then scan the Setup QR code.
+                          Install this APK on estate tablets/phones, scan the Setup QR or enter your Project Code to unlock Clerk Login.
                         </p>
                       </div>
                       {pack.apk_download_url ? (
@@ -176,9 +180,10 @@ export default function FfbAppConnection({ tenantSlug }) {
                           href={pack.apk_download_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#034321] text-white text-xs font-semibold hover:opacity-95"
+                          style={{ color: '#FFFFFF' }}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#3F8432] text-white text-xs font-medium hover:bg-[#2D6A2C]"
                         >
-                          <Download size={14} /> Download APK
+                          <Download size={14} strokeWidth={1.5} /> Download APK
                         </a>
                       ) : (
                         <span className="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200 text-[11px] font-medium">
@@ -234,18 +239,18 @@ export default function FfbAppConnection({ tenantSlug }) {
             </div>
 
             {/* Right col: Scannable Setup QR */}
-            <div className="bg-white rounded-2xl border border-[var(--border-light)] p-5 flex flex-col items-center text-center space-y-3 h-fit">
-              <div className="w-9 h-9 rounded-full bg-[#E8F2E5] text-[#034321] flex items-center justify-center">
-                <Smartphone size={18} />
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 flex flex-col items-center text-center space-y-3 h-fit">
+              <div className="w-9 h-9 rounded-full bg-[#F3F8EF] text-[#3F8432] flex items-center justify-center">
+                <Smartphone size={18} strokeWidth={1.5} />
               </div>
               <div>
-                <h3 className="font-display text-base font-semibold">1-Scan Device Setup QR</h3>
+                <h3 className="font-display text-base font-medium">1-Scan Device Setup QR</h3>
                 <p className="text-xs text-[var(--text-muted)] mt-1">
-                  Open <strong>Earthintelytics FFB</strong> on the phone, tap <strong>Scan Badge</strong> (or Setup QR), and point at this code to lock the device to <strong>{pack.display_name || pack.company_id}</strong>.
+                  Open <strong>FarmIntelytics FFB</strong> on the phone, scan this Setup QR or enter Project Code <strong className="font-mono">{pack.company_id}</strong> to unlock Clerk Login for <strong>{pack.display_name || pack.company_id}</strong>.
                 </p>
               </div>
               {qrImg ? (
-                <div className="p-3 rounded-2xl border-2 border-[#3F8432]/30 bg-white">
+                <div className="p-3 rounded-2xl border border-gray-200 bg-white">
                   <img src={qrImg} alt={`Setup QR for ${pack.company_id}`} className="w-52 h-52" />
                 </div>
               ) : (
@@ -253,11 +258,10 @@ export default function FfbAppConnection({ tenantSlug }) {
                   Generating QR…
                 </div>
               )}
-              <div className="w-full p-2.5 rounded-xl bg-[#E8F2E5] text-[#034321] text-[11px] font-medium">
-                Once scanned, the app displays a permanent green badge:{' '}
+              <div className="w-full p-2.5 rounded-xl bg-[#F3F8EF] text-[#2D6A2C] text-[11px] font-medium">
+                Once validated, the app displays a permanent green badge:{' '}
                 <strong className="font-mono">Connected: {pack.display_name || pack.company_id} ({pack.company_id})</strong>
               </div>
-              <CopyBtn id="qr" value={pack.qr_payload} label="Copy Raw QR Payload" />
             </div>
           </div>
         </>

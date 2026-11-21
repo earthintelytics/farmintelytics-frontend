@@ -17,7 +17,7 @@ function showBar() {
   bar.textContent = 'A new version of the portal is available.';
   const btn = document.createElement('button');
   btn.textContent = 'Reload';
-  btn.style.cssText = 'background:#034321;color:#fff;border:none;border-radius:6px;padding:6px 12px;font:600 13px Inter,sans-serif;cursor:pointer';
+  btn.style.cssText = 'background:#3F8432;color:#fff;border:none;border-radius:6px;padding:6px 12px;font:600 13px Inter,sans-serif;cursor:pointer';
   btn.onclick = () => window.location.reload();
   bar.appendChild(btn);
   document.body.appendChild(bar);

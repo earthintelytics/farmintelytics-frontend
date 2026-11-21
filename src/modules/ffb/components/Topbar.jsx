@@ -6,6 +6,12 @@ import { API } from '../services/api';
 import { useAppContext } from '../context/AppContext';
 import { estateLabel, getEstateScope, getRole, getUserEmail } from '../utils/access';
 
+function cleanOrgName(raw, slug) {
+  if (raw && raw.trim()) return raw.trim().replace(/_/g, ' ');
+  const s = String(slug || 'Enterprise FFB').replace(/[_-]+/g, ' ').trim();
+  return s.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export function Topbar({ onToggleSidebar, onBack, onSignOut }) {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastRefreshed, setLastRefreshed] = useState(
@@ -42,62 +48,62 @@ export function Topbar({ onToggleSidebar, onBack, onSignOut }) {
 
   const userEmail = getUserEmail();
   const roleLabel = getRole();
-  const orgName = tenantMeta?.display_name || tenantSlug || 'Enterprise FFB';
+  const orgName = cleanOrgName(tenantMeta?.display_name, tenantSlug);
 
   return (
     <header id="topbar" role="banner" aria-label="Application topbar">
       <div className="topbar-left">
         <button className="sidebar-toggle" onClick={onToggleSidebar} aria-label="Toggle sidebar">
-          <Menu size={18} strokeWidth={2.5} />
+          <Menu size={18} strokeWidth={1.5} />
         </button>
-        <span className="topbar-title">OPERATIONS ANALYTICS</span>
-        <div className="topbar-sync" style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: '20px' }}>
+        <span className="topbar-title">Harvest Intelligence</span>
+        <div className="topbar-sync" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: '14px' }}>
           <button
             className="btn-sync-global"
             onClick={handleSync}
             disabled={isSyncing}
-            title="Refresh All Analytics Data"
+            title="Sync Latest Harvest & Analytics Data"
             style={{
               display: 'flex',
               alignItems: 'center',
-              gap: '8px',
-              background: '#034321',
-              color: 'white',
-              border: 'none',
-              padding: '8px 18px',
+              gap: '6px',
+              background: '#3F8432',
+              color: '#FFFFFF',
+              border: '1px solid #3F8432',
+              padding: '7px 14px',
               borderRadius: '8px',
               fontSize: '12px',
-              fontWeight: 900,
+              fontWeight: 500,
               cursor: isSyncing ? 'not-allowed' : 'pointer',
               opacity: isSyncing ? 0.85 : 1,
             }}
           >
-            <RefreshCw size={15} className={isSyncing ? 'spin' : ''} />
-            <span>{isSyncing ? 'REFRESHING' : 'REFRESH'}</span>
+            <RefreshCw size={14} strokeWidth={1.5} className={isSyncing ? 'spin' : ''} />
+            <span>{isSyncing ? 'Syncing' : 'Sync Data'}</span>
           </button>
 
-          <div className="topbar-last" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#0f172a', fontWeight: 700 }}>
-            <Clock size={12} />
-            <span>Last: {lastRefreshed}</span>
+          <div className="topbar-last" style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11.5px', color: '#64748B', fontWeight: 400 }}>
+            <Clock size={12} strokeWidth={1.5} />
+            <span>Updated {lastRefreshed}</span>
           </div>
         </div>
       </div>
 
-      <div className="topbar-right" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div className="topbar-right" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         {orgs && orgs.length > 0 && onSelectTenant && (
           <select
             value={tenantSlug}
             onChange={(e) => onSelectTenant(e.target.value)}
             aria-label="Switch organisation"
             style={{
-              height: '36px',
+              height: '34px',
               borderRadius: '8px',
-              border: '1px solid #cbd5e1',
+              border: '1px solid #E2E8F0',
               padding: '0 10px',
               fontSize: '12px',
-              fontWeight: 700,
-              color: '#034321',
-              background: '#E8F2E5',
+              fontWeight: 500,
+              color: '#2D6A2C',
+              background: '#F3F8EF',
             }}
           >
             {orgs.map((o) => (
@@ -110,11 +116,23 @@ export function Topbar({ onToggleSidebar, onBack, onSignOut }) {
 
         <span
           className="topbar-estate"
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '12px',
+            fontWeight: 500,
+            color: '#334155',
+            background: '#FFFFFF',
+            border: '1px solid #E2E8F0',
+            padding: '6px 12px',
+            borderRadius: '8px',
+          }}
           title={getEstateScope() ? `Scoped to ${getEstateScope()}` : `${orgName} — ${estateLabel()}`}
         >
-          <MapPin size={14} />
-          <span className="topbar-estate__label">Estate</span>
-          {estateLabel()}
+          <MapPin size={13} strokeWidth={1.5} color="#3F8432" />
+          <span className="topbar-estate__label" style={{ color: '#64748B', fontWeight: 500, fontSize: '11px', textTransform: 'none' }}>Estate:</span>
+          <span>{estateLabel()}</span>
         </span>
 
         <div style={{ position: 'relative' }}>
@@ -122,20 +140,20 @@ export function Topbar({ onToggleSidebar, onBack, onSignOut }) {
             onClick={() => setShowUserDropdown(!showUserDropdown)}
             className="topbar-user-avatar"
             style={{
-              color: '#034321',
-              background: 'transparent',
-              width: '40px',
-              height: '40px',
-              borderRadius: '10px',
+              color: '#3F8432',
+              background: '#FFFFFF',
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              border: 'none',
+              border: '1px solid #E2E8F0',
               cursor: 'pointer',
             }}
             title="Account & Controls"
           >
-            <UserCircle size={24} />
+            <UserCircle size={20} strokeWidth={1.5} />
           </button>
 
           {showUserDropdown && (
@@ -143,19 +161,19 @@ export function Topbar({ onToggleSidebar, onBack, onSignOut }) {
               style={{
                 position: 'absolute',
                 right: 0,
-                top: '48px',
+                top: '44px',
                 minWidth: '240px',
                 background: '#FFFFFF',
                 border: '1px solid #E2E8F0',
-                borderRadius: '12px',
-                boxShadow: '0 12px 24px rgba(15,23,42,0.12)',
-                padding: '10px',
+                borderRadius: '10px',
+                boxShadow: '0 8px 20px rgba(15,23,42,0.08)',
+                padding: '8px',
                 zIndex: 9999,
               }}
             >
-              <div style={{ padding: '6px 10px', borderBottom: '1px solid #F1F5F9', marginBottom: '6px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A' }}>{userEmail}</div>
-                <div style={{ fontSize: '11px', fontWeight: 700, color: '#034321' }}>
+              <div style={{ padding: '6px 10px', borderBottom: '1px solid #E2E8F0', marginBottom: '6px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 500, color: '#0F172A' }}>{userEmail}</div>
+                <div style={{ fontSize: '11px', fontWeight: 500, color: '#3F8432' }}>
                   {orgName} · {roleLabel}
                 </div>
               </div>
@@ -165,9 +183,9 @@ export function Topbar({ onToggleSidebar, onBack, onSignOut }) {
                   setShowUserDropdown(false);
                   navigate('/mobile-app');
                 }}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'transparent', fontSize: '13px', fontWeight: 600, color: '#0F172A', cursor: 'pointer', borderRadius: '8px' }}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'transparent', fontSize: '13px', fontWeight: 500, color: '#0F172A', cursor: 'pointer', borderRadius: '8px' }}
               >
-                <Smartphone size={15} /> Field App &amp; QR
+                <Smartphone size={15} strokeWidth={1.5} /> Field App &amp; QR
               </button>
               <button
                 type="button"
@@ -175,9 +193,9 @@ export function Topbar({ onToggleSidebar, onBack, onSignOut }) {
                   setShowUserDropdown(false);
                   navigate('/admin');
                 }}
-                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'transparent', fontSize: '13px', fontWeight: 600, color: '#0F172A', cursor: 'pointer', borderRadius: '8px' }}
+                style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'transparent', fontSize: '13px', fontWeight: 500, color: '#0F172A', cursor: 'pointer', borderRadius: '8px' }}
               >
-                <Shield size={15} /> Admin &amp; Alerts
+                <Shield size={15} strokeWidth={1.5} /> Admin &amp; Alerts
               </button>
               {onBack && (
                 <button
@@ -186,9 +204,9 @@ export function Topbar({ onToggleSidebar, onBack, onSignOut }) {
                     setShowUserDropdown(false);
                     onBack();
                   }}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'transparent', fontSize: '13px', fontWeight: 600, color: '#0F172A', cursor: 'pointer', borderRadius: '8px' }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'transparent', fontSize: '13px', fontWeight: 500, color: '#0F172A', cursor: 'pointer', borderRadius: '8px' }}
                 >
-                  <ArrowLeft size={15} /> Back to Portal
+                  <ArrowLeft size={15} strokeWidth={1.5} /> Back to Portal
                 </button>
               )}
               {onSignOut && (
@@ -198,9 +216,9 @@ export function Topbar({ onToggleSidebar, onBack, onSignOut }) {
                     setShowUserDropdown(false);
                     onSignOut();
                   }}
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'transparent', fontSize: '13px', fontWeight: 700, color: '#DC2626', cursor: 'pointer', borderRadius: '8px' }}
+                  style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', border: 'none', background: 'transparent', fontSize: '13px', fontWeight: 500, color: '#DC2626', cursor: 'pointer', borderRadius: '8px' }}
                 >
-                  <LogOut size={15} /> Sign Out
+                  <LogOut size={15} strokeWidth={1.5} /> Sign Out
                 </button>
               )}
             </div>

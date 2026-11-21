@@ -19,17 +19,17 @@ export const CONFIG = Object.freeze({
   PAGE_SIZE: 10,
 
   ROLE_COLORS: {
-    harvesting_clerk: '#034321',
+    harvesting_clerk: '#3F8432',
     loading_clerk: '#3F8432',
     picker: '#5AA041',
   },
 
   STATUS_COLORS: {
-    valid: '#034321',
+    valid: '#3F8432',
     warning: '#f57f17',
     error: '#c62828',
   },
 
-  APP_NAME: 'Earthintelytics FFB Portal',
+  APP_NAME: 'FarmIntelytics FFB Portal',
   APP_VERSION: '3.0.0',
 });

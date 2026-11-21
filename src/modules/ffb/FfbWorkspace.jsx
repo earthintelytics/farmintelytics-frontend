@@ -136,7 +136,7 @@ export default function FfbWorkspace({ onBack, onSignOut }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] p-8">
         <div className="max-w-lg w-full p-8 bg-white rounded-2xl border border-gray-200 text-center space-y-3">
-          <h2 className="text-xl font-bold text-[#034321]">No FFB-licensed organisation selected</h2>
+          <h2 className="text-xl font-bold text-[#3F8432]">No FFB-licensed organisation selected</h2>
           <p className="text-sm text-gray-600">
             Enable <strong>FFB</strong> on an organisation under Admin → Organisations → Licence first.
           </p>

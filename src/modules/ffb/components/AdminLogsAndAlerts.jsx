@@ -371,10 +371,10 @@ export function AdminLogsAndAlerts({ section }) {
               padding: '8px 16px',
               borderRadius: '6px',
               fontSize: '13px',
-              fontWeight: 800,
+              fontWeight: 500,
               border: 'none',
               cursor: 'pointer',
-              background: activeSubTab === 'logs' ? 'var(--clr-brand-primary, #034321)' : 'transparent',
+              background: activeSubTab === 'logs' ? 'var(--clr-brand-primary, #3F8432)' : 'transparent',
               color: activeSubTab === 'logs' ? '#FFFFFF' : '#0F172A',
               transition: 'all 0.15s ease'
             }}
@@ -388,7 +388,7 @@ export function AdminLogsAndAlerts({ section }) {
                 padding: '2px 7px',
                 borderRadius: '10px',
                 fontSize: '11px',
-                fontWeight: 900
+                fontWeight: 500
               }}>
                 {metrics.error_count + metrics.critical_count}
               </span>
@@ -404,10 +404,10 @@ export function AdminLogsAndAlerts({ section }) {
               padding: '8px 16px',
               borderRadius: '6px',
               fontSize: '13px',
-              fontWeight: 800,
+              fontWeight: 500,
               border: 'none',
               cursor: 'pointer',
-              background: activeSubTab === 'recipients' ? 'var(--clr-brand-primary, #034321)' : 'transparent',
+              background: activeSubTab === 'recipients' ? 'var(--clr-brand-primary, #3F8432)' : 'transparent',
               color: activeSubTab === 'recipients' ? '#FFFFFF' : '#0F172A',
               transition: 'all 0.15s ease'
             }}
@@ -416,11 +416,11 @@ export function AdminLogsAndAlerts({ section }) {
             <span>Email Alerting & Recipients</span>
             <span style={{
               background: activeSubTab === 'recipients' ? '#FFFFFF' : '#E2E8F0',
-              color: activeSubTab === 'recipients' ? '#034321' : '#0F172A',
+              color: activeSubTab === 'recipients' ? '#3F8432' : '#0F172A',
               padding: '2px 7px',
               borderRadius: '10px',
               fontSize: '11px',
-              fontWeight: 900
+              fontWeight: 500
             }}>
               {recipients.length}
             </span>
@@ -435,10 +435,10 @@ export function AdminLogsAndAlerts({ section }) {
               padding: '8px 16px',
               borderRadius: '6px',
               fontSize: '13px',
-              fontWeight: 800,
+              fontWeight: 500,
               border: 'none',
               cursor: 'pointer',
-              background: activeSubTab === 'history' ? 'var(--clr-brand-primary, #034321)' : 'transparent',
+              background: activeSubTab === 'history' ? 'var(--clr-brand-primary, #3F8432)' : 'transparent',
               color: activeSubTab === 'history' ? '#FFFFFF' : '#0F172A',
               transition: 'all 0.15s ease'
             }}
@@ -463,7 +463,7 @@ export function AdminLogsAndAlerts({ section }) {
                 background: '#F1F5F9',
                 border: 'none',
                 color: '#0F172A',
-                fontWeight: 800,
+                fontWeight: 500,
                 fontSize: '13px',
                 cursor: 'pointer'
               }}
@@ -484,7 +484,7 @@ export function AdminLogsAndAlerts({ section }) {
                 background: '#DC2626',
                 border: '2px solid #DC2626',
                 color: '#FFFFFF',
-                fontWeight: 800,
+                fontWeight: 500,
                 fontSize: '13px',
                 cursor: 'pointer'
               }}
@@ -505,10 +505,10 @@ export function AdminLogsAndAlerts({ section }) {
               gap: '8px',
               padding: '9px 18px',
               borderRadius: '8px',
-              background: 'var(--clr-brand-primary, #034321)',
+              background: 'var(--clr-brand-primary, #3F8432)',
               border: 'none',
               color: '#FFFFFF',
-              fontWeight: 800,
+              fontWeight: 500,
               fontSize: '13px',
               cursor: 'pointer',
               boxShadow: '0 4px 12px rgba(3, 67, 33, 0.25)'
@@ -536,12 +536,12 @@ export function AdminLogsAndAlerts({ section }) {
             {/* KPI 1: Total Logs */}
             <div style={{ background: '#FFFFFF', padding: '16px 20px', borderRadius: '10px', border: '2px solid #E2E8F0', boxShadow: 'var(--shadow-panel)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ background: 'transparent', color: '#034321', width: '44px', height: '44px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ background: 'transparent', color: '#3F8432', width: '44px', height: '44px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Terminal size={22} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '22px', fontWeight: 900, color: '#000000', lineHeight: 1 }}>{metrics.total}</div>
-                  <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 800, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '22px', fontWeight: 500, color: '#000000', lineHeight: 1 }}>{metrics.total}</div>
+                  <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 500, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Total System Logs
                   </div>
                 </div>
@@ -555,10 +555,10 @@ export function AdminLogsAndAlerts({ section }) {
                   <AlertCircle size={22} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '22px', fontWeight: 900, color: '#DC2626', lineHeight: 1 }}>
+                  <div style={{ fontSize: '22px', fontWeight: 500, color: '#DC2626', lineHeight: 1 }}>
                     {metrics.error_count + metrics.critical_count}
                   </div>
-                  <div style={{ fontSize: '11px', color: '#991B1B', fontWeight: 800, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '11px', color: '#991B1B', fontWeight: 500, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     Errors & Criticals
                   </div>
                 </div>
@@ -572,8 +572,8 @@ export function AdminLogsAndAlerts({ section }) {
                   <AlertTriangle size={22} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '22px', fontWeight: 900, color: '#D97706', lineHeight: 1 }}>{metrics.warning_count}</div>
-                  <div style={{ fontSize: '11px', color: '#92400E', fontWeight: 800, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '22px', fontWeight: 500, color: '#D97706', lineHeight: 1 }}>{metrics.warning_count}</div>
+                  <div style={{ fontSize: '11px', color: '#92400E', fontWeight: 500, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     System Warnings
                   </div>
                 </div>
@@ -583,12 +583,12 @@ export function AdminLogsAndAlerts({ section }) {
             {/* KPI 4: Operational / Info */}
             <div style={{ background: '#FFFFFF', padding: '16px 20px', borderRadius: '10px', border: '2px solid #E2E8F0', boxShadow: 'var(--shadow-panel)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ background: 'transparent', color: '#034321', width: '44px', height: '44px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ background: 'transparent', color: '#3F8432', width: '44px', height: '44px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <Info size={22} />
                 </div>
                 <div>
-                  <div style={{ fontSize: '22px', fontWeight: 900, color: '#034321', lineHeight: 1 }}>{metrics.info_count}</div>
-                  <div style={{ fontSize: '11px', color: '#14532D', fontWeight: 800, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  <div style={{ fontSize: '22px', fontWeight: 500, color: '#3F8432', lineHeight: 1 }}>{metrics.info_count}</div>
+                  <div style={{ fontSize: '11px', color: '#14532D', fontWeight: 500, marginTop: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                     INFO
                   </div>
                 </div>
@@ -654,13 +654,13 @@ export function AdminLogsAndAlerts({ section }) {
 
             {/* Level Selector Pills */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-              <span style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', marginRight: '4px' }}>Level:</span>
+              <span style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a', marginRight: '4px' }}>Level:</span>
               {['ALL', 'ERROR', 'CRITICAL', 'WARNING', 'INFO'].map((lvl) => {
                 const isActive = levelFilter === lvl;
-                let activeBg = '#034321';
+                let activeBg = '#3F8432';
                 if (lvl === 'ERROR' || lvl === 'CRITICAL') activeBg = '#DC2626';
                 if (lvl === 'WARNING') activeBg = '#D97706';
-                if (lvl === 'INFO') activeBg = '#034321';
+                if (lvl === 'INFO') activeBg = '#3F8432';
 
                 return (
                   <button
@@ -670,7 +670,7 @@ export function AdminLogsAndAlerts({ section }) {
                       padding: '6px 12px',
                       borderRadius: '6px',
                       fontSize: '12px',
-                      fontWeight: 800,
+                      fontWeight: 500,
                       border: isActive ? `1.5px solid ${activeBg}` : '1.5px solid #E2E8F0',
                       background: isActive ? activeBg : '#FFFFFF',
                       color: isActive ? '#FFFFFF' : '#0F172A',
@@ -688,7 +688,7 @@ export function AdminLogsAndAlerts({ section }) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <Clock size={15} style={{ color: '#0f172a' }} />
-                <span style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a' }}>Auto-refresh:</span>
+                <span style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a' }}>Auto-refresh:</span>
                 <select
                   value={autoRefreshInterval}
                   onChange={(e) => setAutoRefreshInterval(Number(e.target.value))}
@@ -697,9 +697,9 @@ export function AdminLogsAndAlerts({ section }) {
                     borderRadius: '6px',
                     border: '1.5px solid #CBD5E1',
                     fontSize: '12px',
-                    fontWeight: 700,
-                    background: autoRefreshInterval > 0 ? '#E8F2E5' : '#FFFFFF',
-                    color: autoRefreshInterval > 0 ? '#034321' : '#0F172A',
+                    fontWeight: 500,
+                    background: autoRefreshInterval > 0 ? '#F3F8EF' : '#FFFFFF',
+                    color: autoRefreshInterval > 0 ? '#3F8432' : '#0F172A',
                     outline: 'none',
                     cursor: 'pointer'
                   }}
@@ -723,7 +723,7 @@ export function AdminLogsAndAlerts({ section }) {
                   background: '#F1F5F9',
                   border: '1.5px solid #CBD5E1',
                   fontSize: '12px',
-                  fontWeight: 800,
+                  fontWeight: 500,
                   cursor: logsLoading ? 'not-allowed' : 'pointer',
                   color: '#0F172A'
                 }}
@@ -743,7 +743,7 @@ export function AdminLogsAndAlerts({ section }) {
             overflow: 'hidden'
           }}>
             {logsError && (
-              <div style={{ padding: '16px 20px', background: '#FEF2F2', color: '#DC2626', fontSize: '13px', fontWeight: 700, borderBottom: '1px solid #FECACA' }}>
+              <div style={{ padding: '16px 20px', background: '#FEF2F2', color: '#DC2626', fontSize: '13px', fontWeight: 500, borderBottom: '1px solid #FECACA' }}>
                 {logsError}
               </div>
             )}
@@ -752,11 +752,11 @@ export function AdminLogsAndAlerts({ section }) {
               <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '13px' }}>
                 <thead style={{ position: 'sticky', top: 0, background: '#F8FAFC', zIndex: 10, borderBottom: '2px solid #E2E8F0' }}>
                   <tr>
-                    <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a', width: '100px' }}>LEVEL</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a', width: '170px' }}>TIMESTAMP (UTC)</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a', width: '180px' }}>MODULE</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a' }}>MESSAGE</th>
-                    <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a', width: '120px', textAlign: 'right' }}>ACTIONS</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a', width: '100px' }}>LEVEL</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a', width: '170px' }}>TIMESTAMP (UTC)</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a', width: '180px' }}>MODULE</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a' }}>MESSAGE</th>
+                    <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a', width: '120px', textAlign: 'right' }}>ACTIONS</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -764,13 +764,13 @@ export function AdminLogsAndAlerts({ section }) {
                     <tr>
                       <td colSpan={5} style={{ padding: '40px 20px', textAlign: 'center', color: '#0f172a' }}>
                         {logsLoading ? (
-                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontWeight: 700 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', fontWeight: 500 }}>
                             <RefreshCw size={18} className="sync-spinning" /> Loading system logs
                           </div>
                         ) : (
                           <div>
                             <CheckCircle2 size={32} style={{ color: '#3F8432', margin: '0 auto 10px auto' }} />
-                            <div style={{ fontWeight: 800, color: '#0F172A', fontSize: '15px' }}>No log entries found</div>
+                            <div style={{ fontWeight: 500, color: '#0F172A', fontSize: '15px' }}>No log entries found</div>
                             <div style={{ fontSize: '12px', marginTop: '4px' }}>Try adjusting your search query or level filters.</div>
                           </div>
                         )}
@@ -779,7 +779,7 @@ export function AdminLogsAndAlerts({ section }) {
                   ) : (
                     logs.map((log, idx) => {
                       const lvl = (log.level || 'INFO').toUpperCase();
-                      let badgeColor = '#034321';
+                      let badgeColor = '#3F8432';
                       let badgeBorder = '#86EFAC';
                       if (lvl === 'ERROR' || lvl === 'CRITICAL') {
                         badgeColor = '#DC2626';
@@ -807,7 +807,7 @@ export function AdminLogsAndAlerts({ section }) {
                               padding: '3px 8px',
                               borderRadius: '4px',
                               fontSize: '11px',
-                              fontWeight: 900,
+                              fontWeight: 500,
                               background: 'transparent',
                               color: badgeColor,
                               border: `1px solid ${badgeBorder}`
@@ -822,7 +822,7 @@ export function AdminLogsAndAlerts({ section }) {
                           </td>
 
                           {/* Module */}
-                          <td style={{ padding: '12px 16px', color: '#0F172A', fontWeight: 700, fontSize: '12px' }}>
+                          <td style={{ padding: '12px 16px', color: '#0F172A', fontWeight: 500, fontSize: '12px' }}>
                             <span style={{ background: '#F1F5F9', padding: '2px 6px', borderRadius: '4px', fontFamily: 'monospace' }}>
                               {log.module || log.logger_name || 'app'}
                               {log.line_number ? `:${log.line_number}` : ''}
@@ -856,7 +856,7 @@ export function AdminLogsAndAlerts({ section }) {
                                   padding: '4px 8px',
                                   cursor: 'pointer',
                                   fontSize: '11px',
-                                  fontWeight: 800,
+                                  fontWeight: 500,
                                   color: '#0F172A',
                                   display: 'flex',
                                   alignItems: 'center',
@@ -871,14 +871,14 @@ export function AdminLogsAndAlerts({ section }) {
                               <button
                                 onClick={() => handleCopyLog(log)}
                                 style={{
-                                  background: copiedLogId === log.id ? '#E8F2E5' : '#F8FAFC',
+                                  background: copiedLogId === log.id ? '#F3F8EF' : '#F8FAFC',
                                   border: '1px solid #CBD5E1',
                                   borderRadius: '4px',
                                   padding: '4px 8px',
                                   cursor: 'pointer',
                                   fontSize: '11px',
-                                  fontWeight: 800,
-                                  color: copiedLogId === log.id ? '#034321' : '#64748B'
+                                  fontWeight: 500,
+                                  color: copiedLogId === log.id ? '#3F8432' : '#64748B'
                                 }}
                                 title="Copy log entry to clipboard"
                               >
@@ -911,7 +911,7 @@ export function AdminLogsAndAlerts({ section }) {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: '#0f172a' }}>Page size:</span>
+                  <span style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a' }}>Page size:</span>
                   <select
                     value={pageSize}
                     onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
@@ -920,7 +920,7 @@ export function AdminLogsAndAlerts({ section }) {
                       borderRadius: '4px',
                       border: '1.5px solid #CBD5E1',
                       fontSize: '12px',
-                      fontWeight: 700,
+                      fontWeight: 500,
                       outline: 'none'
                     }}
                   >
@@ -941,7 +941,7 @@ export function AdminLogsAndAlerts({ section }) {
                       background: page <= 1 ? '#F1F5F9' : '#FFFFFF',
                       cursor: page <= 1 ? 'not-allowed' : 'pointer',
                       color: page <= 1 ? '#94A3B8' : '#0F172A',
-                      fontWeight: 700,
+                      fontWeight: 500,
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px'
@@ -951,7 +951,7 @@ export function AdminLogsAndAlerts({ section }) {
                     <span>Prev</span>
                   </button>
 
-                  <span style={{ fontSize: '12px', fontWeight: 800, color: '#0F172A', padding: '0 6px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 500, color: '#0F172A', padding: '0 6px' }}>
                     {page} / {totalPages}
                   </span>
 
@@ -965,7 +965,7 @@ export function AdminLogsAndAlerts({ section }) {
                       background: page >= totalPages ? '#F1F5F9' : '#FFFFFF',
                       cursor: page >= totalPages ? 'not-allowed' : 'pointer',
                       color: page >= totalPages ? '#94A3B8' : '#0F172A',
-                      fontWeight: 700,
+                      fontWeight: 500,
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px'
@@ -1000,60 +1000,60 @@ export function AdminLogsAndAlerts({ section }) {
             }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <Server size={20} style={{ color: '#034321' }} />
-                  <span style={{ fontSize: '16px', fontWeight: 900, color: '#000000' }}>SMTP Engine Status</span>
+                  <Server size={20} style={{ color: '#3F8432' }} />
+                  <span style={{ fontSize: '16px', fontWeight: 500, color: '#000000' }}>SMTP Engine Status</span>
                 </div>
                 <span style={{
                   padding: '4px 12px',
                   borderRadius: '12px',
                   fontSize: '11px',
-                  fontWeight: 900,
+                  fontWeight: 500,
                   background: 'transparent',
-                  color: smtpStatus?.configured ? '#034321' : '#475569'
+                  color: smtpStatus?.configured ? '#3F8432' : '#475569'
                 }}>
                   {smtpStatus?.configured ? 'Active' : 'Standby'}
                 </span>
               </div>
 
               {smtpSaveMsg && (
-                <div style={{ padding: '8px 0', background: 'transparent', border: 'none', borderRadius: '6px', color: '#034321', fontSize: '12px', fontWeight: 800, marginBottom: '12px' }}>
+                <div style={{ padding: '8px 0', background: 'transparent', border: 'none', borderRadius: '6px', color: '#3F8432', fontSize: '12px', fontWeight: 500, marginBottom: '12px' }}>
                   {smtpSaveMsg}
                 </div>
               )}
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', fontSize: '12px' }}>
                 <div style={{ background: '#FFFFFF', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                  <label style={{ color: '#0f172a', fontWeight: 800, fontSize: '11px', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>SMTP Host</label>
+                  <label style={{ color: '#0f172a', fontWeight: 500, fontSize: '11px', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>SMTP Host</label>
                   <input
                     type="text"
                     placeholder="e.g. smtp.gmail.com"
                     value={smtpForm.host}
                     onChange={(e) => setSmtpForm(prev => ({ ...prev, host: e.target.value }))}
-                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontWeight: 800, fontSize: '13px', color: '#000000' }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontWeight: 500, fontSize: '13px', color: '#000000' }}
                   />
                 </div>
                 <div style={{ background: '#FFFFFF', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                  <label style={{ color: '#0f172a', fontWeight: 800, fontSize: '11px', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Port</label>
+                  <label style={{ color: '#0f172a', fontWeight: 500, fontSize: '11px', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Port</label>
                   <input
                     type="number"
                     placeholder="587"
                     value={smtpForm.port}
                     onChange={(e) => setSmtpForm(prev => ({ ...prev, port: Number(e.target.value) }))}
-                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontWeight: 800, fontSize: '13px', color: '#000000' }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontWeight: 500, fontSize: '13px', color: '#000000' }}
                   />
                 </div>
                 <div style={{ background: '#FFFFFF', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
-                  <label style={{ color: '#0f172a', fontWeight: 800, fontSize: '11px', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>SMTP Username / Email</label>
+                  <label style={{ color: '#0f172a', fontWeight: 500, fontSize: '11px', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>SMTP Username / Email</label>
                   <input
                     type="text"
                     placeholder="alerts@ffb.com"
                     value={smtpForm.user}
                     onChange={(e) => setSmtpForm(prev => ({ ...prev, user: e.target.value, from_email: prev.from_email || e.target.value }))}
-                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontWeight: 800, fontSize: '13px', color: '#000000' }}
+                    style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontWeight: 500, fontSize: '13px', color: '#000000' }}
                   />
                 </div>
                 <div style={{ background: '#FFFFFF', padding: '10px 12px', borderRadius: '8px', border: '1px solid #E2E8F0', position: 'relative' }}>
-                  <label style={{ color: '#0f172a', fontWeight: 800, fontSize: '11px', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>App Password</label>
+                  <label style={{ color: '#0f172a', fontWeight: 500, fontSize: '11px', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>App Password</label>
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     {/* Always masked; the saved password never reaches the browser. Blank = keep saved one. */}
                     <input
@@ -1062,7 +1062,7 @@ export function AdminLogsAndAlerts({ section }) {
                       placeholder={smtpStatus?.password_set ? '•••••••• saved (leave blank to keep)' : 'App Password'}
                       value={smtpForm.password}
                       onChange={(e) => setSmtpForm(prev => ({ ...prev, password: e.target.value }))}
-                      style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontWeight: 800, fontSize: '13px', color: '#000000' }}
+                      style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontWeight: 500, fontSize: '13px', color: '#000000' }}
                     />
                   </div>
                 </div>
@@ -1074,7 +1074,7 @@ export function AdminLogsAndAlerts({ section }) {
                   try {
                     await API.updateSmtpConfig(smtpForm);
                     setSmtpForm(prev => ({ ...prev, password: '' }));
-                    setSmtpSaveMsg('✓ SMTP credentials saved successfully!');
+                    setSmtpSaveMsg('SMTP credentials saved successfully.');
                     fetchRecipientsAndStatus();
                     setTimeout(() => setSmtpSaveMsg(''), 3000);
                   } catch (e) {
@@ -1085,9 +1085,9 @@ export function AdminLogsAndAlerts({ section }) {
                   marginTop: '12px',
                   width: '100%',
                   padding: '9px',
-                  background: '#034321',
+                  background: '#3F8432',
                   color: '#FFFFFF',
-                  fontWeight: 900,
+                  fontWeight: 500,
                   fontSize: '12px',
                   border: 'none',
                   borderRadius: '6px',
@@ -1107,8 +1107,8 @@ export function AdminLogsAndAlerts({ section }) {
               boxShadow: 'var(--shadow-panel)'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '14px' }}>
-                <Send size={18} style={{ color: '#034321' }} />
-                <span style={{ fontSize: '15px', fontWeight: 900, color: '#000000' }}>Dispatch Instant Test Alert</span>
+                <Send size={18} style={{ color: '#3F8432' }} />
+                <span style={{ fontSize: '15px', fontWeight: 500, color: '#000000' }}>Dispatch Instant Test Alert</span>
               </div>
               <div style={{ fontSize: '12px', color: '#0f172a', marginBottom: '16px', lineHeight: 1.4 }}>
                 Send a sample alert notification to verify your SMTP pipeline and email rendering.
@@ -1116,7 +1116,7 @@ export function AdminLogsAndAlerts({ section }) {
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div>
-                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '4px', display: 'block' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '4px', display: 'block' }}>
                     Target Email (Optional — defaults to active recipients)
                   </label>
                   <input
@@ -1137,7 +1137,7 @@ export function AdminLogsAndAlerts({ section }) {
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '4px', display: 'block' }}>
+                  <label style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '4px', display: 'block' }}>
                     Severity Level
                   </label>
                   <select
@@ -1149,7 +1149,7 @@ export function AdminLogsAndAlerts({ section }) {
                       borderRadius: '6px',
                       border: '1.5px solid #CBD5E1',
                       fontSize: '13px',
-                      fontWeight: 700,
+                      fontWeight: 500,
                       outline: 'none',
                       background: '#FFFFFF'
                     }}
@@ -1172,10 +1172,10 @@ export function AdminLogsAndAlerts({ section }) {
                     gap: '8px',
                     padding: '10px 16px',
                     borderRadius: '8px',
-                    background: 'var(--clr-brand-primary, #034321)',
+                    background: 'var(--clr-brand-primary, #3F8432)',
                     border: 'none',
                     color: '#FFFFFF',
-                    fontWeight: 800,
+                    fontWeight: 500,
                     fontSize: '13px',
                     cursor: testLoading ? 'not-allowed' : 'pointer'
                   }}
@@ -1190,9 +1190,9 @@ export function AdminLogsAndAlerts({ section }) {
                     padding: '10px 14px',
                     borderRadius: '6px',
                     fontSize: '12px',
-                    fontWeight: 700,
-                    background: testResult.success ? '#E8F2E5' : '#FEF2F2',
-                    color: testResult.success ? '#034321' : '#DC2626',
+                    fontWeight: 500,
+                    background: testResult.success ? '#F3F8EF' : '#FEF2F2',
+                    color: testResult.success ? '#3F8432' : '#DC2626',
                     border: `1px solid ${testResult.success ? '#BBF7D0' : '#FECACA'}`
                   }}>
                     {testResult.message}
@@ -1215,9 +1215,9 @@ export function AdminLogsAndAlerts({ section }) {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Mail size={20} style={{ color: '#034321' }} />
+                <Mail size={20} style={{ color: '#3F8432' }} />
                 <div>
-                  <span style={{ fontSize: '16px', fontWeight: 900, color: '#000000' }}>Registered Alert Recipients</span>
+                  <span style={{ fontSize: '16px', fontWeight: 500, color: '#000000' }}>Registered Alert Recipients</span>
                   <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 600 }}>Emails configured to receive automatic system alerts</div>
                 </div>
               </div>
@@ -1226,7 +1226,7 @@ export function AdminLogsAndAlerts({ section }) {
                 padding: '4px 10px',
                 borderRadius: '10px',
                 fontSize: '12px',
-                fontWeight: 900,
+                fontWeight: 500,
                 color: '#0F172A'
               }}>
                 {recipients.length} Recipient(s)
@@ -1234,14 +1234,14 @@ export function AdminLogsAndAlerts({ section }) {
             </div>
 
             {recipientsLoading ? (
-              <div style={{ padding: '40px', textAlign: 'center', color: '#0f172a', fontWeight: 700 }}>
+              <div style={{ padding: '40px', textAlign: 'center', color: '#0f172a', fontWeight: 500 }}>
                 <RefreshCw size={20} className="sync-spinning" style={{ margin: '0 auto 8px auto' }} />
                 Loading recipients...
               </div>
             ) : recipients.length === 0 ? (
               <div style={{ padding: '40px 20px', textAlign: 'center', color: '#0f172a', border: '1.5px dashed #CBD5E1', borderRadius: '8px' }}>
                 <Mail size={32} style={{ color: '#94A3B8', margin: '0 auto 10px auto' }} />
-                <div style={{ fontWeight: 800, color: '#0F172A', fontSize: '14px' }}>No alert recipients registered yet</div>
+                <div style={{ fontWeight: 500, color: '#0F172A', fontSize: '14px' }}>No alert recipients registered yet</div>
                 <div style={{ fontSize: '12px', marginTop: '4px', color: '#0f172a' }}>Add emails using the button above to start receiving alerts.</div>
               </div>
             ) : (
@@ -1263,11 +1263,11 @@ export function AdminLogsAndAlerts({ section }) {
                   >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontWeight: 800, fontSize: '14px', color: rec.is_active ? '#0F172A' : '#64748B' }}>
+                        <span style={{ fontWeight: 500, fontSize: '14px', color: rec.is_active ? '#0F172A' : '#64748B' }}>
                           {rec.email}
                         </span>
                         {rec.name && (
-                          <span style={{ fontSize: '11px', color: '#0f172a', background: '#F1F5F9', padding: '1px 6px', borderRadius: '4px', fontWeight: 700 }}>
+                          <span style={{ fontSize: '11px', color: '#0f172a', background: '#F1F5F9', padding: '1px 6px', borderRadius: '4px', fontWeight: 500 }}>
                             {rec.name}
                           </span>
                         )}
@@ -1275,10 +1275,10 @@ export function AdminLogsAndAlerts({ section }) {
 
                       {/* Rule tags */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
-                        {rec.notify_errors && <span style={{ fontSize: '10px', fontWeight: 900, background: '#FEF2F2', color: '#DC2626', padding: '1px 5px', borderRadius: '3px' }}>ERROR</span>}
-                        {rec.notify_critical && <span style={{ fontSize: '10px', fontWeight: 900, background: '#FEF2F2', color: '#991B1B', padding: '1px 5px', borderRadius: '3px' }}>CRITICAL</span>}
-                        {rec.notify_security && <span style={{ fontSize: '10px', fontWeight: 900, background: '#F5F3FF', color: '#7C3AED', padding: '1px 5px', borderRadius: '3px' }}>SECURITY</span>}
-                        {rec.notify_warnings && <span style={{ fontSize: '10px', fontWeight: 900, background: '#FFFBEB', color: '#D97706', padding: '1px 5px', borderRadius: '3px' }}>WARN</span>}
+                        {rec.notify_errors && <span style={{ fontSize: '10px', fontWeight: 500, background: '#FEF2F2', color: '#DC2626', padding: '1px 5px', borderRadius: '3px' }}>ERROR</span>}
+                        {rec.notify_critical && <span style={{ fontSize: '10px', fontWeight: 500, background: '#FEF2F2', color: '#991B1B', padding: '1px 5px', borderRadius: '3px' }}>CRITICAL</span>}
+                        {rec.notify_security && <span style={{ fontSize: '10px', fontWeight: 500, background: '#F5F3FF', color: '#7C3AED', padding: '1px 5px', borderRadius: '3px' }}>SECURITY</span>}
+                        {rec.notify_warnings && <span style={{ fontSize: '10px', fontWeight: 500, background: '#FFFBEB', color: '#D97706', padding: '1px 5px', borderRadius: '3px' }}>WARN</span>}
                       </div>
                     </div>
 
@@ -1290,10 +1290,10 @@ export function AdminLogsAndAlerts({ section }) {
                           padding: '5px 10px',
                           borderRadius: '6px',
                           fontSize: '11px',
-                          fontWeight: 800,
+                          fontWeight: 500,
                           border: rec.is_active ? '1px solid #BBF7D0' : '1px solid #CBD5E1',
-                          background: rec.is_active ? '#E8F2E5' : '#F1F5F9',
-                          color: rec.is_active ? '#034321' : '#64748B',
+                          background: rec.is_active ? '#F3F8EF' : '#F1F5F9',
+                          color: rec.is_active ? '#3F8432' : '#64748B',
                           cursor: 'pointer'
                         }}
                       >
@@ -1345,7 +1345,7 @@ export function AdminLogsAndAlerts({ section }) {
             justifyContent: 'space-between'
           }}>
             <div>
-              <div style={{ fontSize: '15px', fontWeight: 900, color: '#000000' }}>Alert Notifications Dispatch Audit Trail</div>
+              <div style={{ fontSize: '15px', fontWeight: 500, color: '#000000' }}>Alert Notifications Dispatch Audit Trail</div>
               <div style={{ fontSize: '11px', color: '#0f172a', fontWeight: 600 }}>History of all automated and manual alerts triggered by the engine</div>
             </div>
             <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -1361,7 +1361,7 @@ export function AdminLogsAndAlerts({ section }) {
                 background: confirmHistoryDelete ? '#DC2626' : '#FFFFFF',
                 border: '1.5px solid #FCA5A5',
                 fontSize: '12px',
-                fontWeight: 800,
+                fontWeight: 500,
                 cursor: !selectedHistoryIds.length || historyDeleting ? 'not-allowed' : 'pointer',
                 color: confirmHistoryDelete ? '#FFFFFF' : '#DC2626',
                 opacity: !selectedHistoryIds.length ? 0.5 : 1
@@ -1388,7 +1388,7 @@ export function AdminLogsAndAlerts({ section }) {
                 background: '#F1F5F9',
                 border: '1.5px solid #CBD5E1',
                 fontSize: '12px',
-                fontWeight: 800,
+                fontWeight: 500,
                 cursor: historyLoading ? 'not-allowed' : 'pointer',
                 color: '#0F172A'
               }}
@@ -1415,11 +1415,11 @@ export function AdminLogsAndAlerts({ section }) {
                       style={{ cursor: 'pointer' }}
                     />
                   </th>
-                  <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a', width: '160px' }}>TIMESTAMP (UTC)</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a', width: '90px' }}>LEVEL</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a', width: '200px' }}>RECIPIENT</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a' }}>SUBJECT / MESSAGE</th>
-                  <th style={{ padding: '12px 16px', fontWeight: 900, color: '#0f172a', width: '110px' }}>STATUS</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a', width: '160px' }}>TIMESTAMP (UTC)</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a', width: '90px' }}>LEVEL</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a', width: '200px' }}>RECIPIENT</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a' }}>SUBJECT / MESSAGE</th>
+                  <th style={{ padding: '12px 16px', fontWeight: 500, color: '#0f172a', width: '110px' }}>STATUS</th>
                 </tr>
               </thead>
               <tbody>
@@ -1432,7 +1432,7 @@ export function AdminLogsAndAlerts({ section }) {
                 ) : (
                   alertHistory.map((item, idx) => {
                     const statusUpper = (item.status || 'SENT').toUpperCase();
-                    let statusColor = '#034321';
+                    let statusColor = '#3F8432';
                     if (statusUpper === 'FAILED') {
                       statusColor = '#DC2626';
                     } else if (statusUpper === 'THROTTLED') {
@@ -1462,15 +1462,15 @@ export function AdminLogsAndAlerts({ section }) {
                           {formattedTime}
                         </td>
                         <td style={{ padding: '12px 16px' }}>
-                          <span style={{ fontSize: '11px', fontWeight: 900, color: '#0F172A' }}>
+                          <span style={{ fontSize: '11px', fontWeight: 500, color: '#0F172A' }}>
                             {item.level}
                           </span>
                         </td>
-                        <td style={{ padding: '12px 16px', fontWeight: 700, color: '#0F172A', fontSize: '12px' }}>
+                        <td style={{ padding: '12px 16px', fontWeight: 500, color: '#0F172A', fontSize: '12px' }}>
                           {item.recipient_email}
                         </td>
                         <td style={{ padding: '12px 16px' }}>
-                          <div style={{ fontWeight: 800, color: '#0F172A', fontSize: '13px' }}>{item.subject}</div>
+                          <div style={{ fontWeight: 500, color: '#0F172A', fontSize: '13px' }}>{item.subject}</div>
                           <div style={{ color: '#0f172a', fontSize: '11px', marginTop: '2px', fontFamily: 'monospace' }}>{item.message?.substring(0, 100)}...</div>
                         </td>
                         <td style={{ padding: '12px 16px' }}>
@@ -1478,7 +1478,7 @@ export function AdminLogsAndAlerts({ section }) {
                             padding: '3px 8px',
                             borderRadius: '4px',
                             fontSize: '11px',
-                            fontWeight: 900,
+                            fontWeight: 500,
                             background: 'transparent',
                             color: statusColor,
                             border: `1px solid ${statusColor}`
@@ -1520,7 +1520,7 @@ export function AdminLogsAndAlerts({ section }) {
               >
                 <ChevronLeft size={14} />
               </button>
-              <span style={{ fontSize: '12px', fontWeight: 800 }}>{historyPage} / {historyTotalPages}</span>
+              <span style={{ fontSize: '12px', fontWeight: 500 }}>{historyPage} / {historyTotalPages}</span>
               <button
                 onClick={() => setHistoryPage(p => Math.min(historyTotalPages, p + 1))}
                 disabled={historyPage >= historyTotalPages}
@@ -1575,8 +1575,8 @@ export function AdminLogsAndAlerts({ section }) {
               background: '#F8FAFC'
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Terminal size={20} style={{ color: '#034321' }} />
-                <span style={{ fontSize: '16px', fontWeight: 900, color: '#0F172A' }}>
+                <Terminal size={20} style={{ color: '#3F8432' }} />
+                <span style={{ fontSize: '16px', fontWeight: 500, color: '#0F172A' }}>
                   Log Record Details (ID #{selectedLogForModal.id})
                 </span>
               </div>
@@ -1593,20 +1593,20 @@ export function AdminLogsAndAlerts({ section }) {
               {/* Metadata strip */}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', fontSize: '12px' }}>
                 <div style={{ background: '#F1F5F9', padding: '10px', borderRadius: '6px' }}>
-                  <div style={{ color: '#0f172a', fontWeight: 700 }}>Severity Level</div>
-                  <div style={{ color: selectedLogForModal.level === 'ERROR' ? '#DC2626' : '#0F172A', fontWeight: 900, fontSize: '14px', marginTop: '2px' }}>
+                  <div style={{ color: '#0f172a', fontWeight: 500 }}>Severity Level</div>
+                  <div style={{ color: selectedLogForModal.level === 'ERROR' ? '#DC2626' : '#0F172A', fontWeight: 500, fontSize: '14px', marginTop: '2px' }}>
                     {selectedLogForModal.level}
                   </div>
                 </div>
                 <div style={{ background: '#F1F5F9', padding: '10px', borderRadius: '6px' }}>
-                  <div style={{ color: '#0f172a', fontWeight: 700 }}>Timestamp (UTC)</div>
-                  <div style={{ color: '#0F172A', fontWeight: 800, marginTop: '2px' }}>
+                  <div style={{ color: '#0f172a', fontWeight: 500 }}>Timestamp (UTC)</div>
+                  <div style={{ color: '#0F172A', fontWeight: 500, marginTop: '2px' }}>
                     {selectedLogForModal.timestamp}
                   </div>
                 </div>
                 <div style={{ background: '#F1F5F9', padding: '10px', borderRadius: '6px' }}>
-                  <div style={{ color: '#0f172a', fontWeight: 700 }}>Module Source</div>
-                  <div style={{ color: '#0F172A', fontWeight: 800, marginTop: '2px', fontFamily: 'monospace' }}>
+                  <div style={{ color: '#0f172a', fontWeight: 500 }}>Module Source</div>
+                  <div style={{ color: '#0F172A', fontWeight: 500, marginTop: '2px', fontFamily: 'monospace' }}>
                     {selectedLogForModal.module || selectedLogForModal.logger_name || 'app'}:{selectedLogForModal.line_number || '0'}
                   </div>
                 </div>
@@ -1614,7 +1614,7 @@ export function AdminLogsAndAlerts({ section }) {
 
               {/* Formatted Message */}
               <div>
-                <div style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px' }}>
                   Log Message / Output:
                 </div>
                 <pre style={{
@@ -1656,7 +1656,7 @@ export function AdminLogsAndAlerts({ section }) {
                   background: '#FFFFFF',
                   border: '1.5px solid #CBD5E1',
                   color: '#0F172A',
-                  fontWeight: 800,
+                  fontWeight: 500,
                   fontSize: '12px',
                   cursor: 'pointer'
                 }}
@@ -1673,7 +1673,7 @@ export function AdminLogsAndAlerts({ section }) {
                   background: '#0F172A',
                   border: 'none',
                   color: '#FFFFFF',
-                  fontWeight: 800,
+                  fontWeight: 500,
                   fontSize: '12px',
                   cursor: 'pointer'
                 }}
@@ -1718,8 +1718,8 @@ export function AdminLogsAndAlerts({ section }) {
                 background: '#F8FAFC'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <UserPlus size={18} style={{ color: '#034321' }} />
-                  <span style={{ fontSize: '15px', fontWeight: 900, color: '#0F172A' }}>Register New Alert Recipient</span>
+                  <UserPlus size={18} style={{ color: '#3F8432' }} />
+                  <span style={{ fontSize: '15px', fontWeight: 500, color: '#0F172A' }}>Register New Alert Recipient</span>
                 </div>
                 <button
                   type="button"
@@ -1732,13 +1732,13 @@ export function AdminLogsAndAlerts({ section }) {
 
               <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 {addRecipientError && (
-                  <div style={{ padding: '10px 14px', background: '#FEF2F2', color: '#DC2626', borderRadius: '6px', fontSize: '12px', fontWeight: 700 }}>
+                  <div style={{ padding: '10px 14px', background: '#FEF2F2', color: '#DC2626', borderRadius: '6px', fontSize: '12px', fontWeight: 500 }}>
                     {addRecipientError}
                   </div>
                 )}
 
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', marginBottom: '4px', display: 'block' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a', marginBottom: '4px', display: 'block' }}>
                     Email Address *
                   </label>
                   <input
@@ -1760,7 +1760,7 @@ export function AdminLogsAndAlerts({ section }) {
                 </div>
 
                 <div>
-                  <label style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', marginBottom: '4px', display: 'block' }}>
+                  <label style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a', marginBottom: '4px', display: 'block' }}>
                     Recipient Name / Role (Optional)
                   </label>
                   <input
@@ -1781,7 +1781,7 @@ export function AdminLogsAndAlerts({ section }) {
                 </div>
 
                 <div>
-                  <div style={{ fontSize: '12px', fontWeight: 800, color: '#0f172a', marginBottom: '8px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 500, color: '#0f172a', marginBottom: '8px' }}>
                     Alert Notification Preferences
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '12px' }}>
@@ -1840,7 +1840,7 @@ export function AdminLogsAndAlerts({ section }) {
                     borderRadius: '6px',
                     border: '1.5px solid #CBD5E1',
                     background: '#FFFFFF',
-                    fontWeight: 700,
+                    fontWeight: 500,
                     fontSize: '12px',
                     cursor: 'pointer'
                   }}
@@ -1853,10 +1853,10 @@ export function AdminLogsAndAlerts({ section }) {
                   style={{
                     padding: '8px 18px',
                     borderRadius: '6px',
-                    background: 'var(--clr-brand-primary, #034321)',
+                    background: 'var(--clr-brand-primary, #3F8432)',
                     border: 'none',
                     color: '#FFFFFF',
-                    fontWeight: 800,
+                    fontWeight: 500,
                     fontSize: '12px',
                     cursor: addRecipientLoading ? 'not-allowed' : 'pointer'
                   }}
@@ -1901,13 +1901,13 @@ export function AdminLogsAndAlerts({ section }) {
               background: '#FEF2F2'
             }}>
               <Trash2 size={18} style={{ color: '#DC2626' }} />
-              <span style={{ fontSize: '15px', fontWeight: 900, color: '#DC2626' }}>Clean & Purge System Logs</span>
+              <span style={{ fontSize: '15px', fontWeight: 500, color: '#DC2626' }}>Clean & Purge System Logs</span>
             </div>
 
             <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
               {clearSuccessMsg ? (
-                <div style={{ padding: '14px', background: 'transparent', color: '#034321', borderRadius: '6px', fontSize: '13px', fontWeight: 800, textAlign: 'center' }}>
-                  ✓ {clearSuccessMsg}
+                <div style={{ padding: '14px', background: 'transparent', color: '#3F8432', borderRadius: '6px', fontSize: '13px', fontWeight: 500, textAlign: 'center' }}>
+                  {clearSuccessMsg}
                 </div>
               ) : (
                 <>
@@ -1916,7 +1916,7 @@ export function AdminLogsAndAlerts({ section }) {
                   </div>
 
                   <div>
-                    <label style={{ fontSize: '11px', fontWeight: 800, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>
+                    <label style={{ fontSize: '11px', fontWeight: 500, color: '#0f172a', textTransform: 'uppercase', marginBottom: '6px', display: 'block' }}>
                       Cleanup Policy
                     </label>
                     <select
@@ -1928,7 +1928,7 @@ export function AdminLogsAndAlerts({ section }) {
                         borderRadius: '6px',
                         border: '1.5px solid #CBD5E1',
                         fontSize: '13px',
-                        fontWeight: 700,
+                        fontWeight: 500,
                         outline: 'none',
                         background: '#FFFFFF'
                       }}
@@ -1960,7 +1960,7 @@ export function AdminLogsAndAlerts({ section }) {
                     borderRadius: '6px',
                     border: '1.5px solid #CBD5E1',
                     background: '#FFFFFF',
-                    fontWeight: 700,
+                    fontWeight: 500,
                     fontSize: '12px',
                     cursor: 'pointer'
                   }}
@@ -1977,7 +1977,7 @@ export function AdminLogsAndAlerts({ section }) {
                     background: '#DC2626',
                     border: 'none',
                     color: '#FFFFFF',
-                    fontWeight: 800,
+                    fontWeight: 500,
                     fontSize: '12px',
                     cursor: isClearing ? 'not-allowed' : 'pointer'
                   }}

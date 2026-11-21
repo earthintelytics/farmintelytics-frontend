@@ -83,6 +83,11 @@ const OrgLicence = ({ org, onSaved }) => {
             </li>
           ))}
         </ul>
+        {modules.includes('ffb-counter') && (
+          <div className="rounded-xl border border-gray-200 bg-[#F3F8EF] px-4 py-3 text-xs text-gray-800">
+            <strong className="text-[#2D6A2C]">FFB Setup Required:</strong> Enabling FFB does not automatically copy the farm monitoring boundary. Please open the <strong>FFB Setup</strong> tab for this organisation to upload its dedicated <span className="font-mono">.geojson</span> estate boundary and build platform edge cells.
+          </div>
+        )}
         <p className="text-xs text-gray-500">Switching off takes effect on the next request: people of this organisation can no longer open that service.</p>
       </div>
       <Note>AI use for this organisation (monthly budget, tokens, per-person daily limits, switching AI off) is set in <Link to="/admin/ai" className="font-semibold underline">AI settings → Limits</Link>.</Note>
