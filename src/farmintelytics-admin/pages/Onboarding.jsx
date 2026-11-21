@@ -482,6 +482,17 @@ const Onboarding = () => {
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Estates</h2>
               <p className="text-sm text-gray-500 mt-1">Add every estate {company.company_name} wants monitored, each with its own boundary file. Estates can be in different places.</p>
+              {services.includes('ffb-counter') && (
+                <div className="mt-3 rounded-xl border border-[#5AA041] bg-[#E8F2E5] px-4 py-3 text-xs text-[#034321] space-y-1">
+                  <p className="font-semibold">FFB Counter Shared Boundary &amp; Default 9-Layer Shield Rules</p>
+                  <p>
+                    The estate GeoJSON boundary you upload below is shared automatically across satellite processing, the FFB web portal map, the offline mobile app geofence, and 8m × 8m platform edge fishnet generation.
+                  </p>
+                  <p>
+                    Default rules applied: 3-Layer reconciliation, auto-approve &ge; 80, auto-reject &lt; 50, +2 manual stepper cap, 15m geofence buffer, pitch lock (38–52° portrait / 28–44° landscape), 60 km/h teleport check, and 26th settlement cutoff. Edit any rule under Organisations → FFB Setup.
+                  </p>
+                </div>
+              )}
             </div>
 
             {estates.map((e, i) => {

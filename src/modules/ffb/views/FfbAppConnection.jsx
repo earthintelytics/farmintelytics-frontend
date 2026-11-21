@@ -84,7 +84,7 @@ export default function FfbAppConnection({ tenantSlug }) {
       {pack && (
         <>
           {/* Verified Client Identity Hero */}
-          <div className="bg-gradient-to-r from-[#034321] to-[#3F8432] text-white rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+          <div className="bg-[#034321] text-white rounded-2xl p-6 flex flex-wrap items-center justify-between gap-4 shadow-sm">
             <div className="flex items-center gap-4 min-w-0">
               {pack.logo_url ? (
                 <img

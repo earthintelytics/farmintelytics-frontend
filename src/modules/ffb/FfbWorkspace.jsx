@@ -1,38 +1,118 @@
-import { useEffect, useState } from 'react';
-import { useParams, useSearchParams } from 'react-router-dom';
-import {
-  ArrowLeft, LayoutDashboard, CheckSquare, Map, TrendingUp,
-  SearchCheck, Banknote, Users, ShieldAlert, LogOut, Smartphone,
-} from 'lucide-react';
+import { lazy, Suspense, useEffect, useState } from 'react';
+import { useParams, useSearchParams as useOuterSearchParams } from 'react-router-dom';
+import './styles/ffb-portal.css';
 import { ffbAdminOverview, ffbCall } from './api/ffbApi';
-import FfbDashboard from './views/FfbDashboard';
-import FfbApprovals from './views/FfbApprovals';
-import FfbMapGeoIntel from './views/FfbMapGeoIntel';
-import FfbAnalytics from './views/FfbAnalytics';
-import FfbClerkLookup from './views/FfbClerkLookup';
-import FfbSettlement from './views/FfbSettlement';
-import FfbWorkforce from './views/FfbWorkforce';
-import FfbAlertsAndGuide from './views/FfbAlertsAndGuide';
-import FfbAppConnection from './views/FfbAppConnection';
+import { AppProvider } from './context/AppContext';
+import { PortalRouter, Navigate, Route, Routes, useLocation } from './utils/portalRouter';
+import { Sidebar } from './components/Sidebar';
+import { Topbar } from './components/Topbar';
+import { PageLoader } from './components/PageLoader';
+import { WelcomeTour } from './components/WelcomeTour';
+import { getRole, isManager } from './utils/access';
+import { scrollPageTop } from './utils/scroll';
 
-const NAV = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'approvals', label: 'Approval Center', icon: CheckSquare },
-  { id: 'map', label: 'Geospatial Intel', icon: Map },
-  { id: 'analytics', label: 'Yield & Analytics', icon: TrendingUp },
-  { id: 'clerk-lookup', label: 'Clerk Lookup', icon: SearchCheck },
-  { id: 'settlement', label: 'Settlement & Rates', icon: Banknote },
-  { id: 'workforce', label: 'Workforce & QR', icon: Users },
-  { id: 'mobile-app', label: 'Field App & QR', icon: Smartphone },
-  { id: 'alerts', label: 'Alerts & Rules', icon: ShieldAlert },
-];
+const DashboardView = lazy(() => import('./pages/DashboardView').then((m) => ({ default: m.DashboardView })));
+const GeoIntelView = lazy(() => import('./pages/GeoIntelView').then((m) => ({ default: m.GeoIntelView })));
+const ApprovalView = lazy(() => import('./pages/ApprovalView').then((m) => ({ default: m.ApprovalView })));
+const ApprovedWorkersView = lazy(() => import('./pages/ApprovedWorkersView').then((m) => ({ default: m.ApprovedWorkersView })));
+const SettlementView = lazy(() => import('./pages/SettlementView').then((m) => ({ default: m.SettlementView })));
+const FaqView = lazy(() => import('./pages/FaqView').then((m) => ({ default: m.FaqView })));
+const HelpView = lazy(() => import('./pages/HelpView').then((m) => ({ default: m.HelpView })));
+const WorkerView = lazy(() => import('./pages/WorkerView').then((m) => ({ default: m.WorkerView })));
+const PlotView = lazy(() => import('./pages/PlotView').then((m) => ({ default: m.PlotView })));
+const YieldView = lazy(() => import('./pages/YieldView').then((m) => ({ default: m.YieldView })));
+const AIQualityView = lazy(() => import('./pages/AuditQualityView').then((m) => ({ default: m.AIQualityView })));
+const EfficiencyView = lazy(() => import('./pages/EfficiencyView').then((m) => ({ default: m.EfficiencyView })));
+const MethodologyView = lazy(() => import('./pages/MethodologyView'));
+const AdminView = lazy(() => import('./pages/AdminView').then((m) => ({ default: m.AdminView })));
+const ClerkLookup = lazy(() => import('./pages/ClerkLookup').then((m) => ({ default: m.ClerkLookup })));
+const FfbAppConnection = lazy(() => import('./views/FfbAppConnection'));
+
+const TAB_TO_PATH = {
+  dashboard: '/',
+  map: '/map',
+  approvals: '/approval',
+  approved: '/approved-workers',
+  settlement: '/approved-workers/monthly-settlement',
+  plots: '/plots',
+  workers: '/workers',
+  analytics: '/yield',
+  yield: '/yield',
+  efficiency: '/efficiency',
+  quality: '/audit-quality',
+  'clerk-lookup': '/harvest',
+  workforce: '/admin',
+  'mobile-app': '/mobile-app',
+  alerts: '/admin',
+  admin: '/admin',
+  methodology: '/methodology',
+  help: '/help',
+  faq: '/help/common-questions',
+};
+
+function FfbShell({ selectedTenant, onBack, onSignOut }) {
+  const isMobileViewport = () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches;
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(isMobileViewport);
+  const { pathname } = useLocation();
+  const userRole = getRole();
+
+  useEffect(() => {
+    if (isMobileViewport()) setIsSidebarCollapsed(true);
+    scrollPageTop('auto');
+  }, [pathname]);
+
+  return (
+    <div id="app-layout" className={isSidebarCollapsed ? 'layout--sidebar-collapsed' : ''}>
+      <Sidebar isCollapsed={isSidebarCollapsed} onBack={onBack} onSignOut={onSignOut} />
+      <Topbar
+        onToggleSidebar={() => setIsSidebarCollapsed((v) => !v)}
+        onBack={onBack}
+        onSignOut={onSignOut}
+      />
+
+      <main id="main-content" role="main" aria-label="Main content area">
+        <div className="view-wrapper">
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<DashboardView />} />
+              <Route path="/map" element={<GeoIntelView />} />
+              <Route path="/approval" element={<ApprovalView />} />
+              <Route path="/approved-workers" element={<ApprovedWorkersView />} />
+              <Route
+                path="/approved-workers/monthly-settlement"
+                element={isManager() ? <SettlementView /> : <Navigate to="/approved-workers" replace />}
+              />
+              <Route path="/workers" element={<WorkerView />} />
+              <Route path="/plots" element={<PlotView />} />
+              <Route path="/yield" element={<YieldView />} />
+              <Route path="/efficiency" element={userRole === 'View' ? <Navigate to="/" replace /> : <EfficiencyView />} />
+              <Route path="/audit-quality" element={<AIQualityView />} />
+              <Route path="/harvest" element={<ClerkLookup />} />
+              <Route path="/mobile-app" element={<FfbAppConnection tenantSlug={selectedTenant} />} />
+              <Route path="/admin" element={isManager() ? <AdminView /> : <Navigate to="/" replace />} />
+              <Route path="/methodology" element={<MethodologyView />} />
+              <Route path="/help" element={<HelpView />} />
+              <Route path="/help/common-questions" element={<FaqView />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </div>
+      </main>
+      <WelcomeTour />
+    </div>
+  );
+}
 
 export default function FfbWorkspace({ onBack, onSignOut }) {
   const { tenant: urlTenant } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const activeTab = searchParams.get('tab') || 'dashboard';
+  const [outerParams] = useOuterSearchParams();
+  const initialTab = outerParams.get('tab') || 'dashboard';
+  const initialPath = TAB_TO_PATH[initialTab] || '/';
+
   const [orgs, setOrgs] = useState([]);
-  const [selectedTenant, setSelectedTenant] = useState(urlTenant || localStorage.getItem('fi_tenant') || '');
+  const [selectedTenant, setSelectedTenant] = useState(
+    (urlTenant || (typeof localStorage !== 'undefined' && localStorage.getItem('fi_tenant')) || '').trim().toLowerCase(),
+  );
   const [meta, setMeta] = useState(null);
 
   useEffect(() => {
@@ -52,85 +132,31 @@ export default function FfbWorkspace({ onBack, onSignOut }) {
       .catch(() => {});
   }, [selectedTenant]);
 
-  const setTab = (id) => setSearchParams({ tab: id });
-  const orgName = meta?.display_name || localStorage.getItem('fi_display_name') || selectedTenant || 'Enterprise';
+  if (!selectedTenant && !localStorage.getItem('fi_token')) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] p-8">
+        <div className="max-w-lg w-full p-8 bg-white rounded-2xl border border-gray-200 text-center space-y-3">
+          <h2 className="text-xl font-bold text-[#034321]">No FFB-licensed organisation selected</h2>
+          <p className="text-sm text-gray-600">
+            Enable <strong>FFB</strong> on an organisation under Admin → Organisations → Licence first.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen flex bg-[var(--bg-main)] text-[var(--text-main)] font-sans">
-      <aside className="w-64 shrink-0 border-r border-[var(--border-light)] bg-white flex flex-col">
-        <div className="p-5 border-b border-[var(--border-light)] space-y-3">
-          <div className="flex items-center gap-2.5">
-            {onBack && (
-              <button onClick={onBack} aria-label="Back" className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-600">
-                <ArrowLeft size={16} />
-              </button>
-            )}
-            <div className="flex items-center gap-2.5 min-w-0">
-              {meta?.logo_url ? (
-                <img src={meta.logo_url} alt="" className="w-8 h-8 rounded-lg object-contain border border-gray-200 p-0.5" />
-              ) : (
-                <span className="w-8 h-8 rounded-lg bg-[#034321] text-white font-display font-bold text-xs flex items-center justify-center shrink-0">FFB</span>
-              )}
-              <div className="min-w-0">
-                <p className="font-display text-sm font-semibold truncate">{orgName}</p>
-                <p className="text-[11px] text-[var(--brand-primary)] font-medium">Earthintelytics FFB</p>
-              </div>
-            </div>
-          </div>
-
-          {orgs.length > 0 && (
-            <select value={selectedTenant} onChange={(e) => setSelectedTenant(e.target.value)}
-              className="w-full px-2.5 py-1.5 text-xs rounded-xl border border-[var(--border-light)] bg-[var(--bg-subtle)]">
-              {orgs.map((o) => <option key={o.company_id} value={o.company_id}>{o.display_name}</option>)}
-            </select>
-          )}
-        </div>
-
-        <nav className="flex-1 p-3 space-y-1">
-          {NAV.map(({ id, label, icon: Icon }) => {
-            const isActive = activeTab === id;
-            return (
-              <button key={id} onClick={() => setTab(id)}
-                className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
-                  isActive ? 'bg-[#034321] text-white' : 'text-gray-700 hover:bg-[var(--bg-subtle)]'
-                }`}>
-                <Icon size={16} />
-                <span>{label}</span>
-              </button>
-            );
-          })}
-        </nav>
-
-        {onSignOut && (
-          <div className="p-3 border-t border-[var(--border-light)]">
-            <button onClick={onSignOut}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-gray-600 hover:bg-gray-100">
-              <LogOut size={15} /> Sign out
-            </button>
-          </div>
-        )}
-      </aside>
-
-      <main className="flex-1 min-w-0 p-6 lg:p-8 bg-[var(--bg-subtle)]/40">
-        {!selectedTenant && !localStorage.getItem('fi_token') ? (
-          <div className="max-w-lg mx-auto mt-16 p-8 bg-white rounded-2xl border border-[var(--border-light)] text-center space-y-2">
-            <h2 className="font-display text-xl font-semibold">No FFB-licensed organisation selected</h2>
-            <p className="text-sm text-[var(--text-muted)]">Enable <strong>FFB</strong> on an organisation under Admin → Organisations → Licence first.</p>
-          </div>
-        ) : (
-          <>
-            {activeTab === 'dashboard' && <FfbDashboard tenantSlug={selectedTenant} />}
-            {activeTab === 'approvals' && <FfbApprovals tenantSlug={selectedTenant} />}
-            {activeTab === 'map' && <FfbMapGeoIntel tenantSlug={selectedTenant} />}
-            {activeTab === 'analytics' && <FfbAnalytics tenantSlug={selectedTenant} />}
-            {activeTab === 'clerk-lookup' && <FfbClerkLookup tenantSlug={selectedTenant} />}
-            {activeTab === 'settlement' && <FfbSettlement tenantSlug={selectedTenant} />}
-            {activeTab === 'workforce' && <FfbWorkforce tenantSlug={selectedTenant} />}
-            {activeTab === 'mobile-app' && <FfbAppConnection tenantSlug={selectedTenant} />}
-            {activeTab === 'alerts' && <FfbAlertsAndGuide tenantSlug={selectedTenant} />}
-          </>
-        )}
-      </main>
+    <div className="ffb-portal">
+      <AppProvider
+        tenantSlug={selectedTenant}
+        tenantMeta={meta}
+        orgs={orgs}
+        onSelectTenant={(slug) => setSelectedTenant(slug)}
+      >
+        <PortalRouter initialEntry={initialPath}>
+          <FfbShell selectedTenant={selectedTenant} onBack={onBack} onSignOut={onSignOut} />
+        </PortalRouter>
+      </AppProvider>
     </div>
   );
 }
