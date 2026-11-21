@@ -16,6 +16,7 @@ import OrgPeople from './organisation/OrgPeople';
 import OrgLicence from './organisation/OrgLicence';
 import OrgPipeline from './organisation/OrgPipeline';
 import OrgAlertEmails from './organisation/OrgAlertEmails';
+import OrgFfbSetup from './organisation/OrgFfbSetup';
 
 /**
  * One organisation in one place: its estates, alert email recipients, its
@@ -75,6 +76,9 @@ const OrgDetailPanel = ({ org: initialOrg, onClose }) => {
               { id: 'people', label: 'People' },
               { id: 'licence', label: 'Licence' },
               { id: 'pipeline', label: 'Pipeline' },
+              ...(Array.isArray(org.allowed_modules) && org.allowed_modules.includes('ffb-counter')
+                ? [{ id: 'ffb', label: 'FFB' }]
+                : []),
             ]}
           />
         </div>
@@ -83,6 +87,7 @@ const OrgDetailPanel = ({ org: initialOrg, onClose }) => {
           {tab === 'people' && <OrgPeople org={org} />}
           {tab === 'licence' && <OrgLicence org={org} onSaved={setOrg} />}
           {tab === 'pipeline' && <OrgPipeline org={org} />}
+          {tab === 'ffb' && <OrgFfbSetup org={org} />}
           {tab === 'estates' && <>
           <ErrorBanner message={error} onDismiss={() => setError('')} onRetry={load} />
           <div className="flex items-center justify-between">

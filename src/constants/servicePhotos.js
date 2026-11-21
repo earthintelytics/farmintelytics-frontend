@@ -39,7 +39,7 @@ export const SERVICE_GROUPS = [
     { id: 'smallholder-eudr', label: 'EUDR passport', desc: 'Location and deforestation check per member' },
   ] },
   { id: 'management', label: 'Management', services: [
-    { id: 'ffb-counter', label: 'FFB Counter', desc: 'Fresh fruit bunches counted per block at harvest' },
+    { id: 'ffb-counter', label: 'FFB', desc: 'Fresh fruit bunches counted per block at harvest with 9-layer anti-fraud verification' },
   ] },
 ];
 

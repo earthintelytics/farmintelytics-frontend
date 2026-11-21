@@ -39,6 +39,7 @@ import EmailLog from './pages/EmailLog';
 import ProtectedAreas from './pages/ProtectedAreas';
 import SystemStatus from './pages/SystemStatus';
 import ActivityLog from './pages/Activity';
+import FfbControlPlane from './pages/FfbControlPlane';
 // Loaded on demand: the markdown renderer is only needed on this page.
 const Documentation = lazy(() => import('./pages/Documentation'));
 import { fetchSystemStatus } from '../services/adminApi';
@@ -70,6 +71,7 @@ const NAV_GROUPS = [
     { id: 'thresholds',      label: 'Map classes',     icon: SlidersHorizontal, path: '/admin/thresholds' },
     { id: 'protected-areas', label: 'Protected areas', icon: Shield,            path: '/admin/protected-areas' },
     { id: 'ai',              label: 'AI settings',     icon: Sparkles,          path: '/admin/ai', owner: true },
+    { id: 'ffb',             label: 'FFB & Mobile Hub',icon: ShieldCheck,       path: '/admin/ffb' },
     { id: 'integrations',    label: 'Integrations',    icon: Radio,             path: '/admin/integrations', owner: true },
   ]},
   { label: 'Help', items: [
@@ -260,6 +262,7 @@ const AdminPortal = () => {
             <Route path="thresholds"      element={<CropThresholds />} />
             <Route path="protected-areas" element={<ProtectedAreas />} />
             <Route path="ai"              element={ownerOnly(<AiSettings />)} />
+            <Route path="ffb"             element={<FfbControlPlane />} />
             <Route path="integrations"    element={ownerOnly(<Integrations />)} />
             <Route path="logs"            element={<Logs />} />
             <Route path="reports"         element={<ProblemReports />} />
