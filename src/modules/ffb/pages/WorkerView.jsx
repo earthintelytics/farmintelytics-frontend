@@ -5,7 +5,6 @@ import { WORKER_ICON, FFB_ICON, WEIGHT_ICON, DURATION_ICON, APPROVED_ICON } from
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fmtDateTime, fmtStatusBadge, fmtAbbrev } from '../utils/formatters';
-import { ROLE_KEY_METRIC } from '../utils/constants';
 import { API } from '../services/api';
 import { Search, Download, User, Cpu, MapPin, Truck, RotateCcw, Lock, Columns, ChevronDown } from 'lucide-react';
 import { scrollPageTop } from '../utils/scroll';
