@@ -65,7 +65,8 @@ const CropDashboardLayout = ({ mode = 'crop', service = null, cropType, cropIndi
   // pick(defaults, list): keep the service's entries, in its order, with
   // its labels, and the default icon for each id.
   // A service that lists nothing shows nothing: it never falls back to the crop pages.
-  const pick = (defaults, list) => !list ? (service ? [] : defaults) : list
+  // Crop and organisation portals (no service) monitor; they make no claim, so they have no Verification tab.
+  const pick = (defaults, list) => !list ? (service ? [] : defaults.filter(d => d.id !== 'verification')) : list
     .map(s => { const d = defaults.find(x => x.id === s.id); return d ? { ...d, label: s.label || d.label } : null; })
     .filter(Boolean);
   const cropLabel = isOrg ? '' : (CROP_CONFIG_KEYS[cropType] || cropType);

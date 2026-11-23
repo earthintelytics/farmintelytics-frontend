@@ -12,6 +12,8 @@ import {
 import { naira, toMinor } from '../../utils/money';
 import { copyText } from '../../utils/copyText';
 import { teamRole } from '../../services/session';
+import GuidePanel from '../../components/page/GuidePanel';
+import { API_ADMIN_GUIDE, API_MODAL_HELP } from '../../components/page/apiHelpText';
 
 /**
  * API clients: organisations that use FarmIntelytics through the public API (EUDR check first). Plans set the
@@ -40,7 +42,7 @@ function PlanModal({ plan, products, onClose, onSaved }) {
     try { await (plan ? updateApiPlan(plan.id, p) : createApiPlan(p)); onSaved(); } catch (e) { setError(e.message); } finally { setBusy(false); }
   };
   return (
-    <Modal title={plan ? `Edit plan: ${plan.name}` : 'New plan'} text="Prices in naira. Clients on this plan are charged per plot checked." onClose={onClose}
+    <Modal help={API_MODAL_HELP.plan} title={plan ? `Edit plan: ${plan.name}` : 'New plan'} text="Prices in naira. Clients on this plan are charged per plot checked." onClose={onClose}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button disabled={busy} onClick={save}>{busy ? 'Saving…' : 'Save plan'}</Button></>}>
       {error && <Note tone="error">{error}</Note>}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -61,7 +63,7 @@ function PlanModal({ plan, products, onClose, onSaved }) {
 }
 
 function ClientModal({ plans, orgs, onClose, onSaved }) {
-  const [f, setF] = useState({ company_id: '', new_name: '', plan_id: plans[0]?.id || '', credit: '0', contact_email: '', billing: '' });
+  const [f, setF] = useState({ company_id: '', new_name: '', plan_id: plans[0]?.id || '', credit: '0', contact_email: '', billing_email: '', billing: '' });
   const isNew = f.company_id === '__new__';
   const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
@@ -69,12 +71,12 @@ function ClientModal({ plans, orgs, onClose, onSaved }) {
     if (!f.plan_id || !f.company_id || (isNew && !f.new_name.trim())) return setError('Choose the organisation (or name a new one) and a plan.');
     setBusy(true); setError('');
     try {
-      await createApiClient({ company_id: isNew ? '' : f.company_id, organisation_name: isNew ? f.new_name.trim() : '', plan_id: +f.plan_id, billing: f.billing || null, credit_limit_minor: toMinor(f.credit || 0), contact_email: f.contact_email });
+      await createApiClient({ company_id: isNew ? '' : f.company_id, organisation_name: isNew ? f.new_name.trim() : '', plan_id: +f.plan_id, billing: f.billing || null, credit_limit_minor: toMinor(f.credit || 0), contact_email: f.contact_email, billing_email: f.billing_email });
       onSaved();
     } catch (e) { setError(e.message); } finally { setBusy(false); }
   };
   return (
-    <Modal title="Add an API client" text="An existing organisation, or a new one from its name (its full onboarding can come later). The EUDR API service is switched on in its licence." onClose={onClose}
+    <Modal help={API_MODAL_HELP.client} title="Add an API client" text="An existing organisation, or a new one from its name (its full onboarding can come later). The EUDR API service is switched on in its licence." onClose={onClose}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button disabled={busy} onClick={save}>{busy ? 'Adding…' : 'Add client'}</Button></>}>
       {error && <Note tone="error">{error}</Note>}
       {!plans.length && <Note tone="info">Make a plan first (Plans tab): it sets the price per plot.</Note>}
@@ -85,8 +87,26 @@ function ClientModal({ plans, orgs, onClose, onSaved }) {
         <Field label="Billing"><select className={inputCls} value={f.billing} onChange={set('billing')}><option value="">As the plan</option><option value="prepaid">Prepaid wallet</option><option value="postpaid">Monthly invoice</option></select></Field>
         <Field label="Credit limit (₦)" hint="Postpaid only"><input className={inputCls} value={f.credit} onChange={set('credit')} inputMode="decimal" /></Field>
       </div>
-      <Field label="Technical contact email"><input className={inputCls} value={f.contact_email} onChange={set('contact_email')} /></Field>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <Field label="Technical contact email"><input className={inputCls} value={f.contact_email} onChange={set('contact_email')} /></Field>
+        <Field label="Billing contact email" hint="Gets the low-balance email"><input className={inputCls} value={f.billing_email} onChange={set('billing_email')} /></Field>
+      </div>
     </Modal>
+  );
+}
+
+function ContactRow({ c, busy, onSave }) {
+  const [draft, setDraft] = useState(null);
+  const f = draft || { contact_email: c.contact_email || '', billing_email: c.billing_email || '' };
+  return (
+    <section className="space-y-2">
+      <h3 className="text-sm font-semibold text-gray-900">Contacts</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+        <Field label="Technical contact"><input className={inputCls} value={f.contact_email} onChange={(e) => setDraft({ ...f, contact_email: e.target.value })} /></Field>
+        <Field label="Billing contact" hint="Gets the low-balance email"><input className={inputCls} value={f.billing_email} onChange={(e) => setDraft({ ...f, billing_email: e.target.value })} /></Field>
+        <Button variant="secondary" disabled={busy || !draft} onClick={() => { onSave(f); setDraft(null); }}>Save</Button>
+      </div>
+    </section>
   );
 }
 
@@ -112,10 +132,12 @@ function ClientPanel({ id, plans, owner, onClose, onChanged }) {
         <div className="space-y-6">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div><p className="text-xs text-gray-500">Balance</p><p className="font-mono text-lg font-semibold">{naira(c.balance_minor)}</p></div>
-            <div><p className="text-xs text-gray-500">Plots checked this month</p><p className="font-mono text-lg font-semibold">{c.usage?.eudr_checks?.plots_checked ?? 0}</p></div>
+            <div><p className="text-xs text-gray-500">Plots checked this month</p><p className="font-mono text-lg font-semibold">{c.usage?.plots_checked ?? 0}</p></div>
             <div><p className="text-xs text-gray-500">Spent this month</p><p className="font-mono text-lg font-semibold">{naira(c.usage?.spend_minor)}</p></div>
             <div><p className="text-xs text-gray-500">Status</p><Pill tone={c.status === 'active' ? 'good' : 'critical'}>{c.status}</Pill></div>
           </div>
+
+          <ContactRow c={c} busy={!!busy} onSave={(patch) => act('contact', () => updateApiClient(c.id, patch))} />
 
           <section className="space-y-2">
             <h3 className="text-sm font-semibold text-gray-900">Products and plan</h3>
@@ -214,6 +236,7 @@ export default function ApiClients() {
     <Page eyebrow="Configuration" title="API clients" text="Organisations using FarmIntelytics through the public API. Prices per plot in naira; prepaid wallets or monthly invoices."
       actions={<Button variant="secondary" onClick={L.reload}><RefreshCw size={15} />Refresh</Button>}>
       {L.error && <ErrorBanner message={L.error} />}
+      <GuidePanel guide={API_ADMIN_GUIDE} />
       <Tabs tabs={[{ id: 'clients', label: 'Clients' }, { id: 'plans', label: 'Plans and prices' }]} value={tab} onChange={setTab} />
       {!d ? <Loading /> : tab === 'clients' ? (
         <div className="space-y-4">
@@ -245,13 +268,13 @@ export default function ApiClients() {
           {d.plans.length === 0 ? <Empty>No plans yet. A plan sets the price per plot for a product.</Empty> : (
             <Card className="overflow-x-auto">
               <table className="w-full text-sm min-w-[720px]">
-                <thead><tr className="text-left text-gray-500 border-b border-gray-200"><th className="px-5 py-3 font-medium">Plan</th><th className="px-5 py-3 font-medium text-right">Price per plot</th><th className="px-5 py-3 font-medium">Included a month</th><th className="px-5 py-3 font-medium">Per request</th><th className="px-5 py-3 font-medium">Free tests a day</th><th className="px-5 py-3 font-medium">Clients</th></tr></thead>
+                <thead><tr className="text-left text-gray-500 border-b border-gray-200"><th className="px-5 py-3 font-medium">Plan</th><th className="px-5 py-3 font-medium text-right">Price per plot</th><th className="px-5 py-3 font-medium">Free plots a month</th><th className="px-5 py-3 font-medium text-right">Monthly fee</th><th className="px-5 py-3 font-medium">Per request</th><th className="px-5 py-3 font-medium">Free tests a day</th><th className="px-5 py-3 font-medium">Clients</th></tr></thead>
                 <tbody className="divide-y divide-gray-100">
                   {d.plans.map((p) => (
                     <tr key={p.id} className={owner ? 'hover:bg-gray-50 cursor-pointer' : ''} onClick={() => owner && setPlanModal(p)}>
                       <td className="px-5 py-3"><p className="font-semibold">{p.name}</p><p className="text-xs text-gray-500">{p.product_name}{p.active ? '' : ' · not offered'}</p></td>
                       <td className="px-5 py-3 text-right font-mono">{naira(p.price_per_unit_minor)}</td>
-                      <td className="px-5 py-3">{p.included_units_per_month || '—'}{p.monthly_fee_minor ? ` (fee ${naira(p.monthly_fee_minor)})` : ''}</td>
+                      <td className="px-5 py-3">{p.included_units_per_month || '—'}</td><td className="px-5 py-3 text-right font-mono">{p.monthly_fee_minor ? naira(p.monthly_fee_minor) : '—'}</td>
                       <td className="px-5 py-3">{p.max_units_per_request}</td><td className="px-5 py-3">{p.test_units_per_day}</td><td className="px-5 py-3">{p.clients}</td>
                     </tr>
                   ))}

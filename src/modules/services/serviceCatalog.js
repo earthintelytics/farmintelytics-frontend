@@ -13,17 +13,20 @@
  *              forms, submissions, group-carbon, eudr-passport
  *   analytics  sub-tabs of the Overview page (overview, vigor-health,
  *              moisture-et, et-log, water-management, soil-nutrients)
- *   topTabs    always HEADER_TABS: Monitor, Reports, Verification, Assistant
+ *   topTabs    CORE_TABS (Monitor, Reports, Assistant); services that back a claim someone else checks
+ *              (EUDR, carbon, restoration) add Verification: CLAIM_TABS
  *
  * The backend catalogue (GET /crop-monitoring/catalogue/{id}, WORK_SPLIT.md)
  * has the same shape and replaces this copy when it is live.
  */
-const HEADER_TABS = [
+const CLAIM_TABS = [
   { id: 'monitor', label: 'Monitor' },
   { id: 'reports', label: 'Reports' },
   { id: 'verification', label: 'Verification' },
   { id: 'ai-assistant', label: 'Assistant' },
 ];
+// Verification is evidence for a buyer, auditor or lender: only where the service makes such a claim.
+const CORE_TABS = CLAIM_TABS.filter(t => t.id !== 'verification');
 
 export const SERVICE_CATALOG = {
   // ── Sustainability ────────────────────────────────────────────────────────
@@ -43,7 +46,7 @@ export const SERVICE_CATALOG = {
       { id: 'overview', label: 'Overview' },
       { id: 'vigor-health', label: 'Biomass and growth' },
     ],
-    topTabs: HEADER_TABS,
+    topTabs: CLAIM_TABS,
   },
   'forestry-intel': {
     title: 'Forestry intelligence',
@@ -63,7 +66,7 @@ export const SERVICE_CATALOG = {
       { id: 'vigor-health', label: 'Canopy condition' },
       { id: 'moisture-et', label: 'Canopy moisture' },
     ],
-    topTabs: HEADER_TABS,
+    topTabs: CORE_TABS,
   },
   'carbon-estimator': {
     title: 'Carbon estimator',
@@ -79,7 +82,7 @@ export const SERVICE_CATALOG = {
       { id: 'overview', label: 'Overview' },
       { id: 'vigor-health', label: 'Biomass and growth' },
     ],
-    topTabs: HEADER_TABS,
+    topTabs: CORE_TABS,
   },
   'land-restoration': {
     title: 'Land restoration',
@@ -105,7 +108,7 @@ export const SERVICE_CATALOG = {
       { id: 'vigor-health', label: 'Vegetation recovery' },
       { id: 'moisture-et', label: 'Moisture' },
     ],
-    topTabs: HEADER_TABS,
+    topTabs: CLAIM_TABS,
   },
   'eudr-check': {
     title: 'EUDR check',
@@ -132,7 +135,7 @@ export const SERVICE_CATALOG = {
     analytics: [
       { id: 'overview', label: 'Overview' },
     ],
-    topTabs: HEADER_TABS,
+    topTabs: CLAIM_TABS,
   },
 
   // ── Field advisory ────────────────────────────────────────────────────────
@@ -159,7 +162,7 @@ export const SERVICE_CATALOG = {
       { id: 'moisture-et', label: 'Water use' },
       { id: 'water-management', label: 'Irrigation' },
     ],
-    topTabs: HEADER_TABS,
+    topTabs: CORE_TABS,
   },
 
   // ── Smallholder (opened from the Smallholder hub) ─────────────────────────
@@ -175,7 +178,7 @@ export const SERVICE_CATALOG = {
       { id: 'intelligence-layers', label: 'Parcel map' },
     ],
     analytics: [{ id: 'overview', label: 'Overview' }],
-    topTabs: HEADER_TABS,
+    topTabs: CORE_TABS,
   },
   'group-monitoring': {
     title: 'Farm monitoring',
@@ -194,7 +197,7 @@ export const SERVICE_CATALOG = {
       { id: 'vigor-health', label: 'Crop health' },
       { id: 'moisture-et', label: 'Water' },
     ],
-    topTabs: HEADER_TABS,
+    topTabs: CORE_TABS,
   },
   'carbon-groups': {
     title: 'Group carbon',
@@ -212,7 +215,7 @@ export const SERVICE_CATALOG = {
       { id: 'overview', label: 'Overview' },
       { id: 'vigor-health', label: 'Biomass and growth' },
     ],
-    topTabs: HEADER_TABS,
+    topTabs: CLAIM_TABS,
   },
   'smallholder-eudr': {
     title: 'EUDR passport',
@@ -226,7 +229,7 @@ export const SERVICE_CATALOG = {
       { id: 'alerts', label: 'Deforestation alerts' },
     ],
     analytics: [{ id: 'overview', label: 'Overview' }],
-    topTabs: HEADER_TABS,
+    topTabs: CLAIM_TABS,
   },
 
   // ── Engine ────────────────────────────────────────────────────────────────
@@ -241,7 +244,7 @@ export const SERVICE_CATALOG = {
       { id: 'alerts', label: 'Survey alerts' },
     ],
     analytics: [{ id: 'overview', label: 'Overview' }],
-    topTabs: HEADER_TABS,
+    topTabs: CORE_TABS,
   },
 };
 

@@ -42,7 +42,7 @@ function localChecks(kind, plots) {
 }
 
 export default function VerificationPage({ plots, serviceId, onOpenData }) {
-  const defaultKind = serviceId === 'eudr-check' ? 'eudr' : ['carbon-ffb', 'carbon-groups', 'carbon-estimator'].includes(serviceId) ? 'carbon' : serviceId === 'land-restoration' ? 'restoration' : 'boundary';
+  const defaultKind = ['eudr-check', 'smallholder-eudr'].includes(serviceId) ? 'eudr' : ['carbon-ffb', 'carbon-groups', 'carbon-estimator'].includes(serviceId) ? 'carbon' : serviceId === 'land-restoration' ? 'restoration' : 'boundary';
   const [kind, setKind] = useState(defaultKind);
   // Boundaries for every service, plus the service's own evidence: never another service's tab.
   const kinds = [...new Set(['boundary', defaultKind])];

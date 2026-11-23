@@ -5,6 +5,8 @@ import { Button, Card, CardHeader, Field, Note, Pill } from '../../../farmintely
 import { createApiKey, fetchDeveloperOverview, fetchDeveloperStatement, revokeApiKey, rotateApiKey, saveWebhook } from '../../../services/developerApi';
 import { naira } from '../../../utils/money';
 import { copyText } from '../../../utils/copyText';
+import GuidePanel from '../../../components/page/GuidePanel';
+import { API_CLIENT_GUIDE } from '../../../components/page/apiHelpText';
 
 /**
  * Developer and API: the organisation's FarmIntelytics API account (products and prices, balance, keys, callback,
@@ -61,6 +63,7 @@ export default function DeveloperCard({ isAdmin }) {
         "geometry":{"type":"Point","coordinates":[8.330123,7.880456]}}]}}'`;
   return (
     <div className="space-y-6">
+      <GuidePanel guide={API_CLIENT_GUIDE} defaultOpen={data.keys.length === 0} />
       <Card>
         <CardHeader title="Developer and API" text="Use FarmIntelytics checks from your own systems. Money is shown in naira; the API reports it in kobo." />
         <div className="p-6 space-y-5">
@@ -68,7 +71,7 @@ export default function DeveloperCard({ isAdmin }) {
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div><p className="text-xs text-gray-500">Balance</p><p className="font-mono text-lg font-semibold">{naira(data.balance_minor)}</p></div>
             <div><p className="text-xs text-gray-500">Billing</p><p className="text-sm font-semibold">{data.billing === 'postpaid' ? `Monthly invoice (limit ${naira(data.credit_limit_minor)})` : 'Prepaid wallet'}</p></div>
-            <div><p className="text-xs text-gray-500">Plots checked this month</p><p className="font-mono text-lg font-semibold">{data.usage?.eudr_checks?.plots_checked ?? 0}</p></div>
+            <div><p className="text-xs text-gray-500">Plots checked this month</p><p className="font-mono text-lg font-semibold">{data.usage?.plots_checked ?? 0}</p></div>
             <div><p className="text-xs text-gray-500">Spent this month</p><p className="font-mono text-lg font-semibold">{naira(data.usage?.spend_minor)}</p></div>
           </div>
           {data.status !== 'active' && <Note tone="error">This API account is suspended: calls are refused. Contact FarmIntelytics.</Note>}
@@ -78,6 +81,7 @@ export default function DeveloperCard({ isAdmin }) {
                 <span className="font-semibold text-gray-900">{p.name}</span>
                 <span>{naira(p.price_per_unit_minor, p.currency)} per {p.unit}</span>
                 {p.included_units_per_month > 0 && <span>{p.included_units_per_month} {p.unit}s a month included</span>}
+                {p.monthly_fee_minor > 0 && <span>Monthly fee {naira(p.monthly_fee_minor, p.currency)}, on the 1st</span>}
                 <span className="text-gray-500">Up to {p.max_units_per_request} per request · {p.test_units_per_day} free test {p.unit}s a day</span>
               </div>
             ))}
