@@ -119,7 +119,7 @@ export function Link({ to, className, style, onClick, children, ...rest }) {
   );
 }
 
-export function Route({ path, element }) {
+export function Route({ element }) {   // path is read by Routes from the props
   return element ?? null;
 }
 

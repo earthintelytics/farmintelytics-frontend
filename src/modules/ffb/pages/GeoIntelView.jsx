@@ -62,7 +62,7 @@ function ZoomWatcher({ onZoom }) {
  * change (location, period, Show, legend statuses) to the plots that filter leaves in focus; not on a view switch.
  * A filter zoom waits until that filter's data has loaded, so it fits the real result.
  */
-function MapMover({ focusFeature, resetTick, fitKey, fitFeatures, placeKey, placeFeatures, ready, home, openOnPlace }) {
+function MapMover({ focusFeature, resetTick, fitKey, fitFeatures, placeKey, placeFeatures, ready, home }) {
   const map = useMap();
   const last = useRef({ focus: undefined, reset: resetTick, fitKey, place: placeKey });
   const placeChanged = useRef(false);
@@ -295,7 +295,7 @@ export function GeoIntelView() {
     plotLayersRef.current.forEach((layer, pid) => {
       const feat = featureById.get(pid);
       if (feat && layer.setStyle) {
-        try { layer.setStyle(styleFor(feat)); } catch (_) {}
+        try { layer.setStyle(styleFor(feat)); } catch { /* optional: ignore and keep the default */ }
       }
     });
   }, [selectedPlot, styleFor, featureById]);

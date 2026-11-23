@@ -2,7 +2,7 @@ import { useRefreshTick } from '../hooks/useRefreshTick';
 import { useMemo, useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fmtNumber, fmtAbbrev } from '../utils/formatters';
-import { Trophy, Truck, Users, TrendingUp, Award, Shield, Building2, ClipboardCheck, Search, ChevronRight, Filter } from 'lucide-react';
+import { Truck, Users, TrendingUp, Award, Building2, ClipboardCheck, Search, ChevronRight } from 'lucide-react';
 import { API } from '../services/api';
 
 const EMPTY_RANKS = { cutters: [], pickers: [], harvesting_clerks: [], loading_clerks: [], contractors: [] };

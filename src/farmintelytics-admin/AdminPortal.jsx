@@ -21,6 +21,7 @@ import {
   Shield,
   FileText,
   BookOpen,
+  Code2,
 } from 'lucide-react';
 
 import Onboarding from './pages/Onboarding';
@@ -35,6 +36,7 @@ import PipelineRuns from './pages/PipelineRuns';
 import TeamAccounts from './pages/TeamAccounts';
 import ProblemReports from './pages/ProblemReports';
 import Integrations from './pages/Integrations';
+import ApiClients from './pages/ApiClients';
 import EmailLog from './pages/EmailLog';
 import ProtectedAreas from './pages/ProtectedAreas';
 import SystemStatus from './pages/SystemStatus';
@@ -72,6 +74,7 @@ const NAV_GROUPS = [
     { id: 'protected-areas', label: 'Protected areas', icon: Shield,            path: '/admin/protected-areas' },
     { id: 'ai',              label: 'AI settings',     icon: Sparkles,          path: '/admin/ai', owner: true },
     { id: 'ffb',             label: 'FFB & Mobile Hub',icon: ShieldCheck,       path: '/admin/ffb' },
+    { id: 'api-clients',     label: 'API clients',     icon: Code2,             path: '/admin/api-clients' },
     { id: 'integrations',    label: 'Integrations',    icon: Radio,             path: '/admin/integrations', owner: true },
   ]},
   { label: 'Help', items: [
@@ -263,6 +266,7 @@ const AdminPortal = () => {
             <Route path="protected-areas" element={<ProtectedAreas />} />
             <Route path="ai"              element={ownerOnly(<AiSettings />)} />
             <Route path="ffb"             element={<FfbControlPlane />} />
+            <Route path="api-clients"     element={<ApiClients />} />
             <Route path="integrations"    element={ownerOnly(<Integrations />)} />
             <Route path="logs"            element={<Logs />} />
             <Route path="reports"         element={<ProblemReports />} />

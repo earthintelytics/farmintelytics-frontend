@@ -1,4 +1,4 @@
-import { getRole, getUserEmail } from '../utils/access';
+import { getRole } from '../utils/access';
 import { useRefreshTick } from '../hooks/useRefreshTick';
 import { exportFileName } from '../utils/exportName';
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -113,7 +113,7 @@ export function PaymentItemizedView() {
       return Object.entries(colFilters).every(([key, val]) => {
         if (!val) return true;
         const q = val.toLowerCase();
-        let cell = '';
+        let cell;
         switch (key) {
           case 'date': cell = row.date_from || ''; break;
           case 'worker': cell = `${row.worker_name || ''} ${row.worker_id || ''}`; break;
@@ -149,7 +149,7 @@ export function PaymentItemizedView() {
       headers,
       ...visible.map((e) =>
         selectedKeys.map(k => {
-          let val = '';
+          let val;
           switch (k) {
             case 'date': val = e.date_from || ''; break;
             case 'worker_id': val = e.worker_id || ''; break;

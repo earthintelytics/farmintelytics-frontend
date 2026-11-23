@@ -1,23 +1,50 @@
 import { fmtDateTime } from '../utils/formatters';
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate, useSearchParams } from '../utils/portalRouter';
-import { 
-  Shield, UserPlus, Trash2, Mail, Lock, CheckCircle, XCircle, 
-  Search, Edit2, LogOut, Key, AlertCircle, Loader2, UploadCloud, 
-  RefreshCw, QrCode, Printer, Filter, Users, LayoutGrid, 
-  List, ChevronLeft, ChevronRight, CheckCircle2, X,
-  ArrowUpDown, ArrowUp, ArrowDown, Scissors, Truck, Boxes, ArrowRight,
-  UserCheck, UserX, Power, Save, Check, Calendar, Copy, Sparkles, Eye, EyeOff,
-  Terminal, FileSpreadsheet
+import { useSearchParams } from '../utils/portalRouter';
+import {
+  UserPlus,
+  Mail,
+  Search,
+  Edit2,
+  Key,
+  AlertCircle,
+  Loader2,
+  UploadCloud,
+  RefreshCw,
+  QrCode,
+  Printer,
+  Users,
+  LayoutGrid,
+  List,
+  ChevronLeft,
+  ChevronRight,
+  X,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown,
+  Scissors,
+  Truck,
+  Boxes,
+  ArrowRight,
+  UserCheck,
+  UserX,
+  Calendar,
+  Copy,
+  Sparkles,
+  Eye,
+  EyeOff,
+  Terminal,
+  FileSpreadsheet,
 } from 'lucide-react';
 import MultiSelectFilter from '../components/MultiSelectFilter';
 import { QRCodeSVG } from 'qrcode.react';
 import { API } from '../services/api';
 import { roleGroup, ROLE_GROUPS } from '../utils/roleGroups';
-import WorkerBadgeModal, { isEligibleForBadge } from '../components/WorkerBadgeModal';
+import WorkerBadgeModal from '../components/WorkerBadgeModal';
+import { isEligibleForBadge } from '../utils/badgeEligibility';
 import { AdminLogsAndAlerts } from '../components/AdminLogsAndAlerts';
 import { ToastContainer, ConfirmModal, NoticeModal } from '../components/CustomToast';
-import { LOGO_ICON } from '../utils/icons';
+
 import { copyText } from '../utils/access';
 import ExcelCsvUploadModal from '../components/ExcelCsvUploadModal';
 import { ClearDatabasePanel } from '../components/ClearDatabasePanel';
@@ -42,7 +69,6 @@ function generateStrongPassword(length = 14) {
 }
 
 export function AdminView() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Excel/CSV Dual Upload Modal State
@@ -107,13 +133,8 @@ export function AdminView() {
   const [newUser, setNewUser] = useState({ email: '', password: '', role: 'View', estate: '', sendTo: '' });
   const [userSearch, setUserSearch] = useState('');
 
-  // Employee CSV Upload State
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [uploadResult, setUploadResult] = useState(null);
-  const [uploadError, setUploadError] = useState('');
-  const [lastSyncTime, setLastSyncTime] = useState(
+  // When the employee list was last synchronised (shown on the Workers card)
+  const [lastSyncTime] = useState(
     localStorage.getItem('fi_ffb_last_employee_sync') || 'Never synchronized'
   );
 
@@ -141,13 +162,11 @@ export function AdminView() {
   const [statusUpdating, setStatusUpdating] = useState(false);
 
   // Status Dropdown Pending Changes state
-  const [pendingStatus, setPendingStatus] = useState({}); // { [employee_id]: 'Active' | 'Inactive' }
-  const [savingStatusId, setSavingStatusId] = useState(null);
-  const [savedSuccessId, setSavedSuccessId] = useState(null);
+  const [pendingStatus] = useState({}); // { [employee_id]: 'Active' | 'Inactive' }
   const [lastRefreshTime, setLastRefreshTime] = useState(
     fmtDateTime(new Date())
   );
-  const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+  const [autoRefreshEnabled] = useState(true);
 
   // Drag & Drop CSV Handlers
   // Reset Password Modal State
@@ -164,9 +183,9 @@ export function AdminView() {
   const generateRandomPassword = () => {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
     let pass = 'FarmIntelytics#';
-    for (let i = 0; i < 6; i++) {
-      pass += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    // A password, so the browser's secure random numbers rather than Math.random.
+    const picks = crypto.getRandomValues(new Uint32Array(6));
+    for (const n of picks) pass += chars.charAt(n % chars.length);
     setNewPassword(pass);
     setCopiedPassword(false);
   };
@@ -217,75 +236,10 @@ export function AdminView() {
     }
   };
 
-  const isSupportedFile = (filename) => {
-    const lower = (filename || '').toLowerCase();
-    return lower.endsWith('.csv') || lower.endsWith('.xlsx') || lower.endsWith('.xls');
-  };
 
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (!isSupportedFile(file.name)) {
-        setUploadError('Only CSV (.csv) and Excel (.xlsx, .xls) files are supported.');
-        setSelectedFile(null);
-        return;
-      }
-      setSelectedFile(file);
-      setUploadError('');
-      setUploadResult(null);
-    }
-  };
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
 
-  const handleDrop = (e) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      if (!isSupportedFile(file.name)) {
-        setUploadError('Only CSV (.csv) and Excel (.xlsx, .xls) files are supported.');
-        setSelectedFile(null);
-        return;
-      }
-      setSelectedFile(file);
-      setUploadError('');
-      setUploadResult(null);
-    }
-  };
 
-  const handleUpload = async () => {
-    if (!selectedFile) return;
-    setIsUploading(true);
-    setUploadProgress(0);
-    setUploadError('');
-    setUploadResult(null);
-
-    try {
-      const res = await API.uploadEmployeeCSV(selectedFile, (p) => setUploadProgress(p));
-      setUploadResult(res);
-      if (res.processed > 0) {
-        const now = new Date();
-        const formattedDate = now.getFullYear() + '-' +
-          String(now.getMonth() + 1).padStart(2, '0') + '-' +
-          String(now.getDate()).padStart(2, '0') + ' ' +
-          String(now.getHours()).padStart(2, '0') + ':' +
-          String(now.getMinutes()).padStart(2, '0') + ':' +
-          String(now.getSeconds()).padStart(2, '0');
-        
-        localStorage.setItem('fi_ffb_last_employee_sync', formattedDate);
-        setLastSyncTime(formattedDate);
-        setSelectedFile(null);
-        loadEmployees();
-      }
-    } catch (err) {
-      setUploadError(err.message || 'Failed to upload CSV file.');
-    } finally {
-      setIsUploading(false);
-      setUploadProgress(0);
-    }
-  };
 
   // Load employees from backend
   const loadEmployees = useCallback(async () => {
@@ -331,37 +285,7 @@ export function AdminView() {
   }, [loadUsers, loadEmployees]);
 
   // Status Dropdown Handlers
-  const handleStatusSelectChange = (empId, newStatus) => {
-    setPendingStatus(prev => ({
-      ...prev,
-      [empId]: newStatus
-    }));
-  };
 
-  const handleSaveWorkerStatus = async (empId) => {
-    const targetEmp = employees.find(e => e.employee_id === empId);
-    const newStatus = pendingStatus[empId] || targetEmp?.worker_status || 'Active';
-
-    setSavingStatusId(empId);
-    try {
-      await API.toggleWorkerStatus(empId, newStatus);
-      setEmployees(prev => prev.map(emp => 
-        emp.employee_id === empId ? { ...emp, worker_status: newStatus } : emp
-      ));
-      setPendingStatus(prev => {
-        const next = { ...prev };
-        delete next[empId];
-        return next;
-      });
-      setSavedSuccessId(empId);
-      setTimeout(() => setSavedSuccessId(null), 2500);
-      showToast(`Worker status updated to ${newStatus}`, 'success');
-    } catch (err) {
-      showToast('Failed to save worker status: ' + (err.message || 'Unknown error'), 'error');
-    } finally {
-      setSavingStatusId(null);
-    }
-  };
 
   // Bulk update worker status
   const handleBulkStatusUpdate = (newStatus) => {
@@ -1111,8 +1035,6 @@ export function AdminView() {
                       const isSelected = selectedEmpIds.has(emp.employee_id);
                       const currentStatus = pendingStatus[emp.employee_id] !== undefined ? pendingStatus[emp.employee_id] : (emp.worker_status || 'Active');
                       const isWorkerActive = currentStatus === 'Active';
-                      const hasPendingChange = pendingStatus[emp.employee_id] !== undefined && pendingStatus[emp.employee_id] !== (emp.worker_status || 'Active');
-
                       const qrPayload = JSON.stringify({
                         employee_id: emp.employee_id,
                         first_name: emp.first_name,
@@ -1359,7 +1281,6 @@ export function AdminView() {
                         const currentStatus = pendingStatus[emp.employee_id] !== undefined ? pendingStatus[emp.employee_id] : (emp.worker_status || 'Active');
                         const isWorkerActive = currentStatus === 'Active';
                         const hasPendingChange = pendingStatus[emp.employee_id] !== undefined && pendingStatus[emp.employee_id] !== (emp.worker_status || 'Active');
-                        const isSuccess = savedSuccessId === emp.employee_id;
 
                         return (
                           <tr

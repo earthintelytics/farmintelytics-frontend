@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { FFB_ICON, WEIGHT_ICON, PLOT_ICON } from '../utils/icons';
 import { useAppContext } from '../context/AppContext';
 import { fmtAbbrev } from '../utils/formatters';
-import { TrendingUp, Sparkles, Package, Scale, Map, Search, Calendar as CalendarIcon, RotateCcw } from 'lucide-react';
+import { TrendingUp, Package, Scale, Search, RotateCcw } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import { EstateOptions } from '../components/EstateOptions';
 

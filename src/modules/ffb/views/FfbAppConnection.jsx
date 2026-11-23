@@ -60,17 +60,6 @@ export default function FfbAppConnection({ tenantSlug }) {
     setTimeout(() => setCopied(''), 1800);
   };
 
-  const CopyBtn = ({ id, value, label = 'Copy' }) => (
-    <button
-      type="button"
-      onClick={() => copyText(id, value)}
-      disabled={!value}
-      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-light)] bg-white text-xs font-normal text-gray-700 hover:bg-gray-50 disabled:opacity-40"
-    >
-      {copied === id ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
-      {copied === id ? 'Copied' : label}
-    </button>
-  );
 
   const devices = pack?.connected_devices || [];
 
@@ -123,7 +112,7 @@ export default function FfbAppConnection({ tenantSlug }) {
                       {pack.access_code || pack.company_id}
                     </span>
                   </p>
-                  <CopyBtn id="code" value={pack.access_code || pack.company_id} label="Copy Access Code" />
+                  <CopyBtn copied={copied} onCopy={copyText} id="code" value={pack.access_code || pack.company_id} label="Copy Access Code" />
                   <button
                     type="button"
                     onClick={handleRegenerateCode}
@@ -170,7 +159,7 @@ export default function FfbAppConnection({ tenantSlug }) {
                     <div className="flex items-center justify-between gap-2">
                       <code className="font-mono text-gray-900 break-all">{pack.portal_url}</code>
                       <div className="flex items-center gap-1.5 shrink-0">
-                        <CopyBtn id="portal" value={pack.portal_url} />
+                        <CopyBtn copied={copied} onCopy={copyText} id="portal" value={pack.portal_url} />
                         {pack.portal_url && (
                           <a
                             href={pack.portal_url}
@@ -190,7 +179,7 @@ export default function FfbAppConnection({ tenantSlug }) {
                     <p className="text-[11px] font-normal text-[var(--text-muted)] mb-1">Dedicated Sign-In URL (Bookmark for Managers)</p>
                     <div className="flex items-center justify-between gap-2">
                       <code className="font-mono text-gray-900 break-all">{pack.login_url}</code>
-                      <CopyBtn id="login" value={pack.login_url} />
+                      <CopyBtn copied={copied} onCopy={copyText} id="login" value={pack.login_url} />
                     </div>
                   </div>
 
@@ -317,5 +306,20 @@ export default function FfbAppConnection({ tenantSlug }) {
         </>
       )}
     </div>
+  );
+}
+
+/** A copy button that shows "Copied" for a moment after it is used. */
+function CopyBtn({ id, value, label = 'Copy', copied, onCopy }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onCopy(id, value)}
+      disabled={!value}
+      className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[var(--border-light)] bg-white text-xs font-normal text-gray-700 hover:bg-gray-50 disabled:opacity-40"
+    >
+      {copied === id ? <Check size={13} className="text-green-600" /> : <Copy size={13} />}
+      {copied === id ? 'Copied' : label}
+    </button>
   );
 }

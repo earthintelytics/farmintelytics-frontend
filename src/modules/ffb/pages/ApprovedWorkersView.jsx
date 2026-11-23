@@ -1,14 +1,18 @@
-import { getRole, getUserEmail } from '../utils/access';
+import { getRole } from '../utils/access';
 import { useRefreshTick } from '../hooks/useRefreshTick';
 import { WORKER_ICON, FFB_ICON, WEIGHT_ICON, UNRIPE_ICON, ROTTEN_ICON } from '../utils/icons';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
-  UserCheck, Search, Calendar, Grid, Users, ShieldAlert,
-  RotateCcw, Download, ChevronLeft, ChevronRight, Truck, User,
-  Columns, ChevronDown, Lock, X
+  UserCheck,
+  Search,
+  RotateCcw,
+  Download,
+  Columns,
+  ChevronDown,
+  Lock,
 } from 'lucide-react';
 import { API } from '../services/api';
-import { CONFIG } from '../config';
+
 import { fmtDate, fmtNumber } from '../utils/formatters';
 import { scrollPageTop } from '../utils/scroll';
 import ExportColumnsModal from '../components/ExportColumnsModal';
@@ -164,7 +168,7 @@ export function ApprovedWorkersView() {
           };
         }
       }
-    } catch (e) { }
+    } catch { /* optional: ignore and keep the default */ }
     const def = getDefaultCols();
     return {
       harvester: new Set(def.harvester),
@@ -180,7 +184,7 @@ export function ApprovedWorkersView() {
         picker: Array.from(visibleCols.picker),
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
-    } catch (e) { }
+    } catch { /* optional: ignore and keep the default */ }
   }, [visibleCols]);
 
   // Dropdown states & click outside
@@ -263,7 +267,7 @@ export function ApprovedWorkersView() {
       return Object.entries(colFilters).every(([key, val]) => {
         if (!val) return true;
         const q = val.toLowerCase();
-        let cell = '';
+        let cell;
         switch (key) {
           case 'date': cell = fmtDate(row.created_at) || ''; break;
           case 'worker_id': cell = String(row.h_worker_id || ''); break;
@@ -385,29 +389,9 @@ export function ApprovedWorkersView() {
     setExportModalOpen(true);
   };
 
-  const toggleExportCol = (key) => {
-    setExportSelectedCols(prev => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  };
 
-  const selectAllExportCols = () => {
-    const registry = roleTab === 'picker' ? PICKER_COLS : HARVESTER_COLS;
-    const next = new Set(registry.filter(c => !(c.isName && isViewer)).map(c => c.key));
-    setExportSelectedCols(next);
-  };
 
-  const matchVisibleExportCols = () => {
-    const current = visibleCols[roleTab] || new Set();
-    setExportSelectedCols(new Set(current));
-  };
 
-  const clearAllExportCols = () => {
-    setExportSelectedCols(new Set());
-  };
 
   const handleConfirmExport = () => {
     if (isViewer) return;

@@ -18,7 +18,7 @@ const CHECKS = {
 };
 
 /** Failed checks, worst first (points lost = (10 − points) × weight). */
-export function reviewReasons(details) {
+function reviewReasons(details) {
   return Object.entries(details || {})
     .filter(([key, v]) => CHECKS[key] && v && typeof v === 'object' && (v.score ?? 10) < 10)
     .map(([key, v]) => ({ key, ...CHECKS[key], msg: v.msg || '', lost: Math.round((10 - (v.score ?? 10)) * CHECKS[key].weight * 10) / 10 }))

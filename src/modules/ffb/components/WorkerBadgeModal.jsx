@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { QRCodeSVG } from 'qrcode.react';
 import { X, Printer, QrCode, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { roleGroup } from '../utils/roleGroups';
+import { isEligibleForBadge } from '../utils/badgeEligibility';
 
 function getWorkerName(emp) {
   if (!emp) return '';
@@ -16,30 +17,6 @@ function getWorkerName(emp) {
 
 const BADGES_PER_PAGE = 8; // print layout: 8 badges on each A4 sheet
 const COPY_OPTIONS = [1, 2, 4, 8];
-
-const BLOCKED_FUNCTIONS = new Set([
-  'headman',
-  'headperson',
-  'headwoman',
-  'field hand',
-  'prunning',
-  'pruning',
-  'tapping',
-  'unknown'
-]);
-
-export function isEligibleForBadge(emp) {
-  if (!emp) return false;
-  const status = (emp.worker_status || emp.service || 'Active').trim().toLowerCase();
-  if (status === 'inactive' || status === 'suspended' || status === 'deactivated' || status === 'terminated') {
-    return false;
-  }
-  const fn = (emp.function || '').trim().toLowerCase();
-  if (!fn || BLOCKED_FUNCTIONS.has(fn)) {
-    return false;
-  }
-  return true;
-}
 
 export default function WorkerBadgeModal({ isOpen, onClose, workers = [] }) {
   const { tenantMeta, tenantSlug } = useAppContext();

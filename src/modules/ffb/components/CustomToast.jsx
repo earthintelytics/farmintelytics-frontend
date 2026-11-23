@@ -1,4 +1,3 @@
-import React from 'react';
 import { AlertTriangle, CheckCircle, Info, XCircle, X, Terminal } from 'lucide-react';
 
 export function ToastContainer({ toasts, removeToast, onViewLogs }) {

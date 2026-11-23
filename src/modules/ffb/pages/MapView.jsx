@@ -3,7 +3,7 @@ import { StatusFilter } from '../components/StatusFilter';
 import { MapFullscreenButton } from '../components/MapFullscreenButton';
 import { useRefreshTick } from '../hooks/useRefreshTick';
 import { useEffect, useMemo, useState, useCallback, memo, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, LayersControl, useMap, FeatureGroup, GeoJSON, ZoomControl, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, LayersControl, useMap, GeoJSON, ZoomControl, useMapEvents } from 'react-leaflet';
 import { useAppContext } from '../context/AppContext';
 import { CONFIG } from '../config';
 import { ROLES } from '../utils/constants';
@@ -236,6 +236,7 @@ const InternalMapHandler = memo(({ setShowLabels }) => {
 const ClusterMarkers = memo(({ markers, onMarkerClick }) => {
   const map = useMap();
   const clusterGroupRef = useRef(null);
+  const canvasRef = useRef(null);         // the canvas renderer the markers draw on
 
   useEffect(() => {
     const clusterGroup = L.markerClusterGroup({
@@ -286,8 +287,9 @@ const ClusterMarkers = memo(({ markers, onMarkerClick }) => {
     if (!clusterGroupRef.current) return;
     clusterGroupRef.current.clearLayers();
 
-    if (!map._ffbCanvas) map._ffbCanvas = L.canvas({ padding: 0.5 });
-    const canvasRenderer = map._ffbCanvas;
+    // One canvas renderer per map, kept on a ref so it is made once.
+    if (!canvasRef.current) canvasRef.current = L.canvas({ padding: 0.5 });
+    const canvasRenderer = canvasRef.current;
 
     markers.forEach(op => {
       if (!op.latitude || !op.longitude) return;
@@ -309,7 +311,7 @@ const ClusterMarkers = memo(({ markers, onMarkerClick }) => {
       marker.on('click', () => onMarkerClick(op));
       clusterGroupRef.current.addLayer(marker);
     });
-  }, [markers, onMarkerClick]);
+  }, [map, markers, onMarkerClick]);
 
   return null;
 });

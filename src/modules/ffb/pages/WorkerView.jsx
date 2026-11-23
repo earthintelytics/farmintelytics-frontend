@@ -1,13 +1,13 @@
-import { getRole, getUserEmail } from '../utils/access';
+import { getRole } from '../utils/access';
 import { useRefreshTick } from '../hooks/useRefreshTick';
 import { EstateOptions } from '../components/EstateOptions';
 import { WORKER_ICON, FFB_ICON, WEIGHT_ICON, DURATION_ICON, APPROVED_ICON } from '../utils/icons';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
-import { fmtDateTime, fmtStatusBadge, fmtAbbrev, fmtRole } from '../utils/formatters';
-import { ROLES, STATUSES, ROLE_KEY_METRIC } from '../utils/constants';
+import { fmtDateTime, fmtStatusBadge, fmtAbbrev } from '../utils/formatters';
+import { ROLE_KEY_METRIC } from '../utils/constants';
 import { API } from '../services/api';
-import { Search, Download, User, Package, Scale, Cpu, Clock, CheckCircle, MapPin, Truck, RotateCcw, X, Layers, Zap, Lock, Columns, ChevronDown, Check } from 'lucide-react';
+import { Search, Download, User, Cpu, MapPin, Truck, RotateCcw, Lock, Columns, ChevronDown } from 'lucide-react';
 import { scrollPageTop } from '../utils/scroll';
 import { approvalSplit } from '../utils/reconStatus';
 import StatCards from '../components/StatCards';
@@ -25,9 +25,6 @@ const ICONS = {
   truck: <Truck size={12} />,
 };
 
-function isWeightRole(role) {
-  return ROLE_KEY_METRIC[(role || '').toLowerCase()] === 'weight';
-}
 
 function formatWeightCell(weight) {
   if (weight == null || Number.isNaN(Number(weight))) return '—';
@@ -184,7 +181,7 @@ const getDefaultCols = () => ({
 });
 
 export function WorkerView() {
-  const { operations, filters, updateFilters, resetFilters, currentPage, setCurrentPage } = useAppContext();
+  const { filters, updateFilters, resetFilters, currentPage, setCurrentPage } = useAppContext();
   const refreshTick = useRefreshTick(); // top-bar Refresh reloads this page's data
   const userRole = getRole();
   const isViewer = userRole === 'View';
@@ -212,7 +209,7 @@ export function WorkerView() {
           picker: sanitize(parsed.picker, PICKER_COLS),
         };
       }
-    } catch (_) {}
+    } catch { /* optional: ignore and keep the default */ }
     return {
       harvester: new Set(defaults.harvester),
       picker: new Set(defaults.picker),
@@ -258,7 +255,7 @@ export function WorkerView() {
           harvester: Array.from(next.harvester),
           picker: Array.from(next.picker),
         }));
-      } catch (_) {}
+      } catch { /* optional: ignore and keep the default */ }
       return next;
     });
   };
@@ -275,7 +272,7 @@ export function WorkerView() {
         harvester: Array.from(next.harvester),
         picker: Array.from(next.picker),
       }));
-    } catch (_) {}
+    } catch { /* optional: ignore and keep the default */ }
   };
 
   const showAllCols = () => {
@@ -289,7 +286,7 @@ export function WorkerView() {
         harvester: Array.from(next.harvester),
         picker: Array.from(next.picker),
       }));
-    } catch (_) {}
+    } catch { /* optional: ignore and keep the default */ }
   };
 
   // Open Export Modal pre-populated with visible columns
@@ -299,31 +296,9 @@ export function WorkerView() {
     setExportModalOpen(true);
   };
 
-  const toggleExportCol = (key) => {
-    setExportSelectedCols(prev => {
-      const next = new Set(prev);
-      if (next.has(key)) {
-        next.delete(key);
-      } else {
-        next.add(key);
-      }
-      return next;
-    });
-  };
 
-  const selectAllExportCols = () => {
-    const next = new Set(allCols.filter(c => !(c.isName && isViewer)).map(c => c.key));
-    setExportSelectedCols(next);
-  };
 
-  const matchVisibleExportCols = () => {
-    const current = visibleCols[roleTab] || new Set();
-    setExportSelectedCols(new Set(current));
-  };
 
-  const clearAllExportCols = () => {
-    setExportSelectedCols(new Set());
-  };
 
   const handleConfirmExport = () => {
     const csvCols = [];
@@ -427,7 +402,7 @@ export function WorkerView() {
       return Object.entries(colFilters).every(([key, val]) => {
         if (!val) return true;
         const q = val.toLowerCase();
-        let cell = '';
+        let cell;
         switch (key) {
           case 'date': cell = fmtDateTime(row.created_at) || ''; break;
           case 'worker_id': cell = String(row.worker_id || ''); break;
@@ -477,19 +452,6 @@ export function WorkerView() {
       { label: 'Average Duration', value: avgDuration, unit: 'min', color: SLATE, title: 'Field time per plot' },
     ];
   }, [workerStats.cards]);
-
-  const hasActiveFilters = Boolean(
-    filters.search ||
-    filters.estate ||
-    filters.role ||
-    filters.status ||
-    filters.plot ||
-    filters.contractor ||
-    filters.team ||
-    filters.dateRange?.from ||
-    filters.dateRange?.to ||
-    Object.values(colFilters).some(Boolean)
-  );
 
   const handleClearAll = () => {
     resetFilters();

@@ -1,4 +1,4 @@
-import { getRole, getUserEmail } from '../utils/access';
+import { getRole } from '../utils/access';
 import { useRefreshTick } from '../hooks/useRefreshTick';
 import { EstateOptions } from '../components/EstateOptions';
 import { PLOT_ICON, FFB_ICON, WEIGHT_ICON, ROTTEN_ICON, UNRIPE_ICON } from '../utils/icons';
@@ -6,9 +6,9 @@ import { exportFileName } from '../utils/exportName';
 import { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fmtAbbrev, fmtDayShort, fmtNumber } from '../utils/formatters';
-import { Map as MapIcon, TrendingUp, Scale, AlertCircle, CheckCircle2, Search, Download, RotateCcw, X, Layers, Zap, Lock } from 'lucide-react';
+import { Map as MapIcon, Scale, AlertCircle, CheckCircle2, Search, Download, RotateCcw, Layers, Lock } from 'lucide-react';
 import { API } from '../services/api';
-import { CONFIG } from '../config';
+
 import { BunchWeightView } from './BunchWeightView';
 
 import { Bar, Line } from 'react-chartjs-2';
@@ -145,7 +145,7 @@ export function PlotView() {
       return Object.entries(colFilters).every(([key, val]) => {
         if (!val) return true;
         const q = val.toLowerCase();
-        let cell = '';
+        let cell;
         switch (key) {
           case 'date': cell = row.date || ''; break;
           case 'plot_id': cell = row.plot_id || ''; break;
@@ -508,12 +508,11 @@ export function PlotView() {
               ) : (
                 filteredPaginatedAgg.map((row, index) => {
                   const diff = Math.abs(row.difference ?? 0); // harvested - rotten - loaded (server rule)
-                  let diffColor = '#000';
-                  let diffBg = 'transparent';
-                  let diffTone = 'neutral';
-                  if (diff > 50) { diffColor = '#be123c'; diffBg = '#fff1f2'; diffTone = 'high'; }
-                  else if (diff > 10) { diffColor = '#92400e'; diffBg = '#fef3c7'; diffTone = 'medium'; }
-                  else { diffColor = '#3F8432'; diffBg = '#F3F8EF'; diffTone = 'low'; }
+                  let diffColor;
+                  let diffBg;
+                  if (diff > 50) { diffColor = '#be123c'; diffBg = '#fff1f2'; }
+                  else if (diff > 10) { diffColor = '#92400e'; diffBg = '#fef3c7'; }
+                  else { diffColor = '#3F8432'; diffBg = '#F3F8EF'; }
 
                   return (
                     <tr

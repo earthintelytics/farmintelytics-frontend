@@ -1,12 +1,28 @@
 import { fmtDateTime } from '../utils/formatters';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { usePageScroll } from '../hooks/usePageScroll';
 import {
-  Terminal, Bell, Send, Download, Trash2, RefreshCw,
-  AlertTriangle, AlertCircle, CheckCircle2, XCircle, Info,
-  Search, Filter, Plus, Clock, Copy, Check, Eye, X,
-  ShieldCheck, ShieldAlert, Zap, Server, ChevronLeft, ChevronRight,
-  ExternalLink, Mail, UserPlus, Power, Play, Pause, FileText
+  Terminal,
+  Bell,
+  Send,
+  Download,
+  Trash2,
+  RefreshCw,
+  AlertTriangle,
+  AlertCircle,
+  CheckCircle2,
+  Info,
+  Search,
+  Clock,
+  Copy,
+  Check,
+  Eye,
+  X,
+  Server,
+  ChevronLeft,
+  ChevronRight,
+  Mail,
+  UserPlus,
 } from 'lucide-react';
 import { API } from '../services/api';
 import { ConfirmModal } from './CustomToast';

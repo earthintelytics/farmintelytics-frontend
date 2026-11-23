@@ -3,13 +3,22 @@ import { getRole, getUserEmail, getEstateScope } from '../utils/access';
 import { EstateOptions } from '../components/EstateOptions';
 import { useAppContext } from '../context/AppContext';
 import { useSearchParams } from '../utils/portalRouter';
-import { fmtDate, fmtTime, fmtRole } from '../utils/formatters';
+import { fmtDate, fmtTime } from '../utils/formatters';
 import { bunchCount, countFlag, confirmedNote } from '../utils/counts';
 import { fmtPlatform } from '../utils/platform';
 import {
-  Search, CheckCircle, Save, HelpCircle, X, Layers, RotateCcw,
-  AlertTriangle, ShieldAlert, ShieldCheck, MapPin, Calendar,
-  ChevronRight, ChevronLeft, User, Truck, Grid, ArrowUpDown, Lock
+  Search,
+  CheckCircle,
+  HelpCircle,
+  X,
+  RotateCcw,
+  AlertTriangle,
+  ShieldAlert,
+  MapPin,
+  ChevronLeft,
+  User,
+  ArrowUpDown,
+  Lock,
 } from 'lucide-react';
 import { API } from '../services/api';
 
@@ -31,7 +40,7 @@ const APPROVAL_INDIVIDUAL_COLS = [
 
 import { MapView } from './MapView';
 import { ReviewReasons } from '../components/ReviewReasons';
-import { RECON_STATUS, reconStatus, PAIR_STATUS, STATUS_CHOICES, statusMatches, isIssue, selectedStatuses, isDefaultStatuses, recordIssues, plotDays } from '../utils/reconStatus';
+import { RECON_STATUS, reconStatus, PAIR_STATUS, STATUS_CHOICES, statusMatches, selectedStatuses, isDefaultStatuses, recordIssues, plotDays } from '../utils/reconStatus';
 import { StatusFilter } from '../components/StatusFilter';
 import { AwaitingRecordersTable } from '../components/AwaitingRecordersTable';
 import { scrollPageTop } from '../utils/scroll';
@@ -108,13 +117,12 @@ export function ApprovalView() {
   const [totalIndividualCount, setTotalIndividualCount] = useState(0);
   const totalPages = Math.max(1, Math.ceil(totalIndividualCount / pageSize));
   const [localChanges, setLocalChanges] = useState({}); // id -> { status, comment, saved }
-  const [approvalStats, setApprovalStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });
+  const [, setApprovalStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 });   // kept for the counters
   const [plotDrilldown, setPlotDrilldown] = useState(null);
 
   const [loadingDrilldown, setLoadingDrilldown] = useState(false);
   const [drilldownFailed, setDrilldownFailed] = useState(false);   // the plot's loads could not be loaded
   const [drilldownTry, setDrilldownTry] = useState(0);             // "Retry" reloads them
-  const [compareMode, setCompareMode] = useState(false);
 
   const [lightboxCompare, setLightboxCompare] = useState(false);
   const [selectedLoaderImageIdx, setSelectedLoaderImageIdx] = useState(0);
@@ -323,7 +331,6 @@ export function ApprovalView() {
   const plotDaysAll = allPlotExceptions;
   const shownPlotDays = useMemo(() => plotDaysAll.filter(p => statusMatches(localFilters.status, p.status)),
     [plotDaysAll, localFilters.status]);
-  const loaderOnlyPlots = shownPlotDays;
 
   // Click handler to select an exception and transition to Individual Records
   const listFiltersRef = useRef(null);   // filters of the list view, restored by "Back to all records"

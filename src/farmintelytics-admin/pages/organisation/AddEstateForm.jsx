@@ -56,6 +56,11 @@ const AddEstateForm = ({ org, farms, onClose, onSaved }) => {
         services, sensors, indices, processing_level: 'plot_level', cloud_cover_threshold: 10,
         start_date: startDate, end_date: null,
       });
+      if (!file) {   // the boundary can be uploaded later from the estate's row
+        setProgress({ pct: 100, text: 'Estate added. Upload its boundary when you have it.' });
+        setTimeout(() => onSaved(), 900);
+        return;
+      }
       const uploadRes = await uploadBoundary(created.farm_id, file, (prog) => setProgress({ pct: Math.max(20, Math.min(95, 20 + Math.round(prog.percent * 0.75))), text: `Uploading the boundary (${prog.percent}%)…` }));
       if (uploadRes?.warnings?.length) {
         // Keep the window open so the points to check are read before going on.
@@ -72,7 +77,7 @@ const AddEstateForm = ({ org, farms, onClose, onSaved }) => {
   const busy = Boolean(progress);
   return (
     <Modal help={MODAL_HELP.addEstate} title="Add an estate" text={org.display_name} onClose={busy ? undefined : onClose}
-      footer={warnings ? <Button onClick={() => onSaved()}>Done</Button> : <><Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button><Button onClick={save} disabled={busy || !name.trim() || !startDate || !file}>{busy ? `Adding (${progress.pct}%)…` : 'Add estate'}</Button></>}>
+      footer={warnings ? <Button onClick={() => onSaved()}>Done</Button> : <><Button variant="secondary" onClick={onClose} disabled={busy}>Cancel</Button><Button onClick={save} disabled={busy || !name.trim() || !startDate || Boolean(fileError)}>{busy ? `Adding (${progress.pct}%)…` : 'Add estate'}</Button></>}>
       {error && <p className="text-sm text-red-800 bg-red-50 border border-red-200 rounded-xl px-4 py-3">{error}</p>}
       {warnings && <><p className="text-sm text-gray-700">{progress?.text}</p><DataWarnings warnings={warnings} /></>}
       <Field label="Estate name"><input className={inputCls} value={name} onChange={(e) => setName(e.target.value)} disabled={busy} placeholder="e.g. North estate" /></Field>
@@ -99,7 +104,7 @@ const AddEstateForm = ({ org, farms, onClose, onSaved }) => {
           </select>
         </Field>
       )}
-      <Field label="Boundary (GeoJSON)" error={fileError} hint={fileNote || 'Polygons in longitude/latitude (WGS 84).'}>
+      <Field label="Boundary (GeoJSON, optional)" error={fileError} hint={fileNote || 'Polygons in longitude/latitude (WGS 84). Optional now: it can be uploaded later from the estate.'}>
         <label className={`flex items-center gap-3 px-4 py-3 rounded-xl border cursor-pointer ${file ? 'border-green-600 bg-green-50/40' : 'border-dashed border-gray-300 bg-white'}`}>
           <UploadCloud size={16} className={file ? 'text-green-700' : 'text-gray-400'} />
           <span className="text-sm text-gray-700 truncate">{file ? file.name : 'Choose a .geojson file'}</span>

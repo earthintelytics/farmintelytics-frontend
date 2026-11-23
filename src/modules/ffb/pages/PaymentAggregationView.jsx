@@ -1,4 +1,4 @@
-import { getRole, getUserEmail } from '../utils/access';
+import { getRole } from '../utils/access';
 import { useRefreshTick } from '../hooks/useRefreshTick';
 import { exportFileName } from '../utils/exportName';
 import { useState, useMemo, useEffect, useCallback } from 'react';
@@ -10,13 +10,10 @@ import {
   Circle,
   Search,
   Calendar,
-  Filter,
   Banknote,
   Users,
   Receipt,
-  RefreshCw,
   RotateCcw,
-  X,
   Download,
   ShieldCheck,
   Lock,
@@ -203,7 +200,7 @@ export function PaymentAggregationView() {
       return Object.entries(colFilters).every(([key, val]) => {
         if (!val) return true;
         const q = val.toLowerCase();
-        let cell = '';
+        let cell;
         switch (key) {
           case 'worker': cell = `${row.worker_name || ''} ${row.worker_id || ''}`; break;
           case 'role': cell = [...row.roles].join(' '); break;
@@ -245,7 +242,7 @@ export function PaymentAggregationView() {
       headers,
       ...visible.map((e) =>
         selectedKeys.map(k => {
-          let val = '';
+          let val;
           switch (k) {
             case 'date': val = e.created_at?.slice(0, 10) || ''; break;
             case 'worker_id': val = e.worker_id || ''; break;

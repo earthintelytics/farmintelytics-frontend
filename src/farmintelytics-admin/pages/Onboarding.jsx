@@ -219,6 +219,8 @@ const Onboarding = () => {
 
   // Exactly what was chosen: a monitoring service per crop, plus the services.
   const allowedModules = useMemo(() => [...new Set([...crops.map((c) => `rs-${c}`), ...services])], [crops, services]);
+  // Only smallholder services: they work from members' parcels, so an estate (and its boundary) is optional.
+  const onlySmallholder = crops.length === 0 && services.length > 0 && services.every(s => SMALLHOLDER_SERVICES.includes(s));
   const datasetsAsked = useMemo(() => {
     const keys = [...crops.map(c => `crop:${CROP_KEY[c] || c}`), ...services.map(s => `service:${s}`)];
     return datasetsForScope(DATASET_DEFINITIONS, keys);
@@ -251,7 +253,7 @@ const Onboarding = () => {
   const canNext = [
     company.company_name.trim() && !slugErr,
     crops.length > 0 || services.length > 0,
-    estates.length > 0 && estates.every(e => e.farm_name.trim() && e.start_date && e.boundaryFile && e.geojson && !e.boundaryError && !estateErr(e) && (e.crop || crops.length <= 1)),
+    estates.every(e => e.farm_name.trim() && e.start_date && (!e.boundaryFile || e.geojson) && !e.boundaryError && !estateErr(e) && (e.crop || crops.length <= 1)),
     true,
     cred.email.trim() && !emailErr && !codeErr,
     true,
@@ -283,11 +285,12 @@ const Onboarding = () => {
         start_date: e.start_date, end_date: e.end_date || null,
         crop: e.crop || (crops.length === 1 ? crops[0] : ''), is_irrigated: e.is_irrigated, // stored once the backend has the fields (G7)
       });
-      const boundary = await uploadBoundary(farm.farm_id, e.boundaryFile);
+      // The boundary is optional: without one the estate waits for it (Organisations → Estates → Upload boundary).
+      const boundary = e.boundaryFile ? await uploadBoundary(farm.farm_id, e.boundaryFile) : null;
       if (boundary?.stray_shapes?.length || boundary?.warnings?.length) {
         setEstate(e.key, { strayShapes: boundary.stray_shapes || null, dataWarnings: boundary.warnings || null });
       }
-      created.push(farm); boundaries.push(boundary);
+      created.push({ ...farm, has_boundary: Boolean(boundary) }); if (boundary) boundaries.push(boundary);
       setDone(d => ({ ...d, org, farms: [...created], boundaries: [...boundaries] })); // keep progress if a later estate fails
     }
     if (services.includes('ffb-counter') && ffbBoundaryFile) {
@@ -305,14 +308,15 @@ const Onboarding = () => {
         throw new Error(d.detail || d.message || `Dedicated FFB boundary upload failed (${res.status})`);
       }
     }
-    setLoadingProps(true);
+    setLoadingProps(created.some(f => f.has_boundary));
     setStep(3);
   });
 
   useEffect(() => {
-    if (step !== 3 || !done.farms.length) return;
+    const withBoundary = done.farms.filter(f => f.has_boundary !== false);
+    if (step !== 3 || !withBoundary.length) return;
     let active = true;
-    Promise.all(done.farms.map(f => getBoundaryProperties(f.farm_id).catch(() => ({ properties: [] }))))
+    Promise.all(withBoundary.map(f => getBoundaryProperties(f.farm_id).catch(() => ({ properties: [] }))))
       .then(results => {
         if (!active) return;
         const byKey = new Map();
@@ -342,8 +346,10 @@ const Onboarding = () => {
   });
 
   const submitSchedule = () => run(async () => {
-    const targets = grouped ? [{ id: `${slug}_farm`, name: `${company.company_name} (combined)`, parent: true }]
-      : done.farms.map(f => ({ id: f.farm_id, name: f.farm_name, parent: false }));
+    const ready = done.farms.filter(f => f.has_boundary !== false);
+    const targets = !ready.length ? []
+      : grouped ? [{ id: `${slug}_farm`, name: `${company.company_name} (combined)`, parent: true }]
+        : ready.map(f => ({ id: f.farm_id, name: f.farm_name, parent: false }));
     const configs = [], schedulers = [];
     for (const [i, t] of targets.entries()) {
       const res = t.parent ? await generateParentConfig(t.id) : await generateFarmConfig(t.id);
@@ -500,7 +506,12 @@ const Onboarding = () => {
           <Card>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Estates</h2>
-              <p className="text-sm text-gray-500 mt-1">Add every estate {company.company_name} wants monitored, each with its own boundary file. Estates can be in different places.</p>
+              <p className="text-sm text-gray-500 mt-1">Add every estate {company.company_name} wants monitored. A boundary file can be added now or later, per estate and per service, under Organisations → Estates. Estates can be in different places.</p>
+              {onlySmallholder && (
+                <p className="text-sm text-gray-700 mt-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                  Smallholder services work from the members&apos; own parcels (added through forms, the field app or an upload), so no estate is needed. Remove the estate below to skip this step.
+                </p>
+              )}
               {services.includes('ffb-counter') && (
                 <div className="mt-3 rounded-xl border border-gray-200 bg-[#F3F8EF] px-4 py-3 text-xs text-gray-800 space-y-2.5">
                   <div className="space-y-1">
@@ -556,7 +567,7 @@ const Onboarding = () => {
                 <div key={e.key} className="rounded-2xl border border-gray-200 p-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm font-semibold text-gray-900"><MapPin size={16} className="text-green-700" /> Estate {i + 1}{created && <span className="text-xs font-semibold text-green-700">· created</span>}</div>
-                    {estates.length > 1 && !created && <button type="button" onClick={() => setEstates(l => l.filter(x => x.key !== e.key))} className="p-2 text-gray-400 hover:text-red-600" aria-label="Remove estate"><Trash2 size={15} /></button>}
+                    {!created && <button type="button" onClick={() => setEstates(l => l.filter(x => x.key !== e.key))} className="p-2 text-gray-400 hover:text-red-600" aria-label="Remove estate"><Trash2 size={15} /></button>}
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <Field label="Estate name"><input className={inputCls} placeholder="e.g. Main estate" value={e.farm_name} onChange={ev => setEstate(e.key, { farm_name: ev.target.value })} /></Field>
@@ -605,6 +616,7 @@ const Onboarding = () => {
                       ) : <div className="h-full flex items-center justify-center text-xs text-gray-500">Map preview appears here</div>}
                     </div>
                   </div>
+                  {!e.boundaryFile && <div className="text-xs text-gray-500">No boundary yet: the estate is created and waits for it. Monitoring starts once a boundary is uploaded.</div>}
                   {e.boundaryError && <div className="text-sm text-red-700">{e.boundaryError}</div>}
                   {e.boundaryInfo && !e.boundaryError && <div className="text-xs text-gray-600">Boundary read: {e.boundaryInfo}</div>}
                   {e.dataWarnings?.length > 0 ? <DataWarnings warnings={e.dataWarnings} /> : e.strayShapes?.length > 0 && (
@@ -655,7 +667,7 @@ const Onboarding = () => {
 
             <div className="flex justify-between">
               <Secondary onClick={() => setStep(1)}>Back</Secondary>
-              <Primary disabled={busy || !canNext[2]} onClick={submitEstates}>{busy ? 'Creating…' : `Create organisation and ${estates.length} estate${estates.length > 1 ? 's' : ''}`} <ChevronRight size={15} /></Primary>
+              <Primary disabled={busy || !canNext[2]} onClick={submitEstates}>{busy ? 'Creating…' : estates.length ? `Create organisation and ${estates.length} estate${estates.length > 1 ? 's' : ''}` : 'Create organisation (no estate yet)'} <ChevronRight size={15} /></Primary>
             </div>
           </Card>
         )}
@@ -668,7 +680,9 @@ const Onboarding = () => {
               <p className="text-sm text-gray-500 mt-1">Tell us which columns of the boundary file name the blocks and estates. Client uploads, alerts and reports use them.</p>
             </div>
             {loadingProps && <p className="text-sm text-gray-500">Reading the boundary files…</p>}
-            {!loadingProps && propOptions.length === 0 && <p className="text-sm text-gray-500">The boundary files have no named columns. Blocks will be numbered automatically.</p>}
+            {!loadingProps && propOptions.length === 0 && (done.farms.some(f => f.has_boundary)
+              ? <p className="text-sm text-gray-500">The boundary files have no named columns. Blocks will be numbered automatically.</p>
+              : <p className="text-sm text-gray-500">No boundary uploaded yet. The block and estate columns can be set later in the organisation&apos;s settings, after a boundary is added.</p>)}
             {!loadingProps && propOptions.length > 0 && (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -727,6 +741,9 @@ const Onboarding = () => {
               <h2 className="text-lg font-semibold text-gray-900">Monitoring schedule</h2>
               <p className="text-sm text-gray-500 mt-1">How often new satellite images are processed {grouped ? 'for the combined site' : `for ${done.farms.length > 1 ? `each of the ${done.farms.length} estates` : 'the estate'}`}.</p>
             </div>
+            {!done.farms.some(f => f.has_boundary !== false) && (
+              <p className="text-sm text-gray-700 rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">No estate has a boundary yet, so there is nothing to schedule now. Each estate gets its monitoring schedule after its boundary is uploaded (Organisations → Estates).</p>
+            )}
             <Toggle on={autoSchedule} label="Run automatically" sub="Off: the configuration is created and runs are started by hand." onChange={setAutoSchedule} />
             {autoSchedule && (
               <div className="space-y-4">

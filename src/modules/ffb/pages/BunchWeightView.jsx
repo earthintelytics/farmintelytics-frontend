@@ -1,7 +1,7 @@
 import { exportFileName } from '../utils/exportName';
 import { useState, useMemo } from 'react';
 import { usePageScroll } from '../hooks/usePageScroll';
-import { Scale, MapPin, Calendar, RotateCcw, Download, Search, ChevronLeft, ChevronRight, Lock } from 'lucide-react';
+import { RotateCcw, Download, Search, Lock } from 'lucide-react';
 import { fmtNumber } from '../utils/formatters';
 import { useAppContext } from '../context/AppContext';
 import ExportColumnsModal from '../components/ExportColumnsModal';
@@ -92,7 +92,7 @@ export function BunchWeightView({ onBack }) {
       return Object.entries(colFilters).every(([key, val]) => {
         if (!val) return true;
         const q = val.toLowerCase();
-        let cell = '';
+        let cell;
         switch (key) {
           case 'date': cell = row.date || ''; break;
           case 'plotId': cell = row.plotId || ''; break;

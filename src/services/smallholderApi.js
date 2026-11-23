@@ -14,3 +14,8 @@ export const exportMember = (id) => serviceCall(`/smallholder/members/${encodeUR
 export const deleteMember = (id, params) => serviceCall(`/smallholder/members/${encodeURIComponent(id)}${query(params)}`, { method: 'DELETE' });
 
 
+
+// The members' EUDR check (monitoring/router/smallholder_eudr.py).
+export const checkParcelsEudr = (parcelIds) => serviceCall('/smallholder/eudr/check', { method: 'POST', body: { parcel_ids: parcelIds || null } });
+export const fetchEudrSummary = () => serviceCall('/smallholder/eudr/summary');
+export const fetchEudrFileForEu = () => serviceCall('/smallholder/eudr/export');

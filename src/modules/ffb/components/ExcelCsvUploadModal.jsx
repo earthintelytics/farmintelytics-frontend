@@ -1,9 +1,16 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
-import { 
-  UploadCloud, FileSpreadsheet, CheckCircle2, AlertCircle, 
-  ArrowRight, X, Table, Check, RefreshCw, Users, ShieldAlert,
-  ChevronRight, ChevronLeft
+import {
+  UploadCloud,
+  FileSpreadsheet,
+  CheckCircle2,
+  AlertCircle,
+  ArrowRight,
+  X,
+  Table,
+  Check,
+  RefreshCw,
+  ChevronLeft,
 } from 'lucide-react';
 import { API } from '../services/api';
 
@@ -20,7 +27,6 @@ const SYSTEM_FIELDS = [
 ];
 
 import { normalizeWorkerStatus } from '../utils/workerStatus';
-export { normalizeWorkerStatus };
 
 
 // Operator IDs look like HAC30148 / CL00038; worker IDs are numeric.
@@ -357,7 +363,7 @@ export function ExcelCsvUploadModal({ isOpen, onClose, onSuccess, uploadType = '
           try {
             const d = new Date(rawDateAdded);
             if (!isNaN(d.getTime())) parsedDateAdded = d.toISOString();
-          } catch (e) {}
+          } catch { /* optional: ignore and keep the default */ }
         }
 
         // Intelligent name deduplication
