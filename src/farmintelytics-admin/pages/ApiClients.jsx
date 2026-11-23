@@ -61,23 +61,25 @@ function PlanModal({ plan, products, onClose, onSaved }) {
 }
 
 function ClientModal({ plans, orgs, onClose, onSaved }) {
-  const [f, setF] = useState({ company_id: '', plan_id: plans[0]?.id || '', credit: '0', contact_email: '', billing: '' });
+  const [f, setF] = useState({ company_id: '', new_name: '', plan_id: plans[0]?.id || '', credit: '0', contact_email: '', billing: '' });
+  const isNew = f.company_id === '__new__';
   const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF((x) => ({ ...x, [k]: e.target.value }));
   const save = async () => {
-    if (!f.company_id || !f.plan_id) return setError('Choose the organisation and a plan.');
+    if (!f.plan_id || !f.company_id || (isNew && !f.new_name.trim())) return setError('Choose the organisation (or name a new one) and a plan.');
     setBusy(true); setError('');
     try {
-      await createApiClient({ company_id: f.company_id, plan_id: +f.plan_id, billing: f.billing || null, credit_limit_minor: toMinor(f.credit || 0), contact_email: f.contact_email });
+      await createApiClient({ company_id: isNew ? '' : f.company_id, organisation_name: isNew ? f.new_name.trim() : '', plan_id: +f.plan_id, billing: f.billing || null, credit_limit_minor: toMinor(f.credit || 0), contact_email: f.contact_email });
       onSaved();
     } catch (e) { setError(e.message); } finally { setBusy(false); }
   };
   return (
-    <Modal title="Add an API client" text="An existing organisation; the EUDR API service is switched on in its licence." onClose={onClose}
+    <Modal title="Add an API client" text="An existing organisation, or a new one from its name (its full onboarding can come later). The EUDR API service is switched on in its licence." onClose={onClose}
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button disabled={busy} onClick={save}>{busy ? 'Adding…' : 'Add client'}</Button></>}>
       {error && <Note tone="error">{error}</Note>}
       {!plans.length && <Note tone="info">Make a plan first (Plans tab): it sets the price per plot.</Note>}
-      <Field label="Organisation"><select className={inputCls} value={f.company_id} onChange={set('company_id')}><option value="">Choose</option>{orgs.map((o) => <option key={o.schema_name} value={o.schema_name}>{o.display_name || o.schema_name}</option>)}</select></Field>
+      <Field label="Organisation"><select className={inputCls} value={f.company_id} onChange={set('company_id')}><option value="">Choose</option><option value="__new__">New organisation…</option>{orgs.map((o) => <option key={o.schema_name} value={o.schema_name}>{o.display_name || o.schema_name}</option>)}</select></Field>
+      {isNew && <Field label="New organisation's name" hint="Estates, boundaries and other services can be added later in Organisations."><input className={inputCls} value={f.new_name} onChange={set('new_name')} placeholder="e.g. Cocoa Buyers Ltd" /></Field>}
       <Field label="Plan"><select className={inputCls} value={f.plan_id} onChange={set('plan_id')}>{plans.filter((p) => p.active).map((p) => <option key={p.id} value={p.id}>{p.product_name} · {p.name} · {naira(p.price_per_unit_minor)} per {p.unit}</option>)}</select></Field>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Billing"><select className={inputCls} value={f.billing} onChange={set('billing')}><option value="">As the plan</option><option value="prepaid">Prepaid wallet</option><option value="postpaid">Monthly invoice</option></select></Field>

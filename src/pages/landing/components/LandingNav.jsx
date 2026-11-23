@@ -40,6 +40,9 @@ const LandingNav = () => {
             <button onClick={() => handleNav('/docs')} className="hover:text-[var(--brand-primary)] transition-colors">
               Guide
             </button>
+            <button onClick={() => handleNav('/developers')} className="hover:text-[var(--brand-primary)] transition-colors">
+              API
+            </button>
             <button onClick={() => handleNav('/contact')} className="hover:text-[var(--brand-primary)] transition-colors">
               Contact
             </button>
@@ -88,6 +91,12 @@ const LandingNav = () => {
               className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
               Guide
+            </button>
+            <button
+              onClick={() => handleNav('/developers')}
+              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
+            >
+              API
             </button>
             <button
               onClick={() => handleNav('/contact')}

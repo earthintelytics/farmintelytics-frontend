@@ -30,6 +30,9 @@ const LandingFooter = () => {
           <button onClick={() => navigate('/docs')} className="hover:text-[var(--brand-primary)] transition-colors">
             Guide
           </button>
+          <button onClick={() => navigate('/developers')} className="hover:text-[var(--brand-primary)] transition-colors">
+            API
+          </button>
           <button onClick={() => navigate('/contact')} className="hover:text-[var(--brand-primary)] transition-colors">
             Contact
           </button>

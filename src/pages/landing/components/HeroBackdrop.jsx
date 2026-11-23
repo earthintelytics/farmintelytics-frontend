@@ -23,9 +23,9 @@ const HeroBackdrop = () => (
         {/* Greenness: more green than red reads as crop, more red as bare ground */}
         <feColorMatrix type="matrix" values="-2.4 3.2 -0.8 0 0.42  -2.4 3.2 -0.8 0 0.42  -2.4 3.2 -0.8 0 0.42  0 0 0 1 0" />
         <feComponentTransfer>
-          <feFuncR type="table" tableValues="0.80 0.93 0.97 0.62 0.20 0.09" />
-          <feFuncG type="table" tableValues="0.20 0.47 0.78 0.80 0.62 0.45" />
-          <feFuncB type="table" tableValues="0.16 0.16 0.22 0.30 0.28 0.22" />
+          <feFuncR type="table" tableValues="0.78 0.92 0.80 0.48 0.18 0.08" />
+          <feFuncG type="table" tableValues="0.24 0.62 0.84 0.78 0.62 0.46" />
+          <feFuncB type="table" tableValues="0.20 0.24 0.36 0.30 0.30 0.24" />
         </feComponentTransfer>
       </filter>
       <filter id="fi-water" colorInterpolationFilters="sRGB">
@@ -38,7 +38,7 @@ const HeroBackdrop = () => (
         </feComponentTransfer>
       </filter>
     </svg>
-    <Tiles />
+    <Tiles style={{ filter: 'saturate(1.08) contrast(1.04)' }} />
     <Tiles className="fi-hero-health" style={{ filter: 'url(#fi-health)' }} />
     <Tiles className="fi-hero-water" style={{ filter: 'url(#fi-water)' }} />
     <div className="absolute right-6 top-6 hidden lg:block w-32 text-center whitespace-nowrap rounded-full bg-white/95 border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800">
@@ -47,7 +47,7 @@ const HeroBackdrop = () => (
       <span className="fi-hero-label-c absolute inset-0 flex items-center justify-center">Moisture</span>
     </div>
     {/* White behind the text: across on wide screens, downwards on phones */}
-    <div className="absolute inset-0 bg-[linear-gradient(180deg,#fff_0%,#fff_55%,rgba(255,255,255,0.6)_80%,rgba(255,255,255,0.1)_100%)] lg:bg-[linear-gradient(90deg,rgba(255,255,255,0.9)_0%,rgba(255,255,255,0.88)_40%,rgba(255,255,255,0.55)_54%,rgba(255,255,255,0)_70%)]" />
+    <div className="absolute inset-0 bg-[linear-gradient(180deg,#fff_0%,#fff_62%,rgba(255,255,255,0.7)_74%,rgba(255,255,255,0)_88%)] lg:bg-[linear-gradient(90deg,#fff_0%,#fff_47%,rgba(255,255,255,0.8)_52%,rgba(255,255,255,0)_60%)]" />
     <p className="absolute bottom-2 right-3 text-[11px] text-white/90">Imagery © Esri, Maxar, Earthstar Geographics</p>
   </div>
 );

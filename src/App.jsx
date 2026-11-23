@@ -67,6 +67,7 @@ const PublicSuitabilitySharePage = lazyWithReload(() => import('./modules/suitab
 // === Public Information & Compliance Pages ===
 const TrustCenterPage = lazyWithReload(() => import('./pages/public/TrustCenterPage'));
 const PoliciesPage = lazyWithReload(() => import('./pages/public/PoliciesPage'));
+const DevelopersPage = lazyWithReload(() => import('./pages/public/DevelopersPage'));
 const DocumentationPage = lazyWithReload(() => import('./pages/public/DocumentationPage'));
 const ContactPage = lazyWithReload(() => import('./pages/public/ContactPage'));
 
@@ -363,6 +364,7 @@ const AppRoutes = () => {
         <Route path="/"                         element={window.Capacitor?.isNativePlatform?.() ? <Navigate to="/buddy" replace /> : <RootPage />} />
         <Route path="/login"                    element={<LoginPage />} />
         <Route path="/policies"                 element={<PoliciesPage />} />
+        <Route path="/developers"               element={<DevelopersPage />} />
         <Route path="/privacy"                  element={<Navigate to="/policies?tab=privacy" replace />} />
         <Route path="/trust"                    element={<TrustCenterPage />} />
         <Route path="/legal"                    element={<Navigate to="/policies?tab=terms" replace />} />

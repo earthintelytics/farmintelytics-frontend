@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Leaf, Droplets, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Code2, Leaf, Droplets, ShieldCheck } from 'lucide-react';
 import HeroBackdrop from './HeroBackdrop';
 
 // What the platform does, in three plain lines. No client data on a public page.
@@ -7,6 +7,7 @@ const POINTS = [
   { icon: Leaf, title: 'Crop health from satellite', text: 'See which blocks are growing well and which need a visit, updated with every new image.' },
   { icon: Droplets, title: 'Water and weather advice', text: 'Know where fields are short of water or flooded, with what to do this week.' },
   { icon: ShieldCheck, title: 'EUDR and land suitability', text: 'Check deforestation risk for every parcel and where each crop fits best.' },
+  { icon: Code2, title: 'An API for your own systems', text: 'Send your plots from your own software and get the EUDR check back, plot by plot.' },
 ];
 
 const HeroSection = () => {
@@ -18,10 +19,10 @@ const HeroSection = () => {
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-24 pb-40 sm:pb-24 lg:grid lg:grid-cols-[1fr_320px] lg:gap-12 lg:items-end">
         <div>
         <p className="text-sm font-medium text-[var(--brand-primary)]">Powered by Earthintelytics</p>
-        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-gray-900 mt-3 max-w-3xl">
+        <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-gray-900 mt-3 max-w-xl">
           Know what is happening on every field, without walking it.
         </h1>
-        <p className="text-base sm:text-lg text-gray-600 mt-5 max-w-2xl leading-relaxed">
+        <p className="text-base sm:text-lg text-gray-600 mt-5 max-w-lg leading-relaxed">
           FarmIntelytics turns satellite imagery into plain answers for farms, estates and co-operatives:
           crop health and growth, water and irrigation advice, EUDR deforestation checks and land suitability,
           in one easy platform.
@@ -51,7 +52,7 @@ const HeroSection = () => {
       </section>
 
       <section className="border-t border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid gap-8 sm:grid-cols-3">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {POINTS.map(({ icon: Icon, title, text }) => (
             <div key={title}>
               <span className="w-10 h-10 rounded-xl bg-green-50 text-[var(--brand-primary)] flex items-center justify-center"><Icon size={20} /></span>
@@ -59,6 +60,24 @@ const HeroSection = () => {
               <p className="text-sm text-gray-600 mt-2 leading-relaxed">{text}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* For developers: the EUDR check as an API (page /developers) */}
+      <section className="border-t border-gray-100 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-14 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+          <div className="max-w-2xl">
+            <p className="text-sm font-medium text-[var(--brand-primary)]">For developers</p>
+            <h2 className="font-display text-2xl sm:text-3xl font-semibold text-gray-900 mt-2">The EUDR check, in your own software</h2>
+            <p className="text-gray-600 mt-3 leading-relaxed">
+              Send the plots your commodity comes from and get back, plot by plot, whether forest was cleared after
+              31 December 2020, with the evidence and a file ready for the EU information system. Priced per plot, in naira.
+            </p>
+          </div>
+          <button type="button" onClick={() => navigate('/developers')}
+            className="shrink-0 inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] transition-colors">
+            See the API<ArrowRight size={16} />
+          </button>
         </div>
       </section>
     </main>
