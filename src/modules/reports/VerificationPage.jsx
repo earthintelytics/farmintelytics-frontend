@@ -25,12 +25,12 @@ const Card = ({ className = '', children }) => <div className={`bg-white rounded
 function localChecks(kind, plots) {
   const polys = plots.filter(p => (p.coords || []).length >= 4);
   const open = polys.filter(p => { const c = p.coords; const a = c[0], b = c[c.length - 1]; return a && b && (a[0] !== b[0] || a[1] !== b[1]); });
-  const big = plots.filter(p => (parseFloat(p.area) || 0) > 4 && (p.coords || []).length < 4);
+  const points = plots.filter(p => (p.coords || []).length < 4);   // a single point, not a boundary
   const checks = [
     { id: 'boundary', name: 'Every plot has a valid boundary', status: plots.length === 0 ? 'not_checked' : polys.length === plots.length && !open.length ? 'passed' : 'review',
       why: plots.length === 0 ? 'No individual plots are registered yet.' : `${polys.length} of ${plots.length} plots have a polygon${open.length ? `; ${open.length} are not closed` : ''}.`, evidence: { sources: ['Boundaries uploaded at onboarding'] } },
-    { id: 'geolocation', name: 'Plots over 4 ha have a polygon, not a point', status: plots.length === 0 ? 'not_checked' : big.length ? 'failed' : 'passed',
-      why: plots.length === 0 ? 'No individual plots are registered yet.' : big.length ? `${big.length} plots over 4 ha have no polygon.` : 'All plots over 4 ha are polygons.', evidence: { sources: ['EUDR Article 9 geolocation rule'] } },
+    { id: 'geolocation', name: 'Every plot is a polygon, not a single point', status: plots.length === 0 ? 'not_checked' : points.length ? 'failed' : 'passed',
+      why: plots.length === 0 ? 'No individual plots are registered yet.' : points.length ? `${points.length} plot${points.length === 1 ? ' is' : 's are'} only a point: map the boundary.` : 'Every plot has its boundary as a polygon.', evidence: { sources: ['FarmIntelytics EUDR rule: plots as polygons'] } },
   ];
   if (kind === 'eudr') checks.push(
     { id: 'forest2020', name: 'No forest cleared after 31 December 2020', status: 'not_checked', why: 'The check results could not be loaded; nothing is shown as passed without them.', evidence: { sources: ['JRC GFC2020', 'Global Forest Change (Hansen/UMD)'] } },
