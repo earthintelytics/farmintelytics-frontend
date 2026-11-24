@@ -16,3 +16,6 @@ export function useBuddyApp() {
   }, []);
   return app;
 }
+
+/** The download address of the published app. */
+export const appHref = (app) => (app ? `/downloads/${encodeURIComponent(app.file)}` : '');

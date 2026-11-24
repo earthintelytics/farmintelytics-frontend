@@ -23,8 +23,8 @@ const SERVICES = [
   { img: '/crops/groundnut.webp', title: 'Crop health and growth', text: 'Which fields are growing well and which need a visit.' },
   { img: '/crops/sorghum.webp', title: 'Water and weather', text: 'Where crops are short of water or flooded, and what to do.' },
   { img: '/crops/eudr.webp', title: 'EUDR deforestation check', text: 'Proof, plot by plot, that no forest was cleared after 2020.' },
-  { img: '/crops/soybean.webp', title: 'Land suitability', text: 'Where each crop grows best, before you plant.' },
-  { img: '/crops/yam.webp', title: 'Farmer groups', text: 'Members, their parcels and visits, for the whole co-operative.' },
+  { img: '/crops/millet.webp', title: 'Land suitability', text: 'Where each crop grows best, before you plant.' },
+  { img: '/crops/field_logs.webp', title: 'Farmer groups', text: 'Members, their parcels and visits, for the whole co-operative.' },
   { img: '/crops/finance.webp', title: 'Evidence for buyers and lenders', text: 'Reports and checks others can trust.' },
 ];
 
@@ -154,7 +154,7 @@ const LandingStory = () => {
 
       <p className="bg-white max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 text-[11px] text-gray-500">
         Photos via Wikimedia Commons: McKay Savage, Kate Holt / AusAID (CC BY 2.0); USAID Africa Bureau, NASA Earth Observatory (public domain);
-        Kambai Akau, Dorcas Atule, Krystal S. Wright, Nabimanya Norman, Thamizhpparithi Maari, Bukulu Steven (CC BY-SA 4.0); RamboSD (CC BY 4.0);
+        Kambai Akau, Krystal S. Wright, Thamizhpparithi Maari, Bukulu Steven (CC BY-SA 4.0); RamboSD (CC BY 4.0);
         Radosław Botev (CC BY 3.0 PL).
       </p>
     </>

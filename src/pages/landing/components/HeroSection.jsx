@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Code2, Leaf, Droplets, ShieldCheck, Smartphone } from 'lucide-react';
-import { useBuddyApp } from './useBuddyApp';
+import { appHref, useBuddyApp } from './useBuddyApp';
 import { paths, sessionTenant } from '../../../routes/paths';
 import { hasValidTeamToken } from '../../../services/session';
 import HeroBackdrop from './HeroBackdrop';
@@ -43,9 +43,9 @@ const HeroSection = () => {
             See how it works
           </button>
           {app && (
-            <a href="#get-the-app"
+            <a href={appHref(app)} download
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-[var(--brand-primary-dark)] border border-[#D8EBD3] bg-[#EEF6EC] hover:bg-[#E2F0DE] transition-colors">
-              <Smartphone size={16} />Get the app
+              <Smartphone size={16} />Get the app for Android
             </a>
           )}
         </div>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Smartphone, X } from 'lucide-react';
-import { useBuddyApp } from './useBuddyApp';
+import { appHref, useBuddyApp } from './useBuddyApp';
 import { paths, sessionTenant } from '../../../routes/paths';
 import { hasValidTeamToken } from '../../../services/session';
 
@@ -14,12 +14,6 @@ const LandingNav = () => {
   const home = tenant ? paths.orgHub(tenant) : hasValidTeamToken() ? paths.teamHub : null;
   // "API" opens the API reference in its default view, ReDoc (Swagger, to try requests, is /public-api/v1/docs).
   const openApiDocs = () => { setMobileMenuOpen(false); window.location.assign('/public-api/v1/redoc'); };
-  const goApp = () => {
-    setMobileMenuOpen(false);
-    const el = document.getElementById('get-the-app');
-    if (el) { window.history.replaceState(null, '', '/#get-the-app'); el.scrollIntoView({ behavior: 'smooth' }); }
-    else window.location.assign('/#get-the-app');
-  };
 
   const handleNav = (path) => {
     setMobileMenuOpen(false);
@@ -61,10 +55,10 @@ const LandingNav = () => {
         {/* Right Section: Desktop Sign In & Mobile Hamburger Toggle */}
         <div className="flex items-center gap-2 sm:gap-3">
           {app && (
-            <button type="button" onClick={goApp}
+            <a href={appHref(app)} download title={app.version ? `FarmIntelytics Buddy for Android, version ${app.version}` : 'FarmIntelytics Buddy for Android'}
               className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-[#D8EBD3] bg-[#EEF6EC] px-3.5 py-1.5 text-sm font-semibold text-[var(--brand-primary-dark)] hover:bg-[#E2F0DE] transition-colors">
               <Smartphone size={15} />Get the app
-            </button>
+            </a>
           )}
           <button
             id="top-nav-sign-in"
@@ -120,9 +114,9 @@ const LandingNav = () => {
               Contact
             </button>
             {app && (
-              <button onClick={goApp} className="text-left py-2.5 px-3 rounded inline-flex items-center gap-2 font-semibold text-[var(--brand-primary-dark)] hover:bg-[#EEF6EC]">
-                <Smartphone size={16} />Get the app
-              </button>
+              <a href={appHref(app)} download onClick={() => setMobileMenuOpen(false)} className="text-left py-2.5 px-3 rounded inline-flex items-center gap-2 font-semibold text-[var(--brand-primary-dark)] hover:bg-[#EEF6EC]">
+                <Smartphone size={16} />Get the app for Android
+              </a>
             )}
             <div className="pt-2 border-t border-slate-100">
               <button

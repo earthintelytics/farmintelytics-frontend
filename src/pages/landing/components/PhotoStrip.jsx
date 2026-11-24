@@ -7,10 +7,8 @@ const PHOTOS = [
   ['/crops/groundnut.webp', 'A groundnut field in Kaduna State, Nigeria'],
   ['/crops/restoration.webp', 'Women with seedlings in a tree nursery in Tanzania'],
   ['/crops/sorghum.webp', 'Sorghum ripening in Ethiopia'],
-  ['/crops/yam.webp', 'Yams at a market in Kaduna State, Nigeria'],
   ['/crops/advisor.webp', 'A farmer among young plants in a nursery'],
   ['/crops/millet.webp', 'Cultivating pearl millet in Namibia'],
-  ['/crops/soybean.webp', 'Soya beans after the harvest'],
   ['/crops/sesame.webp', 'A sesame crop by the White Nile'],
   ['/crops/cowpea.webp', 'A field of cowpea'],
 ];
