@@ -7340,3 +7340,19 @@ html.dark .ffb-portal .export-modal-footer { background: #151e1a; border-top-col
 
 /* Owner's UI rules (24 Nov 2026): cards and buttons do not lift on hover, nothing glows. */
 .ffb-portal .card:hover, .ffb-portal .stat-card:hover, .ffb-portal [class*="card"]:hover { transform: none !important; }
+
+/* Colour for the headline cards (owner, 24 Nov 2026): each card in a row gets a soft tint in turn
+   (green, amber, sky, teal) with a matching border. Flat colour only: no glow, no shadow, no lift. */
+.ffb-portal .wkpi-card:nth-child(4n+1), .ffb-portal .kpi-card:nth-child(4n+1), .ffb-portal .plot-kpi-card:nth-child(4n+1), .ffb-portal .stat-card:nth-child(4n+1) {
+  background: #F1F8EC !important; border-color: #CFE6BF !important;
+}
+.ffb-portal .wkpi-card:nth-child(4n+2), .ffb-portal .kpi-card:nth-child(4n+2), .ffb-portal .plot-kpi-card:nth-child(4n+2), .ffb-portal .stat-card:nth-child(4n+2) {
+  background: #FFF8EB !important; border-color: #F6D9A0 !important;
+}
+.ffb-portal .wkpi-card:nth-child(4n+3), .ffb-portal .kpi-card:nth-child(4n+3), .ffb-portal .plot-kpi-card:nth-child(4n+3), .ffb-portal .stat-card:nth-child(4n+3) {
+  background: #EEF6FD !important; border-color: #BFDDF6 !important;
+}
+.ffb-portal .wkpi-card:nth-child(4n+4), .ffb-portal .kpi-card:nth-child(4n+4), .ffb-portal .plot-kpi-card:nth-child(4n+4), .ffb-portal .stat-card:nth-child(4n+4) {
+  background: #ECFDF8 !important; border-color: #A7E3D4 !important;
+}
+.ffb-portal .wkpi-card, .ffb-portal .kpi-card, .ffb-portal .plot-kpi-card, .ffb-portal .stat-card { box-shadow: none !important; }

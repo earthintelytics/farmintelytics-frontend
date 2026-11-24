@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Code2 } from 'lucide-react';
-import { Chip, Empty } from '../../farmintelytics-admin/components/ui';
+import { Empty } from '../../farmintelytics-admin/components/ui';
 import { paths } from '../../routes/paths';
 import { licensedServices, SERVICE_TABS } from './orgProfile';
 import { fetchCropMonitoringConfig } from '../../services/organizationMonitorApi';
@@ -11,11 +11,14 @@ const OrgServicesPage = ({ profile }) => {
   const navigate = useNavigate();
   const [tab, setTab] = useState('all');
   const services = licensedServices(profile);
-  const tabs = SERVICE_TABS.map((t) => ({ ...t, count: t.id === 'all' ? services.length : services.filter((s) => s.group === t.id).length }))
-    .filter((t) => t.id === 'all' || t.count > 0);
-  const shown = tab === 'all' ? services : services.filter((s) => s.group === tab);
   const first = (profile.fullName || '').split(' ')[0];
+  // Developer (the API) is one of the services: it counts like the others and has its own API tab.
   const hasApi = (profile.modules || []).some((m) => String(m).endsWith('-api'));
+  const total = services.length + (hasApi ? 1 : 0);
+  const tabs = [...SERVICE_TABS, { id: 'api', label: 'API' }]
+    .map((t) => ({ ...t, count: t.id === 'all' ? total : t.id === 'api' ? (hasApi ? 1 : 0) : services.filter((s) => s.group === t.id).length }))
+    .filter((t) => t.id === 'all' || t.count > 0);
+  const shown = tab === 'all' ? services : tab === 'api' ? [] : services.filter((s) => s.group === tab);
   // Licensed crops with no estate blocks yet are marked, so nobody opens an empty dashboard expecting data.
   const [withBlocks, setWithBlocks] = useState(null);
   useEffect(() => {
@@ -39,7 +42,7 @@ const OrgServicesPage = ({ profile }) => {
           <p className="text-sm text-gray-500 mt-2">Open a service to see your farms, results and reports.</p>
         </div>
         <dl className="flex gap-3">
-          {[['Services', services.length], ['Crops', (profile.crops || []).length], ['Today', new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short' })]].map(([k, v]) => (
+          {[['Services', total], ['Crops', (profile.crops || []).length], ['Today', new Date().toLocaleDateString(undefined, { day: 'numeric', month: 'short' })]].map(([k, v]) => (
             <div key={k} className="min-w-[88px] rounded-xl bg-white border border-gray-200 px-4 py-3">
               <dt className="text-xs text-gray-500">{k}</dt>
               <dd className="font-display text-xl font-semibold text-gray-900 mt-0.5">{v}</dd>
@@ -49,12 +52,17 @@ const OrgServicesPage = ({ profile }) => {
       </div>
 
       {tabs.length > 2 && (
-        <div className="flex flex-wrap gap-2">
-          {tabs.map((t) => <Chip key={t.id} on={tab === t.id} onClick={() => setTab(t.id)}>{t.label} · {t.count}</Chip>)}
+        <div role="tablist" className="flex flex-wrap gap-x-1 border-b border-gray-200">
+          {tabs.map((t) => (
+            <button key={t.id} role="tab" aria-selected={tab === t.id} type="button" onClick={() => setTab(t.id)}
+              className={`px-4 py-2.5 -mb-px border-b-2 text-sm font-semibold ${tab === t.id ? 'border-[var(--brand-primary)] text-[var(--brand-primary-dark)]' : 'border-transparent text-gray-500 hover:text-gray-800'}`}>
+              {t.label} <span className="font-normal text-gray-400">{t.count}</span>
+            </button>
+          ))}
         </div>
       )}
 
-      {services.length === 0 ? (
+      {total === 0 ? (
         <Empty>No services are set up for {profile.name} yet. FarmIntelytics adds them during onboarding; contact your FarmIntelytics team.</Empty>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -76,7 +84,7 @@ const OrgServicesPage = ({ profile }) => {
               </div>
             </button>
           ))}
-          {hasApi && tab === 'all' && (
+          {hasApi && (tab === 'all' || tab === 'api') && (
             <button type="button" onClick={() => navigate(paths.orgDeveloper(profile.tenant))}
               className="group w-full text-left flex flex-col items-stretch bg-white border border-gray-200 hover:border-gray-400 rounded-2xl overflow-hidden">
               <div className="w-full h-40 bg-[#F5FAF3] border-b border-[#E3EFDF] flex items-center justify-center">

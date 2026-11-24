@@ -26,7 +26,11 @@ export async function ffbCall(path, { method = 'GET', body, form, tenantSlug } =
   });
   if (res.status === 204) return null;
   const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.detail || data.message || `Request failed (${res.status})`);
+  if (!res.ok) {
+    const err = new Error(data.detail || data.message || `Request failed (${res.status})`);
+    err.status = res.status; // 403 'not_licensed': FFB is not assigned to this organisation
+    throw err;
+  }
   return data;
 }
 

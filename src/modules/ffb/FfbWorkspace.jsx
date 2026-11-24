@@ -57,7 +57,7 @@ function FfbShell({ selectedTenant, onBack, onSignOut }) {
   const userRole = getRole();
 
   useEffect(() => {
-    if (isMobileViewport()) setIsSidebarCollapsed(true);
+    if (isMobileViewport()) setIsSidebarCollapsed(true); // eslint-disable-line react-hooks/set-state-in-effect
     scrollPageTop('auto');
   }, [pathname]);
 
@@ -114,31 +114,57 @@ export default function FfbWorkspace({ onBack, onSignOut }) {
     (urlTenant || (typeof localStorage !== 'undefined' && localStorage.getItem('fi_tenant')) || '').trim().toLowerCase(),
   );
   const [meta, setMeta] = useState(null);
+  // FFB opens only for an organisation it is assigned to (its licence). The team picks one of those; an
+  // organisation without it sees why, instead of pages that fail one by one.
+  const isTeam = !localStorage.getItem('fi_token');
+  const [orgsLoaded, setOrgsLoaded] = useState(!isTeam || Boolean(urlTenant));
+  const [notAssigned, setNotAssigned] = useState(false);
 
   useEffect(() => {
-    if (!urlTenant && !localStorage.getItem('fi_token')) {
+    if (!urlTenant && isTeam) {
       ffbAdminOverview().then((res) => {
         const list = res.items || [];
         setOrgs(list);
-        if (!selectedTenant && list[0]) setSelectedTenant(list[0].company_id);
-      });
+        // A remembered organisation that no longer has FFB is never opened: take the first one that has it.
+        if (!list.some((o) => o.company_id === selectedTenant)) setSelectedTenant(list[0]?.company_id || '');
+      }).catch(() => setOrgs([])).finally(() => setOrgsLoaded(true));
     }
-  }, [urlTenant, selectedTenant]);
+  }, [urlTenant, isTeam]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!selectedTenant && !localStorage.getItem('fi_token')) return;
+    if (!selectedTenant && isTeam) return;
+    if (!orgsLoaded) return;
+    setNotAssigned(false); // eslint-disable-line react-hooks/set-state-in-effect
     ffbCall('/settings', { tenantSlug: selectedTenant })
       .then(setMeta)
-      .catch(() => {});
-  }, [selectedTenant]);
+      .catch((e) => { if (e.status === 403) setNotAssigned(true); });
+  }, [selectedTenant, orgsLoaded, isTeam]);
 
-  if (!selectedTenant && !localStorage.getItem('fi_token')) {
+  if (!orgsLoaded) return <div className="min-h-screen flex items-center justify-center text-sm text-gray-500">Loading…</div>;
+
+  if (notAssigned) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F9F8] p-8">
+        <div className="max-w-lg w-full p-8 bg-white rounded-2xl border border-gray-200 text-center space-y-3">
+          <h2 className="font-display text-xl font-semibold text-gray-900">FFB is not assigned to this organisation yet</h2>
+          <p className="text-sm text-gray-600">
+            FFB management opens once it is in the organisation's licence. The FarmIntelytics team assigns it under
+            Admin → Organisations → Licence.
+          </p>
+          {onBack && <button type="button" onClick={onBack} className="mt-2 px-4 py-2.5 rounded-xl bg-[#3F8432] text-white text-sm font-semibold">Back</button>}
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedTenant && isTeam) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f8fafc] p-8">
         <div className="max-w-lg w-full p-8 bg-white rounded-2xl border border-gray-200 text-center space-y-3">
-          <h2 className="text-xl font-medium text-[#3F8432]">No FFB-licensed organisation selected</h2>
+          <h2 className="font-display text-xl font-semibold text-gray-900">No organisation has FFB yet</h2>
           <p className="text-sm text-gray-600">
-            Enable <strong>FFB</strong> on an organisation under Admin → Organisations → Licence first.
+            FFB management is used by an organisation it is assigned to. Assign <strong>FFB</strong> to an
+            organisation under Admin → Organisations → Licence, then open it here.
           </p>
         </div>
       </div>
