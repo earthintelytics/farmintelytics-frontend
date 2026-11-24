@@ -12,7 +12,6 @@ import { creditFor } from '../landing/components/photoCredits';
  * is sold now (owner, 24 Nov 2026). The price is set in Admin, API clients: the EUDR plan marked "Show on the
  * pricing page", read from GET /public-api/v1/pricing. Without one, the page says the price is on request.
  */
-const POINT_DEFAULT_HA = 4;        // a point with no declared area counts as 4 ha (the EU information system's rule)
 
 const naira = (n) => `₦${Math.round(n).toLocaleString('en-NG')}`;
 const ha = (n) => `${Number(n.toFixed(4)).toLocaleString('en-NG')} ha`;
@@ -20,7 +19,7 @@ const ha = (n) => `${Number(n.toFixed(4)).toLocaleString('en-NG')} ha`;
 const rulesFor = (PRICE_PER_HA) => [
   { icon: Layers, title: 'Charged on the total area', text: `A request costs the total area of its valid plots × ${PRICE_PER_HA ? naira(PRICE_PER_HA) : 'the price per hectare'}. Fifty small plots cost exactly the same as one plot covering the same land.` },
   { icon: Coins, title: 'Smaller than a hectare? You pay the fraction', text: PRICE_PER_HA ? `A 0.4 ha plot costs 0.4 × ${naira(PRICE_PER_HA)} = ${naira(0.4 * PRICE_PER_HA)}. Nothing is rounded up to a whole hectare.` : 'A 0.4 ha plot costs 0.4 of the price per hectare. Nothing is rounded up to a whole hectare.' },
-  { icon: MapPin, title: 'Polygons and points', text: `Polygons count as measured. Points count by their declared area, or ${POINT_DEFAULT_HA} ha when none is given, as the EU information system assumes.` },
+  { icon: MapPin, title: 'Every plot is a polygon', text: 'Each plot is sent as its boundary and counts as measured, so the area, and the price, are exact. Single GPS points are not accepted.' },
   { icon: Wallet, title: 'From a prepaid wallet', text: 'Top up by bank transfer, quoting your payment reference. Checks draw on the wallet. No subscription, no monthly fee, no invoice.' },
   { icon: ShieldCheck, title: 'Held, then charged for what was checked', text: 'Sending a check holds its cost. When it finishes, only the area really checked is charged; the rest goes back to your wallet.' },
   { icon: KeyRound, title: 'Build for free', text: 'Test keys run the same real check, free, up to your free test hectares every day. Pay only when you go live.' },
@@ -31,7 +30,7 @@ const NEVER = ['Validating your file against the EU rules', 'Plots the EU rules 
 const EXAMPLES = [
   { who: 'A smallholder plot', plots: '1 plot', area: 0.4, note: 'Under a hectare: its fraction' },
   { who: 'A co-operative', plots: '250 plots, 1.6 ha each', area: 400, note: 'The total area, whatever the number of plots' },
-  { who: 'A point with no area', plots: '1 point', area: POINT_DEFAULT_HA, note: `Counted as ${POINT_DEFAULT_HA} ha, as the EU system assumes` },
+  { who: 'A family farm', plots: '3 plots, 1.2 ha each', area: 3.6, note: 'Each plot as its boundary' },
   { who: 'An estate', plots: '12 blocks', area: 2_150, note: 'Polygons, as measured' },
 ];
 

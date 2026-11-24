@@ -16,7 +16,7 @@ const BASE = '/public-api/v1';
 const PRODUCTS = [
   {
     code: 'eudr-check', icon: ShieldCheck, name: 'EUDR deforestation check', path: '/eudr',
-    text: 'Send plots as points or polygons. For each plot you get pass, review or fail against the 31 December 2020 cut-off, with forest in 2020, tree cover lost since and the year, protected-area overlap, and a GeoJSON file the EU information system accepts.',
+    text: 'Send each plot as its boundary (a polygon). For each plot you get pass, review or fail against the 31 December 2020 cut-off, with forest in 2020, tree cover lost since and the year, protected-area overlap, and a GeoJSON file the EU information system accepts.',
     facts: ['EU information system geolocation rules, checked first and free', 'JRC GFC2020 · Hansen/UMD GFC · protected areas', 'Map versions named in every result'],
   },
   {
@@ -26,7 +26,7 @@ const PRODUCTS = [
   },
 ];
 
-const PLOT = '{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"ref":"farm-1001","ProducerName":"Ada Obi","ProducerCountry":"NG"},"geometry":{"type":"Point","coordinates":[8.330123,7.880456]}}]}';
+const PLOT = '{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"ref":"farm-1001","ProducerName":"Ada Obi","ProducerCountry":"NG"},"geometry":{"type":"Polygon","coordinates":[[[8.330123,7.880456],[8.331223,7.880456],[8.331223,7.881556],[8.330123,7.881556],[8.330123,7.880456]]]}}]}';
 
 const SAMPLES = {
   curl: `curl -X POST https://<your-host>${BASE}/eudr/checks \\

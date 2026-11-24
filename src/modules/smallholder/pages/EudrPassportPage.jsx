@@ -43,7 +43,7 @@ const EudrPassportPage = () => {
     setError(''); setNote('');
     try {
       const r = await checkParcelsEudr();
-      setNote(r.job_id ? `Checking ${r.parcels} parcel${r.parcels === 1 ? '' : 's'}${r.without_location?.length ? ` (${r.without_location.length} without a location are left out)` : ''}. Results appear here when it finishes.` : r.message);
+      setNote(r.job_id ? `Checking ${r.parcels} parcel${r.parcels === 1 ? '' : 's'}${r.without_location?.length ? ` (${r.without_location.length} without a location are left out)` : ''}${r.need_boundary?.length ? `. ${r.need_boundary.length} parcel${r.need_boundary.length === 1 ? ' is' : 's are'} only a point: map ${r.need_boundary.length === 1 ? 'its' : 'their'} boundary to check ${r.need_boundary.length === 1 ? 'it' : 'them'} (EUDR plots are polygons)` : ''}. Results appear here when it finishes.` : r.message);
       reloadSummary();
     } catch (e) { setError(e.message); }
   };

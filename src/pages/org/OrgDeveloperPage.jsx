@@ -8,7 +8,7 @@ import DeveloperCard from './settings/DeveloperCard';
  */
 const START = [
   { icon: KeyRound, title: 'Make a test key', text: 'Free, up to the daily test hectares. Build and test your integration with it.' },
-  { icon: Code2, title: 'Send your plots', text: 'Points or polygons, from your own system. Each check answers with an id at once.' },
+  { icon: Code2, title: 'Send your plots', text: 'Each plot as its boundary (a polygon), from your own system. Each check answers with an id at once.' },
   { icon: Webhook, title: 'Get the results', text: 'Ask for the check, or set a callback and we call you when it finishes.' },
   { icon: Coins, title: 'Pay per hectare', text: 'From your prepaid wallet: the total area of your plots × the price per hectare.' },
 ];

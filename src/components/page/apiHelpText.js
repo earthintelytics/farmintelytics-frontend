@@ -21,7 +21,7 @@ export const API_ADMIN_GUIDE = {
     ] },
     { title: 'Priced by area, so it cannot be bypassed', points: [
       ['Total area', 'A request costs the total area of its valid plots × the price per hectare. Fifty small plots cost the same as one plot covering the same land.'],
-      ['Polygons and points', 'Polygons count as measured. Points count by their declared Area, or 4 ha when none is given (as the EU information system assumes).'],
+      ['Polygons only', 'Every EUDR plot is a polygon and counts as measured. Points are refused (E_POINT_NOT_ACCEPTED): the client sends the boundary.'],
       ['No monthly fee', 'There are no subscriptions, monthly fees or invoices: the client tops up the wallet and checks draw on it.'],
     ] },
     { title: 'What happens to money on one request', points: [
@@ -55,7 +55,7 @@ export const API_CLIENT_GUIDE = {
   sections: [
     { title: 'What you pay', points: [
       ['Per hectare', 'A request costs the total area of its plots × the price per hectare shown under Products. A plot under a hectare costs its fraction.'],
-      ['Points', 'A point counts by its declared Area, or 4 ha when none is given (as the EU information system assumes).'],
+      ['Polygons only', 'Send each plot as its boundary (a polygon). Single points are refused with E_POINT_NOT_ACCEPTED.'],
       ['Never charged', 'Validating a file, plots the EU rules refuse, test keys, failed checks, and a repeated request with the same Idempotency-Key. No monthly fees.'],
     ] },
     { title: 'Your wallet', points: [
