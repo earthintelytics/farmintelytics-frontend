@@ -8,7 +8,9 @@ import { Check, ChevronRight, ChevronDown, Copy, Rocket, UploadCloud, Plus, Tras
 import {
   createOrganization, createCredential, createFarm, uploadBoundary, generateFarmConfig, generateParentConfig,
   createSchedulerJob, uploadOrganizationLogo, getBoundaryProperties, updateOrganization, runSchedulerJob,
+  updateFarm, deleteFarm, deleteCredential, updateSchedulerJob, deleteSchedulerJob,
 } from '../../services/adminApi';
+import { useConfirm } from '../../components/ConfirmProvider';
 import { slugify, ALL_RS_INDICES } from '../components/orgConstants';
 import ErrorBanner from '../components/ErrorBanner';
 import { SENSOR_OPTIONS, ALL_CROPS, toggleInList } from '../components/formHelpers';
@@ -32,6 +34,11 @@ import { ADMIN_API_BASE } from '../../services/apiBase';
  * blocks and filters → login → schedule → finish (checklist, client links,
  * data the client will be asked for). Every backend call of the previous
  * wizard is kept.
+ *
+ * Every step can be changed, undone and done again (owner, 24 Nov 2026): Back is on every step; a step that
+ * already saved something updates it on the next save instead of making a duplicate (organisation, estates,
+ * login, schedules); removing a created estate deletes it, after the typed-word confirmation; the short ID is
+ * fixed once the organisation exists, because links and storage paths are built from it.
  */
 
 const CROP_LABELS = { ffb: 'Oil palm', maize: 'Maize', rice: 'Rice', cocoa: 'Cocoa', rubber: 'Rubber', cassava: 'Cassava', sugarcane: 'Sugarcane', cashew: 'Cashew' };
@@ -147,6 +154,7 @@ const Onboarding = () => {
   const [step, setStep] = useState(() => draftValue('step', 0));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const confirm = useConfirm();
   const [done, setDone] = useState(() => draftValue('done', { org: null, credential: null, farms: [], boundaries: [], configs: [], schedulers: [] }));
 
   // 1. Organisation
@@ -204,7 +212,7 @@ const Onboarding = () => {
       const check = boundaryCheck(g, file.size);
       setEstate(key, check.error
         ? { boundaryFile: file, geojson: null, centre: null, boundaryError: check.error, boundaryInfo: null }
-        : { boundaryFile: file, geojson: g, centre: geojsonCentre(g), boundaryError: null, boundaryInfo: `${check.polygons} polygon${check.polygons > 1 ? 's' : ''}${check.warning ? ` · ${check.warning}` : ''}` });
+        : { boundaryFile: file, boundaryUploaded: false, geojson: g, centre: geojsonCentre(g), boundaryError: null, boundaryInfo: `${check.polygons} polygon${check.polygons > 1 ? 's' : ''}${check.warning ? ` · ${check.warning}` : ''}` });
     };
     reader.readAsText(file);
   };
@@ -248,7 +256,9 @@ const Onboarding = () => {
     return null;
   };
   const emailErr = cred.email ? emailError(cred.email) : null;
-  const codeErr = accessCodeError(cred.access_code);
+  // A login already made with this email stays as it is when no new access code is typed.
+  const keepLogin = Boolean(done.credential && done.credential.email === cred.email.trim() && !cred.access_code);
+  const codeErr = keepLogin ? null : accessCodeError(cred.access_code);
 
   const canNext = [
     company.company_name.trim() && !slugErr,
@@ -271,13 +281,37 @@ const Onboarding = () => {
         map_center_lat: first.lat, map_center_lon: first.lon,
       });
       setDone(d => ({ ...d, org }));
+    } else {
+      // Back, then changed: the organisation takes the new name, crops, services and indices.
+      org = { ...org, ...(await updateOrganization(org.id, {
+        company_name: company.company_name, allowed_crops: crops, allowed_modules: allowedModules, allowed_indices: allowedIndices,
+      })) };
+      setDone(d => ({ ...d, org }));
     }
     const parentId = `${slug}_farm`, parentName = `${company.company_name} (combined)`;
     const created = [...done.farms], boundaries = [...done.boundaries];
     const createdIds = new Set(created.map(f => f.farm_id));
     for (const e of estates) {
-      const farmId = e.farm_id.trim() || `${slug}_${slugify(e.farm_name)}`;
-      if (createdIds.has(farmId)) continue;
+      const farmId = e.created_id || e.farm_id.trim() || `${slug}_${slugify(e.farm_name)}`;
+      if (createdIds.has(farmId)) {
+        // Already made: save what was changed, and a boundary file chosen again.
+        await updateFarm(farmId, {
+          farm_name: e.farm_name, crop: e.crop || (crops.length === 1 ? crops[0] : ''), is_irrigated: e.is_irrigated,
+          sensors: e.sensors, indices: e.indices, processing_level: e.processing_level, cloud_cover_threshold: e.cloud_cover_threshold,
+          start_date: e.start_date, end_date: e.end_date || null,
+          parent_farm_id: grouped ? parentId : '', parent_farm_name: grouped ? parentName : '',
+        });
+        const idx = created.findIndex(f => f.farm_id === farmId);
+        if (e.boundaryFile && !e.boundaryUploaded) {
+          const boundary = await uploadBoundary(farmId, e.boundaryFile);
+          setEstate(e.key, { boundaryUploaded: true, strayShapes: boundary?.stray_shapes || null, dataWarnings: boundary?.warnings || null });
+          if (boundary) boundaries.push(boundary);
+          created[idx] = { ...created[idx], has_boundary: true };
+        }
+        created[idx] = { ...created[idx], farm_name: e.farm_name };
+        setDone(d => ({ ...d, org, farms: [...created], boundaries: [...boundaries] }));
+        continue;
+      }
       const farm = await createFarm({
         company_name: company.company_name, company_id: org.schema_name, farm_name: e.farm_name, farm_id: farmId,
         parent_farm_id: grouped ? parentId : '', parent_farm_name: grouped ? parentName : '',
@@ -290,6 +324,7 @@ const Onboarding = () => {
       if (boundary?.stray_shapes?.length || boundary?.warnings?.length) {
         setEstate(e.key, { strayShapes: boundary.stray_shapes || null, dataWarnings: boundary.warnings || null });
       }
+      setEstate(e.key, { created_id: farm.farm_id, boundaryUploaded: Boolean(boundary) });
       created.push({ ...farm, has_boundary: Boolean(boundary) }); if (boundary) boundaries.push(boundary);
       setDone(d => ({ ...d, org, farms: [...created], boundaries: [...boundaries] })); // keep progress if a later estate fails
     }
@@ -340,6 +375,9 @@ const Onboarding = () => {
   });
 
   const submitLogin = () => run(async () => {
+    if (keepLogin) { setStep(5); return; }                     // unchanged: keep the login already made
+    // Changed email or a new access code: the earlier login is replaced, never left beside the new one.
+    if (done.credential?.id) await deleteCredential(done.credential.id);
     const credential = await createCredential({ company_id: done.org.schema_name, ...cred, label: cred.label || 'Primary' });
     setDone(d => ({ ...d, credential }));
     setStep(5);
@@ -356,16 +394,35 @@ const Onboarding = () => {
       configs.push(res);
       if (autoSchedule) {
         try {
-          schedulers.push(await createSchedulerJob({
+          const job = {
             name: `${t.id}_scheduled_monitoring`, description: `Satellite monitoring for ${t.name} (set up at onboarding)`,
             cron: cronFor(sched, i * 15), config_path: `configs/${res.filename}`, is_batch: true, enabled: true,
             company_id: done.org.schema_name, // never guessed from the name (an organisation's own name can hold underscores)
-          }));
+          };
+          // Saved before (Back, then Finish again): change that schedule instead of making a second one.
+          const before = (done.schedulers || []).find(s => s.name === job.name);
+          schedulers.push(before ? { ...before, ...(await updateSchedulerJob(job.name, job)), ...job } : await createSchedulerJob(job));
         } catch (e) { setError(`Config created, but the schedule for ${t.name} failed: ${e.message}`); }
       }
     }
+    // Schedules made earlier that are no longer wanted (schedule switched off, estate removed) are removed.
+    const keep = new Set(schedulers.map(s => s.name));
+    for (const s of done.schedulers || []) {
+      if (!keep.has(s.name)) { try { await deleteSchedulerJob(s.name); } catch (e) { setError(`The earlier schedule ${s.name} could not be removed: ${e.message}`); } }
+    }
     setDone(d => ({ ...d, configs, schedulers }));
     setStep(6);
+  });
+
+  // Remove an estate. One that was already created is deleted with what is stored for it, after confirmation.
+  const removeEstate = (e) => run(async () => {
+    const id = e.created_id || done.farms.find(f => f.farm_name === e.farm_name)?.farm_id;
+    if (id) {
+      if (!(await confirm(`Delete ${e.farm_name || 'this estate'} and everything stored for it?`, { typed: true, action: 'Delete' }))) return;
+      await deleteFarm(id);
+      setDone(d => ({ ...d, farms: d.farms.filter(f => f.farm_id !== id) }));
+    }
+    setEstates(l => l.filter(x => x.key !== e.key));
   });
 
   const onLogo = async (e) => {
@@ -444,7 +501,8 @@ const Onboarding = () => {
             <Field label="Organisation name"><input className={inputCls} placeholder="e.g. Okomu Oil Palm" value={company.company_name} onChange={e => setCompany(c => ({ ...c, company_name: e.target.value }))} autoFocus /></Field>
             <Advanced>
               <Field label="Short ID" hint={`Used in links and storage paths. Leave blank to use: ${slug || '—'}`} optional>
-                <input className={inputCls} placeholder={slug || 'generated from the name'} value={company.schema_name} onChange={e => setCompany(c => ({ ...c, schema_name: e.target.value }))} />
+                <input className={inputCls} placeholder={slug || 'generated from the name'} value={done.org ? done.org.schema_name : company.schema_name} disabled={Boolean(done.org)} onChange={e => setCompany(c => ({ ...c, schema_name: e.target.value }))} />
+                {done.org && <span className="block text-xs text-gray-500 mt-1">Fixed now that the organisation exists: its links and storage are built from it. The name can still change.</span>}
                 {slugErr && <span className="block text-xs text-red-700 mt-1">{slugErr}</span>}
               </Field>
             </Advanced>
@@ -562,12 +620,12 @@ const Onboarding = () => {
             </div>
 
             {estates.map((e, i) => {
-              const created = done.farms.some(f => f.farm_name === e.farm_name);
+              const created = Boolean(e.created_id) || done.farms.some(f => f.farm_name === e.farm_name);
               return (
                 <div key={e.key} className="rounded-2xl border border-gray-200 p-5 space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2 text-sm font-semibold text-gray-900"><MapPin size={16} className="text-green-700" /> Estate {i + 1}{created && <span className="text-xs font-semibold text-green-700">· created</span>}</div>
-                    {!created && <button type="button" onClick={() => setEstates(l => l.filter(x => x.key !== e.key))} className="p-2 text-gray-400 hover:text-red-600" aria-label="Remove estate"><Trash2 size={15} /></button>}
+                    <button type="button" onClick={() => removeEstate(e)} disabled={busy} className="p-2 text-gray-400 hover:text-red-600" aria-label={created ? 'Delete estate' : 'Remove estate'}><Trash2 size={15} /></button>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <Field label="Estate name"><input className={inputCls} placeholder="e.g. Main estate" value={e.farm_name} onChange={ev => setEstate(e.key, { farm_name: ev.target.value })} /></Field>
@@ -667,7 +725,7 @@ const Onboarding = () => {
 
             <div className="flex justify-between">
               <Secondary onClick={() => setStep(1)}>Back</Secondary>
-              <Primary disabled={busy || !canNext[2]} onClick={submitEstates}>{busy ? 'Creating…' : estates.length ? `Create organisation and ${estates.length} estate${estates.length > 1 ? 's' : ''}` : 'Create organisation (no estate yet)'} <ChevronRight size={15} /></Primary>
+              <Primary disabled={busy || !canNext[2]} onClick={submitEstates}>{busy ? 'Saving…' : done.org ? 'Save changes' : estates.length ? `Create organisation and ${estates.length} estate${estates.length > 1 ? 's' : ''}` : 'Create organisation (no estate yet)'} <ChevronRight size={15} /></Primary>
             </div>
           </Card>
         )}
@@ -713,7 +771,7 @@ const Onboarding = () => {
               </div>
               <Toggle on={ffill} label="Fill cloudy gaps in charts with the last clear reading" sub="Off by default; filled points are marked, not shown as new measurements." onChange={setFfill} />
             </Advanced>
-            <div className="flex justify-end"><Primary disabled={busy} onClick={submitBlocks}>{busy ? 'Saving…' : 'Next: login'} <ChevronRight size={15} /></Primary></div>
+            <div className="flex justify-between"><Secondary onClick={() => setStep(2)}>Back</Secondary><Primary disabled={busy} onClick={submitBlocks}>{busy ? 'Saving…' : 'Next: login'} <ChevronRight size={15} /></Primary></div>
           </Card>
         )}
 
@@ -730,7 +788,8 @@ const Onboarding = () => {
               <Field label="Email"><input className={inputCls} type="email" placeholder="name@company.com" value={cred.email} onChange={e => setCred(c => ({ ...c, email: e.target.value }))} />{emailErr && <span className="block text-xs text-red-700 mt-1">{emailErr}</span>}</Field>
               <Field label="Access code" optional hint="Leave blank to generate a strong one"><input className={inputCls} value={cred.access_code} onChange={e => setCred(c => ({ ...c, access_code: e.target.value }))} />{codeErr && <span className="block text-xs text-red-700 mt-1">{codeErr}</span>}</Field>
             </div>
-            <div className="flex justify-end"><Primary disabled={busy || !canNext[4]} onClick={submitLogin}>{busy ? 'Creating…' : 'Next: schedule'} <ChevronRight size={15} /></Primary></div>
+            {keepLogin && <p className="text-xs text-gray-500">This login is already made. Type a new access code, or change the email, to replace it.</p>}
+            <div className="flex justify-between"><Secondary onClick={() => setStep(3)}>Back</Secondary><Primary disabled={busy || !canNext[4]} onClick={submitLogin}>{busy ? 'Saving…' : 'Next: schedule'} <ChevronRight size={15} /></Primary></div>
           </Card>
         )}
 
@@ -761,7 +820,7 @@ const Onboarding = () => {
                 {sched.mode !== 'custom' && <p className="text-sm text-gray-700">Runs <span className="font-semibold">{scheduleText(sched)}</span>{!grouped && done.farms.length > 1 ? ', each estate 15 minutes after the previous one' : ''}.</p>}
               </div>
             )}
-            <div className="flex justify-end"><Primary disabled={busy || (autoSchedule && sched.mode === 'custom' && Boolean(cronError(sched.custom)))} onClick={submitSchedule}>{busy ? 'Setting up…' : 'Finish setup'} <ChevronRight size={15} /></Primary></div>
+            <div className="flex justify-between"><Secondary onClick={() => setStep(4)}>Back</Secondary><Primary disabled={busy || (autoSchedule && sched.mode === 'custom' && Boolean(cronError(sched.custom)))} onClick={submitSchedule}>{busy ? 'Setting up…' : 'Finish setup'} <ChevronRight size={15} /></Primary></div>
           </Card>
         )}
 
@@ -866,7 +925,7 @@ const Onboarding = () => {
               )}
             </Card>
 
-            <div className="flex justify-end"><Primary onClick={restart}><Rocket size={15} /> Onboard another organisation</Primary></div>
+            <div className="flex justify-between"><Secondary onClick={() => setStep(5)}>Back: change the set-up</Secondary><Primary onClick={restart}><Rocket size={15} /> Onboard another organisation</Primary></div>
           </div>
         )}
       </div>
