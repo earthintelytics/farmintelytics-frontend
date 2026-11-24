@@ -67,6 +67,9 @@ export const ORG_SERVICES = [
   svc('advisor', 'Farm advisor', 'Advice for each field from your monitoring data and the weather.', 'advisory'),
   svc('rs-drone', 'Drone surveys', 'Drone surveys next to the latest satellite view.', 'engine'),
   svc('ffb-counter', 'FFB Counter', 'Fresh fruit bunches counted per block at harvest.', 'management'),
+  // Managed platforms: built for one organisation, opened at their own address on the hub.
+  { ...svc('platform-gwon', 'GreenWall Observatory Nigeria', 'The Great Green Wall platform: baseline atlas, project registry, monitoring, early warning, climate, reports and the Assistant.', 'platforms'),
+    href: '/platforms/gwon', photo: '/crops/restoration.webp' },
 ];
 
 export const SERVICE_TABS = [
@@ -76,6 +79,7 @@ export const SERVICE_TABS = [
   { id: 'advisory', label: 'Field advisory' },
   { id: 'engine', label: 'Engine' },
   { id: 'management', label: 'Management' },
+  { id: 'platforms', label: 'Managed platforms' },
 ];
 
 export function licensedServices(profile) {

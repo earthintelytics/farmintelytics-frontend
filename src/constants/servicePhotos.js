@@ -41,6 +41,14 @@ export const SERVICE_GROUPS = [
   { id: 'management', label: 'Management', services: [
     { id: 'ffb-counter', label: 'FFB', desc: 'Fresh fruit bunches counted per block at harvest with 9-layer anti-fraud verification' },
   ] },
+  // The public API: switching it on makes the organisation an API client (wallet, keys) on the product's plan.
+  { id: 'api', label: 'API', services: [
+    { id: 'eudr-api', label: 'EUDR check API', desc: 'The EUDR check from the client\'s own software, charged per hectare from a prepaid wallet' },
+  ] },
+  // Platforms built for one organisation and hosted on the hub (their own name, menu and pages).
+  { id: 'platforms', label: 'Managed platforms', services: [
+    { id: 'platform-gwon', label: 'GreenWall Observatory Nigeria (GWON)', desc: 'The Great Green Wall monitoring and results platform, for NAGGW' },
+  ] },
 ];
 
 // Packages: one click grants a set of services (e.g. Sustainable Land Management).

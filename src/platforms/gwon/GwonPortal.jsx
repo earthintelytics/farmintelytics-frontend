@@ -14,8 +14,12 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import {
   Info, Map as MapIcon, Layers, ClipboardList, Sprout, AlertTriangle, Compass, FileBarChart, UploadCloud, Trash2,
+  CloudRain, MessageSquareText, Printer, Play, Pause,
 } from 'lucide-react';
 import { useConfirm } from '../../components/ConfirmProvider';
+import { fetchClimate, monthly, rainToDate } from './climate';
+import { RainBars, MonthLines, StateBars } from './Charts';
+import Assistant from './Assistant';
 
 const GIBS = 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best';
 const LAYERS = {
@@ -91,8 +95,8 @@ function FitTo({ data }) {
   return null;
 }
 
-function GwonMap({ layer, date, states, sites, height = 440, label }) {
-  const d = layerDate(layer, date);
+function GwonMap({ layer, date, states, sites, height = 440, label, exact = false }) {
+  const d = exact ? date : layerDate(layer, date);
   return (
     <div className="rounded-2xl border border-gray-200 overflow-hidden bg-white">
       <div className="flex items-center justify-between gap-3 px-4 py-2.5 border-b border-gray-100 text-sm">
@@ -132,8 +136,48 @@ const MODULES = [
   { id: 'monitoring', label: 'Restoration monitoring', icon: Sprout },
   { id: 'warning', label: 'Early warning', icon: AlertTriangle },
   { id: 'planning', label: 'Planning', icon: Compass },
+  { id: 'climate', label: 'Climate and rain', icon: CloudRain },
   { id: 'results', label: 'Results and reports', icon: FileBarChart },
+  { id: 'assistant', label: 'Assistant', icon: MessageSquareText },
 ];
+
+// The 16-day vegetation pictures of a year, up to the newest one published.
+function ndviPeriods(year) {
+  const newest = ndviDate(new Date());
+  const out = [];
+  for (let k = 0; k < 23; k++) {
+    const d = iso(new Date(Date.UTC(year, 0, 1) + k * 16 * 86400000));
+    if (d.slice(0, 4) !== String(year) || d > newest) break;
+    out.push(d);
+  }
+  return out;
+}
+
+// A slider over the year's vegetation pictures, with play.
+function TimeSlider({ year, setYear, value, setValue }) {
+  const periods = ndviPeriods(year);
+  const [playing, setPlaying] = useState(false);
+  const idx = Math.max(0, periods.indexOf(value));
+  useEffect(() => {
+    if (!playing) return undefined;
+    const t = setInterval(() => setValue((v) => { const i = periods.indexOf(v); return periods[(i + 1) % periods.length]; }), 1400);
+    return () => clearInterval(t);
+  }, [playing, periods, setValue]);
+  const thisYear = new Date().getUTCFullYear();
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-4 flex flex-wrap items-center gap-4">
+      <button type="button" onClick={() => setPlaying((p) => !p)} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0F766E] text-white text-sm font-semibold">
+        {playing ? <Pause size={15} /> : <Play size={15} />}{playing ? 'Pause' : 'Play the year'}
+      </button>
+      <label className="text-sm text-gray-700">Year <select value={year} onChange={(e) => { const y = Number(e.target.value); setYear(y); setValue(ndviPeriods(y).slice(-1)[0]); }} className="ml-1 px-2 py-1.5 rounded-lg border border-gray-300">
+        {Array.from({ length: thisYear - 2015 }, (_, i) => thisYear - i).map((y) => <option key={y} value={y}>{y}</option>)}
+      </select></label>
+      <input type="range" min={0} max={Math.max(0, periods.length - 1)} value={idx} onChange={(e) => setValue(periods[Number(e.target.value)])} className="flex-1 min-w-[200px] accent-[#0F766E]" aria-label="Vegetation picture" />
+      <span className="text-sm font-semibold tabular-nums text-gray-900 w-28 text-right">{value}</span>
+      <Tip text="Each step is one 16-day vegetation picture (NASA MODIS). Play the year to watch the frontline green with the rains and dry out again." />
+    </div>
+  );
+}
 
 const SITES_KEY = 'gwon_prototype_sites';
 const readSites = () => { try { return JSON.parse(localStorage.getItem(SITES_KEY) || 'null') || { type: 'FeatureCollection', features: [] }; } catch { return { type: 'FeatureCollection', features: [] }; } };
@@ -147,12 +191,22 @@ export default function GwonPortal() {
   const [date, setDate] = useState(iso(daysAgo(2)));
   const [msg, setMsg] = useState('');
   const fileRef = useRef(null);
+  const [climate, setClimate] = useState(null);
+  const [climateErr, setClimateErr] = useState('');
+  const [climateState, setClimateState] = useState('Borno');
+  const [sliderYear, setSliderYear] = useState(() => new Date().getUTCFullYear());
+  const [sliderDate, setSliderDate] = useState(() => ndviDate(new Date()));
+  const [reportState, setReportState] = useState('all');
 
   useEffect(() => {
     fetch('/gwon-data/frontline_states.geojson').then((r) => r.json()).then(setStates).catch(() => setStates(null));
     document.title = 'GreenWall Observatory Nigeria (GWON)';
   }, []);
   useEffect(() => { window.history.replaceState(null, '', `#${mod}`); }, [mod]);
+  useEffect(() => {
+    if (!states) return;
+    fetchClimate(states).then(setClimate).catch((e) => setClimateErr(e.message));
+  }, [states]);
   useEffect(() => { try { localStorage.setItem(SITES_KEY, JSON.stringify(sites)); } catch { /* storage unavailable */ } }, [sites]);
 
   const totalHa = useMemo(() => (states?.features || []).reduce((s, f) => s + (f.properties.area_ha || 0), 0), [states]);
@@ -160,7 +214,17 @@ export default function GwonPortal() {
   const siteRows = useMemo(() => (sites.features || []).map((f, i) => ({ i, name: f.properties?.name || f.properties?.ref || `Site ${i + 1}`,
     programme: f.properties?.programme || f.properties?.partner || '', state: f.properties?.state || '', ha: geomHa(f.geometry) })), [sites]);
   const siteHa = siteRows.reduce((s, r) => s + r.ha, 0);
-  const now = ndviDate(new Date(`${date}T00:00:00Z`));
+  const rainRows = useMemo(() => (states?.features || []).map((f) => ({ state: f.properties.state, ...(rainToDate(climate?.[f.properties.state]) || {}) })), [states, climate]);
+  const climateYear = rainRows.find((r) => r.year)?.year || new Date().getUTCFullYear();
+  const facts = useMemo(() => ({
+    frontline_states: (states?.features || []).map((f) => ({ state: f.properties.state, area_ha: f.properties.area_ha })),
+    frontline_area_ha: totalHa,
+    climate_source: 'ERA5 reanalysis (Open-Meteo archive) at one point inside each state',
+    rain_to_date: rainRows.filter((r) => r.year).map((r) => ({ state: r.state, year: r.year, until: r.until, rain_mm: Math.round(r.now),
+      same_days_last_year_mm: Math.round(r.before), change_percent: r.change == null ? null : Math.round(r.change) })),
+    registry: { sites: siteRows.length, hectares: Math.round(siteHa), sites_by_state: siteRows.reduce((m, r) => ({ ...m, [r.state || 'not given']: (m[r.state || 'not given'] || 0) + 1 }), {}) },
+    published: { acresal_land_under_restoration_ha: 922700, acresal_source: 'Federal Ministry of Environment, ACReSAL update, April 2026' },
+  }), [states, totalHa, rainRows, siteRows, siteHa]);
 
   const onFile = (e) => {
     const file = e.target.files?.[0];
@@ -186,7 +250,7 @@ export default function GwonPortal() {
 
   return (
     <div className="min-h-screen bg-[#F7F9F8] text-gray-900">
-      <style>{'.gwon-smooth img{image-rendering:auto}'}</style>
+      <style>{'.gwon-smooth img{image-rendering:auto} @media print { .gwon-noprint, nav[aria-label="GWON modules"], header { display: none !important; } main { grid-column: 1 / -1; } }'}</style>
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -196,6 +260,7 @@ export default function GwonPortal() {
               <p className="text-xs text-gray-500">GWON · for the National Agency for the Great Green Wall · prototype on FarmIntelytics</p>
             </div>
           </div>
+          <button type="button" onClick={() => setMod('assistant')} className="gwon-noprint inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border border-[#A7E3D4] bg-[#ECFDF8] text-[#0F5F57] text-sm font-semibold"><MessageSquareText size={15} /> Ask the Assistant</button>
           <span className="text-xs text-gray-600 flex items-center gap-1.5">Public data only <Tip text="This prototype shows only real public data: state boundaries, NASA satellite layers and published programme figures with their source. The Agency's own sites appear once its files are loaded in the Project registry." /></span>
         </div>
       </header>
@@ -261,7 +326,8 @@ export default function GwonPortal() {
                     className={`text-left rounded-xl border px-3 py-2.5 text-sm ${atlasLayer === k ? 'border-[#0F766E] bg-[#ECFDF8] font-semibold text-[#0F766E]' : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50'}`}>{l.name}</button>
                 ))}
               </div>
-              <GwonMap layer={atlasLayer} date={date} states={states} sites={sites} height={520} />
+              {atlasLayer === 'ndvi' && <TimeSlider year={sliderYear} setYear={setSliderYear} value={sliderDate} setValue={setSliderDate} />}
+              <GwonMap layer={atlasLayer} date={atlasLayer === 'ndvi' ? sliderDate : date} exact={atlasLayer === 'ndvi'} states={states} sites={sites} height={520} />
             </>
           )}
 
@@ -305,9 +371,10 @@ export default function GwonPortal() {
                 <h1 className="font-display text-2xl font-semibold flex items-center gap-2">Restoration monitoring <Tip text="Each registered site is compared with itself season after season: growing, holding or lost. The pipeline measures the vegetation index inside each boundary; here you see the same layer it reads." /></h1>
                 <p className="text-sm text-gray-600 mt-1">The same season this year and last year, for every site in the registry.</p>
               </section>
+              <TimeSlider year={sliderYear} setYear={setSliderYear} value={sliderDate} setValue={setSliderDate} />
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                <GwonMap layer="ndvi" date={lastYear(now)} states={states} sites={sites} height={380} label={`Vegetation, ${lastYear(now)}`} />
-                <GwonMap layer="ndvi" date={now} states={states} sites={sites} height={380} label={`Vegetation, ${now}`} />
+                <GwonMap layer="ndvi" exact date={lastYear(sliderDate)} states={states} sites={sites} height={380} label={`Vegetation, ${lastYear(sliderDate)}`} />
+                <GwonMap layer="ndvi" exact date={sliderDate} states={states} sites={sites} height={380} label={`Vegetation, ${sliderDate}`} />
               </div>
               <p className="text-sm text-gray-600">{siteRows.length ? `${fmt(siteRows.length)} sites are drawn on both maps. In the platform each gets a seasonal reading (growing, holding or lost) and a flag when it needs a visit.` : 'Load sites in the Project registry to see them on both maps.'}</p>
             </>
@@ -359,6 +426,91 @@ export default function GwonPortal() {
                 </table>
               </div>
               <p className="text-xs text-gray-500">The other core indicators and the report layout are agreed with the Agency at the discovery workshop.</p>
+              <section className="rounded-2xl border border-gray-200 bg-white p-5 space-y-4">
+                <div className="flex flex-wrap items-end justify-between gap-3 gwon-noprint">
+                  <h2 className="font-display text-lg font-semibold flex items-center gap-2">Report <Tip text="A one-page summary for the whole frontline or one state, from the figures on this platform. Print it, or save it as PDF from the print window." /></h2>
+                  <div className="flex gap-2">
+                    <select value={reportState} onChange={(e) => setReportState(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-300 text-sm">
+                      <option value="all">All eleven frontline states</option>
+                      {(states?.features || []).map((f) => <option key={f.properties.state} value={f.properties.state}>{f.properties.state}</option>)}
+                    </select>
+                    <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0F766E] text-white text-sm font-semibold"><Printer size={15} /> Print or save as PDF</button>
+                  </div>
+                </div>
+                {(() => {
+                  const sel = reportState === 'all' ? (states?.features || []) : (states?.features || []).filter((f) => f.properties.state === reportState);
+                  const ha = sel.reduce((s, f) => s + f.properties.area_ha, 0);
+                  const rr = rainRows.filter((r) => r.year && (reportState === 'all' || r.state === reportState));
+                  const sitesHere = siteRows.filter((r) => reportState === 'all' || r.state === reportState);
+                  return (
+                    <div className="space-y-4">
+                      <div className="border-b-2 border-[#0F766E] pb-2">
+                        <p className="text-xs font-semibold tracking-widest text-[#0F766E]">GREENWALL OBSERVATORY NIGERIA · REPORT</p>
+                        <p className="font-display text-xl font-semibold">{reportState === 'all' ? 'The eleven frontline states' : `${reportState} State`}</p>
+                        <p className="text-xs text-gray-500">Made {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })} from the figures on GWON</p>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                        {[['Area', `${fmt(ha)} ha`], ['Registered sites', fmt(sitesHere.length)], ['Registered hectares', fmt(sitesHere.reduce((s, r) => s + r.ha, 0))],
+                          ['Rain so far', rr.length === 1 ? `${fmt(rr[0].now)} mm` : rr.length ? `${fmt(rr.reduce((s, r) => s + r.now, 0) / rr.length)} mm a state` : '\u2014']].map(([k, v]) => (
+                          <div key={k} className="rounded-xl border border-gray-200 px-3 py-2"><p className="text-xs text-gray-500">{k}</p><p className="font-semibold tabular-nums">{v}</p></div>
+                        ))}
+                      </div>
+                      {rr.length > 0 && (
+                        <table className="w-full text-sm">
+                          <thead className="bg-[#0F766E] text-white text-left"><tr><th className="px-3 py-2">State</th><th className="px-3 py-2 text-right">Rain {rr[0].year} so far (mm)</th><th className="px-3 py-2 text-right">Same days last year (mm)</th><th className="px-3 py-2 text-right">Change</th></tr></thead>
+                          <tbody>{rr.map((r) => <tr key={r.state} className="border-t border-gray-100"><td className="px-3 py-1.5">{r.state}</td><td className="px-3 py-1.5 text-right tabular-nums">{fmt(r.now)}</td><td className="px-3 py-1.5 text-right tabular-nums">{fmt(r.before)}</td><td className={`px-3 py-1.5 text-right tabular-nums ${r.change < 0 ? 'text-amber-700' : 'text-[#0F766E]'}`}>{r.change == null ? '\u2014' : `${r.change > 0 ? '+' : ''}${Math.round(r.change)}%`}</td></tr>)}</tbody>
+                        </table>
+                      )}
+                      <p className="text-xs text-gray-500">Sources: state boundaries and areas, geoBoundaries (CC BY 4.0); rain, ERA5 through the Open-Meteo archive at one point inside each state{rr[0] ? `, to ${rr[0].until}` : ''}; sites, the GWON project registry.</p>
+                    </div>
+                  );
+                })()}
+              </section>
+            </>
+          )}
+
+          {mod === 'climate' && (
+            <>
+              <section className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <h1 className="font-display text-2xl font-semibold flex items-center gap-2">Climate and rain <Tip text="ERA5 reanalysis (ECMWF), through the Open-Meteo archive, read at one point inside each state. It is the climate of that point, not an average of the whole state; in the platform, state averages come from CHIRPS and ERA5 grids in the pipeline." /></h1>
+                  <p className="text-sm text-gray-600 mt-1">This year against last year, month by month.</p>
+                </div>
+                <label className="text-sm">State <select value={climateState} onChange={(e) => setClimateState(e.target.value)} className="ml-2 px-3 py-2 rounded-xl border border-gray-300">
+                  {(states?.features || []).map((f) => <option key={f.properties.state}>{f.properties.state}</option>)}
+                </select></label>
+              </section>
+              {climateErr && <p className="text-sm text-amber-800">{climateErr}</p>}
+              {!climate ? <p className="text-sm text-gray-500">Loading the climate figures…</p> : (
+                <>
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
+                      <p className="text-sm font-semibold flex items-center gap-1.5">Rain each month, {climateState} <Tip text="Total rain of each month, in millimetres. The current month counts the days so far." /></p>
+                      <RainBars year={climateYear} thisYear={monthly(climate[climateState], climateYear)} lastYear={monthly(climate[climateState], climateYear - 1)} />
+                    </div>
+                    <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
+                      <p className="text-sm font-semibold flex items-center gap-1.5">Daily highest temperature, {climateState} <Tip text="The month's average of each day's highest temperature, in degrees Celsius. Heat raises the water new trees need." /></p>
+                      <MonthLines year={climateYear} thisYear={monthly(climate[climateState], climateYear)} lastYear={monthly(climate[climateState], climateYear - 1)} />
+                    </div>
+                  </div>
+                  <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
+                    <p className="text-sm font-semibold flex items-center gap-1.5">Rain so far in {climateYear}, every frontline state <Tip text="From 1 January to the latest day of data, beside the same days last year: a fair comparison of the season so far." /></p>
+                    <StateBars unit="mm" rows={[...rainRows].filter((r) => r.year).sort((a, b) => b.now - a.now).map((r) => ({ label: r.state, value: r.now }))} />
+                    <p className="text-sm font-semibold pt-3 flex items-center gap-1.5">Change against the same days last year <Tip text="Above zero: wetter than last year so far. Below zero: drier, so new plantings there need watching." /></p>
+                    <StateBars unit="%" rows={[...rainRows].filter((r) => r.change != null).sort((a, b) => a.change - b.change).map((r) => ({ label: r.state, value: r.change, color: r.change < 0 ? '#D97706' : '#0F766E' }))} />
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {mod === 'assistant' && (
+            <>
+              <section>
+                <h1 className="font-display text-2xl font-semibold flex items-center gap-2">Assistant <Tip text="Ask in plain words. The Assistant reads the figures this platform shows now (states, areas, climate, registered sites) and answers from them only, saying where each figure comes from." /></h1>
+                <p className="text-sm text-gray-600 mt-1">Questions and advice about the frontline states, from GWON's own figures.</p>
+              </section>
+              <Assistant facts={facts} module={mod} />
             </>
           )}
 

@@ -29,6 +29,8 @@ const OrgServicesPage = ({ profile }) => {
   const noBlocks = (s) => s.group === 'crops' && withBlocks && !withBlocks.has(s.id);
 
   const open = (id) => {
+    const s = services.find((x) => x.id === id);
+    if (s?.href) { navigate(s.href); return; }       // a managed platform opens at its own address
     navigate(paths.service(id, profile.tenant));
   };
 
@@ -51,7 +53,7 @@ const OrgServicesPage = ({ profile }) => {
         </dl>
       </div>
 
-      {tabs.length > 2 && (
+      {tabs.length > 1 && (
         <div role="tablist" className="flex flex-wrap gap-x-1 border-b border-gray-200">
           {tabs.map((t) => (
             <button key={t.id} role="tab" aria-selected={tab === t.id} type="button" onClick={() => setTab(t.id)}
