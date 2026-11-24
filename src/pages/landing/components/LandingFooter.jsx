@@ -1,41 +1,64 @@
 import { useNavigate } from 'react-router-dom';
+import { ArrowUpRight, Mail, Smartphone } from 'lucide-react';
+import { useBuddyApp } from './useBuddyApp';
+
+/**
+ * The footer of every public page: who we are, the services, the company pages, developers, the app, and the
+ * small print. Soft green, plain words; links only to pages that exist.
+ */
+const COLUMNS = [
+  { title: 'Services', links: [['Crop health and growth', '/docs'], ['Water and weather', '/docs'], ['EUDR deforestation check', '/docs'], ['Land suitability', '/docs'], ['Farmer groups', '/docs']] },
+  { title: 'Company', links: [['Trust centre', '/trust'], ['Policies', '/policies'], ['Guide', '/docs'], ['Contact', '/contact']] },
+  { title: 'Developers', links: [['API reference (Swagger)', '/public-api/v1/docs', true], ['Developer guide', '/developers']] },
+];
 
 const LandingFooter = () => {
   const navigate = useNavigate();
-
+  const app = useBuddyApp();
+  const go = (to, external) => (external ? window.open(to, '_blank', 'noopener') : navigate(to));
   return (
-    <footer className="bg-white text-slate-600 text-xs py-2 sm:py-3 border-t border-gray-200 shrink-0">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
-        {/* Brand Copyright */}
-        <div className="flex items-center gap-2.5">
-          <div className="p-0.5 bg-white rounded-none border border-slate-200 flex items-center justify-center">
-            <img
-              src="/farmintelytics-logo.png?v=7"
-              alt="FarmIntelytics"
-              className="h-4 sm:h-5 w-auto object-contain rounded-none block"
-            />
+    <footer className="shrink-0 bg-[#F5FAF3] border-t border-[#E3EFDF] text-gray-700">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+        <div>
+          <button type="button" onClick={() => navigate('/')} className="flex items-center gap-2.5">
+            <img src="/favicon-192.png?v=3" alt="" className="h-9 w-9 object-contain" />
+            <span className="font-display text-lg font-bold tracking-tight text-gray-900">FarmIntelytics</span>
+          </button>
+          <p className="mt-4 text-sm leading-relaxed max-w-xs text-gray-600">
+            Satellite insight for farms, estates and co-operatives, in plain words. Built by Earthintelytics.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button type="button" onClick={() => navigate('/contact')}
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#D8EBD3] bg-white px-3.5 py-1.5 text-sm font-semibold text-gray-800 hover:bg-[#EEF6EC]">
+              <Mail size={14} />Talk to us
+            </button>
+            {app && (
+              <a href="/#get-the-app"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#D8EBD3] bg-white px-3.5 py-1.5 text-sm font-semibold text-[var(--brand-primary-dark)] hover:bg-[#EEF6EC]">
+                <Smartphone size={14} />Get the app
+              </a>
+            )}
           </div>
-          <span className="font-semibold text-slate-900 text-[11px] sm:text-xs">FarmIntelytics</span>
-          <span className="text-slate-400 text-[11px]">© {new Date().getFullYear()} FarmIntelytics / Earthintelytics</span>
         </div>
-
-        {/* Footer Navigation Links */}
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1 font-medium text-slate-600 text-[11px] sm:text-xs">
-          <button onClick={() => navigate('/trust')} className="hover:text-[var(--brand-primary)] transition-colors">
-            Trust centre
-          </button>
-          <button onClick={() => navigate('/policies')} className="hover:text-[var(--brand-primary)] transition-colors">
-            Policies
-          </button>
-          <button onClick={() => navigate('/docs')} className="hover:text-[var(--brand-primary)] transition-colors">
-            Guide
-          </button>
-          <button onClick={() => navigate('/developers')} className="hover:text-[var(--brand-primary)] transition-colors">
-            API
-          </button>
-          <button onClick={() => navigate('/contact')} className="hover:text-[var(--brand-primary)] transition-colors">
-            Contact
-          </button>
+        {COLUMNS.map((col) => (
+          <nav key={col.title} aria-label={col.title}>
+            <p className="text-sm font-semibold text-gray-900">{col.title}</p>
+            <ul className="mt-3 space-y-2 text-sm">
+              {col.links.map(([label, to, external]) => (
+                <li key={label}>
+                  <button type="button" onClick={() => go(to, external)} className="inline-flex items-center gap-1 text-left text-gray-600 hover:text-[var(--brand-primary)] transition-colors">
+                    {label}{external && <ArrowUpRight size={13} />}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
+      </div>
+      <div className="border-t border-[#E3EFDF]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between text-xs text-gray-500">
+          <span>© {new Date().getFullYear()} FarmIntelytics, a product of Earthintelytics. All rights reserved.</span>
+          <span>Contains modified Copernicus Sentinel data · Imagery © Esri, Maxar, Earthstar Geographics</span>
         </div>
       </div>
     </footer>

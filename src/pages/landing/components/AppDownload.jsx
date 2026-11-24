@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
 import { Download, Mic, Bell, MapPin } from 'lucide-react';
+import { useBuddyApp } from './useBuddyApp';
 
-// The FarmIntelytics Buddy Android app, downloaded straight from this server. What is offered comes from
-// /downloads/farm-buddy.json, written when the APK is published; without it this section stays hidden.
-const INFO = '/downloads/farm-buddy.json';
+// The FarmIntelytics Buddy Android app, downloaded straight from this server (useBuddyApp); without a published
+// app this section stays hidden.
 
 const POINTS = [
   { icon: Mic, text: 'Ask about your farm by voice, in English or Pidgin, and hear the answer.' },
@@ -16,17 +16,13 @@ const size = (bytes) => (bytes ? `${(bytes / 1048576).toFixed(0)} MB` : '');
 const day = (iso) => { const d = new Date(`${iso}T00:00:00`); return Number.isNaN(d.getTime()) ? '' : d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }); };
 
 export default function AppDownload() {
-  const [app, setApp] = useState(null);
+  const app = useBuddyApp();
   const [qr, setQr] = useState('');
-  useEffect(() => {
-    let active = true;
-    fetch(INFO, { cache: 'no-store' })
-      .then((r) => (r.ok && (r.headers.get('content-type') || '').includes('json') ? r.json() : null))
-      .then((info) => { if (active && info?.file) setApp(info); })
-      .catch(() => {});
-    return () => { active = false; };
-  }, []);
   const href = app ? `/downloads/${encodeURIComponent(app.file)}` : '';
+  // "Get the app" (menu and hero) links to /#get-the-app: scroll here once the section exists.
+  useEffect(() => {
+    if (app && window.location.hash === '#get-the-app') document.getElementById('get-the-app')?.scrollIntoView({ behavior: 'smooth' });
+  }, [app]);
   useEffect(() => {
     if (!href) return;
     QRCode.toDataURL(new URL(href, window.location.origin).href, { width: 240, margin: 1 }).then(setQr).catch(() => setQr(''));
@@ -34,7 +30,7 @@ export default function AppDownload() {
   if (!app) return null;
 
   return (
-    <section id="get-the-app" className="border-t border-gray-100 bg-white">
+    <section id="get-the-app" className="scroll-mt-20 border-t border-[#E3EFDF] bg-[#F5FAF3]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid gap-10 lg:grid-cols-[1fr_auto] lg:items-center">
         <div>
           <p className="text-sm font-medium text-[var(--brand-primary)]">For farmers in the field</p>
@@ -58,7 +54,7 @@ export default function AppDownload() {
               {[app.version && `Version ${app.version}`, size(app.bytes), app.built && `updated ${day(app.built)}`].filter(Boolean).join(' · ')}
             </p>
           </div>
-          <div className="mt-6 rounded-2xl border border-gray-200 p-5 max-w-2xl">
+          <div className="mt-6 rounded-2xl border border-[#E3EFDF] bg-white p-5 max-w-2xl">
             <p className="text-sm font-semibold text-gray-900">How to install</p>
             <ol className="mt-2 space-y-1.5 text-sm text-gray-600 list-decimal pl-5">
               <li>Open this page on your Android phone and tap Download for Android.</li>
@@ -69,7 +65,7 @@ export default function AppDownload() {
           </div>
         </div>
         {qr && (
-          <div className="hidden lg:flex flex-col items-center gap-3 rounded-2xl border border-gray-200 p-5">
+          <div className="hidden lg:flex flex-col items-center gap-3 rounded-2xl border border-[#E3EFDF] bg-white p-5">
             <img src={qr} alt="Code to scan with your phone to download FarmIntelytics Buddy" className="w-48 h-48" />
             <p className="text-xs text-gray-500 text-center max-w-[12rem]">On a computer? Scan this with your phone's camera to download.</p>
           </div>

@@ -1,10 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { Menu, Smartphone, X } from 'lucide-react';
+import { useBuddyApp } from './useBuddyApp';
 
 const LandingNav = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const app = useBuddyApp();
+  // "API" opens the Swagger reference, the API's default page (the developer guide is /developers).
+  const openApiDocs = () => { setMobileMenuOpen(false); window.location.assign('/public-api/v1/docs'); };
+  const goApp = () => {
+    setMobileMenuOpen(false);
+    const el = document.getElementById('get-the-app');
+    if (el) { window.history.replaceState(null, '', '/#get-the-app'); el.scrollIntoView({ behavior: 'smooth' }); }
+    else window.location.assign('/#get-the-app');
+  };
 
   const handleNav = (path) => {
     setMobileMenuOpen(false);
@@ -40,7 +50,7 @@ const LandingNav = () => {
             <button onClick={() => handleNav('/docs')} className="hover:text-[var(--brand-primary)] transition-colors">
               Guide
             </button>
-            <button onClick={() => handleNav('/developers')} className="hover:text-[var(--brand-primary)] transition-colors">
+            <button onClick={() => openApiDocs()} className="hover:text-[var(--brand-primary)] transition-colors">
               API
             </button>
             <button onClick={() => handleNav('/contact')} className="hover:text-[var(--brand-primary)] transition-colors">
@@ -51,6 +61,12 @@ const LandingNav = () => {
 
         {/* Right Section: Desktop Sign In & Mobile Hamburger Toggle */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {app && (
+            <button type="button" onClick={goApp}
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#D8EBD3] bg-[#EEF6EC] px-3.5 py-1.5 text-sm font-semibold text-[var(--brand-primary-dark)] hover:bg-[#E2F0DE] transition-colors">
+              <Smartphone size={15} />Get the app
+            </button>
+          )}
           <button
             id="top-nav-sign-in"
             onClick={() => handleNav('/login')}
@@ -93,7 +109,7 @@ const LandingNav = () => {
               Guide
             </button>
             <button
-              onClick={() => handleNav('/developers')}
+              onClick={() => openApiDocs()}
               className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
               API
@@ -104,6 +120,11 @@ const LandingNav = () => {
             >
               Contact
             </button>
+            {app && (
+              <button onClick={goApp} className="text-left py-2.5 px-3 rounded inline-flex items-center gap-2 font-semibold text-[var(--brand-primary-dark)] hover:bg-[#EEF6EC]">
+                <Smartphone size={16} />Get the app
+              </button>
+            )}
             <div className="pt-2 border-t border-slate-100">
               <button
                 onClick={() => handleNav('/login')}

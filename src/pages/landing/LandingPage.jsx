@@ -1,5 +1,6 @@
 import LandingNav from './components/LandingNav';
 import HeroSection from './components/HeroSection';
+import PhotoStrip from './components/PhotoStrip';
 import LandingStory from './components/LandingStory';
 import AppDownload from './components/AppDownload';
 import LandingFooter from './components/LandingFooter';
@@ -9,6 +10,7 @@ const LandingPage = () => (
   <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans">
     <LandingNav />
     <HeroSection />
+    <PhotoStrip />
     <LandingStory />
     <AppDownload />
     <LandingFooter />

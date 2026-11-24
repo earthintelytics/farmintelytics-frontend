@@ -153,8 +153,9 @@ const LandingStory = () => {
       </section>
 
       <p className="bg-white max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 text-[11px] text-gray-500">
-        Photos: McKay Savage (CC BY 2.0), USAID Africa Bureau, Kate Holt / AusAID (CC BY 2.0), Kambai Akau, Radosław Botev, NASA Earth Observatory,
-        Nabimanya Norman, Dorcas Atule, Bukulu Steven (CC BY-SA 4.0 and others), via Wikimedia Commons.
+        Photos via Wikimedia Commons: McKay Savage, Kate Holt / AusAID (CC BY 2.0); USAID Africa Bureau, NASA Earth Observatory (public domain);
+        Kambai Akau, Dorcas Atule, Krystal S. Wright, Nabimanya Norman, Thamizhpparithi Maari, Bukulu Steven (CC BY-SA 4.0); RamboSD (CC BY 4.0);
+        Radosław Botev (CC BY 3.0 PL).
       </p>
     </>
   );

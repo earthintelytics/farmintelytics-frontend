@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Code2, Leaf, Droplets, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Code2, Leaf, Droplets, ShieldCheck, Smartphone } from 'lucide-react';
+import { useBuddyApp } from './useBuddyApp';
 import HeroBackdrop from './HeroBackdrop';
 
 // What the platform does, in three plain lines. No client data on a public page.
@@ -12,6 +13,7 @@ const POINTS = [
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const app = useBuddyApp();
   return (
     <main className="flex-1 bg-white">
       <section className="relative">
@@ -36,6 +38,12 @@ const HeroSection = () => {
             className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold text-gray-800 border border-gray-300 hover:bg-gray-50 transition-colors">
             See how it works
           </button>
+          {app && (
+            <a href="#get-the-app"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-[var(--brand-primary-dark)] border border-[#D8EBD3] bg-[#EEF6EC] hover:bg-[#E2F0DE] transition-colors">
+              <Smartphone size={16} />Get the app
+            </a>
+          )}
         </div>
         </div>
         {/* An example of what a client sees, so the imagery reads as "answers", not decoration */}

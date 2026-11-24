@@ -183,3 +183,9 @@ button:active {
 }
 @keyframes fi-flow { to { background-position: 14px 0; } }
 @media (prefers-reduced-motion: reduce) { .fi-flow-line { animation: none; } }
+
+/* Front page: the photo strip under the hero, moving slowly from right to left (still for reduced motion). */
+.fi-strip { animation: fi-strip 70s linear infinite; }
+.fi-strip:hover { animation-play-state: paused; }
+@keyframes fi-strip { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) { .fi-strip { animation: none; } }
