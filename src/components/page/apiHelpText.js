@@ -8,7 +8,7 @@ export const API_ADMIN_GUIDE = {
   intro: 'Products, plans, prices, wallets and keys: what each one is and what happens to money on a request.',
   sections: [
     { title: 'Product, plan, client', points: [
-      ['Product', 'What a client can call: the EUDR check (deforestation after 2020) and crop suitability (S1 to N per field). Every product is priced per hectare.'],
+      ['Product', 'What a client can call: the EUDR check (deforestation after 31 December 2020), priced per hectare.'],
       ['Plan', 'The price list for one product: its price per hectare and its limits. Make plans in "Plans and prices".'],
       ['Client', 'An organisation using the API. It has one plan per product, its own keys, and a prepaid wallet.'],
       'Changing a client\'s plan applies to its next request; finished checks keep the price they were charged.',
@@ -26,7 +26,7 @@ export const API_ADMIN_GUIDE = {
     { title: 'What happens to money on one request', points: [
       ['Validate', 'Free, always. It only checks the file against the EU information system\'s rules.'],
       ['Send for checking', 'The cost (total valid area × price per hectare) is held from the wallet. Not enough in it: the request is refused (402) and nothing runs.'],
-      ['Check finished', 'Only the area really checked is charged (for suitability: fields that got a class); the rest of the hold goes back.'],
+      ['Check finished', 'Only the area really checked is charged; the rest of the hold goes back.'],
       ['Never charged', 'Plots the EU rules refuse, test keys, failed checks, and a repeated request with the same Idempotency-Key.'],
     ] },
     { title: 'Keys', points: [
@@ -97,7 +97,7 @@ export const API_MODAL_HELP = {
 
 /** The (?) beside each field on the API pages: one or two plain lines each. */
 export const API_FIELD_HELP = {
-  product: 'What the plan prices: the EUDR check or crop suitability. A plan belongs to one product.',
+  product: 'What the plan prices: the EUDR check (the only product of the public API). A plan belongs to one product.',
   planName: 'A name for the team only, for example "Standard" or "Exporter volume". Clients see it on their statement.',
   price: 'What one hectare checked costs, in naira. A request costs the total area of its plots × this price; 0.4 ha costs 0.4 of it.',
   maxPlots: 'The most plots one request may hold. A larger file is refused and the client splits it; the price does not change.',
