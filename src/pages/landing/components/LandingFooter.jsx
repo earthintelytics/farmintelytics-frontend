@@ -56,7 +56,8 @@ const LandingFooter = () => {
       <div className="border-t border-[#E3EFDF]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between text-xs text-gray-500">
           <span>© {new Date().getFullYear()} FarmIntelytics, a product of Earthintelytics. All rights reserved.</span>
-          <span>Contains modified Copernicus Sentinel data · Imagery © Esri, Maxar, Earthstar Geographics</span>
+          <span>Contains modified Copernicus Sentinel data · Imagery © Esri, Maxar, Earthstar Geographics ·{' '}
+            <button type="button" onClick={() => navigate('/credits')} className="underline underline-offset-2 hover:text-gray-700">Photo credits</button></span>
         </div>
       </div>
     </footer>

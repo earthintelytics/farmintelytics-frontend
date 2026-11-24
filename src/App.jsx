@@ -70,6 +70,7 @@ const PoliciesPage = lazyWithReload(() => import('./pages/public/PoliciesPage'))
 const DevelopersPage = lazyWithReload(() => import('./pages/public/DevelopersPage'));
 const AppPage = lazyWithReload(() => import('./pages/public/AppPage'));
 const PricingPage = lazyWithReload(() => import('./pages/public/PricingPage'));
+const CreditsPage = lazyWithReload(() => import('./pages/public/CreditsPage'));
 const DocumentationPage = lazyWithReload(() => import('./pages/public/DocumentationPage'));
 const ContactPage = lazyWithReload(() => import('./pages/public/ContactPage'));
 
@@ -366,6 +367,7 @@ const AppRoutes = () => {
         <Route path="/developers"               element={<DevelopersPage />} />
         <Route path="/app"                      element={<AppPage />} />
         <Route path="/pricing"                  element={<PricingPage />} />
+        <Route path="/credits"                  element={<CreditsPage />} />
         <Route path="/privacy"                  element={<Navigate to="/policies?tab=privacy" replace />} />
         <Route path="/trust"                    element={<TrustCenterPage />} />
         <Route path="/legal"                    element={<Navigate to="/policies?tab=terms" replace />} />
