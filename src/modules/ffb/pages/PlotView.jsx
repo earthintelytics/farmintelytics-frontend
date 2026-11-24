@@ -6,7 +6,7 @@ import { exportFileName } from '../utils/exportName';
 import { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fmtAbbrev, fmtDayShort, fmtNumber } from '../utils/formatters';
-import { Map as MapIcon, Scale, AlertCircle, CheckCircle2, Search, Download, RotateCcw, Layers, Lock } from 'lucide-react';
+import { Map as MapIcon, Scale, AlertCircle, CheckCircle2, Search, RotateCcw, Layers, FileDown } from 'lucide-react';
 import { API } from '../services/api';
 
 import { BunchWeightView } from './BunchWeightView';
@@ -390,7 +390,7 @@ export function PlotView() {
             boxShadow: isViewer ? 'none' : '0 2px 8px rgba(3, 67, 33, 0.2)'
           }}
         >
-          {isViewer ? <Lock size={15} /> : <Download size={15} />} EXPORT CSV
+          <FileDown size={15} /> Export CSV
         </button>
       </div>
 

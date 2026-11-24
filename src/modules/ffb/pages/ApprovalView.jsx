@@ -6,20 +6,7 @@ import { useSearchParams } from '../utils/portalRouter';
 import { fmtDate, fmtTime } from '../utils/formatters';
 import { bunchCount, countFlag, confirmedNote } from '../utils/counts';
 import { fmtPlatform } from '../utils/platform';
-import {
-  Search,
-  CheckCircle,
-  HelpCircle,
-  X,
-  RotateCcw,
-  AlertTriangle,
-  ShieldAlert,
-  MapPin,
-  ChevronLeft,
-  User,
-  ArrowUpDown,
-  Lock,
-} from 'lucide-react';
+import { Search, CheckCircle, HelpCircle, X, RotateCcw, AlertTriangle, ShieldAlert, MapPin, ChevronLeft, User, ArrowUpDown, FileDown } from 'lucide-react';
 import { API } from '../services/api';
 
 import { downloadReconciliationCsv, RECONCILIATION_EXPORT_COLS } from '../utils/reconciliationCsv';
@@ -914,7 +901,7 @@ export function ApprovalView() {
             fontWeight: 500, display: 'flex', alignItems: 'center', gap: '6px'
           }}
         >
-          {userRole === 'View' ? <Lock size={14} /> : null} Export CSV
+          <FileDown size={15} /> Export CSV
         </button>
       </div>
 

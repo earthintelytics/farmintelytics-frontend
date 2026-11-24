@@ -8,10 +8,9 @@ import {
   fetchProtectedAreasGeojson,
   deleteProtectedArea,
   toggleProtectedArea,
-  uploadWdpaZip,
 } from '../../services/adminApi';
 import { getCssToken } from '../../utils/tokens';
-import UploadWdpaModal from './protected_areas/UploadWdpaModal';
+import UploadWdpaParquetModal from './protected_areas/UploadWdpaParquetModal';
 import { useConfirm } from '../components/ConfirmProvider';
 import UploadBoundaryModal from './protected_areas/UploadBoundaryModal';
 
@@ -50,11 +49,6 @@ export default function ProtectedAreas() {
 
   // Modals
   const [uploadModalOpen, setUploadModalOpen] = useState(false);
-  const [uploading, setUploading] = useState(false);
-  const [uploadFile, setUploadFile] = useState(null);
-  const [sourceVersion, setSourceVersion] = useState('Oct2026');
-  const [marginKm, setMarginKm] = useState(50);
-  const [uploadCounts, setUploadCounts] = useState(null);
 
   const [boundaryOpen, setBoundaryOpen] = useState(false);
   const [editArea, setEditArea] = useState(null);
@@ -114,24 +108,6 @@ export default function ProtectedAreas() {
     }
   };
 
-  const handleUploadSubmit = async (e) => {
-    e.preventDefault();
-    if (!uploadFile) return;
-    try {
-      setUploading(true);
-      setError('');
-      setUploadCounts(null);
-      const res = await uploadWdpaZip(uploadFile, sourceVersion, Number(marginKm));
-      setUploadCounts(res.counts);
-      setSuccessMsg(`Import complete: ${res.counts.created} created, ${res.counts.updated} updated.`);
-      loadData();
-    } catch (err) {
-      setError(err.message || 'Failed to upload WDPA archive.');
-    } finally {
-      setUploading(false);
-    }
-  };
-
   const openEditModal = (area) => { setEditArea(area); setBoundaryOpen(true); };
   const openCreateModal = () => { setEditArea(null); setBoundaryOpen(true); };
   const onBoundarySaved = (res) => {
@@ -163,11 +139,11 @@ export default function ProtectedAreas() {
         <div className="flex flex-wrap items-center gap-3 shrink-0">
           <button
             type="button"
-            onClick={() => { setUploadModalOpen(true); setUploadCounts(null); }}
+            onClick={() => setUploadModalOpen(true)}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold border border-gray-300 bg-white text-gray-800 hover:bg-gray-50 transition-colors shadow-sm"
           >
             <Upload size={16} />
-            Upload WDPA zip
+            Upload WDPA (GeoParquet)
           </button>
           <button
             type="button"
@@ -396,19 +372,8 @@ export default function ProtectedAreas() {
       </div>
 
       {/* Upload WDPA Modal */}
-      <UploadWdpaModal
-        isOpen={uploadModalOpen}
-        onClose={() => setUploadModalOpen(false)}
-        onSubmit={handleUploadSubmit}
-        uploadFile={uploadFile}
-        setUploadFile={setUploadFile}
-        sourceVersion={sourceVersion}
-        setSourceVersion={setSourceVersion}
-        marginKm={marginKm}
-        setMarginKm={setMarginKm}
-        uploading={uploading}
-        uploadCounts={uploadCounts}
-      />
+      <UploadWdpaParquetModal open={uploadModalOpen} onClose={() => setUploadModalOpen(false)}
+        onDone={() => setSuccessMsg('The WDPA is loaded: every check from now on uses it.')} />
 
       <UploadBoundaryModal
         open={boundaryOpen}

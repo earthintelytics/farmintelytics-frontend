@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Code2 } from 'lucide-react';
 import { Chip, Empty } from '../../farmintelytics-admin/components/ui';
 import { paths } from '../../routes/paths';
 import { licensedServices, SERVICE_TABS } from './orgProfile';
@@ -15,6 +15,7 @@ const OrgServicesPage = ({ profile }) => {
     .filter((t) => t.id === 'all' || t.count > 0);
   const shown = tab === 'all' ? services : services.filter((s) => s.group === tab);
   const first = (profile.fullName || '').split(' ')[0];
+  const hasApi = (profile.modules || []).some((m) => String(m).endsWith('-api'));
   // Licensed crops with no estate blocks yet are marked, so nobody opens an empty dashboard expecting data.
   const [withBlocks, setWithBlocks] = useState(null);
   useEffect(() => {
@@ -66,7 +67,7 @@ const OrgServicesPage = ({ profile }) => {
               <div className="flex-1 flex flex-col p-5">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-display text-base font-semibold text-gray-900">{s.title}</h3>
-                  {noBlocks(s) && <span className="shrink-0 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">No blocks yet</span>}
+                  {noBlocks(s) && <span className="shrink-0 rounded-md bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">No blocks yet</span>}
                 </div>
                 <p className="mt-1.5 text-sm text-gray-500 leading-relaxed flex-1">{noBlocks(s) ? 'Licensed, but no estate has blocks for this crop yet. Results appear once its boundaries are uploaded.' : s.text}</p>
                 <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-green-700">
@@ -75,6 +76,21 @@ const OrgServicesPage = ({ profile }) => {
               </div>
             </button>
           ))}
+          {hasApi && tab === 'all' && (
+            <button type="button" onClick={() => navigate(paths.orgDeveloper(profile.tenant))}
+              className="group w-full text-left flex flex-col items-stretch bg-white border border-gray-200 hover:border-gray-400 rounded-2xl overflow-hidden">
+              <div className="w-full h-40 bg-[#F5FAF3] border-b border-[#E3EFDF] flex items-center justify-center">
+                <span className="w-16 h-16 rounded-2xl bg-white border border-[#E3EFDF] text-[var(--brand-primary)] flex items-center justify-center"><Code2 size={30} /></span>
+              </div>
+              <div className="flex-1 flex flex-col p-5">
+                <h3 className="font-display text-base font-semibold text-gray-900">Developer and API</h3>
+                <p className="mt-1.5 text-sm text-gray-500 leading-relaxed flex-1">Use FarmIntelytics checks from your own software: your keys, wallet, usage and the API reference.</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-green-700">
+                  Open <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+                </span>
+              </div>
+            </button>
+          )}
         </div>
       )}
     </>

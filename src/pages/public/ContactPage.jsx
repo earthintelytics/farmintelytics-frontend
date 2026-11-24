@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Mail, MapPin, Send } from 'lucide-react';
 import PublicLayout from './PublicLayout';
 
-const EMAIL = 'support@earthintelytics.com';
+const EMAIL = 'hello@earthintelytics.com';   // the one contact address (owner, 24 Nov 2026)
 const SUBJECTS = ['A demo for my organisation', 'Pricing and licences', 'Help with my account', 'Data and privacy', 'Something else'];
 const inputCls = 'w-full px-3.5 py-2.5 rounded-xl border border-gray-300 bg-white text-[15px] outline-none focus:border-[var(--brand-primary)]';
 

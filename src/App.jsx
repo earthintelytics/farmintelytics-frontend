@@ -69,6 +69,7 @@ const TrustCenterPage = lazyWithReload(() => import('./pages/public/TrustCenterP
 const PoliciesPage = lazyWithReload(() => import('./pages/public/PoliciesPage'));
 const DevelopersPage = lazyWithReload(() => import('./pages/public/DevelopersPage'));
 const AppPage = lazyWithReload(() => import('./pages/public/AppPage'));
+const PricingPage = lazyWithReload(() => import('./pages/public/PricingPage'));
 const DocumentationPage = lazyWithReload(() => import('./pages/public/DocumentationPage'));
 const ContactPage = lazyWithReload(() => import('./pages/public/ContactPage'));
 
@@ -95,6 +96,7 @@ const RESTRICTED_MODULE = import.meta.env.VITE_RESTRICT_TO_MODULE || null;
 const OrgShell = lazyWithReload(() => import('./pages/org/OrgShell'));
 const OrgServicesPage = lazyWithReload(() => import('./pages/org/OrgServicesPage'));
 const OrgSettingsPage = lazyWithReload(() => import('./pages/org/OrgSettingsPage'));
+const OrgDeveloperPage = lazyWithReload(() => import('./pages/org/OrgDeveloperPage'));
 const FieldPage = lazyWithReload(() => import('./pages/org/FieldPage'));
 import { readOrgProfile } from './pages/org/orgProfile';
 import { paths, sessionTenant } from './routes/paths';
@@ -170,7 +172,7 @@ const OrgPage = ({ view }) => {
           </button>
         </div>
       )}
-      {view === 'settings' ? <OrgSettingsPage profile={profile} onProfile={setProfile} /> : view === 'field' ? <FieldPage /> : <OrgServicesPage profile={profile} />}
+      {view === 'settings' ? <OrgSettingsPage profile={profile} onProfile={setProfile} /> : view === 'field' ? <FieldPage /> : view === 'developer' ? <OrgDeveloperPage profile={profile} /> : <OrgServicesPage profile={profile} />}
     </OrgShell>
   );
 };
@@ -363,6 +365,7 @@ const AppRoutes = () => {
         <Route path="/policies"                 element={<PoliciesPage />} />
         <Route path="/developers"               element={<DevelopersPage />} />
         <Route path="/app"                      element={<AppPage />} />
+        <Route path="/pricing"                  element={<PricingPage />} />
         <Route path="/privacy"                  element={<Navigate to="/policies?tab=privacy" replace />} />
         <Route path="/trust"                    element={<TrustCenterPage />} />
         <Route path="/legal"                    element={<Navigate to="/policies?tab=terms" replace />} />
@@ -380,6 +383,7 @@ const AppRoutes = () => {
         <Route path="/org/:tenant"              element={<OrgPage view="services" />} />
         <Route path="/org/:tenant/settings"     element={<OrgPage view="settings" />} />
         <Route path="/org/:tenant/field"        element={<OrgPage view="field" />} />
+        <Route path="/org/:tenant/developer"    element={<OrgPage view="developer" />} />
         {/* The installed phone app opens here: the signed-in organisation's Field page. */}
         <Route path="/field"                    element={<Navigate to={sessionTenant() ? paths.orgField(sessionTenant()) : '/login?next=field'} replace />} />
         {/* FarmIntelytics Buddy, the farmers' phone app: /buddy (Ask) and /buddy/alerts. */}

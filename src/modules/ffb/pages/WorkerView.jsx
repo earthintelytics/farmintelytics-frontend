@@ -6,7 +6,7 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { fmtDateTime, fmtStatusBadge, fmtAbbrev } from '../utils/formatters';
 import { API } from '../services/api';
-import { Search, Download, User, Cpu, MapPin, Truck, RotateCcw, Lock, Columns, ChevronDown } from 'lucide-react';
+import { Search, User, Cpu, MapPin, Truck, RotateCcw, Lock, Columns, ChevronDown, FileDown } from 'lucide-react';
 import { scrollPageTop } from '../utils/scroll';
 import { approvalSplit } from '../utils/reconStatus';
 import StatCards from '../components/StatCards';
@@ -582,7 +582,7 @@ export function WorkerView() {
               background: '#94a3b8', borderColor: '#94a3b8', cursor: 'not-allowed', opacity: 0.7
             }}
           >
-            <Lock size={15} /> EXPORT CSV
+            <FileDown size={15} /> Export CSV
           </button>
         ) : (
           <button 
@@ -593,10 +593,10 @@ export function WorkerView() {
             style={{
               height: '40px', padding: '0 18px', fontWeight: 500, fontSize: '12px', borderRadius: '8px',
               display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap', flexShrink: 0,
-              cursor: 'pointer', boxShadow: '0 2px 8px rgba(3, 67, 33, 0.2)'
+              cursor: 'pointer'
             }}
           >
-            <Download size={15} /> EXPORT CSV
+            <FileDown size={15} /> Export CSV
           </button>
         )}
       </div>

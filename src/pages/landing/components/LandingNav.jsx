@@ -44,6 +44,9 @@ const LandingNav = () => {
             <button onClick={() => handleNav('/docs')} aria-current={on('/docs') ? 'page' : undefined} className={deskCls('/docs')}>
               Guide
             </button>
+            <button onClick={() => handleNav('/pricing')} aria-current={on('/pricing') ? 'page' : undefined} className={deskCls('/pricing')}>
+              Pricing
+            </button>
             <button onClick={() => handleNav('/developers')} aria-current={on('/developers') ? 'page' : undefined} className={deskCls('/developers')}>
               Developers
             </button>
@@ -104,6 +107,13 @@ const LandingNav = () => {
               className={mobCls('/docs')}
             >
               Guide
+            </button>
+            <button
+              onClick={() => handleNav('/pricing')}
+              aria-current={on('/pricing') ? 'page' : undefined}
+              className={mobCls('/pricing')}
+            >
+              Pricing
             </button>
             <button
               onClick={() => handleNav('/developers')}

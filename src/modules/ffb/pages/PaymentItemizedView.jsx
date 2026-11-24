@@ -3,16 +3,7 @@ import { useRefreshTick } from '../hooks/useRefreshTick';
 import { exportFileName } from '../utils/exportName';
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { fmtNumber, fmtRole } from '../utils/formatters';
-import {
-  CheckCircle2,
-  Circle,
-  Search,
-  Calendar,
-  Filter,
-  Download,
-  ArrowLeft,
-  Lock,
-} from 'lucide-react';
+import { CheckCircle2, Circle, Search, Calendar, Filter, ArrowLeft, FileDown } from 'lucide-react';
 import { API } from '../services/api';
 import { useNavigate } from '../utils/portalRouter';
 import ExportColumnsModal from '../components/ExportColumnsModal';
@@ -208,7 +199,7 @@ export function PaymentItemizedView() {
               opacity: isViewer ? 0.7 : 1
             }}
           >
-            {isViewer ? <Lock size={16} /> : <Download size={16} />} Export CSV
+            <FileDown size={15} /> Export CSV
           </button>
         </div>
       </div>

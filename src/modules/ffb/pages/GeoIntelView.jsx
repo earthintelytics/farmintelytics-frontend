@@ -5,7 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from '../utils/portalRouter';
 import { GeoJSON, LayersControl, MapContainer, TileLayer, ZoomControl, useMap, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
-import { Download, ExternalLink, RotateCcw, Search, X, Lock } from 'lucide-react';
+import { ExternalLink, RotateCcw, Search, X, FileDown } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { CONFIG } from '../config';
 import { API } from '../services/api';
@@ -430,7 +430,7 @@ export function GeoIntelView() {
               display: 'inline-flex', alignItems: 'center', gap: '6px'
             }}
           >
-            {isViewer ? <Lock size={14} /> : <Download size={14} />} Export CSV
+            <FileDown size={15} /> Export CSV
           </button>
         )}
       </div>

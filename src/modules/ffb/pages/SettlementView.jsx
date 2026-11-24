@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
-import { CalendarCheck, Search, Download, Lock, Unlock, RotateCcw, ChevronLeft, ChevronRight, AlertTriangle, Scissors, Truck, Boxes, Users } from 'lucide-react';
+import { CalendarCheck, Search, Lock, Unlock, RotateCcw, ChevronLeft, ChevronRight, AlertTriangle, Scissors, Truck, Boxes, Users, FileDown } from 'lucide-react';
 import { API } from '../services/api';
 import { useRefreshTick } from '../hooks/useRefreshTick';
 import { fmtNumber } from '../utils/formatters';
@@ -181,7 +181,7 @@ export function SettlementView() {
           </button>
           <button className="btn btn--primary" onClick={() => setExportOpen(true)} disabled={!data || loading}
             style={{ height: '42px', fontWeight: 500, fontSize: '12px', borderRadius: '10px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Download size={15} /> Export CSV
+            <FileDown size={15} /> Export CSV
           </button>
           {isSuperAdmin && current && (current.locked ? (
             <button className="btn btn--outline" disabled={busy} onClick={() => setConfirmLock('unlock')} title="Work this month out again from the approved records"

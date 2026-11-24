@@ -101,7 +101,7 @@ export default function FfbAppConnection({ tenantSlug }) {
                 }
               />
               <div className="min-w-0">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#F3F8EF] text-[#2D6A2C] text-[11px] font-medium uppercase tracking-wider mb-1">
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-[#F3F8EF] text-[#2D6A2C] text-[11px] font-medium uppercase tracking-wider mb-1">
                   <CheckCircle2 size={12} strokeWidth={1.5} /> Connected &amp; Tenant-Isolated
                 </div>
                 <h2 className="font-display text-xl font-medium text-gray-900 truncate">{pack.display_name || pack.company_id}</h2>
@@ -260,7 +260,7 @@ export default function FfbAppConnection({ tenantSlug }) {
                                 )}
                               </td>
                               <td className="px-4 py-2.5">
-                                <span className={`inline-flex px-2 py-0.5 rounded-full text-[11px] font-medium ${badge}`}>{stLabel}</span>
+                                <span className={`inline-flex px-2 py-0.5 rounded-md text-[11px] font-medium ${badge}`}>{stLabel}</span>
                               </td>
                               <td className="px-4 py-2.5 font-mono text-gray-700">{d.clerk_id || '—'}</td>
                               <td className="px-4 py-2.5 font-normal text-gray-900">{d.scans ?? 0}</td>
@@ -279,7 +279,7 @@ export default function FfbAppConnection({ tenantSlug }) {
 
             {/* Right col: Scannable Setup QR */}
             <div className="bg-white rounded-2xl border border-gray-200 p-5 flex flex-col items-center text-center space-y-3 h-fit">
-              <div className="w-9 h-9 rounded-full bg-[#F3F8EF] text-[#3F8432] flex items-center justify-center">
+              <div className="w-9 h-9 rounded-lg bg-[#F3F8EF] text-[#3F8432] flex items-center justify-center">
                 <Smartphone size={18} strokeWidth={1.5} />
               </div>
               <div>

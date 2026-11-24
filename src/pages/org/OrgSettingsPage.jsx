@@ -1,11 +1,10 @@
 import { useSearchParams } from 'react-router-dom';
-import { Building2, Code2, KeyRound, ShieldCheck, Users } from 'lucide-react';
+import { Building2, KeyRound, ShieldCheck, Users } from 'lucide-react';
 import { licensedServices } from './orgProfile';
 import OrganisationCard from './settings/OrganisationCard';
 import TeamCard from './settings/TeamCard';
 import PasswordCard from './settings/PasswordCard';
 import RolesCard from './settings/RolesCard';
-import DeveloperCard from './settings/DeveloperCard';
 
 // Each section has its own address (?section=<id>). `admin` sections are not
 // offered to analysts or viewers, and the server refuses them too (/team).
@@ -14,7 +13,6 @@ const SECTIONS = [
   { id: 'organisation', label: 'Organisation', icon: Building2 },
   { id: 'team', label: 'Team', icon: Users, admin: true },
   { id: 'roles', label: 'Roles and access', icon: ShieldCheck },
-  { id: 'developer', label: 'Developer and API', icon: Code2, api: true },
 ];
 
 /** /org/<tenant>/settings: a sidebar of sections, limited by the person's role. */
@@ -22,9 +20,8 @@ const OrgSettingsPage = ({ profile, onProfile }) => {
   const [params, setParams] = useSearchParams();
   const services = licensedServices(profile);
   const isAdmin = profile.role === 'admin';
-  // Developer and API: only for organisations with an API service (eudr-api, and later others ending -api).
-  const hasApi = (profile.modules || []).some((m) => String(m).endsWith('-api'));
-  const sections = SECTIONS.filter((s) => (!s.admin || isAdmin) && (!s.api || hasApi));
+  // Developer and API is no longer here: it is the Developer tab (OrgDeveloperPage), one of the services.
+  const sections = SECTIONS.filter((s) => !s.admin || isAdmin);
   const current = sections.find((s) => s.id === params.get('section')) || sections[0];
   const open = (id) => setParams(id === sections[0].id ? {} : { section: id }, { replace: true });
 
@@ -52,7 +49,6 @@ const OrgSettingsPage = ({ profile, onProfile }) => {
           {current.id === 'organisation' && <OrganisationCard profile={profile} services={services} canEdit={isAdmin} onLogo={(logoVersion) => onProfile({ ...profile, logoVersion })} />}
           {current.id === 'team' && isAdmin && <TeamCard profile={profile} services={services} canEdit />}
           {current.id === 'roles' && <RolesCard profile={profile} isAdmin={isAdmin} />}
-          {current.id === 'developer' && hasApi && <DeveloperCard isAdmin={isAdmin} />}
         </div>
       </div>
     </>

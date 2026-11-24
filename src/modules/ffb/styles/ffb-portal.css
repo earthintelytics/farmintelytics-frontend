@@ -182,13 +182,13 @@
 .ffb-portal .btn--primary {
   background: var(--clr-brand-primary);
   color: white;
-  box-shadow: 0 4px 6px -1px rgba(20, 76, 29, 0.15);
+  box-shadow: none;
 }
 
 .ffb-portal .btn--primary:hover {
   background: #2D6A2C;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px 0 rgba(20, 76, 29, 0.2);
+  transform: none;
+  box-shadow: none;
 }
 
 .ffb-portal .btn--outline {
@@ -252,7 +252,7 @@
   padding: 3px 10px;
   font-size: 11px;
   font-weight: 500;
-  border-radius: 999px;  /* pill shape */
+  border-radius: 6px;  /* pill shape */
   letter-spacing: 0.02em;
   white-space: nowrap;
 }
@@ -477,7 +477,7 @@
 .ffb-portal .login-input:focus {
   background: white;
   border-color: var(--clr-brand-primary);
-  box-shadow: 0 0 0 4px rgba(20, 76, 29, 0.1);
+  box-shadow: none;
 }
 
 .ffb-portal .login-btn {
@@ -592,7 +592,7 @@
   letter-spacing: 0.8px; line-height: 1.1;
 }
 .ffb-portal .sidebar-brand-sub {
-  font-size: 9px; font-weight: 400;
+  font-size: 11px; font-weight: 400;
   color: rgba(255,255,255,0.4);
   text-transform: uppercase; letter-spacing: 1.2px;
 }
@@ -653,7 +653,7 @@
   gap: 4px;
   background: rgba(0,0,0,0.1);
 }
-.ffb-portal .sidebar-version { font-size: 10px; color: rgba(255,255,255,0.25); font-weight: 400; letter-spacing: 0.5px; }
+.ffb-portal .sidebar-version { font-size: 11px; color: rgba(255,255,255,0.25); font-weight: 400; letter-spacing: 0.5px; }
 .ffb-portal .sidebar-footer-label { font-size: 11px; color: rgba(255,255,255,0.35); font-weight: 500; }
 
 /* ── Topbar ───────────────────────────────────────────────── */
@@ -707,7 +707,7 @@
   color: white; font-size: 12px; font-weight: 500;
   cursor: pointer; transition: all 0.2s;
 }
-.ffb-portal .logout-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.ffb-portal .logout-btn:hover { opacity: 0.9; transform: none; }
 
 /* ── Main content area ────────────────────────────────────── */
 .ffb-portal #main-content {
@@ -819,7 +819,7 @@
 
 .ffb-portal .kpi-card:hover {
   transform: none;
-  box-shadow: var(--shadow-hover);
+  box-shadow: none;
   border-color: var(--clr-brand-primary);
 }
 
@@ -1368,7 +1368,7 @@
 .ffb-portal .page-links { display: flex; align-items: center; gap: 4px; }
 .ffb-portal .page-link, .ffb-portal .page-nav { display: flex; align-items: center; justify-content: center; height: 38px; min-width: 38px; padding: 0 12px; border: 1px solid var(--border-subtle); background: white; border-radius: 4px; color: var(--text-main); font-size: 14px; font-weight: 400; cursor: pointer; transition: all 0.2s; }
 .ffb-portal .page-link:hover, .ffb-portal .page-nav:hover:not([disabled]) { background: var(--bg-page); border-color: var(--clr-brand-primary); color: var(--clr-brand-primary); }
-.ffb-portal .page-link--active { background: var(--clr-brand-primary); border-color: var(--clr-brand-primary); color: white !important; box-shadow: 0 4px 6px -1px rgba(22, 128, 61, 0.2); }
+.ffb-portal .page-link--active { background: var(--clr-brand-primary); border-color: var(--clr-brand-primary); color: white !important; box-shadow: none; }
 .ffb-portal .page-nav[disabled] { opacity: 0.35; cursor: not-allowed; background: #F8FAFC; }
 .ffb-portal .page-ellipsis { color: var(--text-muted); font-weight: 500; padding: 0 4px; }
 
@@ -2076,7 +2076,7 @@
 }
 
 .ffb-portal .worker-role-pill {
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.04em;
 }
 
@@ -2090,7 +2090,7 @@
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: 6px;
   border: 1px solid #e2e8f0;
   background: #f8fafc;
   color: #475569;
@@ -2204,7 +2204,7 @@
 
 .ffb-portal .worker-detail-item span {
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -2379,7 +2379,7 @@
 .ffb-portal .plot-results-pill {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
+  border-radius: 6px;
   border: 1px solid #dbe4ee;
   background: #f8fafc;
   color: #0f172a;
@@ -2447,7 +2447,7 @@
   z-index: 1;
   background: #f8fafc;
   color: #64748b;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2625,7 +2625,7 @@
 
 .ffb-portal .plot-detail-item span {
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -2768,7 +2768,7 @@
 }
 
 .ffb-portal .yield-validated-pill {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -2796,7 +2796,7 @@
   z-index: 1;
   background: #f8fafc;
   color: #64748b;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -2850,7 +2850,7 @@
 }
 
 .ffb-portal .yield-cell small {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
   margin-left: 4px;
   font-weight: 400;
@@ -2859,7 +2859,7 @@
 .ffb-portal .yield-block-pill {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
+  border-radius: 6px;
   border: 1px solid #dbe4ee;
   background: #f8fafc;
   color: #0f172a;
@@ -2875,7 +2875,7 @@
 .ffb-portal .yield-grade-pill {
   display: inline-flex;
   align-items: center;
-  border-radius: 999px;
+  border-radius: 6px;
   border: 1px solid #bbf7d0;
   background: #F3F8EF;
   color: #3F8432;
@@ -2995,7 +2995,7 @@
 
 .ffb-portal .yield-detail-item span {
   color: var(--text-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -3258,7 +3258,7 @@
 }
 
 .ffb-portal .worker-metric__label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -3585,7 +3585,7 @@
 }
 
 .ffb-portal .plot-metric__label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -3772,7 +3772,7 @@
 }
 
 .ffb-portal .km-label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -3781,7 +3781,7 @@
 }
 
 .ffb-portal .km-ai {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   color: #10b981;
   margin-top: 4px;
@@ -3799,7 +3799,7 @@
 
 /* ── Plot Section Header ─────────────────────────────────────── */
 .ffb-portal .plot-section-header {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -3977,7 +3977,7 @@ html.dark .ffb-portal .worker-card__review {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.15em;
@@ -4070,7 +4070,7 @@ html.dark .ffb-portal .worker-card__review {
 }
 
 .ffb-portal .rmetric__label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -4112,7 +4112,7 @@ html.dark .ffb-portal .worker-card__review {
 
 .ffb-portal .review-comment-input:focus {
   border-color: var(--clr-brand-primary);
-  box-shadow: 0 0 0 3px rgba(3, 67, 33, 0.05);
+  box-shadow: none;
 }
 
 .ffb-portal .review-save-btn {
@@ -4130,7 +4130,7 @@ html.dark .ffb-portal .worker-card__review {
 }
 
 .ffb-portal .review-prev-reviewer {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--text-muted);
   font-weight: 500;
   text-align: right;
@@ -4581,7 +4581,7 @@ html.dark .ffb-portal .review-comment-input {
 }
 
 .ffb-portal .pay-chip {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 750;
   padding: 3px 10px;
   border-radius: 6px;
@@ -4723,7 +4723,7 @@ html.dark .ffb-portal .review-comment-input {
 
 .ffb-portal button:focus-visible, .ffb-portal input:focus-visible, .ffb-portal select:focus-visible, .ffb-portal textarea:focus-visible, .ffb-portal a:focus-visible {
   outline: none !important;
-  box-shadow: 0 0 0 3px rgba(3, 67, 33, 0.18) !important;
+  box-shadow: none;
 }
 
 .ffb-portal #app-layout {
@@ -4746,7 +4746,7 @@ html.dark .ffb-portal .review-comment-input {
 }
 
 .ffb-portal .sidebar-brand-sub {
-  font-size: 10px !important;
+  font-size: 11px !important;
   opacity: 0.7;
 }
 
@@ -4907,7 +4907,7 @@ html.dark .ffb-portal .review-comment-input {
 
 .ffb-portal .btn--primary:hover {
   background: #106b34 !important;
-  transform: translateY(-1px);
+  transform: none;
 }
 
 .ffb-portal .btn--outline {
@@ -5123,7 +5123,7 @@ html.dark .ffb-portal .review-comment-input {
 }
 
 .ffb-portal .badge, .ffb-portal .role-badge, .ffb-portal .role-pill, .ffb-portal .workers-results-pill, .ffb-portal .plot-results-pill, .ffb-portal .yield-grade-pill, .ffb-portal .yield-block-pill, .ffb-portal .yield-validated-pill, .ffb-portal .plot-id-pill, .ffb-portal .worker-source-chip {
-  border-radius: 999px !important;
+  border-radius: 6px !important;
   padding: 3px 10px !important;
   border: 1px solid transparent;
   font-size: 11px !important;
@@ -5209,7 +5209,7 @@ html.dark .ffb-portal .review-comment-input {
   justify-content: center;
   min-width: 40px;
   padding: 4px 10px;
-  border-radius: 999px;
+  border-radius: 6px;
   border: 1px solid transparent;
   font-size: 11px;
   font-weight: 650;
@@ -5267,7 +5267,7 @@ html.dark .ffb-portal .review-comment-input {
 }
 
 .ffb-portal .review-card__thumb::after {
-  font-size: 10px !important;
+  font-size: 11px !important;
   letter-spacing: 0.08em !important;
   background: rgba(16, 33, 26, 0.56) !important;
 }
@@ -5304,7 +5304,7 @@ html.dark .ffb-portal .review-comment-input {
 }
 
 .ffb-portal .rmetric__label {
-  font-size: 9px !important;
+  font-size: 11px !important;
   font-weight: 400 !important;
   letter-spacing: 0.04em !important;
 }
@@ -5384,7 +5384,7 @@ html.dark .ffb-portal .review-comment-input {
 }
 
 .ffb-portal .map-legend__title {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -5544,7 +5544,7 @@ html.dark .ffb-portal .review-comment-input {
 
 .ffb-portal .map-super-popup__badge {
   padding: 4px 12px;
-  border-radius: 999px;
+  border-radius: 6px;
   font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
@@ -5609,7 +5609,7 @@ html.dark .ffb-portal .review-comment-input {
 
 .ffb-portal .map-super-popup__subtitle {
   margin-top: 2px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -5633,11 +5633,11 @@ html.dark .ffb-portal .review-comment-input {
   position: absolute;
   top: 8px;
   right: 8px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: rgba(16, 33, 26, 0.72);
   color: #ffffff;
   padding: 2px 8px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 400;
   letter-spacing: 0.02em;
 }
@@ -5672,7 +5672,7 @@ html.dark .ffb-portal .review-comment-input {
 }
 
 .ffb-portal .map-super-popup__metric-label {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 650;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -5835,7 +5835,7 @@ html.dark .ffb-portal .review-comment-input {
 }
 
 .ffb-portal .auth-shell label {
-  font-size: 10px !important;
+  font-size: 11px !important;
   font-weight: 650 !important;
   letter-spacing: 0.05em;
 }
@@ -6035,7 +6035,7 @@ html.dark .ffb-portal .review-comment-input {
 
 .ffb-portal .table-entries-bar__left select:focus {
   border-color: var(--clr-brand-primary);
-  box-shadow: 0 0 0 3px rgba(3, 67, 33, 0.1);
+  box-shadow: none;
 }
 
 .ffb-portal .table-entries-bar__right {
@@ -6204,7 +6204,7 @@ html.dark .ffb-portal .review-comment-input {
 
 .ffb-portal .col-filter-input:focus {
   border-color: var(--clr-brand-primary, #3F8432);
-  box-shadow: 0 0 0 2px rgba(3, 67, 33, 0.12);
+  box-shadow: none;
 }
 
 html.dark .ffb-portal .col-filter-input {
@@ -6533,7 +6533,7 @@ html.dark .ffb-portal .col-filter-input:focus {
 .ffb-portal .review-action--reject { background: #ef4444 !important; border-color: #ef4444 !important; }
 .ffb-portal .review-action--map { background: #eab308 !important; border-color: #eab308 !important; color: #1f2937 !important; }
 /* Map Audit: the platforms of the audited plot, labelled */
-.ffb-portal .platform-label { background: rgba(15, 23, 42, 0.75) !important; color: white !important; border: none !important; box-shadow: none !important; font-size: 10px !important; font-weight: 500; padding: 1px 4px !important; }
+.ffb-portal .platform-label { background: rgba(15, 23, 42, 0.75) !important; color: white !important; border: none !important; box-shadow: none !important; font-size: 11px !important; font-weight: 500; padding: 1px 4px !important; }
 .ffb-portal .platform-label--focus { background: #facc15 !important; color: #0f172a !important; font-size: 12px !important; }
 .ffb-portal .platform-label::before { display: none !important; }
 .ffb-portal .hide-platform-labels .platform-label:not(.platform-label--focus) { display: none !important; }
@@ -7055,7 +7055,7 @@ html.dark .ffb-portal .export-modal-footer { background: #151e1a; border-top-col
 
 /* Estate shown in the top bar */
 .ffb-portal .topbar-estate { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 500; color: #3F8432; background: transparent; padding: 8px 14px; border-radius: 8px; white-space: nowrap; }
-.ffb-portal .topbar-estate__label { color: #0f172a; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; font-size: 10px; }
+.ffb-portal .topbar-estate__label { color: #0f172a; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em; font-size: 11px; }
 
 .ffb-portal .admin-sidebar__logo { height: 44px; width: auto; flex: 0 0 auto; }
 
@@ -7165,7 +7165,7 @@ html.dark .ffb-portal .export-modal-footer { background: #151e1a; border-top-col
 }
 
 .ffb-portal .sidebar-group-label {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -7336,3 +7336,6 @@ html.dark .ffb-portal .export-modal-footer { background: #151e1a; border-top-col
 .ffb-portal td, .ffb-portal p, .ffb-portal li, .ffb-portal span {
   font-weight: inherit;
 }
+
+/* Owner's UI rules (24 Nov 2026): cards and buttons do not lift on hover, nothing glows. */
+.ffb-portal .card:hover, .ffb-portal .stat-card:hover, .ffb-portal [class*="card"]:hover { transform: none !important; }

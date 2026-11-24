@@ -23,6 +23,7 @@ export const paths = {
   orgHub: (tenant) => `/org/${enc(tenant)}`,
   orgSettings: (tenant) => `/org/${enc(tenant)}/settings`,
   orgField: (tenant) => `/org/${enc(tenant)}/field`,
+  orgDeveloper: (tenant) => `/org/${enc(tenant)}/developer`,
   orgLogin: (tenant) => `/org/${enc(tenant)}/login`,
   serviceLogin: (id) => `/login?module=${enc(id)}`,
   tool: (id) => `/tools/${enc(id)}`,

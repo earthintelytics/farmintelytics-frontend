@@ -2,15 +2,7 @@ import { getRole } from '../utils/access';
 import { useRefreshTick } from '../hooks/useRefreshTick';
 import { WORKER_ICON, FFB_ICON, WEIGHT_ICON, UNRIPE_ICON, ROTTEN_ICON } from '../utils/icons';
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import {
-  UserCheck,
-  Search,
-  RotateCcw,
-  Download,
-  Columns,
-  ChevronDown,
-  Lock,
-} from 'lucide-react';
+import { UserCheck, Search, RotateCcw, Columns, ChevronDown, Lock, FileDown } from 'lucide-react';
 import { API } from '../services/api';
 
 import { fmtDate, fmtNumber } from '../utils/formatters';
@@ -609,7 +601,7 @@ export function ApprovedWorkersView() {
                 background: '#94a3b8', borderColor: '#94a3b8', cursor: 'not-allowed', opacity: 0.7
               }}
             >
-              <Lock size={15} /> Export CSV
+              <FileDown size={15} /> Export CSV
             </button>
           ) : (
             <button
@@ -623,7 +615,7 @@ export function ApprovedWorkersView() {
                 cursor: 'pointer'
               }}
             >
-              <Download size={15} /> Export CSV
+              <FileDown size={15} /> Export CSV
             </button>
           )}
         </div>

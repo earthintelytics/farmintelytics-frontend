@@ -1,7 +1,7 @@
 import { exportFileName } from '../utils/exportName';
 import { useState, useMemo } from 'react';
 import { usePageScroll } from '../hooks/usePageScroll';
-import { RotateCcw, Download, Search, Lock } from 'lucide-react';
+import { RotateCcw, Search, FileDown } from 'lucide-react';
 import { fmtNumber } from '../utils/formatters';
 import { useAppContext } from '../context/AppContext';
 import ExportColumnsModal from '../components/ExportColumnsModal';
@@ -237,7 +237,7 @@ export function BunchWeightView({ onBack }) {
               opacity: isViewer ? 0.7 : 1
             }}
           >
-            {isViewer ? <Lock size={15} /> : <Download size={15} />} Export CSV
+            <FileDown size={15} /> Export CSV
           </button>
         </div>
       </div>

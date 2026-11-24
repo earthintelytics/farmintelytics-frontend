@@ -7,7 +7,7 @@ import { ArrowUpRight, Mail, Smartphone } from 'lucide-react';
  */
 const COLUMNS = [
   { title: 'Services', links: [['Crop health and growth', '/docs'], ['Water and weather', '/docs'], ['EUDR deforestation check', '/docs'], ['Land suitability', '/docs'], ['Farmer groups', '/docs']] },
-  { title: 'Company', links: [['Trust centre', '/trust'], ['Policies', '/policies'], ['Guide', '/docs'], ['Contact', '/contact']] },
+  { title: 'Company', links: [['Pricing', '/pricing'], ['Trust centre', '/trust'], ['Policies', '/policies'], ['Guide', '/docs'], ['Contact', '/contact']] },
   { title: 'Developers', links: [['API reference', '/public-api/v1/redoc', true], ['Try it in Swagger', '/public-api/v1/docs', true], ['Developer guide', '/developers']] },
 ];
 

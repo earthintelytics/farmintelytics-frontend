@@ -612,6 +612,22 @@ export async function toggleProtectedArea(id) {
   return adminFetch(`/protected-areas/${id}/toggle`, { method: 'POST' });
 }
 
+/** The WDPA as a GeoParquet, uploaded in parts (backend monitoring/services/wdpa_upload.py). */
+export async function startWdpaUpload(payload) {
+  return adminFetch('/protected-areas/wdpa/uploads', { method: 'POST', body: JSON.stringify(payload) });
+}
+export async function uploadWdpaPart(uploadId, n, blob) {
+  const fd = new FormData();
+  fd.append('part', blob, `part-${n}`);
+  return adminUpload(`/protected-areas/wdpa/uploads/${uploadId}/parts/${n}`, fd);
+}
+export async function completeWdpaUpload(uploadId) {
+  return adminFetch(`/protected-areas/wdpa/uploads/${uploadId}/complete`, { method: 'POST' });
+}
+export async function fetchWdpaReleases() {
+  return rawAdminFetch('/protected-areas/wdpa/releases');
+}
+
 export async function uploadWdpaZip(file, sourceVersion = 'Oct2026', marginKm = 50.0) {
   const fd = new FormData();
   fd.append('file', file);

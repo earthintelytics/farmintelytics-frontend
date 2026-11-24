@@ -4,21 +4,7 @@ import { exportFileName } from '../utils/exportName';
 import { useState, useMemo, useEffect, useCallback } from 'react';
 
 import { fmtNumber, fmtRole } from '../utils/formatters';
-import {
-  Wallet,
-  CheckCircle2,
-  Circle,
-  Search,
-  Calendar,
-  Banknote,
-  Users,
-  Receipt,
-  RotateCcw,
-  Download,
-  ShieldCheck,
-  Lock,
-  ListFilter,
-} from 'lucide-react';
+import { Wallet, CheckCircle2, Circle, Search, Calendar, Banknote, Users, Receipt, RotateCcw, ShieldCheck, Lock, ListFilter, FileDown } from 'lucide-react';
 import { API } from '../services/api';
 import { useNavigate } from '../utils/portalRouter';
 import ExportColumnsModal from '../components/ExportColumnsModal';
@@ -312,7 +298,7 @@ export function PaymentAggregationView() {
               opacity: isViewer ? 0.7 : 1
             }}
           >
-            {isViewer ? <Lock size={16} /> : <Download size={16} />} Export CSV
+            <FileDown size={15} /> Export CSV
           </button>
         </div>
       </div>
