@@ -1,6 +1,7 @@
 import { useRefreshTick } from '../hooks/useRefreshTick';
 import { EstateOptions } from '../components/EstateOptions';
 import { FFB_ICON, WEIGHT_ICON, PLOT_ICON } from '../utils/icons';
+import Sparkline from '../components/Sparkline';
 import { useMemo, useState, useEffect } from 'react';
 import { useAppContext } from '../context/AppContext';
 import { ROLES } from '../utils/constants';
@@ -100,12 +101,14 @@ export function DashboardView() {
     const plotTotal = dashboardCards.reduce((s, o) => s + (o.total_plot || 0), 0);
 
     return [
-      { id: 'kpi-bunches', title: 'Verified FFB Bunches', value: fmtNumber(bunchesTotal), sub: 'AI-counted bunches harvested', icon: FFB_ICON },
-      { id: 'kpi-weight', title: 'Loose Fruit Tonnage', value: `${fmtNumber(weightTotal)} kg`, sub: 'Collected loose fruit weight', icon: WEIGHT_ICON },
+      { id: 'kpi-bunches', title: 'Verified FFB Bunches', value: fmtNumber(bunchesTotal), sub: 'AI-counted bunches harvested', icon: FFB_ICON,
+        trend: { values: dashboardSummary.bunches.map((d) => d.total_harvested_count || 0), dates: dashboardSummary.bunches.map((d) => d.date_from), color: '#3F8432', label: 'Bunches a day' } },
+      { id: 'kpi-weight', title: 'Loose Fruit Tonnage', value: `${fmtNumber(weightTotal)} kg`, sub: 'Collected loose fruit weight', icon: WEIGHT_ICON,
+        trend: { values: dashboardSummary.weight.map((d) => d.h_total_weight_kg || 0), dates: dashboardSummary.weight.map((d) => d.date_from), color: '#E8732C', unit: 'kg', label: 'Loose fruit a day' } },
       { id: 'kpi-plots', title: 'Active Harvest Blocks', value: fmtNumber(plotTotal), sub: 'Blocks with recorded output', icon: PLOT_ICON },
       { id: 'kpi-total-plots', title: 'Mapped Estate Blocks', value: fmtNumber(totalPlotsCount), sub: filters.estate || 'Total plantation coverage', icon: PLOT_ICON },
     ];
-  }, [dashboardCards, totalPlotsCount, filters.estate]);
+  }, [dashboardCards, dashboardSummary, totalPlotsCount, filters.estate]);
 
   const aggregatedBunches = useMemo(() => {
     const grouped = (dashboardSummary.bunches || []).reduce((acc, d) => {
@@ -396,6 +399,7 @@ export function DashboardView() {
                     </div>
                   )}
                 </div>
+                {k.trend && <Sparkline {...k.trend} />}
               </div>
             ))}
           </div>
