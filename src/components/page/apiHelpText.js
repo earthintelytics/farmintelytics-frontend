@@ -16,7 +16,7 @@ export const API_ADMIN_GUIDE = {
     { title: 'What each plan setting means', points: [
       ['Price per hectare', 'What one hectare checked costs, in naira. A plot under a hectare costs its fraction (0.4 ha = 0.4 × the price).'],
       ['Most plots in one request', 'A larger file is refused; the client splits it. The price does not change with the number of plots.'],
-      ['Free test hectares a day', 'How many hectares test keys can check each day, free.'],
+      ['Free tests', 'Per client account, in total (not a day): a number of test requests, each up to a number of hectares, and hectares in all (10 requests, 1 ha each, 10 ha by default).'],
       ['Warn the client below', 'When the wallet falls under this, one email goes to the billing contact. The next one goes only after a top-up.'],
     ] },
     { title: 'Priced by area, so it cannot be bypassed', points: [
@@ -30,7 +30,7 @@ export const API_ADMIN_GUIDE = {
       ['Never charged', 'Plots the EU rules refuse, test keys, failed checks, and a repeated request with the same Idempotency-Key.'],
     ] },
     { title: 'Keys', points: [
-      ['Test key (fi_test_…)', 'Runs the same real check, free, up to the plan\'s test hectares a day. For building the integration.'],
+      ['Test key (fi_test_…)', 'Runs the same real check, free: 10 test requests per account, each up to 1 ha. For building the integration.'],
       ['Live key (fi_live_…)', 'Charged. Give it when the client is ready.'],
       'A key is shown once, when made: send it safely. We keep only a fingerprint, so a lost key is revoked and replaced, never recovered.',
       'Revoking stops the key at once. Suspending the client stops all its keys.',
@@ -63,7 +63,7 @@ export const API_CLIENT_GUIDE = {
       ['Low balance', 'If your plan has a warning level, we email your billing contact once when the balance falls below it.'],
     ] },
     { title: 'Your keys', points: [
-      ['Test key', 'Runs the same real check, free, up to the daily test hectares. Build with this first.'],
+      ['Test key', 'Runs the same real check, free: 10 test requests in all, each up to 1 ha. Build with this first.'],
       ['Live key', 'Charged. Use it once your integration works.'],
       'Keys are shown once. Keep them on your server, never in a website or app people can download.',
       'Rotate a key to replace it (the old one stops at once); revoke a key you no longer use.',
@@ -101,7 +101,9 @@ export const API_FIELD_HELP = {
   planName: 'A name for the team only, for example "Standard" or "Exporter volume". Clients see it on their statement.',
   price: 'What one hectare checked costs, in naira. A request costs the total area of its plots × this price; 0.4 ha costs 0.4 of it.',
   maxPlots: 'The most plots one request may hold. A larger file is refused and the client splits it; the price does not change.',
-  testHa: 'Hectares a client may check free each day with a test key, to build its integration.',
+  testHa: 'Hectares a client may check free with test keys, in total (not a day).',
+  testRequests: 'How many test requests a client account gets in total (not a day). After that, live keys only.',
+  testPerRequest: 'The most hectares one test request may cover; a larger test request is refused (test_request_too_large).',
   warnBelow: 'When the wallet falls under this amount, one email goes to the billing contact; the next only after a top-up. 0: no warning.',
   notes: 'For the team only; the client never sees it.',
   organisation: 'The client: an existing organisation, or a new one made from its name. Its API service is switched on in its licence.',
@@ -114,7 +116,7 @@ export const API_FIELD_HELP = {
   reference: 'Leave empty and one is made for you (TOP-FI-…). If the bank gave its own reference, type that instead so the statement matches the bank.',
   moneyNote: 'Why this entry was made, for the statement, for example "Bank transfer of 24 Nov".',
   keyName: 'A name to recognise the key by, for example "ERP server" or "Sandbox". It is not secret.',
-  keyMode: 'Test: free, up to the daily test hectares, for building. Live: charged from the wallet.',
+  keyMode: 'Test: free, 10 requests in all, each up to 1 ha, for building. Live: charged from the wallet.',
   callback: 'An https address on the public internet. When a check finishes we POST the result there, signed with your secret.',
   paymentReference: 'Quote this on every bank transfer to this wallet, so the money is credited to the right account.',
 };

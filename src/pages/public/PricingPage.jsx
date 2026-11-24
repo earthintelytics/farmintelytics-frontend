@@ -22,7 +22,7 @@ const rulesFor = (PRICE_PER_HA) => [
   { icon: MapPin, title: 'Every plot is a polygon', text: 'Each plot is sent as its boundary and counts as measured, so the area, and the price, are exact. Single GPS points are not accepted.' },
   { icon: Wallet, title: 'From a prepaid wallet', text: 'Top up by bank transfer, quoting your payment reference. Checks draw on the wallet.' },
   { icon: ShieldCheck, title: 'Held, then charged for what was checked', text: 'Sending a check holds its cost. When it finishes, only the area really checked is charged; the rest goes back to your wallet.' },
-  { icon: KeyRound, title: 'Build for free', text: 'Test keys run the same real check, free, up to your free test hectares every day. Pay only when you go live.' },
+  { icon: KeyRound, title: 'Build for free', text: 'Test keys run the same real check, free: 10 test requests per account, each up to 1 ha. Pay only when you go live.' },
 ];
 
 const NEVER = ['Validating your file against the EU rules', 'Plots the EU rules refuse', 'Checks that fail', 'Test keys', 'A repeated request with the same Idempotency-Key'];

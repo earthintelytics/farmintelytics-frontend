@@ -21,12 +21,13 @@ import { API_ADMIN_GUIDE, API_FIELD_HELP as H, API_MODAL_HELP } from '../../comp
  * statement. No monthly fees or invoices (api_platform/pricing.py). Prices and money can only be changed by a team owner (the server refuses the others too).
  */
 const BLANK_PLAN = { product: 'eudr-check', name: '', price: '', max_units_per_request: 1000,
-  test_units_per_day: 50, low_balance_alert: '0', active: true, public: false, notes: '' };
+  test_units_per_day: 10, test_max_requests: 10, test_max_ha_per_request: 1, low_balance_alert: '0', active: true, public: false, notes: '' };
 
 function planPayload(f) {
   return { product: f.product, name: f.name.trim(), price_per_unit_minor: toMinor(f.price), monthly_fee_minor: 0,
     included_units_per_month: 0, max_units_per_request: +f.max_units_per_request || 1000,
-    test_units_per_day: +f.test_units_per_day || 0, low_balance_alert_minor: toMinor(f.low_balance_alert || 0), currency: 'NGN',
+    test_units_per_day: +f.test_units_per_day || 0, test_max_requests: +f.test_max_requests || 0,
+    test_max_ha_per_request: +f.test_max_ha_per_request || 1, low_balance_alert_minor: toMinor(f.low_balance_alert || 0), currency: 'NGN',
     default_billing: 'prepaid', active: !!f.active, public: !!f.public, notes: f.notes || '' };
 }
 
@@ -50,7 +51,9 @@ function PlanModal({ plan, products, onClose, onSaved }) {
         <Field label="Plan name" help={H.planName}><input className={inputCls} value={f.name} onChange={set('name')} placeholder="e.g. Standard" /></Field>
         <Field label="Price per hectare (₦)" help={H.price}><input className={inputCls} value={f.price} onChange={set('price')} inputMode="decimal" /></Field>
         <Field label="Most plots in one request" help={H.maxPlots}><input type="number" min="1" className={inputCls} value={f.max_units_per_request} onChange={set('max_units_per_request')} /></Field>
-        <Field label="Free test hectares a day" help={H.testHa}><input type="number" min="0" className={inputCls} value={f.test_units_per_day} onChange={set('test_units_per_day')} /></Field>
+        <Field label="Free test requests in total" help={H.testRequests}><input type="number" min="0" className={inputCls} value={f.test_max_requests} onChange={set('test_max_requests')} /></Field>
+        <Field label="Hectares per test request" help={H.testPerRequest}><input type="number" min="0.1" step="0.1" className={inputCls} value={f.test_max_ha_per_request} onChange={set('test_max_ha_per_request')} /></Field>
+        <Field label="Free test hectares in total" help={H.testHa}><input type="number" min="0" className={inputCls} value={f.test_units_per_day} onChange={set('test_units_per_day')} /></Field>
         <Field label="Warn the client below (₦)" help={H.warnBelow}><input className={inputCls} value={f.low_balance_alert} onChange={set('low_balance_alert')} inputMode="decimal" /></Field>
         <Field label="Notes" help={H.notes}><input className={inputCls} value={f.notes} onChange={set('notes')} /></Field>
       </div>
@@ -277,13 +280,13 @@ export default function ApiClients() {
           {d.plans.length === 0 ? <Empty>No plans yet. A plan sets the price per hectare for a product.</Empty> : (
             <Card className="overflow-x-auto">
               <table className="w-full text-sm min-w-[720px]">
-                <thead><tr className="text-left text-gray-500 border-b border-gray-200"><th className="px-5 py-3 font-medium">Plan</th><th className="px-5 py-3 font-medium text-right">Price per hectare</th><th className="px-5 py-3 font-medium">Most plots per request</th><th className="px-5 py-3 font-medium">Free test ha a day</th><th className="px-5 py-3 font-medium">Clients</th></tr></thead>
+                <thead><tr className="text-left text-gray-500 border-b border-gray-200"><th className="px-5 py-3 font-medium">Plan</th><th className="px-5 py-3 font-medium text-right">Price per hectare</th><th className="px-5 py-3 font-medium">Most plots per request</th><th className="px-5 py-3 font-medium">Free tests</th><th className="px-5 py-3 font-medium">Clients</th></tr></thead>
                 <tbody className="divide-y divide-gray-100">
                   {d.plans.map((p) => (
                     <tr key={p.id} className={owner ? 'hover:bg-gray-50 cursor-pointer' : ''} onClick={() => owner && setPlanModal(p)}>
                       <td className="px-5 py-3"><p className="font-semibold">{p.name}</p><p className="text-xs text-gray-500">{p.product_name}{p.active ? '' : ' · not offered'}{p.public ? ' · on the pricing page' : ''}</p></td>
                       <td className="px-5 py-3 text-right font-mono">{naira(p.price_per_unit_minor)}</td>
-                      <td className="px-5 py-3">{p.max_units_per_request}</td><td className="px-5 py-3">{p.test_units_per_day}</td><td className="px-5 py-3">{p.clients}</td>
+                      <td className="px-5 py-3">{p.max_units_per_request}</td><td className="px-5 py-3">{p.test_max_requests} × {p.test_max_ha_per_request} ha ({p.test_units_per_day} ha)</td><td className="px-5 py-3">{p.clients}</td>
                     </tr>
                   ))}
                 </tbody>

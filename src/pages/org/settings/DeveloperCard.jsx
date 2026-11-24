@@ -81,7 +81,8 @@ export default function DeveloperCard({ isAdmin }) {
               <div key={p.code} className="rounded-xl border border-gray-200 p-4 text-sm flex flex-wrap items-center gap-x-6 gap-y-1">
                 <span className="font-semibold text-gray-900">{p.name}</span>
                 <span>{naira(p.price_per_unit_minor, p.currency)} per hectare</span>
-                <span className="text-gray-500">Up to {p.max_units_per_request} plots per request · {p.test_units_per_day} free test hectares a day</span>
+                <span className="text-gray-500">Up to {p.max_units_per_request} plots per request · Free tests: {p.test_max_requests} requests of up to {p.test_max_ha_per_request} ha ({p.test_units_per_day} ha in all)</span>
+                {p.test_used && <span className="text-gray-700 font-medium">{p.test_used.requests} of {p.test_max_requests} test requests used, {Number(p.test_used.hectares).toFixed(2)} of {p.test_units_per_day} ha</span>}
               </div>
             ))}
           </div>
@@ -91,7 +92,7 @@ export default function DeveloperCard({ isAdmin }) {
       </Card>
 
       <Card>
-        <CardHeader title="API keys" text="Test keys (fi_test_…) run the same real checks, free, up to the daily limit. Live keys (fi_live_…) are charged." />
+        <CardHeader title="API keys" text="Test keys (fi_test_…) run the same real checks, free: 10 test requests in all, each up to 1 ha. Live keys (fi_live_…) are charged from your wallet." />
         <div className="p-6 space-y-4">
           {shown && <Secret label={shown.label} value={shown.value} />}
           <div className="divide-y divide-gray-100">

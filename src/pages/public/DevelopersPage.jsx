@@ -161,7 +161,7 @@ export default function DevelopersPage() {
             <H2 id="quickstart" kicker="Quickstart" text="Four calls from a test key to a result.">From zero to a result</H2>
             <ol className="grid gap-4 sm:grid-cols-2">
               {[
-                ['1', 'Get a test key', 'We set up your account and send a fi_test_ key. Test keys run the real check, free, up to a daily number of plots.'],
+                ['1', 'Get a test key', 'We set up your account and send a fi_test_ key. Test keys run the real check, free: 10 test requests, each up to 1 ha.'],
                 ['2', 'Validate your file', 'POST /eudr/validate tells you, plot by plot, what the EU rules would refuse and why. It costs nothing.'],
                 ['3', 'Send the plots', 'POST /eudr/checks or /suitability/checks answers 202 with a check id. Send an Idempotency-Key so a retry is never run twice.'],
                 ['4', 'Read the result', 'Poll GET …/checks/{id} until status is done, or let us call your webhook. Most checks finish in seconds to minutes.'],
