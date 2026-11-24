@@ -13,8 +13,8 @@
  *              forms, submissions, group-carbon, eudr-passport
  *   analytics  sub-tabs of the Overview page (overview, vigor-health,
  *              moisture-et, et-log, water-management, soil-nutrients)
- *   topTabs    CORE_TABS (Monitor, Reports, Assistant); services that back a claim someone else checks
- *              (EUDR, carbon, restoration) add Verification: CLAIM_TABS
+ *   topTabs    CORE_TABS: Monitor, Reports, Assistant. No service has a Verification tab (owner, 24 Nov 2026):
+ *              EUDR results live on the EUDR service's own pages (Plot register, Deforestation check).
  *
  * The backend catalogue (GET /crop-monitoring/catalogue/{id}, WORK_SPLIT.md)
  * has the same shape and replaces this copy when it is live.
@@ -46,7 +46,7 @@ export const SERVICE_CATALOG = {
       { id: 'overview', label: 'Overview' },
       { id: 'vigor-health', label: 'Biomass and growth' },
     ],
-    topTabs: CLAIM_TABS,
+    topTabs: CORE_TABS,
   },
   'forestry-intel': {
     title: 'Forestry intelligence',
@@ -108,7 +108,7 @@ export const SERVICE_CATALOG = {
       { id: 'vigor-health', label: 'Vegetation recovery' },
       { id: 'moisture-et', label: 'Moisture' },
     ],
-    topTabs: CLAIM_TABS,
+    topTabs: CORE_TABS,
   },
   'eudr-check': {
     title: 'EUDR check',
@@ -135,7 +135,7 @@ export const SERVICE_CATALOG = {
     analytics: [
       { id: 'overview', label: 'Overview' },
     ],
-    topTabs: CLAIM_TABS,
+    topTabs: CORE_TABS,
   },
 
   // ── Field advisory ────────────────────────────────────────────────────────
@@ -215,7 +215,7 @@ export const SERVICE_CATALOG = {
       { id: 'overview', label: 'Overview' },
       { id: 'vigor-health', label: 'Biomass and growth' },
     ],
-    topTabs: CLAIM_TABS,
+    topTabs: CORE_TABS,
   },
   'smallholder-eudr': {
     title: 'EUDR passport',
@@ -229,7 +229,7 @@ export const SERVICE_CATALOG = {
       { id: 'alerts', label: 'Deforestation alerts' },
     ],
     analytics: [{ id: 'overview', label: 'Overview' }],
-    topTabs: CLAIM_TABS,
+    topTabs: CORE_TABS,
   },
 
   // ── Engine ────────────────────────────────────────────────────────────────
