@@ -5,6 +5,7 @@ import { SERVICE_GROUPS } from '../../../constants/servicePhotos';
 import { ALL_CROPS, inputCls } from '../../components/formHelpers';
 import { CROP_LABELS } from '../../components/orgConstants';
 import { Button, Field, Note, Toggle } from '../../components/ui';
+import OrgSubscription from './OrgSubscription';
 
 /**
  * What the organisation is licensed for: services, crops, how many accounts
@@ -51,6 +52,7 @@ const OrgLicence = ({ org, onSaved }) => {
 
   return (
     <div className="space-y-6">
+      <OrgSubscription org={org} />
       <div className="rounded-xl border border-gray-200 bg-white p-4 space-y-3">
         <p className="text-sm font-semibold text-gray-800">Accounts the licence allows</p>
         <div className="flex items-end gap-3">

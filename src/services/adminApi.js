@@ -661,3 +661,14 @@ export async function sendTestSystemAlert(message = '') {
 export async function fetchStorageUsage(refresh = false) {
   return adminFetch(`/system-status/storage${refresh ? '?refresh=true' : ''}`);
 }
+
+// ── Monthly subscriptions by size (crop monitoring per hectare a month) ─────────────────────────
+export async function fetchSubscriptionPrices() {
+  return adminFetch('/subscription-prices');
+}
+export async function updateSubscriptionPrice(code, data) {
+  return adminFetch(`/subscription-prices/${encodeURIComponent(code)}`, { method: 'PUT', body: JSON.stringify(data) });
+}
+export async function fetchSubscriptionEstimate(orgId) {
+  return adminFetch(`/organizations/${orgId}/subscription-estimate`);
+}
