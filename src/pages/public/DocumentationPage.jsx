@@ -96,7 +96,7 @@ export default function DocumentationPage() {
   const idx = TUTORIALS.findIndex((t) => t.id === active.id);
   const next = idx >= 0 ? TUTORIALS[idx + 1] : null;
   return (
-    <PublicLayout eyebrow="Guide" title="How FarmIntelytics works" wide
+    <PublicLayout eyebrow="Guide" title="How FarmIntelytics works" wide image="/crops/hero/field_logs.webp" imageAlt="Two farmers tending maize and vegetables on their smallholding"
       intro="What each part of the platform does, where its numbers come from, and step-by-step tutorials for everyday tasks.">
       <CapsuleTabs label="Guide sections" active={section} onChange={switchSection}
         tabs={[{ id: 'learn', label: 'Learn' }, { id: 'tutorials', label: 'Tutorials' }]} />

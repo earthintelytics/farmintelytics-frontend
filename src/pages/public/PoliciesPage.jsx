@@ -110,7 +110,7 @@ export default function PoliciesPage() {
   const active = TABS.find((t) => t.id === params.get('tab')) || TABS[0];
   const { Body } = active;
   return (
-    <PublicLayout eyebrow="Policies" title={active.title} intro={active.intro} aside={<PageAside sections={active.sections} />}>
+    <PublicLayout eyebrow="Policies" title={active.title} image="/crops/hero/advisor.webp" imageAlt="A farmer among young plants in a nursery" intro={active.intro} aside={<PageAside sections={active.sections} />}>
       <CapsuleTabs label="Policies" tabs={TABS} active={active.id} onChange={(id) => setParams({ tab: id })} />
       <div className="mt-10"><Body /></div>
     </PublicLayout>

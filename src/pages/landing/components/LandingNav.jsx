@@ -1,11 +1,16 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Menu, Smartphone, X } from 'lucide-react';
 import { paths, sessionTenant } from '../../../routes/paths';
 import { hasValidTeamToken } from '../../../services/session';
 
 const LandingNav = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  // The menu item of the page in view is green (desktop: with a green underline; phone: a green row).
+  const on = (path) => pathname === path || pathname.startsWith(`${path}/`);
+  const deskCls = (path) => `py-1 border-b-2 transition-colors ${on(path) ? 'border-[var(--brand-primary)] text-[var(--brand-primary)] font-semibold' : 'border-transparent hover:text-[var(--brand-primary)]'}`;
+  const mobCls = (path) => `text-left py-2.5 px-3 rounded transition-colors ${on(path) ? 'bg-[#EEF6EC] text-[var(--brand-primary-dark)] font-semibold' : 'hover:bg-slate-50 hover:text-[var(--brand-primary)]'}`;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // "Sign in" takes someone already signed in on this browser straight to their dashboard.
   const tenant = sessionTenant();
@@ -30,19 +35,19 @@ const LandingNav = () => {
 
           {/* Desktop Navigation Links */}
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
-            <button onClick={() => handleNav('/trust')} className="hover:text-[var(--brand-primary)] transition-colors">
+            <button onClick={() => handleNav('/trust')} aria-current={on('/trust') ? 'page' : undefined} className={deskCls('/trust')}>
               Trust centre
             </button>
-            <button onClick={() => handleNav('/policies')} className="hover:text-[var(--brand-primary)] transition-colors">
+            <button onClick={() => handleNav('/policies')} aria-current={on('/policies') ? 'page' : undefined} className={deskCls('/policies')}>
               Policies
             </button>
-            <button onClick={() => handleNav('/docs')} className="hover:text-[var(--brand-primary)] transition-colors">
+            <button onClick={() => handleNav('/docs')} aria-current={on('/docs') ? 'page' : undefined} className={deskCls('/docs')}>
               Guide
             </button>
-            <button onClick={() => handleNav('/developers')} className="hover:text-[var(--brand-primary)] transition-colors">
+            <button onClick={() => handleNav('/developers')} aria-current={on('/developers') ? 'page' : undefined} className={deskCls('/developers')}>
               Developers
             </button>
-            <button onClick={() => handleNav('/contact')} className="hover:text-[var(--brand-primary)] transition-colors">
+            <button onClick={() => handleNav('/contact')} aria-current={on('/contact') ? 'page' : undefined} className={deskCls('/contact')}>
               Contact
             </button>
           </nav>
@@ -52,7 +57,7 @@ const LandingNav = () => {
         <div className="flex items-center gap-2 sm:gap-3">
           {(
             <a href="/app" onClick={(e) => { e.preventDefault(); handleNav('/app'); }}
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-[#D8EBD3] bg-[#EEF6EC] px-3.5 py-1.5 text-sm font-semibold text-[var(--brand-primary-dark)] hover:bg-[#E2F0DE] transition-colors">
+              className={`hidden sm:inline-flex items-center gap-1.5 rounded-xl border px-3.5 py-1.5 text-sm font-semibold transition-colors ${on('/app') ? 'border-[var(--brand-primary)] bg-[var(--brand-primary)] text-white' : 'border-[#D8EBD3] bg-[#EEF6EC] text-[var(--brand-primary-dark)] hover:bg-[#E2F0DE]'}`}>
               <Smartphone size={15} />Get the app
             </a>
           )}
@@ -81,31 +86,36 @@ const LandingNav = () => {
           <nav className="flex flex-col space-y-1 text-sm font-medium text-slate-700">
             <button
               onClick={() => handleNav('/trust')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
+              aria-current={on('/trust') ? 'page' : undefined}
+              className={mobCls('/trust')}
             >
               Trust centre
             </button>
             <button
               onClick={() => handleNav('/policies')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
+              aria-current={on('/policies') ? 'page' : undefined}
+              className={mobCls('/policies')}
             >
               Policies
             </button>
             <button
               onClick={() => handleNav('/docs')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
+              aria-current={on('/docs') ? 'page' : undefined}
+              className={mobCls('/docs')}
             >
               Guide
             </button>
             <button
               onClick={() => handleNav('/developers')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
+              aria-current={on('/developers') ? 'page' : undefined}
+              className={mobCls('/developers')}
             >
               Developers
             </button>
             <button
               onClick={() => handleNav('/contact')}
-              className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
+              aria-current={on('/contact') ? 'page' : undefined}
+              className={mobCls('/contact')}
             >
               Contact
             </button>

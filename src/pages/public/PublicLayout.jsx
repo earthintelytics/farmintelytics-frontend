@@ -4,23 +4,31 @@ import { ChevronDown } from 'lucide-react';
 import LandingNav from '../landing/components/LandingNav';
 import LandingFooter from '../landing/components/LandingFooter';
 import { GLOSSARY, slug } from './publicGlossary';
+import { creditFor } from '../landing/components/photoCredits';
 
 /**
  * Frame for every public page: the landing header and footer, white page, one readable column.
  * With `aside`, the page uses the full width: a side panel on the left (below the text on phones)
  * and the text on the right.
  */
-export default function PublicLayout({ eyebrow, title, intro, children, wide = false, aside = null }) {
+export default function PublicLayout({ eyebrow, title, intro, children, wide = false, aside = null, image = null, imageAlt = '' }) {
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans">
       <LandingNav />
-      {/* The page's title band: soft green with a sunny accent, the same on every public page */}
+      {/* The page's title band, in the front page's style: soft green, the words on the left and, when the page has
+          one, a real farm photo on the right (its credit kept as metadata) */}
       <section className="bg-[#F5FAF3] border-b border-[#E3EFDF]">
-        <div className={`mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 ${wide || aside ? 'max-w-6xl' : 'max-w-3xl'}`}>
-          {eyebrow && <p className="text-sm font-semibold text-[var(--brand-primary-dark)]">{eyebrow}</p>}
-          <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight mt-2 text-gray-900">{title}</h1>
-          <span aria-hidden="true" className="mt-4 flex gap-1.5"><span className="h-1 w-10 bg-[var(--brand-primary)]" /><span className="h-1 w-4 bg-[#F4B740]" /></span>
-          {intro && <p className="text-base text-gray-600 mt-4 leading-relaxed max-w-2xl">{intro}</p>}
+        <div className={`mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 ${image || wide || aside ? 'max-w-6xl' : 'max-w-3xl'} ${image ? 'grid gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] items-center' : ''}`}>
+          <div>
+            {eyebrow && <p className="text-sm font-semibold text-[var(--brand-primary-dark)]">{eyebrow}</p>}
+            <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight mt-2 text-gray-900">{title}</h1>
+            <span aria-hidden="true" className="mt-4 flex gap-1.5"><span className="h-1 w-10 bg-[var(--brand-primary)]" /><span className="h-1 w-4 bg-[#F4B740]" /></span>
+            {intro && <p className="text-base sm:text-lg text-gray-600 mt-4 leading-relaxed max-w-2xl">{intro}</p>}
+          </div>
+          {image && (
+            <img src={image} alt={imageAlt} data-credit={creditFor(image)} loading="eager"
+              className="w-full h-56 sm:h-64 lg:h-72 rounded-3xl object-cover border border-[#E3EFDF]" />
+          )}
         </div>
       </section>
       <main className={`flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 ${wide || aside ? 'max-w-6xl' : 'max-w-3xl'}`}>

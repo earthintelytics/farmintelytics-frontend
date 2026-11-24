@@ -52,7 +52,7 @@ const HeroSection = () => {
         </div>
         {/* An example of what a client sees, so the imagery reads as "answers", not decoration */}
         <div className="hidden lg:block mb-2 rounded-2xl bg-white/95 border border-gray-200 p-4 space-y-3">
-          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">Example reading</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">Reading</p>
           <div className="flex items-center justify-between gap-3">
             <p className="font-display text-base font-semibold text-gray-900">Field 12</p>
             <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-green-50 text-green-800 border border-green-200">Growing well</span>
@@ -62,7 +62,7 @@ const HeroSection = () => {
         </div>
         </div>
         <a href="#more" aria-label="Scroll to see more"
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 hidden sm:inline-flex flex-col items-center gap-0.5 text-xs font-medium text-gray-600 hover:text-gray-900">
+          className="absolute bottom-0 translate-y-1/2 left-1/2 -translate-x-1/2 z-10 hidden sm:inline-flex rounded-xl border border-gray-200 bg-white px-3 py-1.5 flex-col items-center gap-0.5 text-xs font-medium text-gray-600 hover:text-gray-900">
           Scroll to see more<ChevronDown size={18} className="fi-scroll-cue" />
         </a>
       </section>

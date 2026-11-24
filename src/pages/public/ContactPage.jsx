@@ -22,7 +22,7 @@ export default function ContactPage() {
     window.location.href = `mailto:${EMAIL}?subject=${encodeURIComponent(`FarmIntelytics: ${form.subject}`)}&body=${encodeURIComponent(body)}`;
   };
   return (
-    <PublicLayout eyebrow="Contact" title="Talk to us" wide
+    <PublicLayout eyebrow="Contact" title="Talk to us" wide image="/crops/hero/restoration.webp" imageAlt="Two women in a tree nursery with their phones"
       intro="For a demo, pricing, help with your account or anything about your data.">
       <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr]">
         <div className="space-y-6">
