@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BookOpen, Check, Copy, ShieldCheck, Terminal } from 'lucide-react';
+import { ArrowRight, BookOpen, Check, Copy, Leaf, ShieldCheck, Terminal } from 'lucide-react';
 import LandingNav from '../landing/components/LandingNav';
 import LandingFooter from '../landing/components/LandingFooter';
 import { copyText } from '../../utils/copyText';
@@ -18,6 +18,11 @@ const PRODUCTS = [
     code: 'eudr-check', icon: ShieldCheck, name: 'EUDR deforestation check', path: '/eudr',
     text: 'Send each plot as its boundary (a polygon). For each plot you get pass, review or fail against the 31 December 2020 cut-off, with forest in 2020, tree cover lost since and the year, protected-area overlap, and a GeoJSON file the EU information system accepts.',
     facts: ['EU information system geolocation rules, checked first and free', 'JRC GFC2020 · Hansen/UMD GFC · protected areas', 'Map versions named in every result'],
+  },
+  {
+    code: 'suitability-check', icon: Leaf, name: 'Crop suitability', path: '/suitability',
+    text: 'Send fields as polygons and a crop. Each field gets an FAO suitability class from S1 (very suitable) to N (not suitable), the factors that hold it back and how sure the rating is, and you get the designed suitability report as a PDF.',
+    facts: ['Slope, rainfall, dry season, temperature, soil pH, water, flooding', '30 m grid, worst limiting factor (FAO)', 'The PDF report of every check, included'],
   },
 ];
 
@@ -158,7 +163,7 @@ export default function DevelopersPage() {
               {[
                 ['1', 'Get a test key', 'We set up your account and send a fi_test_ key. Test keys run the real check, free: 10 test requests, each up to 1 ha.'],
                 ['2', 'Validate your file', 'POST /eudr/validate tells you, plot by plot, what the EU rules would refuse and why. It costs nothing.'],
-                ['3', 'Send the plots', 'POST /eudr/checks answers 202 with a check id. Send an Idempotency-Key so a retry is never run twice.'],
+                ['3', 'Send the plots', 'POST /eudr/checks (or /suitability/checks) answers 202 with a check id. Send an Idempotency-Key so a retry is never run twice.'],
                 ['4', 'Read the result', 'Poll GET …/checks/{id} until status is done, or let us call your webhook. Most checks finish in seconds to minutes.'],
               ].map(([n, t, x]) => (
                 <li key={n} className="rounded-2xl border border-gray-200 p-5">

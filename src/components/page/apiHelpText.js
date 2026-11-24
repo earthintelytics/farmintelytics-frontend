@@ -8,7 +8,7 @@ export const API_ADMIN_GUIDE = {
   intro: 'Products, plans, prices, wallets and keys: what each one is and what happens to money on a request.',
   sections: [
     { title: 'Product, plan, client', points: [
-      ['Product', 'What a client can call: the EUDR check (deforestation after 31 December 2020), priced per hectare.'],
+      ['Product', 'What a client can call: the EUDR check (deforestation after 31 December 2020) and crop suitability (S1 to N per field, with its PDF report). Each is priced per hectare.'],
       ['Plan', 'The price list for one product: its price per hectare and its limits. Make plans in "Plans and prices".'],
       ['Client', 'An organisation using the API. It has one plan per product, its own keys, and a prepaid wallet.'],
       'Changing a client\'s plan applies to its next request; finished checks keep the price they were charged.',
@@ -97,7 +97,7 @@ export const API_MODAL_HELP = {
 
 /** The (?) beside each field on the API pages: one or two plain lines each. */
 export const API_FIELD_HELP = {
-  product: 'What the plan prices: the EUDR check (the only product of the public API). A plan belongs to one product.',
+  product: 'What the plan prices: the EUDR check or crop suitability. A plan belongs to one product.',
   planName: 'A name for the team only, for example "Standard" or "Exporter volume". Clients see it on their statement.',
   price: 'What one hectare checked costs, in naira. A request costs the total area of its plots × this price; 0.4 ha costs 0.4 of it.',
   maxPlots: 'The most plots one request may hold. A larger file is refused and the client splits it; the price does not change.',
