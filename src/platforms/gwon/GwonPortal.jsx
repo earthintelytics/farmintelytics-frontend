@@ -149,7 +149,7 @@ export default function GwonPortal() {
   const fileRef = useRef(null);
 
   useEffect(() => {
-    fetch('/platforms/gwon/frontline_states.geojson').then((r) => r.json()).then(setStates).catch(() => setStates(null));
+    fetch('/gwon-data/frontline_states.geojson').then((r) => r.json()).then(setStates).catch(() => setStates(null));
     document.title = 'GreenWall Observatory Nigeria (GWON)';
   }, []);
   useEffect(() => { window.history.replaceState(null, '', `#${mod}`); }, [mod]);
