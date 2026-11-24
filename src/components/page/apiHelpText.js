@@ -94,3 +94,28 @@ export const API_MODAL_HELP = {
     ],
   },
 };
+
+/** The (?) beside each field on the API pages: one or two plain lines each. */
+export const API_FIELD_HELP = {
+  product: 'What the plan prices: the EUDR check or crop suitability. A plan belongs to one product.',
+  planName: 'A name for the team only, for example "Standard" or "Exporter volume". Clients see it on their statement.',
+  price: 'What one hectare checked costs, in naira. A request costs the total area of its plots × this price; 0.4 ha costs 0.4 of it.',
+  maxPlots: 'The most plots one request may hold. A larger file is refused and the client splits it; the price does not change.',
+  testHa: 'Hectares a client may check free each day with a test key, to build its integration.',
+  warnBelow: 'When the wallet falls under this amount, one email goes to the billing contact; the next only after a top-up. 0: no warning.',
+  notes: 'For the team only; the client never sees it.',
+  organisation: 'The client: an existing organisation, or a new one made from its name. Its API service is switched on in its licence.',
+  newName: 'The organisation\'s name as it should appear. Its estates and other services can be added later.',
+  plan: 'The price list this client pays: price per hectare and limits. It can be changed later; finished checks keep their price.',
+  techContact: 'Who builds the integration: we write to them about keys and changes to the API.',
+  billingContact: 'Who pays: gets the low-balance email. Empty: the technical contact gets it.',
+  moneyType: 'Top-up: money received from the client. Adjustment: a correction by the team (+ adds, − removes), always with a note.',
+  amount: 'In naira, for example 50000 for ₦50,000. For an adjustment, use − to take money off.',
+  reference: 'Leave empty and one is made for you (TOP-FI-…). If the bank gave its own reference, type that instead so the statement matches the bank.',
+  moneyNote: 'Why this entry was made, for the statement, for example "Bank transfer of 24 Nov".',
+  keyName: 'A name to recognise the key by, for example "ERP server" or "Sandbox". It is not secret.',
+  keyMode: 'Test: free, up to the daily test hectares, for building. Live: charged from the wallet.',
+  callback: 'An https address on the public internet. When a check finishes we POST the result there, signed with your secret.',
+  paymentReference: 'Quote this on every bank transfer to this wallet, so the money is credited to the right account.',
+};
+

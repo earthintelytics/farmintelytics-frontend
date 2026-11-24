@@ -4,7 +4,8 @@
  * Sora headings, sentence case, status colours from tokens, no inline styles,
  * no glows.
  */
-import { X } from 'lucide-react';
+import { useState } from 'react';
+import { HelpCircle, X } from 'lucide-react';
 import { useModalHelp } from '../../components/page/ModalHelp';
 
 export const Page = ({ eyebrow, title, text, actions, children, wide = false }) => (
@@ -51,13 +52,27 @@ export const IconButton = ({ label, danger = false, children, ...props }) => (
   <button type="button" aria-label={label} title={label} {...props} className={`p-2 rounded-lg text-gray-500 ${danger ? 'hover:text-red-600 hover:bg-red-50' : 'hover:bg-gray-100'} disabled:opacity-40`}>{children}</button>
 );
 
-export const Field = ({ label, hint, error, children, className = '' }) => (
-  <label className={`block space-y-1.5 ${className}`}>
-    <span className="block text-sm font-semibold text-gray-800">{label}</span>
-    {children}
-    {error ? <span className="block text-xs text-red-700">{error}</span> : hint ? <span className="block text-xs text-gray-500">{hint}</span> : null}
-  </label>
-);
+/** A labelled field. With `help`, a (?) beside the label opens a one- or two-line explanation of the field. */
+export function Field({ label, hint, error, help, children, className = '' }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <label className={`block space-y-1.5 ${className}`}>
+      <span className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
+        {label}
+        {help && (
+          <button type="button" aria-label={`What is ${label}?`} aria-expanded={open} title="What is this?"
+            onClick={(e) => { e.preventDefault(); setOpen((o) => !o); }}
+            className={`inline-flex h-5 w-5 items-center justify-center rounded-md ${open ? 'text-[var(--brand-primary)]' : 'text-gray-400 hover:text-gray-700'}`}>
+            <HelpCircle size={15} />
+          </button>
+        )}
+      </span>
+      {help && open && <span className="block rounded-lg border border-sky-200 bg-sky-50 px-3 py-2 text-xs leading-relaxed text-sky-950">{help}</span>}
+      {children}
+      {error ? <span className="block text-xs text-red-700">{error}</span> : hint ? <span className="block text-xs text-gray-500">{hint}</span> : null}
+    </label>
+  );
+}
 
 export const Toggle = ({ on, onChange, label, disabled = false }) => (
   <button type="button" role="switch" aria-checked={on} aria-label={label} disabled={disabled} onClick={() => onChange(!on)}

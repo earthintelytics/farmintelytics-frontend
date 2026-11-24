@@ -6,7 +6,8 @@ import { createApiKey, fetchDeveloperOverview, fetchDeveloperStatement, revokeAp
 import { naira } from '../../../utils/money';
 import { copyText } from '../../../utils/copyText';
 import GuidePanel from '../../../components/page/GuidePanel';
-import { API_CLIENT_GUIDE } from '../../../components/page/apiHelpText';
+import { API_CLIENT_GUIDE, API_FIELD_HELP as H } from '../../../components/page/apiHelpText';
+import { PaymentReference } from '../../../farmintelytics-admin/pages/ApiClients';
 
 /**
  * Developer and API: the organisation's FarmIntelytics API account (products and prices, balance, keys, callback,
@@ -84,7 +85,8 @@ export default function DeveloperCard({ isAdmin }) {
               </div>
             ))}
           </div>
-          <p className="text-sm text-gray-600">To add money, pay by bank transfer and send the reference to FarmIntelytics; the balance updates when it is recorded. A request costs the total area of its plots × the price per hectare (a plot under a hectare costs its fraction). Plots refused by the EU rules, test keys and failed checks are never charged.</p>
+          <PaymentReference value={data.payment_reference} />
+          <p className="text-sm text-gray-600">To add money, pay by bank transfer quoting your payment reference above; the balance updates when FarmIntelytics records it. A request costs the total area of its plots × the price per hectare (a plot under a hectare costs its fraction). Plots refused by the EU rules, test keys and failed checks are never charged.</p>
         </div>
       </Card>
 
@@ -112,8 +114,8 @@ export default function DeveloperCard({ isAdmin }) {
           </div>
           {isAdmin && (
             <div className="flex flex-wrap items-end gap-3 pt-2">
-              <Field label="Key name" className="flex-1 min-w-[180px]"><input className={inputCls} value={keyName} onChange={(e) => setKeyName(e.target.value)} placeholder="e.g. ERP server" /></Field>
-              <Field label="Mode"><select className={inputCls} value={keyMode} onChange={(e) => setKeyMode(e.target.value)}><option value="test">Test (free)</option><option value="live">Live (charged)</option></select></Field>
+              <Field label="Key name" help={H.keyName} className="flex-1 min-w-[180px]"><input className={inputCls} value={keyName} onChange={(e) => setKeyName(e.target.value)} placeholder="e.g. ERP server" /></Field>
+              <Field label="Mode" help={H.keyMode}><select className={inputCls} value={keyMode} onChange={(e) => setKeyMode(e.target.value)}><option value="test">Test (free)</option><option value="live">Live (charged)</option></select></Field>
               <Button disabled={!!busy} onClick={() => act('new', async () => { const r = await createApiKey(keyName || 'Default', keyMode); setShown({ label: `Your ${r.mode} key "${r.name}"`, value: r.key }); setKeyName(''); })}>Create key</Button>
             </div>
           )}
@@ -123,7 +125,7 @@ export default function DeveloperCard({ isAdmin }) {
       <Card>
         <CardHeader title="Callback" text="We POST to this https address when a check finishes. Each call is signed: check the FI-Signature header with your signing secret." />
         <div className="p-6 flex flex-wrap items-end gap-3">
-          <Field label="Callback URL" className="flex-1 min-w-[240px]"><input className={inputCls} value={hook} disabled={!isAdmin} onChange={(e) => setHook(e.target.value)} placeholder="https://your-system.example/eudr-webhook" /></Field>
+          <Field label="Callback URL" help={H.callback} className="flex-1 min-w-[240px]"><input className={inputCls} value={hook} disabled={!isAdmin} onChange={(e) => setHook(e.target.value)} placeholder="https://your-system.example/eudr-webhook" /></Field>
           {isAdmin && <Button disabled={!!busy} onClick={() => act('hook', async () => { const r = await saveWebhook(hook); if (r.webhook_secret) setShown({ label: 'Your webhook signing secret', value: r.webhook_secret }); })}>Save</Button>}
           {isAdmin && <Button variant="secondary" disabled={!!busy} onClick={() => act('sec', async () => { const r = await saveWebhook(hook, true); setShown({ label: 'Your new webhook signing secret', value: r.webhook_secret }); })}>New signing secret</Button>}
         </div>

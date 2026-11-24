@@ -13,7 +13,7 @@ import { naira, toMinor } from '../../utils/money';
 import { copyText } from '../../utils/copyText';
 import { teamRole } from '../../services/session';
 import GuidePanel from '../../components/page/GuidePanel';
-import { API_ADMIN_GUIDE, API_MODAL_HELP } from '../../components/page/apiHelpText';
+import { API_ADMIN_GUIDE, API_FIELD_HELP as H, API_MODAL_HELP } from '../../components/page/apiHelpText';
 
 /**
  * API clients: organisations that use FarmIntelytics through the public API. Plans set the price per hectare in
@@ -46,13 +46,13 @@ function PlanModal({ plan, products, onClose, onSaved }) {
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button disabled={busy} onClick={save}>{busy ? 'Saving…' : 'Save plan'}</Button></>}>
       {error && <Note tone="error">{error}</Note>}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Product"><select className={inputCls} value={f.product} onChange={set('product')} disabled={!!plan}>{products.map((p) => <option key={p.code} value={p.code}>{p.name}</option>)}</select></Field>
-        <Field label="Plan name"><input className={inputCls} value={f.name} onChange={set('name')} placeholder="e.g. Standard" /></Field>
-        <Field label="Price per hectare (₦)" hint="A plot under a hectare costs its fraction"><input className={inputCls} value={f.price} onChange={set('price')} inputMode="decimal" /></Field>
-        <Field label="Most plots in one request"><input type="number" min="1" className={inputCls} value={f.max_units_per_request} onChange={set('max_units_per_request')} /></Field>
-        <Field label="Free test hectares a day" hint="With a test key"><input type="number" min="0" className={inputCls} value={f.test_units_per_day} onChange={set('test_units_per_day')} /></Field>
-        <Field label="Warn the client below (₦)"><input className={inputCls} value={f.low_balance_alert} onChange={set('low_balance_alert')} inputMode="decimal" /></Field>
-        <Field label="Notes"><input className={inputCls} value={f.notes} onChange={set('notes')} /></Field>
+        <Field label="Product" help={H.product}><select className={inputCls} value={f.product} onChange={set('product')} disabled={!!plan}>{products.map((p) => <option key={p.code} value={p.code}>{p.name}</option>)}</select></Field>
+        <Field label="Plan name" help={H.planName}><input className={inputCls} value={f.name} onChange={set('name')} placeholder="e.g. Standard" /></Field>
+        <Field label="Price per hectare (₦)" help={H.price}><input className={inputCls} value={f.price} onChange={set('price')} inputMode="decimal" /></Field>
+        <Field label="Most plots in one request" help={H.maxPlots}><input type="number" min="1" className={inputCls} value={f.max_units_per_request} onChange={set('max_units_per_request')} /></Field>
+        <Field label="Free test hectares a day" help={H.testHa}><input type="number" min="0" className={inputCls} value={f.test_units_per_day} onChange={set('test_units_per_day')} /></Field>
+        <Field label="Warn the client below (₦)" help={H.warnBelow}><input className={inputCls} value={f.low_balance_alert} onChange={set('low_balance_alert')} inputMode="decimal" /></Field>
+        <Field label="Notes" help={H.notes}><input className={inputCls} value={f.notes} onChange={set('notes')} /></Field>
       </div>
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!f.active} onChange={set('active')} /> Plan can be given to clients</label>
     </Modal>
@@ -77,14 +77,30 @@ function ClientModal({ plans, orgs, onClose, onSaved }) {
       footer={<><Button variant="secondary" onClick={onClose}>Cancel</Button><Button disabled={busy} onClick={save}>{busy ? 'Adding…' : 'Add client'}</Button></>}>
       {error && <Note tone="error">{error}</Note>}
       {!plans.length && <Note tone="info">Make a plan first (Plans tab): it sets the price per hectare.</Note>}
-      <Field label="Organisation"><select className={inputCls} value={f.company_id} onChange={set('company_id')}><option value="">Choose</option><option value="__new__">New organisation…</option>{orgs.map((o) => <option key={o.schema_name} value={o.schema_name}>{o.display_name || o.schema_name}</option>)}</select></Field>
-      {isNew && <Field label="New organisation's name" hint="Estates, boundaries and other services can be added later in Organisations."><input className={inputCls} value={f.new_name} onChange={set('new_name')} placeholder="e.g. Cocoa Buyers Ltd" /></Field>}
-      <Field label="Plan"><select className={inputCls} value={f.plan_id} onChange={set('plan_id')}>{plans.filter((p) => p.active).map((p) => <option key={p.id} value={p.id}>{p.product_name} · {p.name} · {naira(p.price_per_unit_minor)} per hectare</option>)}</select></Field>
+      <Field label="Organisation" help={H.organisation}><select className={inputCls} value={f.company_id} onChange={set('company_id')}><option value="">Choose</option><option value="__new__">New organisation…</option>{orgs.map((o) => <option key={o.schema_name} value={o.schema_name}>{o.display_name || o.schema_name}</option>)}</select></Field>
+      {isNew && <Field label="New organisation's name" help={H.newName}><input className={inputCls} value={f.new_name} onChange={set('new_name')} placeholder="e.g. Cocoa Buyers Ltd" /></Field>}
+      <Field label="Plan" help={H.plan}><select className={inputCls} value={f.plan_id} onChange={set('plan_id')}>{plans.filter((p) => p.active).map((p) => <option key={p.id} value={p.id}>{p.product_name} · {p.name} · {naira(p.price_per_unit_minor)} per hectare</option>)}</select></Field>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Technical contact email"><input className={inputCls} value={f.contact_email} onChange={set('contact_email')} /></Field>
-        <Field label="Billing contact email" hint="Gets the low-balance email"><input className={inputCls} value={f.billing_email} onChange={set('billing_email')} /></Field>
+        <Field label="Technical contact email" help={H.techContact}><input className={inputCls} value={f.contact_email} onChange={set('contact_email')} /></Field>
+        <Field label="Billing contact email" help={H.billingContact}><input className={inputCls} value={f.billing_email} onChange={set('billing_email')} /></Field>
       </div>
     </Modal>
+  );
+}
+
+/** The reference the client quotes on its bank transfers, with a copy button. */
+export function PaymentReference({ value, who = 'you' }) {
+  const [done, setDone] = useState(false);
+  if (!value) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-3 rounded-xl border border-[#E3EFDF] bg-[#F5FAF3] px-4 py-3">
+      <div className="mr-auto">
+        <p className="text-xs font-semibold text-gray-600">Payment reference</p>
+        <p className="text-sm text-gray-700">Quoted by {who} on every bank transfer, so the money reaches this wallet.</p>
+      </div>
+      <code className="font-mono text-base font-semibold text-gray-900">{value}</code>
+      <Button variant="secondary" onClick={() => copyText(value).then(() => setDone(true))}>{done ? <Check size={14} /> : <Copy size={14} />}{done ? 'Copied' : 'Copy'}</Button>
+    </div>
   );
 }
 
@@ -95,8 +111,8 @@ function ContactRow({ c, busy, onSave }) {
     <section className="space-y-2">
       <h3 className="text-sm font-semibold text-gray-900">Contacts</h3>
       <div className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
-        <Field label="Technical contact"><input className={inputCls} value={f.contact_email} onChange={(e) => setDraft({ ...f, contact_email: e.target.value })} /></Field>
-        <Field label="Billing contact" hint="Gets the low-balance email"><input className={inputCls} value={f.billing_email} onChange={(e) => setDraft({ ...f, billing_email: e.target.value })} /></Field>
+        <Field label="Technical contact" help={H.techContact}><input className={inputCls} value={f.contact_email} onChange={(e) => setDraft({ ...f, contact_email: e.target.value })} /></Field>
+        <Field label="Billing contact" help={H.billingContact}><input className={inputCls} value={f.billing_email} onChange={(e) => setDraft({ ...f, billing_email: e.target.value })} /></Field>
         <Button variant="secondary" disabled={busy || !draft} onClick={() => { onSave(f); setDraft(null); }}>Save</Button>
       </div>
     </section>
@@ -129,6 +145,8 @@ function ClientPanel({ id, plans, owner, onClose, onChanged }) {
             <div><p className="text-xs text-gray-500">Spent this month</p><p className="font-mono text-lg font-semibold">{naira(c.usage?.spend_minor)}</p></div>
             <div><p className="text-xs text-gray-500">Status</p><Pill tone={c.status === 'active' ? 'good' : 'critical'}>{c.status}</Pill></div>
           </div>
+
+          <PaymentReference value={c.payment_reference} who="the client" />
 
           <ContactRow c={c} busy={!!busy} onSave={(patch) => act('contact', () => updateApiClient(c.id, patch))} />
 
@@ -177,11 +195,11 @@ function ClientPanel({ id, plans, owner, onClose, onChanged }) {
             <h3 className="text-sm font-semibold text-gray-900">Money</h3>
             {!owner ? <p className="text-sm text-gray-500">Only a team owner records top-ups and adjustments.</p> : (
               <div className="grid grid-cols-1 sm:grid-cols-5 gap-3 items-end">
-                <Field label="Type"><select className={inputCls} value={money.kind} onChange={(e) => setMoney((m) => ({ ...m, kind: e.target.value }))}><option value="topup">Top-up received</option><option value="adjust">Adjustment (+ or −)</option></select></Field>
-                <Field label="Amount (₦)"><input className={inputCls} value={money.amount} onChange={(e) => setMoney((m) => ({ ...m, amount: e.target.value }))} inputMode="decimal" /></Field>
-                <Field label="Reference" hint="Bank transfer reference"><input className={inputCls} value={money.reference} onChange={(e) => setMoney((m) => ({ ...m, reference: e.target.value }))} /></Field>
-                <Field label="Note"><input className={inputCls} value={money.note} onChange={(e) => setMoney((m) => ({ ...m, note: e.target.value }))} /></Field>
-                <Button disabled={!!busy || !money.amount || !money.reference} onClick={() => act('money', async () => {
+                <Field label="Type" help={H.moneyType}><select className={inputCls} value={money.kind} onChange={(e) => setMoney((m) => ({ ...m, kind: e.target.value }))}><option value="topup">Top-up received</option><option value="adjust">Adjustment (+ or −)</option></select></Field>
+                <Field label="Amount (₦)" help={H.amount}><input className={inputCls} value={money.amount} onChange={(e) => setMoney((m) => ({ ...m, amount: e.target.value }))} inputMode="decimal" /></Field>
+                <Field label="Reference" help={H.reference}><input className={inputCls} value={money.reference} placeholder="Made for you if empty" onChange={(e) => setMoney((m) => ({ ...m, reference: e.target.value }))} /></Field>
+                <Field label="Note" help={H.moneyNote}><input className={inputCls} value={money.note} onChange={(e) => setMoney((m) => ({ ...m, note: e.target.value }))} /></Field>
+                <Button disabled={!!busy || !money.amount} onClick={() => act('money', async () => {
                   const amt = toMinor(money.amount);
                   if (!Number.isFinite(amt) || amt === 0) throw new Error('Give an amount.');
                   await (money.kind === 'topup' ? topupApiWallet(c.id, amt, money.reference, money.note) : adjustApiWallet(c.id, amt, money.reference, money.note));
