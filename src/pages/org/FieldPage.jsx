@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ArrowLeft, Crosshair, MapPin, Search, History, PencilLine, ClipboardCheck } from 'lucide-react';
+import { ArrowLeft, Crosshair, MapPin, Search, History, PencilLine, ClipboardCheck, Undo2, Trash2 } from 'lucide-react';
+import { useConfirm } from '../../components/ConfirmProvider';
 import { fetchParcels } from '../../services/smallholderApi';
 import { serviceCall, NotConnectedError } from '../../services/serviceClient';
 import { fetchScoutingObservations, submitScoutingObservation } from '../../services/scoutingService';
@@ -31,6 +32,9 @@ const describeChanges = (changes = {}) => Object.entries(changes).map(([k, v]) =
   if (v && typeof v === 'object' && !Array.isArray(v) && ('old' in v || 'new' in v)) return `${label}: ${show(v.old)} → ${show(v.new)}`;
   return `${label}: ${show(v)}`;
 });
+
+// Fields a recorded change can be undone for (the server checks the same list).
+const UNDOABLE = ['crop', 'crops', 'planting_year', 'tenure', 'certification_tags', 'geometry'];
 
 const centre = (g) => {
   const ring = g?.type === 'Polygon' ? g.coordinates[0] : g?.type === 'MultiPolygon' ? g.coordinates[0][0] : g?.type === 'Point' ? [g.coordinates] : [];
@@ -79,7 +83,8 @@ const FieldPage = () => {
     return rows.slice(0, 200);
   }, [parcels, q, me]);
 
-  if (open) return <ParcelView feature={open} onBack={() => setOpen(null)} onPending={() => setPending(readPending())} />;
+  if (open) return <ParcelView feature={open} onBack={() => setOpen(null)} onPending={() => setPending(readPending())}
+    onRemoved={(id) => { setParcels((l) => (l || []).filter((f) => f.properties?.id !== id)); setOpen(null); }} />;
 
   return (
     <div className="max-w-xl mx-auto space-y-4">
@@ -116,7 +121,9 @@ const FieldPage = () => {
   );
 };
 
-function ParcelView({ feature, onBack, onPending }) {
+function ParcelView({ feature, onBack, onPending, onRemoved }) {
+  const confirm = useConfirm();
+  const [working, setWorking] = useState(false);
   const [pr, setPr] = useState(feature.properties);
   const plotId = `P${pr.id}`;
   const [tab, setTab] = useState('history');
@@ -132,8 +139,28 @@ function ParcelView({ feature, onBack, onPending }) {
 
   const timeline = useMemo(() => [
     ...(visits || []).map((v) => ({ at: v.observed_at || v.created_at, kind: 'Visit', text: [v.finding_type?.replace(/_/g, ' '), v.notes].filter(Boolean).join(': '), by: v.scout_name })),
-    ...(changes || []).map((c) => ({ at: c.changed_at, kind: 'Update', lines: describeChanges(c.changes), notes: c.notes, by: [c.changed_by, SOURCE_LABEL[c.source]].filter(Boolean).join(' ') })),
+    ...(changes || []).map((c) => ({ at: c.changed_at, kind: 'Update', id: c.id, undoable: Object.keys(c.changes || {}).some((k) => UNDOABLE.includes(k)), lines: describeChanges(c.changes), notes: c.notes, by: [c.changed_by, SOURCE_LABEL[c.source]].filter(Boolean).join(' ') })),
   ].filter((e) => e.at).sort((a, b) => String(b.at).localeCompare(String(a.at))), [visits, changes]);
+
+  // Undo one recorded change: the parcel goes back to what it was before it. The undo is recorded too, so it can
+  // be undone again. Refused when the parcel was changed again since (undo the later change first).
+  const undo = async (id) => {
+    if (!(await confirm('Undo this change? The parcel goes back to what it was before it.', { action: 'Undo' }))) return;
+    setWorking(true); setMsg('');
+    try {
+      const res = await serviceCall(`/smallholder/parcels/${pr.id}/history/${id}/undo`, { method: 'POST' });
+      setPr((p) => ({ ...p, crop: res.crop, crops: res.crops, planting_year: res.planting_year, area_ha: res.area_ha }));
+      setMsg('Change undone. The undo is in the history, so it can be undone too.');
+      loadHistory();
+    } catch (e) { setMsg(e.message); }
+    setWorking(false);
+  };
+  // Remove the parcel (the member and their other parcels stay), after the typed-word confirmation.
+  const remove = async () => {
+    if (!(await confirm(`Remove this parcel of ${pr.member_name || 'the member'} and its history?`, { typed: true, action: 'Remove' }))) return;
+    setWorking(true);
+    try { await serviceCall(`/smallholder/parcels/${pr.id}`, { method: 'DELETE' }); onRemoved?.(pr.id); } catch (e) { setMsg(e.message); setWorking(false); }
+  };
 
   return (
     <div className="max-w-xl mx-auto space-y-4">
@@ -166,6 +193,7 @@ function ParcelView({ feature, onBack, onPending }) {
                     <ul className="text-sm text-gray-800 space-y-0.5">{e.lines.length ? e.lines.map((l) => <li key={l}>{l}</li>) : <li>—</li>}</ul>
                   ) : <p className="text-sm text-gray-800">{e.text || '—'}</p>}
                   {e.notes && <p className="text-sm text-gray-500 mt-0.5">“{e.notes}”</p>}
+                  {e.undoable && <button type="button" disabled={working} onClick={() => undo(e.id)} className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-green-800 hover:underline disabled:opacity-50"><Undo2 size={14} /> Undo this change</button>}
                 </li>
               ))}
             </ol>
@@ -175,6 +203,9 @@ function ParcelView({ feature, onBack, onPending }) {
 
       {tab === 'visit' && <VisitForm plotId={plotId} onDone={(t) => { setMsg(t); setTab('history'); loadHistory(); }} />}
       {tab === 'update' && <UpdateForm feature={{ ...feature, properties: pr }} onDone={(t, saved) => { if (saved) setPr((p) => ({ ...p, ...saved })); setMsg(t); setTab('history'); onPending(); loadHistory(); }} />}
+      <div className="pt-2 border-t border-gray-100">
+        <button type="button" disabled={working} onClick={remove} className="inline-flex items-center gap-2 text-sm font-semibold text-red-700 hover:underline disabled:opacity-50"><Trash2 size={15} /> Remove this parcel</button>
+      </div>
     </div>
   );
 }

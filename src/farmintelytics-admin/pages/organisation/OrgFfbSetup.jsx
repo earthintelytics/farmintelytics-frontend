@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { ADMIN_API_BASE } from '../../../services/apiBase';
 import { Button, Field, Note } from '../../components/ui';
+import { useConfirm } from '../../../components/ConfirmProvider';
 import { inputCls } from '../../components/formHelpers';
 
 const ffbAdminBase = ADMIN_API_BASE.replace(/\/admin\/?$/, '/admin/ffb');
@@ -68,6 +69,7 @@ const OrgFfbSetup = ({ org }) => {
   const [err, setErr] = useState('');
   const [settings, setSettings] = useState(null);
   const [rates, setRates] = useState([]);
+  const confirm = useConfirm();
   const [counts, setCounts] = useState({ employees: 0, grid_cells: 0, records: 0 });
   const [boundaryData, setBoundaryData] = useState(null);
   const [showPlatforms, setShowPlatforms] = useState(true);
@@ -108,7 +110,7 @@ const OrgFfbSetup = ({ org }) => {
   };
 
   useEffect(() => {
-    load();
+    load(); // eslint-disable-line react-hooks/set-state-in-effect
   }, [org.schema_name]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const saveSettings = async () => {
@@ -182,6 +184,16 @@ const OrgFfbSetup = ({ org }) => {
       setImporting(false);
       if (fileRef.current) fileRef.current.value = '';
     }
+  };
+
+  // Remove one role's pay rate (set it again to bring it back).
+  const removeRate = async (role) => {
+    if (!(await confirm(`Remove the pay rate for ${role}? Set it again any time to bring it back.`, { action: 'Remove' }))) return;
+    try {
+      await ffbAdminCall(`/${org.schema_name}/pay-rates/${encodeURIComponent(role)}`, { method: 'DELETE' });
+      setMsg(`Pay rate for ${role} removed.`);
+      await load();
+    } catch (e) { setMsg(e.message); }
   };
 
   const saveRate = async () => {
@@ -383,6 +395,10 @@ const OrgFfbSetup = ({ org }) => {
               <div key={r.id} className="px-3 py-2 flex justify-between font-mono">
                 <span className="font-semibold text-gray-800">{r.role}</span>
                 <span className="text-gray-600">Ripe {r.ripe_rate} · Unripe {r.unripe_rate} · Rotten {r.rotten_rate} · Kg {r.kg_rate} ({r.unit})</span>
+                <span className="flex gap-3 font-sans">
+                  <button type="button" onClick={() => setNewRate({ role: r.role, ripe_rate: r.ripe_rate, unripe_rate: r.unripe_rate, rotten_rate: r.rotten_rate, kg_rate: r.kg_rate, unit: r.unit })} className="font-semibold text-green-800 hover:underline">Edit</button>
+                  <button type="button" onClick={() => removeRate(r.role)} className="font-semibold text-red-700 hover:underline">Remove</button>
+                </span>
               </div>
             ))}
           </div>
