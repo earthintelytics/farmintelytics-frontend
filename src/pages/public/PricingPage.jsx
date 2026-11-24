@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useLoader } from '../../components/page/useLoader';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Calculator, Check, Coins, KeyRound, Layers, MapPin, ShieldCheck, Wallet } from 'lucide-react';
 import LandingNav from '../landing/components/LandingNav';
@@ -8,22 +9,21 @@ import { creditFor } from '../landing/components/photoCredits';
 /**
  * /pricing: what the EUDR check costs and exactly how it is charged (api_platform/pricing.py): per hectare, on the
  * total area of a request's plots, from a prepaid wallet; only the area really checked is charged. Only the EUDR check
- * is sold now (owner, 24 Nov 2026). The price below must match the EUDR plan in Admin, API clients.
+ * is sold now (owner, 24 Nov 2026). The price is set in Admin, API clients: the EUDR plan marked "Show on the
+ * pricing page", read from GET /public-api/v1/pricing. Without one, the page says the price is on request.
  */
-const PRICE_PER_HA = 300;          // ₦ per hectare: the published EUDR check price
 const POINT_DEFAULT_HA = 4;        // a point with no declared area counts as 4 ha (the EU information system's rule)
-const TEST_HA = 'free test hectares every day';
 
 const naira = (n) => `₦${Math.round(n).toLocaleString('en-NG')}`;
 const ha = (n) => `${Number(n.toFixed(4)).toLocaleString('en-NG')} ha`;
 
-const RULES = [
-  { icon: Layers, title: 'Charged on the total area', text: 'A request costs the total area of its valid plots × ₦300. Fifty small plots cost exactly the same as one plot covering the same land.' },
-  { icon: Coins, title: 'Smaller than a hectare? You pay the fraction', text: 'A 0.4 ha plot costs 0.4 × ₦300 = ₦120. Nothing is rounded up to a whole hectare.' },
+const rulesFor = (PRICE_PER_HA) => [
+  { icon: Layers, title: 'Charged on the total area', text: `A request costs the total area of its valid plots × ${PRICE_PER_HA ? naira(PRICE_PER_HA) : 'the price per hectare'}. Fifty small plots cost exactly the same as one plot covering the same land.` },
+  { icon: Coins, title: 'Smaller than a hectare? You pay the fraction', text: PRICE_PER_HA ? `A 0.4 ha plot costs 0.4 × ${naira(PRICE_PER_HA)} = ${naira(0.4 * PRICE_PER_HA)}. Nothing is rounded up to a whole hectare.` : 'A 0.4 ha plot costs 0.4 of the price per hectare. Nothing is rounded up to a whole hectare.' },
   { icon: MapPin, title: 'Polygons and points', text: `Polygons count as measured. Points count by their declared area, or ${POINT_DEFAULT_HA} ha when none is given, as the EU information system assumes.` },
   { icon: Wallet, title: 'From a prepaid wallet', text: 'Top up by bank transfer, quoting your payment reference. Checks draw on the wallet. No subscription, no monthly fee, no invoice.' },
   { icon: ShieldCheck, title: 'Held, then charged for what was checked', text: 'Sending a check holds its cost. When it finishes, only the area really checked is charged; the rest goes back to your wallet.' },
-  { icon: KeyRound, title: 'Build for free', text: `Test keys run the same real check, free, up to your ${TEST_HA}. Pay only when you go live.` },
+  { icon: KeyRound, title: 'Build for free', text: 'Test keys run the same real check, free, up to your free test hectares every day. Pay only when you go live.' },
 ];
 
 const NEVER = ['Validating your file against the EU rules', 'Plots the EU rules refuse', 'Checks that fail', 'Test keys', 'A repeated request with the same Idempotency-Key'];
@@ -43,7 +43,7 @@ const FAQ = [
   ['What happens if my balance is too low?', 'The request is refused with a clear message (402) and nothing runs or is charged. Top up and send it again.'],
 ];
 
-function Estimator() {
+function Estimator({ PRICE_PER_HA }) {
   const [mode, setMode] = useState('area');
   const [area, setArea] = useState('100');
   const [plots, setPlots] = useState('50');
@@ -88,6 +88,12 @@ function Estimator() {
 
 export default function PricingPage() {
   const navigate = useNavigate();
+  // The published price, from the admin (the EUDR plan marked "Show on the pricing page").
+  const load = useCallback(() => fetch('/public-api/v1/pricing', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : { data: [] })), []);
+  const prices = useLoader(load);
+  const eudr = (prices.data?.data || []).find((p) => p.code === 'eudr-check');
+  const PRICE_PER_HA = eudr ? eudr.price_per_ha_minor / 100 : null;
+  const RULES = rulesFor(PRICE_PER_HA);
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans">
       <LandingNav />
@@ -124,8 +130,10 @@ export default function PricingPage() {
             </div>
             <div className="p-7">
               <p className="flex items-end gap-2">
-                <span className="font-display text-6xl font-semibold tracking-tight text-gray-900">{naira(PRICE_PER_HA)}</span>
-                <span className="pb-2 text-gray-600">per hectare</span>
+                {PRICE_PER_HA ? (
+                  <><span className="font-display text-6xl font-semibold tracking-tight text-gray-900">{naira(PRICE_PER_HA)}</span>
+                    <span className="pb-2 text-gray-600">per hectare</span></>
+                ) : <span className="font-display text-3xl font-semibold text-gray-900">{prices.state === 'loading' ? '…' : 'Price per hectare on request'}</span>}
               </p>
               <ul className="mt-6 space-y-2.5 text-sm text-gray-700">
                 {['Pass, review or fail for every plot', 'Forest in 2020, loss since and its year', 'Protected-area overlap', 'A GeoJSON file for the EU information system', 'API, callbacks and test keys included'].map((x) => (
@@ -157,7 +165,7 @@ export default function PricingPage() {
         {/* Estimator and examples */}
         <section className="bg-[#FBF8F1] border-y border-[#F0E9DA]">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start">
-            <Estimator />
+            {PRICE_PER_HA ? <Estimator PRICE_PER_HA={PRICE_PER_HA} /> : <div className="rounded-3xl border border-[#E3EFDF] bg-white p-8 text-gray-600">The estimator appears once the price is published.</div>}
             <div>
               <p className="text-sm font-semibold text-[#9A6A00]">Examples</p>
               <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">What a check costs</h2>
@@ -169,7 +177,7 @@ export default function PricingPage() {
                       <p className="text-sm text-gray-600">{e.plots} · {ha(e.area)}</p>
                       <p className="text-xs text-gray-500 mt-0.5">{e.note}</p>
                     </div>
-                    <p className="self-center font-display text-xl font-semibold text-gray-900">{naira(e.area * PRICE_PER_HA)}</p>
+                    <p className="self-center font-display text-xl font-semibold text-gray-900">{PRICE_PER_HA ? naira(e.area * PRICE_PER_HA) : ha(e.area)}</p>
                   </div>
                 ))}
               </div>

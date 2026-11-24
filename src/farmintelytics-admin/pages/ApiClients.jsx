@@ -21,13 +21,13 @@ import { API_ADMIN_GUIDE, API_FIELD_HELP as H, API_MODAL_HELP } from '../../comp
  * statement. No monthly fees or invoices (api_platform/pricing.py). Prices and money can only be changed by a team owner (the server refuses the others too).
  */
 const BLANK_PLAN = { product: 'eudr-check', name: '', price: '', max_units_per_request: 1000,
-  test_units_per_day: 50, low_balance_alert: '0', active: true, notes: '' };
+  test_units_per_day: 50, low_balance_alert: '0', active: true, public: false, notes: '' };
 
 function planPayload(f) {
   return { product: f.product, name: f.name.trim(), price_per_unit_minor: toMinor(f.price), monthly_fee_minor: 0,
     included_units_per_month: 0, max_units_per_request: +f.max_units_per_request || 1000,
     test_units_per_day: +f.test_units_per_day || 0, low_balance_alert_minor: toMinor(f.low_balance_alert || 0), currency: 'NGN',
-    default_billing: 'prepaid', active: !!f.active, notes: f.notes || '' };
+    default_billing: 'prepaid', active: !!f.active, public: !!f.public, notes: f.notes || '' };
 }
 
 function PlanModal({ plan, products, onClose, onSaved }) {
@@ -55,6 +55,8 @@ function PlanModal({ plan, products, onClose, onSaved }) {
         <Field label="Notes" help={H.notes}><input className={inputCls} value={f.notes} onChange={set('notes')} /></Field>
       </div>
       <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={!!f.active} onChange={set('active')} /> Plan can be given to clients</label>
+      <label className="flex items-start gap-2 text-sm"><input type="checkbox" className="mt-0.5" checked={!!f.public} onChange={set('public')} />
+        <span><span className="font-semibold">Show on the pricing page</span><span className="block text-xs text-gray-500">Its price per hectare becomes the published price of this product on /pricing. Only one plan per product: marking this one unmarks the others.</span></span></label>
     </Modal>
   );
 }
@@ -279,7 +281,7 @@ export default function ApiClients() {
                 <tbody className="divide-y divide-gray-100">
                   {d.plans.map((p) => (
                     <tr key={p.id} className={owner ? 'hover:bg-gray-50 cursor-pointer' : ''} onClick={() => owner && setPlanModal(p)}>
-                      <td className="px-5 py-3"><p className="font-semibold">{p.name}</p><p className="text-xs text-gray-500">{p.product_name}{p.active ? '' : ' · not offered'}</p></td>
+                      <td className="px-5 py-3"><p className="font-semibold">{p.name}</p><p className="text-xs text-gray-500">{p.product_name}{p.active ? '' : ' · not offered'}{p.public ? ' · on the pricing page' : ''}</p></td>
                       <td className="px-5 py-3 text-right font-mono">{naira(p.price_per_unit_minor)}</td>
                       <td className="px-5 py-3">{p.max_units_per_request}</td><td className="px-5 py-3">{p.test_units_per_day}</td><td className="px-5 py-3">{p.clients}</td>
                     </tr>

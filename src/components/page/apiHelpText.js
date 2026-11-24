@@ -82,6 +82,7 @@ export const API_MODAL_HELP = {
     intro: 'A plan is the price list for one product, per hectare. Clients on it pay from a prepaid wallet.',
     items: API_ADMIN_GUIDE.sections[1].points.concat([
       ['Plan can be given to clients', 'Untick to stop offering it; clients already on it keep it.'],
+      ['Show on the pricing page', 'Makes this plan\'s price per hectare the published price on /pricing. One plan per product.'],
     ]),
   },
   client: {
