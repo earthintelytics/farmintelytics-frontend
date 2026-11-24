@@ -114,6 +114,7 @@ const hasValidTeamSession = hasValidTeamToken;
 const backHub = (tenant) => (tenant ? paths.orgHub(tenant) : paths.teamHub);
 import LandingPage from './pages/LandingPage';
 import { ConfirmProvider } from './components/ConfirmProvider';
+const GwonPortal = React.lazy(() => import('./platforms/gwon/GwonPortal'));
 
 // ─── Root Landing Page ───────────────────────────────────────────────────────
 // "/" always shows the FarmIntelytics website, signed in or not (owner, 24 Nov 2026: it used to jump to the
@@ -367,6 +368,8 @@ const AppRoutes = () => {
         <Route path="/developers"               element={<DevelopersPage />} />
         <Route path="/app"                      element={<AppPage />} />
         <Route path="/pricing"                  element={<PricingPage />} />
+        {/* Organisation platforms hosted on the hub (custom name, menu and pages): GreenWall Observatory Nigeria */}
+        <Route path="/platforms/gwon"           element={<GwonPortal />} />
         <Route path="/credits"                  element={<CreditsPage />} />
         <Route path="/privacy"                  element={<Navigate to="/policies?tab=privacy" replace />} />
         <Route path="/trust"                    element={<TrustCenterPage />} />
