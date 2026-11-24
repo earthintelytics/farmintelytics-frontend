@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom';
+import { creditFor } from './photoCredits';
 import { ArrowRight, Building2, Code2, Leaf, MessageSquareText, Satellite, Sprout, Trees, Users, Wheat } from 'lucide-react';
 
 /**
@@ -65,7 +66,7 @@ const LandingStory = () => {
           <div className="grid gap-3 sm:grid-cols-2 sm:grid-rows-2 sm:h-[440px]">
             {PEOPLE.map((p) => (
               <figure key={p.src} className={`relative overflow-hidden rounded-3xl ${p.className || ''} h-56 sm:h-auto`}>
-                <img src={p.src} alt={p.alt} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
+                <img src={p.src} alt={p.alt} data-credit={creditFor(p.src)} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
                 <figcaption className="absolute left-3 bottom-3 rounded-lg bg-white/95 px-3 py-1 text-xs font-semibold text-gray-800">{p.label}</figcaption>
               </figure>
             ))}
@@ -104,7 +105,7 @@ const LandingStory = () => {
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {SERVICES.map((s) => (
               <article key={s.title} className="group rounded-3xl bg-white border border-[#E3EFDF] overflow-hidden">
-                <div className="h-40 overflow-hidden"><img src={s.img} alt="" loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" /></div>
+                <div className="h-40 overflow-hidden"><img src={s.img} alt="" data-credit={creditFor(s.img)} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" /></div>
                 <div className="p-5">
                   <h3 className="font-display text-lg font-semibold text-gray-900">{s.title}</h3>
                   <p className="text-sm text-gray-600 mt-1.5 leading-relaxed">{s.text}</p>
@@ -152,11 +153,6 @@ const LandingStory = () => {
         </div>
       </section>
 
-      <p className="bg-white max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-4 text-[11px] text-gray-500">
-        Photos via Wikimedia Commons: McKay Savage, Kate Holt / AusAID (CC BY 2.0); USAID Africa Bureau, NASA Earth Observatory (public domain);
-        Kambai Akau, Krystal S. Wright, Thamizhpparithi Maari, Bukulu Steven (CC BY-SA 4.0); RamboSD (CC BY 4.0);
-        Radosław Botev (CC BY 3.0 PL).
-      </p>
     </>
   );
 };

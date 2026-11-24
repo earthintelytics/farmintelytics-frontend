@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Code2, Leaf, Droplets, ShieldCheck, Smartphone } from 'lucide-react';
+import { ArrowRight, ChevronDown, Code2, Leaf, Droplets, ShieldCheck, Smartphone } from 'lucide-react';
 import { paths, sessionTenant } from '../../../routes/paths';
 import { hasValidTeamToken } from '../../../services/session';
 import HeroBackdrop from './HeroBackdrop';
@@ -59,9 +59,13 @@ const HeroSection = () => {
           <p className="text-xs text-gray-500">Latest image 7 Oct · 92% of the field clear</p>
         </div>
         </div>
+        <a href="#more" aria-label="Scroll to see more"
+          className="absolute bottom-3 left-1/2 -translate-x-1/2 hidden sm:inline-flex flex-col items-center gap-0.5 text-xs font-medium text-gray-600 hover:text-gray-900">
+          Scroll to see more<ChevronDown size={18} className="fi-scroll-cue" />
+        </a>
       </section>
 
-      <section className="border-t border-gray-100">
+      <section id="more" className="border-t border-gray-100 scroll-mt-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {POINTS.map(({ icon: Icon, title, text }) => (
             <div key={title}>

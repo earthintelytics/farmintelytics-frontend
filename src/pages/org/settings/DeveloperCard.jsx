@@ -70,8 +70,8 @@ export default function DeveloperCard({ isAdmin }) {
           {error && <Note tone="error">{error}</Note>}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div><p className="text-xs text-gray-500">Balance</p><p className="font-mono text-lg font-semibold">{naira(data.balance_minor)}</p></div>
-            <div><p className="text-xs text-gray-500">Billing</p><p className="text-sm font-semibold">{data.billing === 'postpaid' ? `Monthly invoice (limit ${naira(data.credit_limit_minor)})` : 'Prepaid wallet'}</p></div>
-            <div><p className="text-xs text-gray-500">Plots checked this month</p><p className="font-mono text-lg font-semibold">{data.usage?.plots_checked ?? 0}</p></div>
+            <div><p className="text-xs text-gray-500">Billing</p><p className="text-sm font-semibold">Prepaid wallet, per hectare</p></div>
+            <div><p className="text-xs text-gray-500">Hectares checked this month</p><p className="font-mono text-lg font-semibold">{(data.usage?.hectares_checked ?? 0).toLocaleString()}</p></div>
             <div><p className="text-xs text-gray-500">Spent this month</p><p className="font-mono text-lg font-semibold">{naira(data.usage?.spend_minor)}</p></div>
           </div>
           {data.status !== 'active' && <Note tone="error">This API account is suspended: calls are refused. Contact FarmIntelytics.</Note>}
@@ -79,14 +79,12 @@ export default function DeveloperCard({ isAdmin }) {
             {data.products.map((p) => (
               <div key={p.code} className="rounded-xl border border-gray-200 p-4 text-sm flex flex-wrap items-center gap-x-6 gap-y-1">
                 <span className="font-semibold text-gray-900">{p.name}</span>
-                <span>{naira(p.price_per_unit_minor, p.currency)} per {p.unit}</span>
-                {p.included_units_per_month > 0 && <span>{p.included_units_per_month} {p.unit}s a month included</span>}
-                {p.monthly_fee_minor > 0 && <span>Monthly fee {naira(p.monthly_fee_minor, p.currency)}, on the 1st</span>}
-                <span className="text-gray-500">Up to {p.max_units_per_request} per request · {p.test_units_per_day} free test {p.unit}s a day</span>
+                <span>{naira(p.price_per_unit_minor, p.currency)} per hectare</span>
+                <span className="text-gray-500">Up to {p.max_units_per_request} plots per request · {p.test_units_per_day} free test hectares a day</span>
               </div>
             ))}
           </div>
-          <p className="text-sm text-gray-600">To add money, pay by bank transfer and send the reference to FarmIntelytics; the balance updates when it is recorded. Plots refused by the EU rules, test keys and failed checks are never charged.</p>
+          <p className="text-sm text-gray-600">To add money, pay by bank transfer and send the reference to FarmIntelytics; the balance updates when it is recorded. A request costs the total area of its plots × the price per hectare (a plot under a hectare costs its fraction). Plots refused by the EU rules, test keys and failed checks are never charged.</p>
         </div>
       </Card>
 

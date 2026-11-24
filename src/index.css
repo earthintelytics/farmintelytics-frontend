@@ -182,3 +182,8 @@ button:active {
 .fi-strip:hover { animation-play-state: paused; }
 @keyframes fi-strip { to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) { .fi-strip { animation: none; } }
+
+/* Front page: the "Scroll to see more" arrow, a slow nudge downwards (still for reduced motion). */
+.fi-scroll-cue { animation: fi-nudge 1.8s ease-in-out infinite; }
+@keyframes fi-nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }
+@media (prefers-reduced-motion: reduce) { .fi-scroll-cue { animation: none; } }

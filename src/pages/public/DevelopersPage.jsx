@@ -129,7 +129,7 @@ export default function DevelopersPage() {
               </button>
             </div>
             <dl className="mt-10 grid grid-cols-3 gap-4 max-w-md">
-              {[['2', 'products'], ['202', 'async, with callbacks'], ['₦', 'billed per plot']].map(([v, l]) => (
+              {[['2', 'products'], ['202', 'async, with callbacks'], ['₦', 'per hectare, prepaid']].map(([v, l]) => (
                 <div key={l}><dt className="font-mono text-xl font-semibold text-gray-900">{v}</dt><dd className="text-xs text-gray-500 mt-0.5">{l}</dd></div>
               ))}
             </dl>
@@ -141,7 +141,7 @@ export default function DevelopersPage() {
       <div className="flex-1 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <main className="min-w-0 space-y-16">
           <section className="space-y-6">
-            <H2 id="products" kicker="Products" text="Each product is switched on per account, with its own price per plot. More services join the same API, keys and wallet.">What you can call</H2>
+            <H2 id="products" kicker="Products" text="Each product is switched on per account, priced per hectare from a prepaid wallet. More services join the same API, keys and wallet.">What you can call</H2>
             <div className="grid gap-4 md:grid-cols-2">
               {PRODUCTS.map((p) => (
                 <article key={p.code} className="rounded-2xl border border-gray-200 p-6 flex flex-col">
