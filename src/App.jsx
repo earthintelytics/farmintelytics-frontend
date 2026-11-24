@@ -68,6 +68,7 @@ const PublicSuitabilitySharePage = lazyWithReload(() => import('./modules/suitab
 const TrustCenterPage = lazyWithReload(() => import('./pages/public/TrustCenterPage'));
 const PoliciesPage = lazyWithReload(() => import('./pages/public/PoliciesPage'));
 const DevelopersPage = lazyWithReload(() => import('./pages/public/DevelopersPage'));
+const AppPage = lazyWithReload(() => import('./pages/public/AppPage'));
 const DocumentationPage = lazyWithReload(() => import('./pages/public/DocumentationPage'));
 const ContactPage = lazyWithReload(() => import('./pages/public/ContactPage'));
 
@@ -361,6 +362,7 @@ const AppRoutes = () => {
         <Route path="/login"                    element={<LoginPage />} />
         <Route path="/policies"                 element={<PoliciesPage />} />
         <Route path="/developers"               element={<DevelopersPage />} />
+        <Route path="/app"                      element={<AppPage />} />
         <Route path="/privacy"                  element={<Navigate to="/policies?tab=privacy" replace />} />
         <Route path="/trust"                    element={<TrustCenterPage />} />
         <Route path="/legal"                    element={<Navigate to="/policies?tab=terms" replace />} />

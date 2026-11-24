@@ -1,19 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Smartphone, X } from 'lucide-react';
-import { appHref, useBuddyApp } from './useBuddyApp';
 import { paths, sessionTenant } from '../../../routes/paths';
 import { hasValidTeamToken } from '../../../services/session';
 
 const LandingNav = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const app = useBuddyApp();
   // "Sign in" takes someone already signed in on this browser straight to their dashboard.
   const tenant = sessionTenant();
   const home = tenant ? paths.orgHub(tenant) : hasValidTeamToken() ? paths.teamHub : null;
-  // "API" opens the API reference in its default view, ReDoc (Swagger, to try requests, is /public-api/v1/docs).
-  const openApiDocs = () => { setMobileMenuOpen(false); window.location.assign('/public-api/v1/redoc'); };
 
   const handleNav = (path) => {
     setMobileMenuOpen(false);
@@ -43,8 +39,8 @@ const LandingNav = () => {
             <button onClick={() => handleNav('/docs')} className="hover:text-[var(--brand-primary)] transition-colors">
               Guide
             </button>
-            <button onClick={() => openApiDocs()} className="hover:text-[var(--brand-primary)] transition-colors">
-              API
+            <button onClick={() => handleNav('/developers')} className="hover:text-[var(--brand-primary)] transition-colors">
+              Developers
             </button>
             <button onClick={() => handleNav('/contact')} className="hover:text-[var(--brand-primary)] transition-colors">
               Contact
@@ -54,8 +50,8 @@ const LandingNav = () => {
 
         {/* Right Section: Desktop Sign In & Mobile Hamburger Toggle */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {app && (
-            <a href={appHref(app)} download title={app.version ? `FarmIntelytics Buddy for Android, version ${app.version}` : 'FarmIntelytics Buddy for Android'}
+          {(
+            <a href="/app" onClick={(e) => { e.preventDefault(); handleNav('/app'); }}
               className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-[#D8EBD3] bg-[#EEF6EC] px-3.5 py-1.5 text-sm font-semibold text-[var(--brand-primary-dark)] hover:bg-[#E2F0DE] transition-colors">
               <Smartphone size={15} />Get the app
             </a>
@@ -102,10 +98,10 @@ const LandingNav = () => {
               Guide
             </button>
             <button
-              onClick={() => openApiDocs()}
+              onClick={() => handleNav('/developers')}
               className="text-left py-2.5 px-3 hover:bg-slate-50 hover:text-[var(--brand-primary)] rounded transition-colors"
             >
-              API
+              Developers
             </button>
             <button
               onClick={() => handleNav('/contact')}
@@ -113,9 +109,9 @@ const LandingNav = () => {
             >
               Contact
             </button>
-            {app && (
-              <a href={appHref(app)} download onClick={() => setMobileMenuOpen(false)} className="text-left py-2.5 px-3 rounded inline-flex items-center gap-2 font-semibold text-[var(--brand-primary-dark)] hover:bg-[#EEF6EC]">
-                <Smartphone size={16} />Get the app for Android
+            {(
+              <a href="/app" onClick={(e) => { e.preventDefault(); handleNav('/app'); }} className="text-left py-2.5 px-3 rounded inline-flex items-center gap-2 font-semibold text-[var(--brand-primary-dark)] hover:bg-[#EEF6EC]">
+                <Smartphone size={16} />Get the app
               </a>
             )}
             <div className="pt-2 border-t border-slate-100">

@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, BookOpen, Check, Copy, KeyRound, Leaf, Map as MapIcon, RefreshCw, ShieldCheck, Webhook, Wallet } from 'lucide-react';
+import { ArrowRight, BookOpen, Check, Copy, Leaf, ShieldCheck, Terminal } from 'lucide-react';
 import LandingNav from '../landing/components/LandingNav';
 import LandingFooter from '../landing/components/LandingFooter';
 import { copyText } from '../../utils/copyText';
 
 /**
- * /developers: the FarmIntelytics API for engineers. The products (EUDR check, crop suitability), a request in three
- * languages with its real response shape, the endpoints, keys and sandbox, charging, webhooks and errors. Everything
- * here matches api_platform (public_api.py, products/*, errors.py, webhooks.py): change both together. Prices are
- * agreed per account, so none are shown.
+ * /developers: the front door of the FarmIntelytics API ("Developers" in the menu). What it is (the products), a first
+ * request in three languages, four steps to a result, and the way to the reference: ReDoc to read it (/redoc, the
+ * default) and Swagger to try it (/docs). The detail (endpoints, fields, errors, webhooks, charging) lives only in the
+ * reference, so it is written once (api_platform/public_api.py). Prices are agreed per account, so none are shown.
  */
 const BASE = '/public-api/v1';
 
@@ -24,21 +24,6 @@ const PRODUCTS = [
     text: 'Send fields as polygons and a crop. Each field gets an FAO suitability class from S1 (very suitable) to N (not suitable), the factors that hold it back, the data that was missing, and how sure the rating is.',
     facts: ['Slope, rainfall, dry season, temperature, soil pH, water, flooding', '30 m grid, worst limiting factor (FAO)', 'Irrigated fields rated without the rain limits'],
   },
-];
-
-const ENDPOINTS = [
-  ['GET', '/me', 'Your account: products on your plan, prices, balance and limits'],
-  ['POST', '/eudr/validate', 'Check plots by the EU information system rules. Free, instant'],
-  ['POST', '/eudr/checks', 'Send plots for the EUDR check. Answers 202 with a check id'],
-  ['GET', '/eudr/checks', 'Your EUDR checks, newest first (cursor: starting_after)'],
-  ['GET', '/eudr/checks/{id}', 'One check, then each plot\'s result'],
-  ['GET', '/eudr/checks/{id}/geojson', 'The plots as GeoJSON for the EU information system'],
-  ['GET', '/suitability/crops', 'The crops that can be rated, and their factors'],
-  ['POST', '/suitability/checks', 'Send fields for a crop rating. Answers 202 with a check id'],
-  ['GET', '/suitability/checks', 'Your suitability checks, newest first'],
-  ['GET', '/suitability/checks/{id}', 'One check, then each field\'s class and limits'],
-  ['GET', '/wallet', 'Balance and every top-up, hold, release and charge'],
-  ['GET', '/usage', 'Plots and spend for a month'],
 ];
 
 const PLOT = '{"type":"FeatureCollection","features":[{"type":"Feature","properties":{"ref":"farm-1001","ProducerName":"Ada Obi","ProducerCountry":"NG"},"geometry":{"type":"Point","coordinates":[8.330123,7.880456]}}]}';
@@ -72,64 +57,6 @@ check = r.json()               # 202: {"id": "chk_…", "status": "queued", …}
 });
 const check = await r.json();  // 202: { id: "chk_…", status: "queued", … }`,
 };
-
-const RESPONSE = `{
-  "id": "chk_6f1d…",
-  "object": "eudr_check",
-  "status": "done",
-  "commodity": "cocoa",
-  "cutoff_date": "2020-12-31",
-  "plots": { "sent": 1, "valid": 1, "charged": 1 },
-  "billing": { "currency": "NGN", "held_minor": …, "charged_minor": … },
-  "results": [{
-    "ref": "farm-1001",
-    "status": "pass",
-    "forest_2020_pct": 0.0,
-    "loss_after_cutoff_ha": 0.0,
-    "loss_year": null,
-    "protected_overlap": false
-  }],
-  "sources": [ … ], "data_versions": { … }
-}`;
-
-const SUIT_RESPONSE = `{
-  "object": "suitability_check",
-  "crop": "cocoa",
-  "status": "done",
-  "summary": { "plots_rated": 1, "by_class": { "S2": 1 } },
-  "results": [{
-    "ref": "field-07",
-    "class": "S2",
-    "class_name": "Suitable",
-    "limiting_factors": ["…"],
-    "missing_factors": [],
-    "confidence": "medium"
-  }]
-}`;
-
-const WEBHOOK = `# FI-Signature: t=1732370000,v1=5c2e…
-import hmac, hashlib
-
-def verify(raw_body: bytes, header: str, secret: str) -> bool:
-    parts = dict(p.split("=", 1) for p in header.split(","))
-    signed = f"{parts['t']}.".encode() + raw_body
-    expected = hmac.new(secret.encode(), signed, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(expected, parts["v1"])`;
-
-const ERRORS = [
-  ['400', 'invalid_request', 'A field is missing or wrong; details name it'],
-  ['401', 'invalid_api_key', 'No key, or a revoked one'],
-  ['402', 'insufficient_balance', 'Not enough balance: nothing was run or charged'],
-  ['403', 'product_not_allowed', 'Your plan does not include this product'],
-  ['409', 'idempotency_conflict', 'Same Idempotency-Key, different body'],
-  ['422', 'invalid_geojson', 'No plot can be checked; each issue has a code'],
-  ['429', 'rate_limited', 'Slow down; wait Retry-After seconds'],
-];
-
-const NAV = [['products', 'Products'], ['quickstart', 'Quickstart'], ['endpoints', 'Endpoints'], ['responses', 'Responses'],
-  ['keys', 'Keys and sandbox'], ['charging', 'Charging'], ['webhooks', 'Webhooks'], ['errors', 'Errors']];
-
-const METHOD = { GET: 'text-sky-700 bg-sky-50 border-sky-200', POST: 'text-green-800 bg-green-50 border-green-200' };
 
 function Code({ code, label }) {
   const [done, setDone] = useState(false);
@@ -188,9 +115,13 @@ export default function DevelopersPage() {
               Send plot boundaries, get back evidence: whether forest was cleared after the EUDR cut-off, and how suited each field is to a crop. Plot by plot, with the sources named.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <a href={`${BASE}/docs`} target="_blank" rel="noreferrer"
+              <a href={`${BASE}/redoc`} target="_blank" rel="noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)]">
                 <BookOpen size={16} />API reference
+              </a>
+              <a href={`${BASE}/docs`} target="_blank" rel="noreferrer"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-gray-800 border border-gray-300 hover:bg-gray-50">
+                <Terminal size={16} />Try it in Swagger
               </a>
               <button type="button" onClick={() => navigate('/contact')}
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold text-gray-800 border border-gray-300 hover:bg-gray-50">
@@ -207,12 +138,8 @@ export default function DevelopersPage() {
         </div>
       </header>
 
-      <div className="flex-1 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 grid gap-12 lg:grid-cols-[200px_minmax(0,1fr)]">
-        <nav aria-label="On this page" className="hidden lg:block sticky top-24 self-start space-y-1 text-sm">
-          {NAV.map(([id, label]) => <a key={id} href={`#${id}`} className="block rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-50 hover:text-gray-900">{label}</a>)}
-        </nav>
-
-        <main className="min-w-0 space-y-20">
+      <div className="flex-1 mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <main className="min-w-0 space-y-16">
           <section className="space-y-6">
             <H2 id="products" kicker="Products" text="Each product is switched on per account, with its own price per plot. More services join the same API, keys and wallet.">What you can call</H2>
             <div className="grid gap-4 md:grid-cols-2">
@@ -250,75 +177,20 @@ export default function DevelopersPage() {
           </section>
 
           <section className="space-y-6">
-            <H2 id="endpoints" kicker="Reference" text={`All paths start with ${BASE}. Send your key as Authorization: Bearer <key>.`}>Endpoints</H2>
-            <div className="rounded-2xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
-              {ENDPOINTS.map(([m, path, text]) => (
-                <div key={m + path} className="grid gap-x-4 gap-y-1 px-4 sm:px-5 py-3 sm:grid-cols-[64px_minmax(0,260px)_minmax(0,1fr)] items-baseline">
-                  <span className={`justify-self-start rounded-md border px-2 py-0.5 font-mono text-[11px] font-semibold ${METHOD[m]}`}>{m}</span>
-                  <code className="font-mono text-[13px] text-gray-900 break-all">{path}</code>
-                  <span className="text-sm text-gray-600">{text}</span>
-                </div>
-              ))}
-            </div>
-            <a href={`${BASE}/docs`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--brand-primary)] hover:underline">
-              Try every endpoint in Swagger<ArrowRight size={15} />
-            </a>
-            <a href={`${BASE}/redoc`} target="_blank" rel="noreferrer" className="ml-6 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:underline">
-              Read it as a document (ReDoc)<ArrowRight size={15} />
-            </a>
-          </section>
-
-          <section className="space-y-6">
-            <H2 id="responses" kicker="Responses" text="One shape per product, the same for polling and webhooks. Money is in kobo (minor units).">What comes back</H2>
-            <div className="grid gap-4 xl:grid-cols-2">
-              <Code label="GET /eudr/checks/{id}" code={RESPONSE} />
-              <Code label="GET /suitability/checks/{id}" code={SUIT_RESPONSE} />
-            </div>
-          </section>
-
-          <section className="grid gap-6 md:grid-cols-2">
-            <div id="keys" className="scroll-mt-24 rounded-2xl border border-gray-200 p-6">
-              <KeyRound size={20} className="text-[var(--brand-primary)]" />
-              <h3 className="mt-3 font-display text-lg font-semibold">Keys and sandbox</h3>
-              <ul className="mt-3 space-y-2 text-sm text-gray-600 leading-relaxed">
-                <li><code className="font-mono text-gray-900">fi_test_…</code> runs the same real check, free, up to a daily limit.</li>
-                <li><code className="font-mono text-gray-900">fi_live_…</code> is charged. Keep keys on your server only.</li>
-                <li>Make, rotate and revoke keys yourself in Settings, Developer and API. A key is shown once.</li>
-              </ul>
-            </div>
-            <div id="charging" className="scroll-mt-24 rounded-2xl border border-gray-200 p-6">
-              <Wallet size={20} className="text-[var(--brand-primary)]" />
-              <h3 className="mt-3 font-display text-lg font-semibold">Charging</h3>
-              <ul className="mt-3 space-y-2 text-sm text-gray-600 leading-relaxed">
-                <li>Per plot, in naira: a prepaid wallet or a monthly invoice. Prices are agreed for your volumes.</li>
-                <li>Sending holds the cost; only plots really checked are charged and the rest comes back.</li>
-                <li>Never charged: validation, refused plots, test keys, failed checks, retries with the same Idempotency-Key.</li>
-              </ul>
-            </div>
-          </section>
-
-          <section className="space-y-6">
-            <H2 id="webhooks" kicker="Webhooks" text="Set a callback URL (https, public address). When a check finishes we POST the result, signed with your secret. If your server does not answer 2xx, we retry 5 more times over about 7 hours.">Get called when it is done</H2>
-            <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_260px] items-start">
-              <Code label="Verify FI-Signature (Python)" code={WEBHOOK} />
-              <ul className="rounded-2xl border border-gray-200 p-5 space-y-3 text-sm">
-                {[[Webhook, 'eudr.check.completed / .failed'], [MapIcon, 'suitability.check.completed / .failed'], [RefreshCw, 'Header FI-Event names the event']].map(([I, t]) => (
-                  <li key={t} className="flex gap-2.5"><I size={16} className="mt-0.5 shrink-0 text-[var(--brand-primary)]" /><code className="font-mono text-[12.5px] text-gray-800 break-all">{t}</code></li>
-                ))}
-              </ul>
-            </div>
-          </section>
-
-          <section className="space-y-6">
-            <H2 id="errors" kicker="Errors" text={'Every error has the same shape: {"error": {"code", "message", "details"}, "request_id"}. Handle the code, not the message.'}>Errors you can handle</H2>
-            <div className="rounded-2xl border border-gray-200 divide-y divide-gray-100 overflow-hidden">
-              {ERRORS.map(([s, code, text]) => (
-                <div key={code} className="grid gap-x-4 gap-y-1 px-4 sm:px-5 py-3 sm:grid-cols-[48px_220px_minmax(0,1fr)] items-baseline">
-                  <span className="font-mono text-sm font-semibold text-gray-900">{s}</span>
-                  <code className="font-mono text-[13px] text-gray-800">{code}</code>
-                  <span className="text-sm text-gray-600">{text}</span>
-                </div>
-              ))}
+            <H2 id="reference" kicker="Reference" text="Every endpoint, field, parameter, example request and response, error code, the webhook signature and how charging works are in the API reference. Two views of the same reference:">Everything else is in the reference</H2>
+            <div className="grid gap-4 md:grid-cols-2">
+              <a href={`${BASE}/redoc`} target="_blank" rel="noreferrer" className="group rounded-2xl border border-gray-200 p-6 hover:border-[var(--brand-primary)]">
+                <BookOpen size={22} className="text-[var(--brand-primary)]" />
+                <h3 className="mt-3 font-display text-lg font-semibold">Read the API reference</h3>
+                <p className="mt-1.5 text-sm text-gray-600 leading-relaxed">The full reference as a document, section by section, with every example. Start here.</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--brand-primary)]">Open the reference<ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" /></span>
+              </a>
+              <a href={`${BASE}/docs`} target="_blank" rel="noreferrer" className="group rounded-2xl border border-gray-200 p-6 hover:border-[var(--brand-primary)]">
+                <Terminal size={22} className="text-[var(--brand-primary)]" />
+                <h3 className="mt-3 font-display text-lg font-semibold">Try it in Swagger</h3>
+                <p className="mt-1.5 text-sm text-gray-600 leading-relaxed">Press Authorize, add your test key, and send real requests from the page.</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--brand-primary)]">Open Swagger<ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" /></span>
+              </a>
             </div>
           </section>
 

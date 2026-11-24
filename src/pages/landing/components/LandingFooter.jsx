@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowUpRight, Mail, Smartphone } from 'lucide-react';
-import { appHref, useBuddyApp } from './useBuddyApp';
 
 /**
  * The footer of every public page: who we are, the services, the company pages, developers, the app, and the
@@ -14,7 +13,6 @@ const COLUMNS = [
 
 const LandingFooter = () => {
   const navigate = useNavigate();
-  const app = useBuddyApp();
   const go = (to, external) => (external ? window.open(to, '_blank', 'noopener') : navigate(to));
   return (
     <footer className="shrink-0 bg-[#F5FAF3] border-t border-[#E3EFDF] text-gray-700">
@@ -32,8 +30,8 @@ const LandingFooter = () => {
               className="inline-flex items-center gap-1.5 rounded-xl border border-[#D8EBD3] bg-white px-3.5 py-2 text-sm font-semibold text-gray-800 hover:bg-[#EEF6EC]">
               <Mail size={14} />Talk to us
             </button>
-            {app && (
-              <a href={appHref(app)} download
+            {(
+              <a href="/app" onClick={(e) => { e.preventDefault(); navigate('/app'); }}
                 className="inline-flex items-center gap-1.5 rounded-xl border border-[#D8EBD3] bg-white px-3.5 py-2 text-sm font-semibold text-[var(--brand-primary-dark)] hover:bg-[#EEF6EC]">
                 <Smartphone size={14} />Get the app
               </a>

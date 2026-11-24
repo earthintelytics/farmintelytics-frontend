@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Code2, Leaf, Droplets, ShieldCheck, Smartphone } from 'lucide-react';
-import { appHref, useBuddyApp } from './useBuddyApp';
 import { paths, sessionTenant } from '../../../routes/paths';
 import { hasValidTeamToken } from '../../../services/session';
 import HeroBackdrop from './HeroBackdrop';
@@ -15,7 +14,6 @@ const POINTS = [
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const app = useBuddyApp();
   const tenant = sessionTenant();
   const home = tenant ? paths.orgHub(tenant) : hasValidTeamToken() ? paths.teamHub : null;
   return (
@@ -42,10 +40,10 @@ const HeroSection = () => {
             className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold text-gray-800 border border-gray-300 hover:bg-gray-50 transition-colors">
             See how it works
           </button>
-          {app && (
-            <a href={appHref(app)} download
+          {(
+            <a href="/app" onClick={(e) => { e.preventDefault(); navigate('/app'); }}
               className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-[var(--brand-primary-dark)] border border-[#D8EBD3] bg-[#EEF6EC] hover:bg-[#E2F0DE] transition-colors">
-              <Smartphone size={16} />Get the app for Android
+              <Smartphone size={16} />Get the app
             </a>
           )}
         </div>
