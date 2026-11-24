@@ -202,7 +202,7 @@ const PortalHub = ({ onSelectModule, onSignOut, onOpenAdmin }) => {
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-6xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/farmintelytics-logo.png" alt="FarmIntelytics" className="h-10 w-10 object-contain" width="40" height="40" />
+            <img src="/farmintelytics-mark.png" alt="FarmIntelytics" className="h-10 w-10 object-contain" width="40" height="40" />
             <div className="leading-tight">
               <p className="font-display text-base font-semibold">FarmIntelytics</p>
               <p className="text-xs text-[var(--text-muted)]">Platform hub</p>

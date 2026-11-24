@@ -41,7 +41,7 @@ const HeroBackdrop = () => (
     <Tiles style={{ filter: 'saturate(1.08) contrast(1.04)' }} />
     <Tiles className="fi-hero-health" style={{ filter: 'url(#fi-health)' }} />
     <Tiles className="fi-hero-water" style={{ filter: 'url(#fi-water)' }} />
-    <div className="absolute right-6 top-6 hidden lg:block w-32 text-center whitespace-nowrap rounded-full bg-white/95 border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800">
+    <div className="absolute right-6 top-6 hidden lg:block w-32 text-center whitespace-nowrap rounded-lg bg-white/95 border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-800">
       <span className="fi-hero-label-a">Natural colour</span>
       <span className="fi-hero-label-b absolute inset-0 flex items-center justify-center">Crop health</span>
       <span className="fi-hero-label-c absolute inset-0 flex items-center justify-center">Moisture</span>

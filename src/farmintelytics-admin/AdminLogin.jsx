@@ -46,7 +46,7 @@ const AdminLogin = ({ onSuccess = null, context = 'admin' }) => {
     <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)] text-[var(--text-main)] font-sans px-6 py-12">
       <div className="w-full max-w-md">
         <div className="flex items-center justify-center gap-3 mb-8">
-          <img src="/farmintelytics-logo.png" alt="FarmIntelytics" className="h-10 w-10 object-contain" width="40" height="40" />
+          <img src="/farmintelytics-mark.png" alt="FarmIntelytics" className="h-10 w-10 object-contain" width="40" height="40" />
           <div className="leading-tight">
             <p className="font-display text-base font-semibold">FarmIntelytics</p>
             <p className="text-xs text-[var(--text-muted)]">{isHub ? 'Platform hub' : 'Admin console'}</p>

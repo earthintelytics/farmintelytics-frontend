@@ -66,7 +66,7 @@ const LandingStory = () => {
             {PEOPLE.map((p) => (
               <figure key={p.src} className={`relative overflow-hidden rounded-3xl ${p.className || ''} h-56 sm:h-auto`}>
                 <img src={p.src} alt={p.alt} loading="lazy" className="absolute inset-0 w-full h-full object-cover" />
-                <figcaption className="absolute left-3 bottom-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-gray-800">{p.label}</figcaption>
+                <figcaption className="absolute left-3 bottom-3 rounded-lg bg-white/95 px-3 py-1 text-xs font-semibold text-gray-800">{p.label}</figcaption>
               </figure>
             ))}
           </div>
@@ -84,9 +84,9 @@ const LandingStory = () => {
               <li key={title} className="relative text-center">
                 <span className="relative mx-auto w-14 h-14 rounded-2xl bg-[#EEF6EC] border border-[#D8EBD3] text-[var(--brand-primary)] flex items-center justify-center">
                   <Icon size={24} />
-                  <span className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-[#F4B740] text-[11px] font-bold text-gray-900 flex items-center justify-center">{i + 1}</span>
                 </span>
-                <h3 className="font-display text-lg font-semibold text-gray-900 mt-5">{title}</h3>
+                <p className="mt-5 text-xs font-semibold text-[#9A6A00]">Step {i + 1}</p>
+                <h3 className="font-display text-lg font-semibold text-gray-900 mt-1">{title}</h3>
                 <p className="text-sm text-gray-600 mt-2 leading-relaxed max-w-[15rem] mx-auto">{text}</p>
               </li>
             ))}

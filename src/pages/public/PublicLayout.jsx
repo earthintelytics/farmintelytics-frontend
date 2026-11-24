@@ -17,9 +17,9 @@ export default function PublicLayout({ eyebrow, title, intro, children, wide = f
       {/* The page's title band: soft green with a sunny accent, the same on every public page */}
       <section className="bg-[#F5FAF3] border-b border-[#E3EFDF]">
         <div className={`mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 ${wide || aside ? 'max-w-6xl' : 'max-w-3xl'}`}>
-          {eyebrow && <p className="inline-flex items-center gap-2 rounded-full border border-[#D8EBD3] bg-white px-3 py-1 text-xs font-semibold text-[var(--brand-primary-dark)]"><span className="h-1.5 w-1.5 rounded-full bg-[#F4B740]" />{eyebrow}</p>}
-          <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight mt-4 text-gray-900">{title}</h1>
-          <span aria-hidden="true" className="mt-4 flex gap-1.5"><span className="h-1 w-10 rounded-full bg-[var(--brand-primary)]" /><span className="h-1 w-4 rounded-full bg-[#F4B740]" /></span>
+          {eyebrow && <p className="text-sm font-semibold text-[var(--brand-primary-dark)]">{eyebrow}</p>}
+          <h1 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight mt-2 text-gray-900">{title}</h1>
+          <span aria-hidden="true" className="mt-4 flex gap-1.5"><span className="h-1 w-10 bg-[var(--brand-primary)]" /><span className="h-1 w-4 bg-[#F4B740]" /></span>
           {intro && <p className="text-base text-gray-600 mt-4 leading-relaxed max-w-2xl">{intro}</p>}
         </div>
       </section>
@@ -40,7 +40,7 @@ export default function PublicLayout({ eyebrow, title, intro, children, wide = f
 export function Section({ title, children }) {
   return (
     <section id={slug(title)} className="py-6 border-t border-gray-100 first:border-t-0 first:pt-0 scroll-mt-24">
-      <h2 className="font-display text-xl font-semibold text-gray-900 flex items-center gap-2.5"><span aria-hidden="true" className="h-5 w-1 rounded-full bg-[var(--brand-primary)]" />{title}</h2>
+      <h2 className="font-display text-xl font-semibold text-gray-900 flex items-center gap-2.5"><span aria-hidden="true" className="h-5 w-1 bg-[var(--brand-primary)]" />{title}</h2>
       <div className="mt-3 space-y-3 text-[15px] text-gray-700 leading-relaxed">{children}</div>
     </section>
   );
@@ -49,10 +49,10 @@ export function Section({ title, children }) {
 /** Capsule buttons that switch between the sub-pages of a public page. */
 export function CapsuleTabs({ tabs, active, onChange, label }) {
   return (
-    <div role="tablist" aria-label={label} className="inline-flex flex-wrap p-1 rounded-full bg-[#EEF6EC] border border-[#D8EBD3]">
+    <div role="tablist" aria-label={label} className="inline-flex flex-wrap p-1 rounded-xl bg-[#EEF6EC] border border-[#D8EBD3]">
       {tabs.map(({ id, label: text }) => (
         <button key={id} type="button" role="tab" aria-selected={active === id} onClick={() => onChange(id)}
-          className={`px-5 py-2 rounded-full text-sm font-semibold transition-colors ${active === id ? 'bg-white text-[var(--brand-primary-dark)] border border-[#D8EBD3]' : 'text-gray-600 hover:text-gray-900 border border-transparent'}`}>
+          className={`px-5 py-2 rounded-lg text-sm font-semibold transition-colors ${active === id ? 'bg-white text-[var(--brand-primary-dark)] border border-[#D8EBD3]' : 'text-gray-600 hover:text-gray-900 border border-transparent'}`}>
           {text}
         </button>
       ))}

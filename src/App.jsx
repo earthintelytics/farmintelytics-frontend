@@ -113,7 +113,7 @@ import { ConfirmProvider } from './components/ConfirmProvider';
 
 // ─── Root Landing Page ───────────────────────────────────────────────────────
 // "/" always shows the FarmIntelytics website, signed in or not (owner, 24 Nov 2026: it used to jump to the
-// organisation's last hub). A signed-in visitor gets "Open dashboard" in the menu instead of "Sign in".
+// organisation's last hub). "Sign in" takes a signed-in visitor straight to their dashboard.
 const RootPage = () => <LandingPage />;
 
 // "/admin-engine" & "/admin/login" is the Super Admin & Team sign-in page.

@@ -180,9 +180,7 @@ export default function DevelopersPage() {
       <header className="border-b border-gray-100">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-14 sm:py-20 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] items-center">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1 font-mono text-xs text-gray-600">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--brand-primary)]" />REST · JSON · {BASE}
-            </p>
+            <p className="font-mono text-xs font-semibold text-[var(--brand-primary)]">REST · JSON · {BASE}</p>
             <h1 className="mt-5 font-display text-4xl sm:text-5xl font-semibold tracking-tight leading-[1.08]">
               Satellite checks for farm land, <span className="text-[var(--brand-primary)]">from your own code</span>
             </h1>
@@ -263,7 +261,10 @@ export default function DevelopersPage() {
               ))}
             </div>
             <a href={`${BASE}/docs`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--brand-primary)] hover:underline">
-              Full reference with every field<ArrowRight size={15} />
+              Try every endpoint in Swagger<ArrowRight size={15} />
+            </a>
+            <a href={`${BASE}/redoc`} target="_blank" rel="noreferrer" className="ml-6 inline-flex items-center gap-1.5 text-sm font-semibold text-gray-700 hover:underline">
+              Read it as a document (ReDoc)<ArrowRight size={15} />
             </a>
           </section>
 

@@ -114,7 +114,7 @@ export default function DocumentationPage() {
                 {active.steps.map(([title, text], i) => (
                   <li key={title} className="relative pl-12 pb-7 last:pb-0">
                     {i < active.steps.length - 1 && <span className="absolute left-[15px] top-9 bottom-0 w-px bg-gray-200" aria-hidden="true" />}
-                    <span className="absolute left-0 top-0 w-8 h-8 rounded-full bg-green-50 border border-green-200 text-green-900 text-sm font-semibold flex items-center justify-center">{i + 1}</span>
+                    <span className="absolute left-0 top-0 w-8 h-8 rounded-lg bg-green-50 border border-green-200 text-green-900 text-sm font-semibold flex items-center justify-center">{i + 1}</span>
                     <h3 className="font-semibold text-gray-900 pt-1">{title}</h3>
                     <p className="mt-1.5 text-[15px] text-gray-700 leading-relaxed">{text}</p>
                   </li>

@@ -9,11 +9,11 @@ const LandingNav = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const app = useBuddyApp();
-  // Signed in on this browser: the way back to the work, instead of "Sign in".
+  // "Sign in" takes someone already signed in on this browser straight to their dashboard.
   const tenant = sessionTenant();
   const home = tenant ? paths.orgHub(tenant) : hasValidTeamToken() ? paths.teamHub : null;
-  // "API" opens the Swagger reference, the API's default page (the developer guide is /developers).
-  const openApiDocs = () => { setMobileMenuOpen(false); window.location.assign('/public-api/v1/docs'); };
+  // "API" opens the API reference in its default view, ReDoc (Swagger, to try requests, is /public-api/v1/docs).
+  const openApiDocs = () => { setMobileMenuOpen(false); window.location.assign('/public-api/v1/redoc'); };
   const goApp = () => {
     setMobileMenuOpen(false);
     const el = document.getElementById('get-the-app');
@@ -32,13 +32,7 @@ const LandingNav = () => {
         {/* Brand Logo & Name */}
         <div className="flex items-center gap-8">
           <div className="flex items-center gap-2.5 sm:gap-3 cursor-pointer" onClick={() => handleNav('/')}>
-            <div className="p-0.5 bg-white rounded-none shadow-sm border border-slate-200/80 flex items-center justify-center">
-              <img
-                src="/farmintelytics-logo.png?v=7"
-                alt="FarmIntelytics"
-                className="h-7 sm:h-8 w-auto object-contain rounded-none block"
-              />
-            </div>
+            <img src="/farmintelytics-mark.png" alt="" className="h-8 w-8 sm:h-9 sm:w-9 object-contain block" />
             <span className="font-display text-base sm:text-lg font-bold tracking-tight text-slate-900">
               FarmIntelytics
             </span>
@@ -68,16 +62,16 @@ const LandingNav = () => {
         <div className="flex items-center gap-2 sm:gap-3">
           {app && (
             <button type="button" onClick={goApp}
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-[#D8EBD3] bg-[#EEF6EC] px-3.5 py-1.5 text-sm font-semibold text-[var(--brand-primary-dark)] hover:bg-[#E2F0DE] transition-colors">
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-xl border border-[#D8EBD3] bg-[#EEF6EC] px-3.5 py-1.5 text-sm font-semibold text-[var(--brand-primary-dark)] hover:bg-[#E2F0DE] transition-colors">
               <Smartphone size={15} />Get the app
             </button>
           )}
           <button
             id="top-nav-sign-in"
             onClick={() => handleNav(home || '/login')}
-            className={home ? 'text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] rounded-full px-4 py-1.5 transition-colors' : 'text-sm font-semibold text-slate-800 hover:text-[var(--brand-primary)] transition-colors px-3 py-1.5 cursor-pointer bg-transparent border-0 active:scale-95'}
+            className="text-sm font-semibold text-slate-800 hover:text-[var(--brand-primary)] transition-colors px-3 py-1.5 cursor-pointer bg-transparent border-0 active:scale-95"
           >
-            {home ? 'Open dashboard' : 'Sign in'}
+            Sign in
           </button>
 
           {/* Mobile Hamburger Button */}
@@ -135,7 +129,7 @@ const LandingNav = () => {
                 onClick={() => handleNav(home || '/login')}
                 className="w-full text-center py-2.5 px-4 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white font-bold rounded shadow-sm transition-colors"
               >
-                {home ? 'Open dashboard' : 'Sign in'}
+                Sign in
               </button>
             </div>
           </nav>

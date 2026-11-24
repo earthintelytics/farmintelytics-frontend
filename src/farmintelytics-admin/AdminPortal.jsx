@@ -140,7 +140,7 @@ const AdminPortal = () => {
         ? `fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col bg-white border-r border-gray-200 transition-transform duration-200 ${menuOpen ? 'translate-x-0' : '-translate-x-full'}`
         : `relative flex flex-col shrink-0 bg-white border-r border-gray-200 transition-[width] duration-200 ${wide ? 'w-64' : 'w-[68px]'}`}>
         <div className={`h-16 flex items-center gap-3 border-b border-gray-200 ${wide ? 'px-5' : 'justify-center'}`}>
-          <img src="/farmintelytics-logo.png" alt="FarmIntelytics" className="h-9 w-9 object-contain shrink-0" width="36" height="36" />
+          <img src="/farmintelytics-mark.png" alt="FarmIntelytics" className="h-9 w-9 object-contain shrink-0" width="36" height="36" />
           {wide && (
             <div className="leading-tight min-w-0">
               <p className="font-display text-sm font-semibold truncate">FarmIntelytics</p>

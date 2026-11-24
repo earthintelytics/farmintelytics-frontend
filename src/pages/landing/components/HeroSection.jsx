@@ -36,7 +36,7 @@ const HeroSection = () => {
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
           <button type="button" id="hero-primary-sign-in" onClick={() => navigate(home || '/login')}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] transition-colors">
-            {home ? 'Open dashboard' : 'Sign in'}<ArrowRight size={16} />
+            Sign in<ArrowRight size={16} />
           </button>
           <button type="button" onClick={() => navigate('/docs')}
             className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold text-gray-800 border border-gray-300 hover:bg-gray-50 transition-colors">
@@ -55,7 +55,7 @@ const HeroSection = () => {
           <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">Example reading</p>
           <div className="flex items-center justify-between gap-3">
             <p className="font-display text-base font-semibold text-gray-900">Field 12</p>
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-green-50 text-green-800 border border-green-200">Growing well</span>
+            <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-green-50 text-green-800 border border-green-200">Growing well</span>
           </div>
           <p className="text-sm text-gray-600 leading-relaxed">Crop vigour is steady against last month. No action needed this week.</p>
           <p className="text-xs text-gray-500">Latest image 7 Oct · 92% of the field clear</p>

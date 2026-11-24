@@ -132,7 +132,7 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
       <main className="lg:w-1/2 flex flex-col px-6 sm:px-12 lg:px-16 py-8">
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/farmintelytics-logo.png" alt="FarmIntelytics" className="h-9 w-9 object-contain" width="36" height="36" />
+            <img src="/farmintelytics-mark.png" alt="FarmIntelytics" className="h-9 w-9 object-contain" width="36" height="36" />
             <div className="leading-tight">
               <p className="font-display text-sm font-semibold">FarmIntelytics</p>
               <p className="text-xs text-[var(--text-muted)]">{currentDesign.name}</p>
