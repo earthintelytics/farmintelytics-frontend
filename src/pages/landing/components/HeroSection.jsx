@@ -24,7 +24,9 @@ const HeroSection = () => {
         <div>
         <p className="text-sm font-medium text-[var(--brand-primary)]">Powered by Earthintelytics</p>
         <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-gray-900 mt-3 max-w-xl">
-          Know what is happening on every field, without walking it.
+          <span className="block">Monitor every field.</span>
+          <span className="block">Stay informed.</span>
+          <span className="block text-[var(--brand-primary)]">Stay in control.</span>
         </h1>
         <p className="text-base sm:text-lg text-gray-600 mt-5 max-w-lg leading-relaxed">
           FarmIntelytics turns satellite imagery into plain answers for farms, estates and co-operatives:
