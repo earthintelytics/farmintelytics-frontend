@@ -1,6 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Code2, Leaf, Droplets, ShieldCheck, Smartphone } from 'lucide-react';
 import { useBuddyApp } from './useBuddyApp';
+import { paths, sessionTenant } from '../../../routes/paths';
+import { hasValidTeamToken } from '../../../services/session';
 import HeroBackdrop from './HeroBackdrop';
 
 // What the platform does, in three plain lines. No client data on a public page.
@@ -14,6 +16,8 @@ const POINTS = [
 const HeroSection = () => {
   const navigate = useNavigate();
   const app = useBuddyApp();
+  const tenant = sessionTenant();
+  const home = tenant ? paths.orgHub(tenant) : hasValidTeamToken() ? paths.teamHub : null;
   return (
     <main className="flex-1 bg-white">
       <section className="relative">
@@ -30,9 +34,9 @@ const HeroSection = () => {
           in one easy platform.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <button type="button" id="hero-primary-sign-in" onClick={() => navigate('/login')}
+          <button type="button" id="hero-primary-sign-in" onClick={() => navigate(home || '/login')}
             className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] transition-colors">
-            Sign in<ArrowRight size={16} />
+            {home ? 'Open dashboard' : 'Sign in'}<ArrowRight size={16} />
           </button>
           <button type="button" onClick={() => navigate('/docs')}
             className="inline-flex items-center justify-center px-6 py-3 rounded-xl text-sm font-semibold text-gray-800 border border-gray-300 hover:bg-gray-50 transition-colors">

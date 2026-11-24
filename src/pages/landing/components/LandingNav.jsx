@@ -2,11 +2,16 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Menu, Smartphone, X } from 'lucide-react';
 import { useBuddyApp } from './useBuddyApp';
+import { paths, sessionTenant } from '../../../routes/paths';
+import { hasValidTeamToken } from '../../../services/session';
 
 const LandingNav = () => {
   const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const app = useBuddyApp();
+  // Signed in on this browser: the way back to the work, instead of "Sign in".
+  const tenant = sessionTenant();
+  const home = tenant ? paths.orgHub(tenant) : hasValidTeamToken() ? paths.teamHub : null;
   // "API" opens the Swagger reference, the API's default page (the developer guide is /developers).
   const openApiDocs = () => { setMobileMenuOpen(false); window.location.assign('/public-api/v1/docs'); };
   const goApp = () => {
@@ -69,10 +74,10 @@ const LandingNav = () => {
           )}
           <button
             id="top-nav-sign-in"
-            onClick={() => handleNav('/login')}
-            className="text-sm font-semibold text-slate-800 hover:text-[var(--brand-primary)] transition-colors px-3 py-1.5 cursor-pointer bg-transparent border-0 active:scale-95"
+            onClick={() => handleNav(home || '/login')}
+            className={home ? 'text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] rounded-full px-4 py-1.5 transition-colors' : 'text-sm font-semibold text-slate-800 hover:text-[var(--brand-primary)] transition-colors px-3 py-1.5 cursor-pointer bg-transparent border-0 active:scale-95'}
           >
-            Sign in
+            {home ? 'Open dashboard' : 'Sign in'}
           </button>
 
           {/* Mobile Hamburger Button */}
@@ -127,10 +132,10 @@ const LandingNav = () => {
             )}
             <div className="pt-2 border-t border-slate-100">
               <button
-                onClick={() => handleNav('/login')}
+                onClick={() => handleNav(home || '/login')}
                 className="w-full text-center py-2.5 px-4 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white font-bold rounded shadow-sm transition-colors"
               >
-                Sign in
+                {home ? 'Open dashboard' : 'Sign in'}
               </button>
             </div>
           </nav>

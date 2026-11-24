@@ -112,13 +112,9 @@ import LandingPage from './pages/LandingPage';
 import { ConfirmProvider } from './components/ConfirmProvider';
 
 // ─── Root Landing Page ───────────────────────────────────────────────────────
-// "/" renders the FarmIntelytics Online landing page (ArcGIS Online style).
-// If an organisation is already signed in on this browser, go to their hub.
-const RootPage = () => {
-  const tenant = sessionTenant();
-  if (tenant) return <Navigate to={paths.orgHub(tenant)} replace />;
-  return <LandingPage />;
-};
+// "/" always shows the FarmIntelytics website, signed in or not (owner, 24 Nov 2026: it used to jump to the
+// organisation's last hub). A signed-in visitor gets "Open dashboard" in the menu instead of "Sign in".
+const RootPage = () => <LandingPage />;
 
 // "/admin-engine" & "/admin/login" is the Super Admin & Team sign-in page.
 const AdminLoginPage = () => {
