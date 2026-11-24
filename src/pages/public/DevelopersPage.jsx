@@ -107,8 +107,7 @@ export default function DevelopersPage() {
       <header className="border-b border-gray-100">
         <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-14 sm:py-20 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] items-center">
           <div>
-            <p className="font-mono text-xs font-semibold text-[var(--brand-primary)]">REST · JSON · {BASE}</p>
-            <h1 className="mt-5 font-display text-4xl sm:text-5xl font-semibold tracking-tight leading-[1.08]">
+            <h1 className="font-display text-4xl sm:text-5xl font-semibold tracking-tight leading-[1.08]">
               Satellite checks for farm land, <span className="text-[var(--brand-primary)]">from your own code</span>
             </h1>
             <p className="mt-5 text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl">
