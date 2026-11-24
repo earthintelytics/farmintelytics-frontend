@@ -20,7 +20,7 @@ const rulesFor = (PRICE_PER_HA) => [
   { icon: Layers, title: 'Charged on the total area', text: `A request costs the total area of its valid plots × ${PRICE_PER_HA ? naira(PRICE_PER_HA) : 'the price per hectare'}. Fifty small plots cost exactly the same as one plot covering the same land.` },
   { icon: Coins, title: 'Smaller than a hectare? You pay the fraction', text: PRICE_PER_HA ? `A 0.4 ha plot costs 0.4 × ${naira(PRICE_PER_HA)} = ${naira(0.4 * PRICE_PER_HA)}. Nothing is rounded up to a whole hectare.` : 'A 0.4 ha plot costs 0.4 of the price per hectare. Nothing is rounded up to a whole hectare.' },
   { icon: MapPin, title: 'Every plot is a polygon', text: 'Each plot is sent as its boundary and counts as measured, so the area, and the price, are exact. Single GPS points are not accepted.' },
-  { icon: Wallet, title: 'From a prepaid wallet', text: 'Top up by bank transfer, quoting your payment reference. Checks draw on the wallet. No subscription, no monthly fee, no invoice.' },
+  { icon: Wallet, title: 'From a prepaid wallet', text: 'Top up by bank transfer, quoting your payment reference. Checks draw on the wallet.' },
   { icon: ShieldCheck, title: 'Held, then charged for what was checked', text: 'Sending a check holds its cost. When it finishes, only the area really checked is charged; the rest goes back to your wallet.' },
   { icon: KeyRound, title: 'Build for free', text: 'Test keys run the same real check, free, up to your free test hectares every day. Pay only when you go live.' },
 ];
@@ -35,7 +35,6 @@ const EXAMPLES = [
 ];
 
 const FAQ = [
-  ['Is there a minimum spend or a contract?', 'No. Top up what you need; there is no monthly fee and no contract term.'],
   ['What if I split my land into many small plots?', 'The price does not change: it is the total area that is charged, never the number of plots.'],
   ['What do I get for each plot?', 'Pass, review or fail against the 31 December 2020 cut-off, with forest in 2020, tree cover lost since and its year, protected-area overlap, and a GeoJSON file ready for the EU information system.'],
   ['How do I top up?', 'Pay by bank transfer and quote your payment reference (shown in your Developer page). Your balance updates when the payment is recorded.'],
@@ -106,8 +105,7 @@ export default function PricingPage() {
               One price per hectare. <span className="text-[var(--brand-primary)]">Nothing else.</span>
             </h1>
             <p className="mt-5 text-lg text-gray-600 leading-relaxed max-w-xl">
-              The EUDR deforestation check, plot by plot, charged on the land you check, from a prepaid wallet. No
-              subscription, no monthly fee, no contract.
+              The EUDR deforestation check, plot by plot, charged on the land you check, from a prepaid wallet.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button type="button" onClick={() => navigate('/contact')}
