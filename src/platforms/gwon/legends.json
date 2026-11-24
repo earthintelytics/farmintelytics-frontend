@@ -1,0 +1,196 @@
+{
+ "population": {
+  "unit": "people/km2",
+  "kind": "ramp",
+  "stops": [
+   {
+    "color": "#FFF2D1",
+    "label": "0"
+   },
+   {
+    "color": "#FFDDAB",
+    "label": "4"
+   },
+   {
+    "color": "#FABC60",
+    "label": "17.5"
+   },
+   {
+    "color": "#FD8D3C",
+    "label": "150"
+   },
+   {
+    "color": "#F03B20",
+    "label": "475"
+   },
+   {
+    "color": "#BD0026",
+    "label": "1000"
+   }
+  ]
+ },
+ "rain": {
+  "unit": "mm/hr",
+  "kind": "ramp",
+  "stops": [
+   {
+    "color": "#B1FAEE",
+    "label": "0.10"
+   },
+   {
+    "color": "#71C1E4",
+    "label": "0.35"
+   },
+   {
+    "color": "#4B6AC7",
+    "label": "1.1885"
+   },
+   {
+    "color": "#5931E1",
+    "label": "4.217"
+   },
+   {
+    "color": "#7B09B2",
+    "label": "14.1254"
+   },
+   {
+    "color": "#3F0336",
+    "label": "50.1187"
+   }
+  ]
+ },
+ "landcover": {
+  "unit": "",
+  "kind": "classes",
+  "stops": [
+   {
+    "color": "#218A21",
+    "label": "Evergreen Needleleaf Forests"
+   },
+   {
+    "color": "#31CC31",
+    "label": "Evergreen Broadleaf Forests"
+   },
+   {
+    "color": "#98CC31",
+    "label": "Deciduous Needleleaf Forests"
+   },
+   {
+    "color": "#96FA96",
+    "label": "Deciduous Broadleaf Forests"
+   },
+   {
+    "color": "#8DBA8D",
+    "label": "Mixed Forests"
+   },
+   {
+    "color": "#BA8D8D",
+    "label": "Closed Shrublands"
+   },
+   {
+    "color": "#F5DEB3",
+    "label": "Open Shrublands"
+   },
+   {
+    "color": "#DAEB9D",
+    "label": "Woody Savannas"
+   },
+   {
+    "color": "#FFD500",
+    "label": "Savannas"
+   },
+   {
+    "color": "#F0B967",
+    "label": "Grasslands"
+   },
+   {
+    "color": "#4783B5",
+    "label": "Permanent Wetlands"
+   },
+   {
+    "color": "#FAEF73",
+    "label": "Croplands"
+   },
+   {
+    "color": "#FF0000",
+    "label": "Urban and Built-up Lands"
+   },
+   {
+    "color": "#999356",
+    "label": "Cropland/Natural Vegetation Mosaics"
+   },
+   {
+    "color": "#FFFFFF",
+    "label": "Permanent Snow and Ice"
+   },
+   {
+    "color": "#BFBFBD",
+    "label": "Barren"
+   },
+   {
+    "color": "#86CAE3",
+    "label": "Water Bodies"
+   }
+  ]
+ },
+ "ndvi": {
+  "unit": "NDVI",
+  "kind": "ramp",
+  "stops": [
+   {
+    "color": "#F1ECEC",
+    "label": "0.00"
+   },
+   {
+    "color": "#C8B5A5",
+    "label": "0.14"
+   },
+   {
+    "color": "#9A6E59",
+    "label": "0.28"
+   },
+   {
+    "color": "#64A601",
+    "label": "0.47"
+   },
+   {
+    "color": "#1D7501",
+    "label": "0.71"
+   },
+   {
+    "color": "#001801",
+    "label": "0.99"
+   }
+  ]
+ },
+ "soil": {
+  "unit": "m3/m3",
+  "kind": "ramp",
+  "stops": [
+   {
+    "color": "#FFA200",
+    "label": "0"
+   },
+   {
+    "color": "#CAE400",
+    "label": "0.14"
+   },
+   {
+    "color": "#00B164",
+    "label": "0.28"
+   },
+   {
+    "color": "#0071FF",
+    "label": "0.42"
+   },
+   {
+    "color": "#00008F",
+    "label": "0.56"
+   },
+   {
+    "color": "#4E4E50",
+    "label": "0.70"
+   }
+  ]
+ }
+}
