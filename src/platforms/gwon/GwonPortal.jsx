@@ -21,7 +21,7 @@ import { ndviDate } from './layers';
 import { fetchClimate, monthly, rainToDate } from './climate';
 import { RainBars, MonthLines, StateBars } from './Charts';
 import { SeasonCurve, YearBars, MonthVsMean } from './AnalysisCharts';
-import { LandStack, LandChange } from './LandCharts';
+import { LandDonut, LandBars } from './LandCharts';
 import Indicator from './Indicators';
 import { averageSeries, averageDaily, sumLand } from './scope';
 import Assistant from './Assistant';
@@ -33,7 +33,8 @@ const TABS = [
 ];
 const PAGES = {
   monitor: [
-    { id: 'overview', label: 'Overview', icon: MapIcon, group: 'Maps' },
+    { id: 'overview', label: 'Overview', icon: Activity, group: 'Dashboard' },
+    { id: 'map', label: 'Map', icon: MapIcon, group: 'Maps' },
     { id: 'atlas', label: 'Baseline atlas', icon: Layers, group: 'Maps' },
     { id: 'registry', label: 'Project registry', icon: ClipboardList, group: 'Maps' },
     { id: 'monitoring', label: 'Restoration monitoring', icon: Sprout, group: 'Maps' },
@@ -297,6 +298,13 @@ export default function GwonPortal() {
             </>
           )}
 
+          {tab === 'monitor' && page === 'map' && (
+            <>
+              <Title title={all ? 'Map of the frontline' : `Map of ${scope}`} tip="The vegetation now over the frontline states, with every registered site. Switch other layers on in the Layers panel; step through the year on the strip under the map." text="How green the land is now, and where the registered sites are." />
+              <MapView focus={scopeFeature} initial={['ndvi']} states={states} sites={sites} date={period} onDate={setPeriod} title="Vegetation now" stats={[siteStat]} />
+            </>
+          )}
+
           {tab === 'monitor' && page === 'atlas' && (
             <>
               <Title title="Baseline atlas" tip="The same layers for every state, so progress is measured against a fixed baseline. In the platform, 10 m Sentinel-2 and 30 m Landsat layers come from the pipeline." text="Switch layers on in the Layers panel; step through the year on the strip under the map." />
@@ -424,8 +432,10 @@ export default function GwonPortal() {
                       <Kpi tone="sky" label={`Shrub and grass, ${last}`} value={`${(share(a1, 'Shrubland') + share(a1, 'Grassland')).toFixed(1)}%`} sub={`${(share(a0, 'Shrubland') + share(a0, 'Grassland')).toFixed(1)}% in ${first}`} tip="Share under shrubland and grassland together." />
                       <Kpi tone="teal" label={`Bare and sparse, ${last}`} value={`${(share(a1, 'Bare land') + share(a1, 'Sparse vegetation')).toFixed(1)}%`} sub={`${(share(a0, 'Bare land') + share(a0, 'Sparse vegetation')).toFixed(1)}% in ${first}`} tip="Share that is bare land or sparse vegetation: the land the Great Green Wall works to restore." />
                     </div>
-                    {card(`Land types each year, ${aState}`, 'Each bar is one year, split into its land types. Hover a year for the hectares.', <LandStack years={ys} byYear={landOf} types={land.types} colors={land.colors} />)}
-                    {card(`${first} against ${last}, ${aState}`, 'Hectares of each land type in the first and last year, and the change. Amber: less than before.', <LandChange from={first} to={last} a={a0} b={a1} types={land.types} colors={land.colors} />)}
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                      {card(`Share of each land type, ${aState}`, 'Percent of the land under each type in the chosen year. Hover a slice or a row.', <LandDonut years={ys} byYear={landOf} types={land.types} colors={land.colors} />)}
+                      {card(`${first} against ${last}, ${aState}`, 'Hectares of each land type in the first year (grey) and the last year, with the change. Amber: less than before.', <LandBars from={first} to={last} a={a0} b={a1} types={land.types} colors={land.colors} />)}
+                    </div>
                     <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
                       {card(`Cropland change, ${first}–${last}`, 'Hectares of cropland gained or lost in each state.', <StateBars unit="ha" rows={diffRows('Cropland').map((r) => ({ ...r, color: r.value < 0 ? '#D97706' : '#0F766E' }))} />)}
                       {card(`Tree cover change, ${first}–${last}`, 'Hectares of tree cover gained or lost in each state.', <StateBars unit="ha" rows={diffRows('Tree cover').map((r) => ({ ...r, color: r.value < 0 ? '#D97706' : '#0F766E' }))} />)}

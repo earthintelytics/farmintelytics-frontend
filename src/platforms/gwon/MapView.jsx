@@ -4,11 +4,11 @@
  * headline figures float top right; the strip under the map holds the timeline (the year's 16-day vegetation
  * pictures, or the last weeks day by day), step and play, and a calendar. Maps are drawn smooth.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useId, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import { Layers, X, ChevronLeft, ChevronRight, Play, Pause, CalendarDays } from 'lucide-react';
+import { Layers, X, ChevronLeft, ChevronRight, Play, Pause, CalendarDays, Columns2 } from 'lucide-react';
 import InfoTip from '../../components/page/InfoTip';
 import LEGENDS from './legends.json';
 
@@ -21,6 +21,25 @@ const fmt = (n) => Math.round(n).toLocaleString('en-GB');
 function Fit({ data }) {
   const map = useMap();
   useEffect(() => { if (data) { try { map.fitBounds(L.geoJSON(data).getBounds(), { padding: [20, 20] }); } catch { /* empty */ } } }, [data, map]);
+  return null;
+}
+
+// Split screen: the maps of one view pan and zoom together.
+const GROUPS = {};   // split-screen map groups: { maps, moving }
+function Sync({ group, id }) {
+  const map = useMap();
+  useEffect(() => {
+    const g = (GROUPS[group] ||= { maps: {}, moving: false });
+    g.maps[id] = map;
+    const follow = () => {
+      if (g.moving) return;
+      g.moving = true;
+      Object.entries(g.maps).forEach(([k, m]) => { if (k !== id && m) m.setView(map.getCenter(), map.getZoom(), { animate: false }); });
+      g.moving = false;
+    };
+    map.on('move', follow);
+    return () => { map.off('move', follow); delete g.maps[id]; };
+  }, [group, id, map]);
   return null;
 }
 
@@ -105,35 +124,45 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, site
   // The chosen day, while it is on the timeline; otherwise the newest picture.
   const date = dateIn ?? (own && timeline.includes(own) ? own : timeline[timeline.length - 1]);
   const setDate = (d) => { if (onDate) onDate(d); else setOwn(d); };
-  const idx = Math.max(0, timeline.indexOf(date));
   const [playing, setPlaying] = useState(false);
   const [cal, setCal] = useState(false);
   const anyTime = ORDER.some((k) => layers[k].on && LAYERS[k].time);
+  // Split screen: a second map with its own date (by default the same picture a year earlier, or 30 days earlier).
+  const [split, setSplit] = useState(false);
+  const [side, setSide] = useState('B');           // which map the strip moves: A (left) or B (right, the main date)
+  const [yearA, setYearA] = useState(() => new Date().getUTCFullYear() - 1);
+  const timelineA = useMemo(() => (periodMode ? ndviPeriods(yearA) : dailyDays(dailyLag)), [periodMode, yearA, dailyLag]);
+  const [ownA, setOwnA] = useState(null);
+  const defaultA = periodMode ? (timelineA.find((d) => d.slice(5) >= date.slice(5)) || timelineA[timelineA.length - 1]) : timelineA[Math.max(0, timelineA.indexOf(date) - 30)];
+  const dateA = ownA && timelineA.includes(ownA) ? ownA : defaultA;
+  const sync = useId();
+  const act = split && side === 'A'
+    ? { tl: timelineA, d: dateA, set: setOwnA, year: yearA, setYear: (y) => { setYearA(y); setOwnA(null); } }
+    : { tl: timeline, d: date, set: setDate, year, setYear: (y) => { setYear(y); setOwn(null); } };
+  const actIdx = Math.max(0, act.tl.indexOf(act.d));
 
   useEffect(() => {
     if (!playing) return undefined;
-    const t = setInterval(() => setDate(timeline[(timeline.indexOf(date) + 1) % timeline.length]), 1300);
+    const t = setInterval(() => act.set(act.tl[(act.tl.indexOf(act.d) + 1) % act.tl.length]), 1300);
     return () => clearInterval(t);
-  }, [playing, timeline, date]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [playing, act.tl, act.d]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const set = (k, patch) => setLayers((s) => ({ ...s, [k]: { ...s[k], ...patch } }));
   // The day each layer shows: the timeline's day, the nearest 16-day picture, or the layer's fixed year.
-  const dayFor = (k) => {
+  const dayFor = (k, d = date) => {
     const l = LAYERS[k];
     if (l.fixed) return l.fixed;
-    if (l.time === 'period') return periodMode ? date : ndviDate(new Date(`${date}T00:00:00Z`));
-    return periodMode ? iso(daysAgo(l.lag || 1)) : date;
+    if (l.time === 'period') return periodMode ? d : ndviDate(new Date(`${d}T00:00:00Z`));
+    return periodMode ? iso(daysAgo(l.lag || 1)) : d;
   };
 
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
-      {/* Smooth maps (owner's rule): coarse layers (9 to 10 km cells) are softened, never shown as blocks. */}
-      <style>{'.gwon-soft img { filter: blur(2.5px); }'}</style>
-      <div className="relative" style={{ height }}>
-        <MapContainer center={[11.5, 8.5]} zoom={6} style={{ height: '100%' }} zoomControl={false} scrollWheelZoom>
+  // One map at a date: drawn once, or twice side by side in split screen.
+  const drawMap = (d, id) => (
+    <MapContainer center={[11.5, 8.5]} zoom={6} style={{ height: '100%' }} zoomControl={false} scrollWheelZoom>
+          <Sync group={sync} id={id} />
           <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}" attribution="Base map: Esri" maxNativeZoom={16} />
           {ORDER.filter((k) => layers[k].on).map((k) => (
-            <TileLayer key={`${k}-${dayFor(k)}`} url={tileUrl(k, dayFor(k))} maxNativeZoom={LAYERS[k].level} maxZoom={13}
+            <TileLayer key={`${k}-${dayFor(k, d)}`} url={tileUrl(k, dayFor(k, d))} maxNativeZoom={LAYERS[k].level} maxZoom={13}
               opacity={layers[k].opacity / 100} attribution="NASA GIBS (public domain)" className={LAYERS[k].coarse ? 'gwon-soft' : ''} />
           ))}
           <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}" attribution="Places: Esri" opacity={0.9} />
@@ -147,6 +176,25 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, site
             onEachFeature={(f, lyr) => lyr.bindTooltip(f.properties?.name || f.properties?.ref || 'Site', { sticky: true })} />}
           <Fit data={focus || states} />
         </MapContainer>
+  );
+
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
+      {/* Smooth maps (owner's rule): coarse layers (9 to 10 km cells) are softened, never shown as blocks. */}
+      <style>{'.gwon-soft img { filter: blur(2.5px); }'}</style>
+      <div className="relative" style={{ height }}>
+        {split ? (
+          <div className="grid grid-cols-2 h-full gap-0.5 bg-gray-200">
+            {[['A', dateA], ['B', date]].map(([id, d]) => (
+              <div key={id} className="relative h-full">
+                {drawMap(d, id)}
+                <button type="button" onClick={() => setSide(id)} className={`absolute top-3 left-1/2 -translate-x-1/2 z-[1000] px-3 py-1.5 rounded-lg text-xs font-semibold border ${side === id ? 'bg-[#0F766E] border-[#0F766E] text-white' : 'bg-white border-gray-200 text-gray-800'}`}>
+                  {id === 'A' ? 'Left' : 'Right'} · {long(d)}
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : drawMap(date, 'B')}
 
         {/* Layers */}
         <div className="absolute top-3 left-3 z-[1000] w-[300px] max-w-[calc(100%-24px)]">
@@ -204,26 +252,35 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, site
           <button type="button" onClick={() => setPlaying((p) => !p)} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#0F766E] text-white text-sm font-semibold shrink-0" aria-label={playing ? 'Pause' : 'Play'}>
             {playing ? <Pause size={15} /> : <Play size={15} />}<span className="hidden sm:inline">{playing ? 'Pause' : 'Play'}</span>
           </button>
-          <button type="button" onClick={() => setDate(timeline[Math.max(0, idx - 1)])} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 shrink-0" aria-label="Picture before"><ChevronLeft size={16} /></button>
+          <button type="button" onClick={() => { setSplit((s) => !s); setSide('B'); }} aria-pressed={split}
+            className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-xl border text-sm font-semibold shrink-0 ${split ? 'bg-[#ECFDF8] border-[#0F766E] text-[#0F5F57]' : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'}`}>
+            <Columns2 size={15} /><span className="hidden sm:inline">Split screen</span>
+          </button>
+          {split && (
+            <div className="flex items-center bg-gray-100 p-0.5 rounded-lg shrink-0" role="group" aria-label="Which map the timeline moves">
+              {['A', 'B'].map((s) => <button key={s} type="button" onClick={() => setSide(s)} className={`px-2.5 py-1.5 rounded-md text-xs font-semibold ${side === s ? 'bg-white border border-gray-200 text-[#0F5F57]' : 'text-gray-600'}`}>{s === 'A' ? 'Left' : 'Right'}</button>)}
+            </div>
+          )}
+          <button type="button" onClick={() => act.set(act.tl[Math.max(0, actIdx - 1)])} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 shrink-0" aria-label="Picture before"><ChevronLeft size={16} /></button>
           <div className="flex-1 min-w-0 overflow-x-auto">
             <div className="flex gap-1 w-max">
-              {timeline.map((d) => (
-                <button key={d} type="button" onClick={() => setDate(d)} data-active={d === date}
-                  className={`px-2.5 py-1.5 rounded-lg text-xs whitespace-nowrap border ${d === date ? 'bg-[#0F766E] border-[#0F766E] text-white font-semibold' : 'bg-white border-gray-200 text-gray-600 hover:border-[#0F766E]'}`}>{short(d)}</button>
+              {act.tl.map((d) => (
+                <button key={d} type="button" onClick={() => act.set(d)} data-active={d === act.d}
+                  className={`px-2.5 py-1.5 rounded-lg text-xs whitespace-nowrap border ${d === act.d ? 'bg-[#0F766E] border-[#0F766E] text-white font-semibold' : 'bg-white border-gray-200 text-gray-600 hover:border-[#0F766E]'}`}>{short(d)}</button>
               ))}
             </div>
           </div>
-          <button type="button" onClick={() => setDate(timeline[Math.min(timeline.length - 1, idx + 1)])} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 shrink-0" aria-label="Picture after"><ChevronRight size={16} /></button>
+          <button type="button" onClick={() => act.set(act.tl[Math.min(act.tl.length - 1, actIdx + 1)])} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 shrink-0" aria-label="Picture after"><ChevronRight size={16} /></button>
           {periodMode && (
-            <select value={year} onChange={(e) => { setYear(Number(e.target.value)); setOwn(null); }} className="px-2 py-2 rounded-lg border border-gray-200 text-sm shrink-0" aria-label="Year">
+            <select value={act.year} onChange={(e) => act.setYear(Number(e.target.value))} className="px-2 py-2 rounded-lg border border-gray-200 text-sm shrink-0" aria-label="Year">
               {Array.from({ length: new Date().getUTCFullYear() - 2015 }, (_, i) => new Date().getUTCFullYear() - i).map((y) => <option key={y}>{y}</option>)}
             </select>
           )}
           <div className="relative shrink-0">
             <button type="button" onClick={() => setCal((c) => !c)} className="p-2 rounded-lg border border-gray-200 hover:bg-gray-50" aria-label="Calendar"><CalendarDays size={16} /></button>
-            {cal && <Calendar dates={timeline} value={date} onPick={setDate} onClose={() => setCal(false)} />}
+            {cal && <Calendar dates={act.tl} value={act.d} onPick={act.set} onClose={() => setCal(false)} />}
           </div>
-          <span className="hidden lg:block text-sm font-semibold tabular-nums text-gray-900 shrink-0 w-32 text-right">{long(date)}</span>
+          <span className="hidden lg:block text-sm font-semibold tabular-nums text-gray-900 shrink-0 w-32 text-right">{long(act.d)}</span>
         </div>
       )}
     </div>
