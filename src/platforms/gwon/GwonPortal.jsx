@@ -13,7 +13,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   SlidersHorizontal,
   Activity, FileBarChart, MessageSquareText, Map as MapIcon, Layers, ClipboardList, Sprout, AlertTriangle, Compass, CloudRain,
-  UploadCloud, Trash2, Printer, LogIn, LogOut, UserCircle2, ListChecks, Sun, Moon, Droplets, Trees, FileText, MapPin, Gauge, TrendingUp, Users, GitCompare, FlaskConical, HelpCircle, BookOpen, BookOpenText, Lightbulb, Shovel, Target, ShieldCheck, Users2, Database, Cpu, Info,
+  UploadCloud, Trash2, Printer, LogIn, LogOut, UserCircle2, ListChecks, Sun, Moon, Droplets, Trees, FileText, MapPin, Gauge, TrendingUp, Users, GitCompare, FlaskConical, HelpCircle, BookOpen, BookOpenText, Lightbulb, Home, Shovel, Target, ShieldCheck, Users2, Database, Cpu, Info,
 } from 'lucide-react';
 import InfoTip from '../../components/page/InfoTip';
 import { useConfirm } from '../../components/ConfirmProvider';
@@ -33,6 +33,8 @@ import Advisor from './Advisor';
 import { Slm, Programmes } from './SlmProgrammes';
 import { Gender, Resilience, DataCatalogue } from './GgwPages';
 import { AccountPanel, About, Models } from './AccountInfo';
+import ResearchReport from './ResearchReport';
+import GwonHome from './GwonHome';
 import { shortName } from './gwonApi';
 import { SignInDialog, Locked } from './SignIn';
 import { gwonFetch, gwonMe, gwonSignOut } from './gwonApi';
@@ -40,6 +42,7 @@ import { DroughtIndices, ClimateFutures, People, Compare, Scenarios } from './An
 import './gwon-theme.css';
 
 const TABS = [
+  { id: 'home', label: 'Home', icon: Home },
   { id: 'monitor', label: 'Monitor', icon: Activity },
   { id: 'reports', label: 'Reports', icon: FileBarChart },
   { id: 'assistant', label: 'Assistant', icon: MessageSquareText },
@@ -69,6 +72,7 @@ const PAGES = {
   ],
   reports: [
     { id: 'report', label: 'Report', icon: Printer },
+    { id: 'research', label: 'Research report', icon: FileText },
     { id: 'results', label: 'Results Framework', icon: ListChecks },
     { id: 'programmes', label: 'Programmes', icon: Target },
     { id: 'stories', label: 'Story maps', icon: BookOpenText },
@@ -131,8 +135,8 @@ function Kpi({ label, value, sub, tip, tone }) {
 
 export default function GwonPortal() {
   const confirm = useConfirm();
-  const initial = (window.location.hash.slice(1).split('?')[0] || 'monitor/overview').split('/');
-  const [tab, setTab] = useState(TABS.some((t) => t.id === initial[0]) ? initial[0] : 'monitor');
+  const initial = (window.location.hash.slice(1).split('?')[0] || 'home').split('/');
+  const [tab, setTab] = useState(TABS.some((t) => t.id === initial[0]) ? initial[0] : 'home');
   const [page, setPage] = useState(initial[1] || (initial[0] === 'reports' ? 'report' : 'overview'));
   const [states, setStates] = useState(null);
   const EMPTY_SITES = { type: 'FeatureCollection', features: [] };
@@ -187,7 +191,7 @@ export default function GwonPortal() {
   }, []);
   useEffect(() => { if (states) fetchClimate(states).then(setClimate).catch((e) => setClimateErr(e.message)); }, [states]);
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'auto' }); }, [tab, page]);
-  useEffect(() => { const q = page === 'stories' ? (window.location.hash.match(/\?.*$/) || [''])[0] : ''; window.history.replaceState(null, '', `#${tab}${tab === 'assistant' ? '' : `/${page}`}${q}`); }, [tab, page]);
+  useEffect(() => { const q = page === 'stories' ? (window.location.hash.match(/\?.*$/) || [''])[0] : ''; window.history.replaceState(null, '', `#${tab}${tab === 'assistant' || tab === 'home' ? '' : `/${page}`}${q}`); }, [tab, page]);
   useEffect(() => { gwonMe().then(setMe).catch(() => setMe(null)); }, []);
   const loadSites = () => gwonFetch('/platforms/gwon/sites').then(setSites).catch(() => setSites(EMPTY_SITES));
   useEffect(() => { if (signedIn) loadSites(); }, [signedIn]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -294,7 +298,7 @@ export default function GwonPortal() {
       <header className="gwon-noprint bg-white border-b border-gray-200 sticky top-0 z-[1200]">
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 min-h-[68px] py-2 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <img src="/gwon-data/naggw-seal.png" alt="National Agency for the Great Green Wall" className="w-11 h-11 shrink-0" />
+            <button type="button" onClick={() => setTab('home')} aria-label="GWON home" className="shrink-0"><img src="/gwon-data/naggw-seal.png" alt="National Agency for the Great Green Wall" className="w-11 h-11" /></button>
             <div className="min-w-0">
               <p className="font-display text-base font-semibold leading-tight truncate">GreenWall Observatory Nigeria</p>
               <p className="hidden sm:block text-xs text-gray-500 truncate">National Agency for the Great Green Wall · Powered by <span className="font-semibold text-gray-700">Earthintelytics</span></p>
@@ -331,7 +335,7 @@ export default function GwonPortal() {
           </div>
         </div>
         {/* Dashboard filters: one row, every page follows them */}
-        {tab !== 'assistant' && (
+        {tab !== 'assistant' && tab !== 'home' && (
           <div className="border-t border-gray-100 bg-white" data-tour="filters">
             <button type="button" onClick={() => setFiltersOpen((o) => !o)} aria-expanded={filtersOpen} className="md:hidden w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-gray-800">
               <span className="inline-flex items-center gap-2"><SlidersHorizontal size={15} /> Filters</span>
@@ -385,8 +389,8 @@ export default function GwonPortal() {
         )}
       </header>
 
-      <div className={`max-w-[1600px] mx-auto px-4 sm:px-6 py-5 grid gap-5 ${tab === 'assistant' ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-[224px_1fr]'}`}>
-        {tab !== 'assistant' && (
+      <div className={`max-w-[1600px] mx-auto px-4 sm:px-6 py-5 grid gap-5 ${tab === 'assistant' || tab === 'home' ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-[224px_1fr]'}`}>
+        {tab !== 'assistant' && tab !== 'home' && (
           <label className="gwon-noprint lg:hidden flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 py-2">
             <span className="text-xs font-semibold text-gray-600 shrink-0">Page</span>
             <select value={page} onChange={(e) => setPage(e.target.value)} aria-label="Page" className="flex-1 min-w-0 py-1.5 bg-transparent text-sm font-semibold text-gray-900 outline-none">
@@ -396,7 +400,7 @@ export default function GwonPortal() {
             </select>
           </label>
         )}
-        {tab !== 'assistant' && (
+        {tab !== 'assistant' && tab !== 'home' && (
           <nav className="gwon-noprint hidden lg:block lg:sticky lg:top-[164px] self-start lg:max-h-[calc(100vh-180px)] overflow-y-auto overscroll-contain rounded-2xl border border-gray-200 bg-white p-2" aria-label="Pages" data-tour="menu">
             {PAGES[tab].map(({ id, label, icon: Icon, group }, i) => (
               <div key={id}>
@@ -815,6 +819,12 @@ export default function GwonPortal() {
             </>
           )}
 
+          {tab === 'reports' && page === 'research' && (
+            <>
+              <Title title="Research report" tip="A full study in the shape of a research paper: summary, study area, data and methods, rainfall, drought, heat, land cover, cropland, people, climate futures, land management, recommendations, limitations and references. Follows the state filter." text={`A research-style study of ${all ? 'the frontline' : `${scope} State`}, about fifteen pages.`} />
+              <ResearchReport scope={scope} states={states} series={series} land={land} signedIn={signedIn} onSignIn={() => setSignIn(true)} dark={dark} />
+            </>
+          )}
           {tab === 'reports' && page === 'programmes' && (
             <>
               <Title title="Programmes" tip="The programme indicators the Agency publishes (ACReSAL, the Great Green Wall Accelerator, state programmes): baseline, target, achieved and source. Signed-in staff add and publish them." text="Programme indicators, as published by the Agency." />
@@ -871,6 +881,9 @@ export default function GwonPortal() {
             </>
           )}
 
+          {tab === 'home' && (
+            <GwonHome go={(to) => { const [tb, pg] = to.split('/'); setTab(tb); if (pg) setPage(pg); }} states={states} series={series} adminIndex={adminIndex} signedIn={signedIn} onSignIn={() => setSignIn(true)} />
+          )}
           {tab === 'assistant' && (
             <div className="max-w-5xl mx-auto w-full space-y-4">
               <Title title="Assistant" tip="Ask in plain words. The Assistant reads the figures GWON shows now (states, areas, climate, registered sites) and answers from them only, saying where each figure comes from." text="Questions and advice about the frontline states, from GWON's own figures." />

@@ -51,12 +51,25 @@ const CARD_PHOTOS = {
 };
 const photoFor = (id) => CARD_PHOTOS[id] || (id?.startsWith('org:') ? '/crops/organization.webp' : null);
 
-const ModuleCard = ({ title, crop, id, icon, active, onSelect, logoUrl }) => {
+// A colour for each service group, from the front page's palette: flat tints, no glow.
+const GROUP_TONES = {
+  monitoring: { band: '#EEF6EC', ink: '#2D6A2C', line: '#5DA04C' },
+  sustainability: { band: '#E8F5EE', ink: '#0F6B4A', line: '#2F9E6E' },
+  advisory: { band: '#FFF5DD', ink: '#8A5D00', line: '#D49A1A' },
+  engine: { band: '#EEF3FB', ink: '#1E4E8C', line: '#3B78C4' },
+  management: { band: '#F6EFE6', ink: '#7A4B1E', line: '#B07A3F' },
+  api: { band: '#EFEFFA', ink: '#3A3A8C', line: '#6366C4' },
+  platforms: { band: '#E6F0F2', ink: '#0E2D41', line: '#007248' },
+  organizations: { band: '#F3F4F6', ink: '#374151', line: '#9CA3AF' },
+};
+
+const ModuleCard = ({ title, crop, id, icon, active, onSelect, logoUrl, tone = GROUP_TONES.monitoring }) => {
   const photo = photoFor(id);
   return (
     <button
       onClick={() => active && onSelect(id)}
       disabled={!active}
+      style={{ borderTop: `4px solid ${tone.line}` }}
       className={`group flex flex-col text-left bg-white rounded-2xl border border-gray-200 overflow-hidden transition-colors ${
         active ? 'hover:border-gray-300' : 'opacity-50 cursor-not-allowed'
       }`}
@@ -81,10 +94,10 @@ const ModuleCard = ({ title, crop, id, icon, active, onSelect, logoUrl }) => {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col p-5">
-        <p className="text-xs font-medium text-gray-500">{crop}</p>
+      <div className="flex-1 flex flex-col p-5" style={{ background: `linear-gradient(to bottom, #FFFFFF, ${tone.band})` }}>
+        <p className="text-xs font-semibold" style={{ color: tone.ink }}>{crop}</p>
         <h3 className="font-display text-lg font-semibold text-gray-900 leading-snug mt-1">{title}</h3>
-        <span className={`mt-5 flex items-center gap-1.5 text-sm font-medium ${active ? 'text-[var(--brand-primary)]' : 'text-gray-400'}`}>
+        <span className={`mt-5 flex items-center gap-1.5 text-sm font-semibold ${active ? '' : 'text-gray-400'}`} style={active ? { color: tone.ink } : undefined}>
           Open
           <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
         </span>
@@ -283,7 +296,7 @@ const PortalHub = ({ onSelectModule, onSignOut, onOpenAdmin }) => {
           <p className="text-sm text-[var(--text-muted)] max-w-2xl">{currentSection.description}</p>
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {currentSection.modules.map(module => (
-              <ModuleCard key={module.id} {...module} onSelect={onSelectModule} />
+              <ModuleCard key={module.id} {...module} onSelect={onSelectModule} tone={GROUP_TONES[currentTabId] || GROUP_TONES.organizations} />
             ))}
           </div>
         </section>

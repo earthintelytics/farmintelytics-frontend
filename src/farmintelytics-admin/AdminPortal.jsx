@@ -22,6 +22,7 @@ import {
   FileText,
   BookOpen,
   Code2,
+  Globe2,
 } from 'lucide-react';
 
 import Onboarding from './pages/Onboarding';
@@ -42,6 +43,7 @@ import ProtectedAreas from './pages/ProtectedAreas';
 import SystemStatus from './pages/SystemStatus';
 import ActivityLog from './pages/Activity';
 import FfbControlPlane from './pages/FfbControlPlane';
+import ManagedPlatforms from './pages/ManagedPlatforms';
 // Loaded on demand: the markdown renderer is only needed on this page.
 const Documentation = lazy(() => import('./pages/Documentation'));
 import { fetchSystemStatus } from '../services/adminApi';
@@ -75,6 +77,7 @@ const NAV_GROUPS = [
     { id: 'ai',              label: 'AI settings',     icon: Sparkles,          path: '/admin/ai', owner: true },
     { id: 'ffb',             label: 'Plantation360 & Mobile',icon: ShieldCheck,       path: '/admin/ffb' },
     { id: 'api-clients',     label: 'API clients',     icon: Code2,             path: '/admin/api-clients' },
+    { id: 'platforms',       label: 'Managed platforms', icon: Globe2,          path: '/admin/platforms' },
     { id: 'integrations',    label: 'Integrations',    icon: Radio,             path: '/admin/integrations', owner: true },
   ]},
   { label: 'Help', items: [
@@ -267,6 +270,7 @@ const AdminPortal = () => {
             <Route path="ai"              element={ownerOnly(<AiSettings />)} />
             <Route path="ffb"             element={<FfbControlPlane />} />
             <Route path="api-clients"     element={<ApiClients />} />
+            <Route path="platforms"       element={<ManagedPlatforms />} />
             <Route path="integrations"    element={ownerOnly(<Integrations />)} />
             <Route path="logs"            element={<Logs />} />
             <Route path="reports"         element={<ProblemReports />} />
