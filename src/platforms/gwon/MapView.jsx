@@ -7,11 +7,12 @@
  * Maps are drawn smooth.
  */
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { MapContainer, TileLayer, WMSTileLayer, GeoJSON, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, WMSTileLayer, GeoJSON, CircleMarker, Popup, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { Layers, X, ChevronLeft, ChevronRight, ChevronDown, Play, Pause, CalendarDays, Columns2, SplitSquareHorizontal, RotateCcw } from 'lucide-react';
 import InfoTip from '../../components/page/InfoTip';
+import { API_BASE } from '../../services/apiBase';
 import LEGENDS from './legends.json';
 
 import { LAYERS, ORDER, GROUPS, GIBS_WMS, iso, daysAgo, ndviDate, ndviPeriods, dailyDays, periodOf, tileUrl } from './layers';
@@ -55,6 +56,69 @@ function Sync({ group, id }) {
   return null;
 }
 
+// Click anywhere: where it is (state, LGA or ward) and what the top layer shows there, read from the layer's own
+// colour scale (the picture's colour at that point matched to its legend; an estimate, said so).
+const inPoly = (pt, g) => {
+  const test = (ring) => { let c = false; for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) { const [xi, yi] = ring[i], [xj, yj] = ring[j]; if ((yi > pt[1]) !== (yj > pt[1]) && pt[0] < ((xj - xi) * (pt[1] - yi)) / (yj - yi) + xi) c = !c; } return c; };
+  const polys = g?.type === 'Polygon' ? [g.coordinates] : g?.type === 'MultiPolygon' ? g.coordinates : [];
+  return polys.some((p) => test(p[0]) && !p.slice(1).some(test));
+};
+const hex2 = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
+function readValue(k, rgb) {
+  const lg = LEGENDS[k];
+  if (!lg || !rgb) return null;
+  const d = (c) => { const [r, g, b] = hex2(c); return (r - rgb[0]) ** 2 + (g - rgb[1]) ** 2 + (b - rgb[2]) ** 2; };
+  if (lg.kind === 'classes') { const s = [...lg.stops].sort((a, b) => d(a.color) - d(b.color))[0]; return s ? s.label : null; }
+  let best = null;
+  for (let i = 0; i + 1 < lg.stops.length; i++) {
+    const a = hex2(lg.stops[i].color), b = hex2(lg.stops[i + 1].color);
+    const ab = a.map((x, j) => b[j] - x), ap = a.map((x, j) => rgb[j] - x);
+    const len = ab.reduce((s, x) => s + x * x, 0) || 1;
+    const tt = Math.max(0, Math.min(1, ab.reduce((s, x, j) => s + x * ap[j], 0) / len));
+    const dist = ap.reduce((s, x, j) => s + (x - ab[j] * tt) ** 2, 0);
+    if (!best || dist < best.dist) best = { dist, v: Number(lg.stops[i].label) + tt * (Number(lg.stops[i + 1].label) - Number(lg.stops[i].label)) };
+  }
+  return best && Number.isFinite(best.v) ? `about ${best.v.toLocaleString('en-GB', { maximumFractionDigits: best.v < 10 ? 2 : 0 })}${lg.unit ? ` ${lg.unit}` : ''}` : null;
+}
+function Inspect({ states, outlines, active, dayFor }) {
+  const [hit, setHit] = useState(null);
+  const map = useMapEvents({
+    click(e) {
+      const pt = [e.latlng.lng, e.latlng.lat];
+      const st = (states?.features || []).find((f) => inPoly(pt, f.geometry))?.properties.state;
+      const inner = (outlines?.features || []).find((f) => inPoly(pt, f.geometry))?.properties.name;
+      const k = active.find((x) => !LAYERS[x].kind && !LAYERS[x].legendImg && LEGENDS[x] && x !== 'truecolor');
+      setHit({ ll: e.latlng, st, inner, k, value: k ? '…' : null });
+      if (!k) return;
+      const l = LAYERS[k];
+      const z = Math.min(map.getZoom(), l.level);
+      const n = 2 ** z, x = ((e.latlng.lng + 180) / 360) * n, lat = (e.latlng.lat * Math.PI) / 180;
+      const y = ((1 - Math.log(Math.tan(lat) + 1 / Math.cos(lat)) / Math.PI) / 2) * n;
+      const url = tileUrl(k, dayFor(k)).replace('{z}', z).replace('{x}', Math.floor(x)).replace('{y}', Math.floor(y));
+      const img = new Image(); img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const c = document.createElement('canvas'); c.width = 256; c.height = 256; const g = c.getContext('2d'); g.drawImage(img, 0, 0);
+          const px = g.getImageData(Math.floor((x % 1) * 256), Math.floor((y % 1) * 256), 1, 1).data;
+          setHit((h) => (h && h.ll === e.latlng ? { ...h, value: px[3] < 20 ? 'no data here' : readValue(k, [px[0], px[1], px[2]]) || 'not readable' } : h));
+        } catch { setHit((h) => (h ? { ...h, value: 'not readable' } : h)); }
+      };
+      img.onerror = () => setHit((h) => (h ? { ...h, value: 'not readable' } : h));
+      img.src = url;
+    },
+  });
+  if (!hit) return null;
+  return (
+    <Popup position={hit.ll} eventHandlers={{ remove: () => setHit(null) }}>
+      <div style={{ minWidth: 190 }}>
+        <b>{hit.inner ? `${hit.inner}, ` : ''}{hit.st ? `${hit.st} State` : 'Outside the frontline'}</b><br />
+        <span style={{ color: '#6B7280' }}>{hit.ll.lat.toFixed(4)}, {hit.ll.lng.toFixed(4)}</span>
+        {hit.k && <><br />{LAYERS[hit.k].name}: <b>{hit.value}</b><br /><span style={{ color: '#6B7280', fontSize: 11 }}>Read from the map colour against its legend: an estimate.</span></>}
+      </div>
+    </Popup>
+  );
+}
+
 // Everything outside the chosen area, dimmed: the world with the area cut out of it.
 function maskOf(feature) {
   const g = feature?.geometry;
@@ -64,6 +128,7 @@ function maskOf(feature) {
 }
 
 function Legend({ k }) {
+  if (LAYERS[k]?.legendImg) return <img src={LAYERS[k].legendImg} alt={`Legend: ${LAYERS[k].name}`} className="max-h-40" loading="lazy" />;
   const l = LEGENDS[k];
   if (!l) return null;
   if (l.kind === 'classes') {
@@ -235,6 +300,13 @@ export default function MapView({ detail = false, focus = null, initial = ['ndvi
     return `Showing ${long(dayFor(k))}`;
   };
   const mask = useMemo(() => maskOf(focus), [focus]);
+  const [firms, setFirms] = useState({ data: null, err: '' });
+  const firmsOn = isOn('firms');
+  useEffect(() => {
+    if (!firmsOn || firms.data || firms.err) return;
+    fetch(`${API_BASE}/public/platforms/gwon/fires?days=2`).then(async (r) => { const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.detail || 'Not available'); return j; })
+      .then((j) => setFirms({ data: j, err: '' })).catch((e) => setFirms({ data: null, err: e.message }));
+  }, [firmsOn]); // eslint-disable-line react-hooks/exhaustive-deps
   const theme = dark ? 'dark' : 'light';
   const focusKey = focus ? (focus.properties.name || focus.properties.state) : '';
 
@@ -248,8 +320,11 @@ export default function MapView({ detail = false, focus = null, initial = ['ndvi
         const l = LAYERS[k];
         const cls = l.coarse ? 'gwon-soft' : '';
         if (l.kind === 'wms') {
-          return <WMSTileLayer key={`${k}-${dayFor(k, d)}`} url={GIBS_WMS} params={{ layers: l.id, format: 'image/png', transparent: true, time: dayFor(k, d) }}
-            opacity={layers[k].opacity / 100} attribution="NASA GIBS (public domain)" className={cls} />;
+          return <WMSTileLayer key={`${k}-${dayFor(k, d)}`} url={l.url || GIBS_WMS} params={{ layers: l.id, format: 'image/png', transparent: true, ...(l.time ? { time: dayFor(k, d) } : {}) }}
+            opacity={layers[k].opacity / 100} attribution={l.url ? 'SoilGrids 2.0, ISRIC (CC BY 4.0)' : 'NASA GIBS (public domain)'} className={cls} />;
+        }
+        if (l.kind === 'points') {
+          return null;   // drawn below, from the backend
         }
         return <TileLayer key={`${k}-${dayFor(k, d)}`} url={tileUrl(k, l.kind === 'xyz' ? null : dayFor(k, d))} maxNativeZoom={l.level} maxZoom={14}
           opacity={layers[k].opacity / 100} attribution={l.kind === 'xyz' ? (k === 'protected' ? 'WDPA, UNEP-WCMC and IUCN' : 'Hansen/UMD/Google/USGS/NASA') : 'NASA GIBS (public domain)'} className={cls} />;
@@ -265,6 +340,12 @@ export default function MapView({ detail = false, focus = null, initial = ['ndvi
       {/* The chosen state, LGA or ward stands out; the rest is dimmed. */}
       {mask && <GeoJSON key={`mask-${focusKey}-${theme}`} data={mask} interactive={false} style={{ stroke: false, fillColor: dark ? '#0B1820' : '#FFFFFF', fillOpacity: detail ? 0.45 : 0.6 }} />}
       {focus && <GeoJSON key={`focus-${focusKey}`} data={focus} interactive={false} style={{ color: detail ? '#FACC15' : dark ? '#7FD3A6' : '#0E2D41', weight: 3, fill: false }} />}
+      {isOn('firms') && firms.data?.features?.map((f, i) => (
+        <CircleMarker key={`fp-${i}`} center={[f.geometry.coordinates[1], f.geometry.coordinates[0]]} radius={4} pathOptions={{ color: '#FFFFFF', weight: 1, fillColor: '#E8462A', fillOpacity: 0.9 }}>
+          <Popup><b>Fire or hot spot</b><br />{f.properties.date} {String(f.properties.time || '').padStart(4, '0').replace(/(..)(..)/, '$1:$2')} UTC<br />Fire power {f.properties.frp_mw} MW · confidence {f.properties.confidence}<br /><span style={{ color: '#6B7280' }}>NASA FIRMS, VIIRS</span></Popup>
+        </CircleMarker>
+      ))}
+      <Inspect states={states} outlines={outlines} active={ORDER.filter((k) => isOn(k)).reverse()} dayFor={(k) => dayFor(k, d)} />
       {sites?.features?.length > 0 && <GeoJSON key={`s-${sites.features.length}`} data={sites} style={{ color: '#B45309', weight: 2, fillColor: '#F59E0B', fillOpacity: 0.4 }}
         onEachFeature={(f, lyr) => lyr.bindTooltip(f.properties?.name || f.properties?.ref || 'Site', { sticky: true })} />}
       <Fit data={focus || states} />
@@ -366,7 +447,8 @@ export default function MapView({ detail = false, focus = null, initial = ['ndvi
                                     <span className="flex justify-between text-[11px] text-gray-600"><span>Opacity</span><span>{layers[k].opacity}%</span></span>
                                     <input type="range" min="10" max="100" value={layers[k].opacity} onChange={(e) => set(k, { opacity: Number(e.target.value) })} className="w-full accent-[#007248]" />
                                   </label>
-                                  <p className="text-[11px] text-gray-500">{shownAs(k)}</p>
+                                  <p className="text-[11px] text-gray-500">{shownAs(k)}{k === 'firms' && firms.data ? ` · ${firms.data.features.length} points` : ''}</p>
+                                  {k === 'firms' && firms.err && <p className="text-[11px] text-amber-700">{firms.err}</p>}
                                 </div>
                               )}
                             </div>

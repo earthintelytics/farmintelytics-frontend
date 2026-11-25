@@ -1,0 +1,75 @@
+{
+ "type": "Collection",
+ "stac_version": "1.0.0",
+ "id": "admin-boundaries",
+ "title": "States, LGAs and wards",
+ "description": "Every Nigerian state, and the LGAs and wards of each frontline state (files admin/lgas_<state>.geojson and admin/wards_<state>.geojson).",
+ "license": "CC-BY-IGO / CC-BY-SA-4.0",
+ "keywords": [
+  "boundaries",
+  "lga",
+  "ward"
+ ],
+ "providers": [
+  {
+   "name": "OCHA COD-AB; GRID3",
+   "roles": [
+    "producer"
+   ]
+  },
+  {
+   "name": "Earthintelytics",
+   "roles": [
+    "processor",
+    "host"
+   ]
+  }
+ ],
+ "extent": {
+  "spatial": {
+   "bbox": [
+    [
+     2.6,
+     6.4,
+     15.0,
+     14.0
+    ]
+   ]
+  },
+  "temporal": {
+   "interval": [
+    [
+     "2022-01-01T00:00:00Z",
+     null
+    ]
+   ]
+  }
+ },
+ "assets": {
+  "data": {
+   "href": "../../admin/index.json",
+   "type": "application/json",
+   "title": "States, LGAs and wards",
+   "roles": [
+    "data"
+   ],
+   "updated": "2026-11-25T05:47:47+00:00",
+   "file:size": 3322
+  }
+ },
+ "links": [
+  {
+   "rel": "root",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "parent",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "self",
+   "href": "./admin-boundaries.json"
+  }
+ ],
+ "updated": "2026-11-25T06:49:00+00:00"
+}

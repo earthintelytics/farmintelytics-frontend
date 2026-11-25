@@ -1,0 +1,73 @@
+{
+ "type": "Collection",
+ "stac_version": "1.0.0",
+ "id": "frontline-states",
+ "title": "Frontline states",
+ "description": "The eleven frontline states: boundaries, areas (equal-area) and the point inside each state the climate is read at.",
+ "license": "CC-BY-4.0",
+ "keywords": [
+  "boundaries"
+ ],
+ "providers": [
+  {
+   "name": "geoBoundaries",
+   "roles": [
+    "producer"
+   ]
+  },
+  {
+   "name": "Earthintelytics",
+   "roles": [
+    "processor",
+    "host"
+   ]
+  }
+ ],
+ "extent": {
+  "spatial": {
+   "bbox": [
+    [
+     2.6,
+     6.4,
+     15.0,
+     14.0
+    ]
+   ]
+  },
+  "temporal": {
+   "interval": [
+    [
+     "2023-01-01T00:00:00Z",
+     null
+    ]
+   ]
+  }
+ },
+ "assets": {
+  "data": {
+   "href": "../../frontline_states.geojson",
+   "type": "application/geo+json",
+   "title": "Frontline states",
+   "roles": [
+    "data"
+   ],
+   "updated": "2026-11-24T21:48:33+00:00",
+   "file:size": 78117
+  }
+ },
+ "links": [
+  {
+   "rel": "root",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "parent",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "self",
+   "href": "./frontline-states.json"
+  }
+ ],
+ "updated": "2026-11-25T06:49:00+00:00"
+}

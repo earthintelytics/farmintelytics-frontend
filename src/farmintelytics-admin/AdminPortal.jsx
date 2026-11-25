@@ -73,7 +73,7 @@ const NAV_GROUPS = [
     { id: 'thresholds',      label: 'Map classes',     icon: SlidersHorizontal, path: '/admin/thresholds' },
     { id: 'protected-areas', label: 'Protected areas', icon: Shield,            path: '/admin/protected-areas' },
     { id: 'ai',              label: 'AI settings',     icon: Sparkles,          path: '/admin/ai', owner: true },
-    { id: 'ffb',             label: 'FFB & Mobile Hub',icon: ShieldCheck,       path: '/admin/ffb' },
+    { id: 'ffb',             label: 'Plantation360 & Mobile',icon: ShieldCheck,       path: '/admin/ffb' },
     { id: 'api-clients',     label: 'API clients',     icon: Code2,             path: '/admin/api-clients' },
     { id: 'integrations',    label: 'Integrations',    icon: Radio,             path: '/admin/integrations', owner: true },
   ]},

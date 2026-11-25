@@ -13,7 +13,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   SlidersHorizontal,
   Activity, FileBarChart, MessageSquareText, Map as MapIcon, Layers, ClipboardList, Sprout, AlertTriangle, Compass, CloudRain,
-  UploadCloud, Trash2, Printer, LogIn, LogOut, UserCircle2, ListChecks, Sun, Moon, Droplets, Trees, FileText, MapPin, Gauge, TrendingUp, Users, GitCompare, FlaskConical, HelpCircle, BookOpen, BookOpenText, Lightbulb,
+  UploadCloud, Trash2, Printer, LogIn, LogOut, UserCircle2, ListChecks, Sun, Moon, Droplets, Trees, FileText, MapPin, Gauge, TrendingUp, Users, GitCompare, FlaskConical, HelpCircle, BookOpen, BookOpenText, Lightbulb, Shovel, Target, ShieldCheck, Users2, Database, Cpu, Info,
 } from 'lucide-react';
 import InfoTip from '../../components/page/InfoTip';
 import { useConfirm } from '../../components/ConfirmProvider';
@@ -30,6 +30,10 @@ import Welcome, { TOUR_KEY } from './Welcome';
 import Glossary from './Glossary';
 import StoryMaps from './StoryMaps';
 import Advisor from './Advisor';
+import { Slm, Programmes } from './SlmProgrammes';
+import { Gender, Resilience, DataCatalogue } from './GgwPages';
+import { AccountPanel, About, Models } from './AccountInfo';
+import { shortName } from './gwonApi';
 import { SignInDialog, Locked } from './SignIn';
 import { gwonFetch, gwonMe, gwonSignOut } from './gwonApi';
 import { DroughtIndices, ClimateFutures, People, Compare, Scenarios } from './AnalyticsPages';
@@ -43,7 +47,9 @@ const TABS = [
 const PAGES = {
   monitor: [
     { id: 'overview', label: 'Overview', icon: Activity, group: 'Dashboard' },
-    { id: 'advisor', label: 'Advisor', icon: Lightbulb, group: 'Dashboard' },
+    { id: 'advisor', label: 'Advisor', icon: Lightbulb, group: 'Advisory and inclusion' },
+    { id: 'resilience', label: 'Climate resilience', icon: ShieldCheck, group: 'Advisory and inclusion' },
+    { id: 'gender', label: 'Gender and youth', icon: Users2, group: 'Advisory and inclusion' },
     { id: 'map', label: 'Map', icon: MapIcon, group: 'Maps' },
     { id: 'atlas', label: 'Baseline atlas', icon: Layers, group: 'Maps' },
     { id: 'registry', label: 'Project registry', icon: ClipboardList, group: 'Maps' },
@@ -57,14 +63,19 @@ const PAGES = {
     { id: 'climate', label: 'Climate and rain', icon: CloudRain, group: 'Analysis' },
     { id: 'futures', label: 'Climate futures', icon: TrendingUp, group: 'Analysis' },
     { id: 'people', label: 'People and livelihoods', icon: Users, group: 'Analysis' },
+    { id: 'slm', label: 'Land management', icon: Shovel, group: 'Planning' },
     { id: 'scenarios', label: 'Scenario planner', icon: FlaskConical, group: 'Planning' },
     { id: 'compare', label: 'Compare', icon: GitCompare, group: 'Planning' },
   ],
   reports: [
     { id: 'report', label: 'Report', icon: Printer },
     { id: 'results', label: 'Results Framework', icon: ListChecks },
+    { id: 'programmes', label: 'Programmes', icon: Target },
     { id: 'stories', label: 'Story maps', icon: BookOpenText },
+    { id: 'catalogue', label: 'Data and API', icon: Database },
     { id: 'glossary', label: 'Glossary', icon: BookOpen },
+    { id: 'models', label: 'Models', icon: Cpu },
+    { id: 'about', label: 'About GWON', icon: Info },
   ],
 };
 
@@ -129,6 +140,7 @@ export default function GwonPortal() {
   // Signed in: who (me), or null for a public visitor; me.error when the organisation has no GWON.
   const [me, setMe] = useState(null);
   const [signIn, setSignIn] = useState(false);
+  const [account, setAccount] = useState(false);
   const signedIn = !!(me && !me.error);
   const canEdit = signedIn && me.can_edit;
   const [climate, setClimate] = useState(null);
@@ -274,6 +286,7 @@ export default function GwonPortal() {
 
   return (
     <div className={`min-h-screen bg-[#F7F9F8] text-gray-900 overflow-x-clip ${dark ? 'gwon-dark' : ''}`}>
+      <AccountPanel open={account} me={me} onClose={() => setAccount(false)} onSignOut={() => { setAccount(false); signOut(); }} adminIndex={adminIndex} stateNames={(states?.features || []).map((f) => f.properties.state).sort()} />
       <SignInDialog open={signIn} onClose={() => setSignIn(false)} onSignedIn={setMe} />
       <Welcome key={tourNow ? 'tour' : 'welcome'} open={welcome} startTour={tourNow} onClose={() => { setWelcome(false); setTourNow(false); }} />
       <style>{'@media print { .gwon-noprint { display: none !important; } .gwon-print-full { grid-column: 1 / -1 !important; } }'}</style>
@@ -303,7 +316,10 @@ export default function GwonPortal() {
               className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">{dark ? <Sun size={16} /> : <Moon size={16} />}</button>
             {signedIn ? (
               <div className="flex items-center gap-2">
-                <span className="hidden lg:flex items-center gap-2 text-xs text-gray-700"><UserCircle2 size={18} className="text-[#007248]" /><span className="min-w-0"><span className="block font-semibold text-gray-900 truncate max-w-[180px]">{me.name || me.email}</span><span className="block text-gray-500 truncate max-w-[180px]">{me.team ? `Team · ${me.organisation}` : me.organisation}</span></span></span>
+                <button type="button" onClick={() => setAccount(true)} className="flex items-center gap-2 px-2.5 py-1.5 rounded-xl border border-gray-200 text-left hover:bg-gray-50" aria-label="Your account">
+                <UserCircle2 size={20} className="text-[#007248] shrink-0" />
+                <span className="hidden lg:block min-w-0"><span className="block text-sm font-semibold text-gray-900 truncate max-w-[140px]">{shortName(me)}</span><span className="block text-[11px] text-gray-500 truncate max-w-[140px]">{me.team ? 'Earthintelytics team' : me.organisation}</span></span>
+              </button>
                 <button type="button" onClick={signOut} className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50" aria-label="Sign out" title="Sign out"><LogOut size={16} /></button>
               </div>
             ) : (
@@ -535,6 +551,24 @@ export default function GwonPortal() {
             <>
               <Title title="Advisor" tip="What to do now, this season and for the future, for the state, LGA or ward in the filters: from the drought record, the season so far, the 16-day and seasonal forecasts, land cover, people and climate futures. Each piece of advice says why." text={`Actions for ${placeName || (all ? 'the frontline' : `${scope} State`)}, from all of GWON's data.`} />
               <Advisor scope={scope} placeName={placeName} focus={wardFeature || lgaFeature} stateFeature={stateFeature} series={series} land={land} signedIn={signedIn} onSignIn={() => setSignIn(true)} />
+            </>
+          )}
+          {tab === 'monitor' && page === 'slm' && (
+            <>
+              <Title title="Sustainable land management" tip="Which land management practices fit the rain and land here, how the cropland is changing, and where to look at the soil." text={`Practices, cropland and soil, ${aState}.`} />
+              <Slm scope={scope} aState={aState} series={series} land={land} inYears={inYears} />
+            </>
+          )}
+          {tab === 'monitor' && page === 'resilience' && (
+            <>
+              <Title title="Climate resilience" tip="How exposed each frontline state is to drought and heat, how sensitive its people are, and the state of its land, in one score you can re-weight." text="Which states are least able to cope with drought and heat, and why." />
+              <Resilience scope={scope} frontline={states} dark={dark} series={series} land={land} onScope={(s) => { setScope(s); setLga(''); setWard(''); }} />
+            </>
+          )}
+          {tab === 'monitor' && page === 'gender' && (
+            <>
+              <Title title="Gender and youth" tip="Women, men and young people in each state (OCHA 2022), and the gender and youth figures the Agency publishes in its programmes." text={`Women, men and young people, ${aState}.`} />
+              <Gender scope={scope} aState={aState} />
             </>
           )}
           {tab === 'monitor' && page === 'indices' && (
@@ -781,10 +815,34 @@ export default function GwonPortal() {
             </>
           )}
 
+          {tab === 'reports' && page === 'programmes' && (
+            <>
+              <Title title="Programmes" tip="The programme indicators the Agency publishes (ACReSAL, the Great Green Wall Accelerator, state programmes): baseline, target, achieved and source. Signed-in staff add and publish them." text="Programme indicators, as published by the Agency." />
+              <Programmes signedIn={signedIn} canEdit={canEdit} onSignIn={() => setSignIn(true)} stateNames={(states?.features || []).map((f) => f.properties.state).sort()} />
+            </>
+          )}
           {tab === 'reports' && page === 'stories' && (
             <>
               <Title title="Story maps" tip="Chapters of words, maps and charts that change as the reader scrolls; share them with a link." text="Tell the Great Green Wall's story with maps, and share it." />
               <StoryMaps states={states} dark={dark} series={series} />
+            </>
+          )}
+          {tab === 'reports' && page === 'catalogue' && (
+            <>
+              <Title title="Data and API" tip="GWON's datasets as an open STAC catalogue, free to download, and the public API." text="Every dataset behind GWON, and how to fetch it." />
+              <DataCatalogue />
+            </>
+          )}
+          {tab === 'reports' && page === 'models' && (
+            <>
+              <Title title="Models and predictions" text="What GWON runs now, and the models planned for the full platform." />
+              <Models />
+            </>
+          )}
+          {tab === 'reports' && page === 'about' && (
+            <>
+              <Title title="About GWON" text="The platform, its data and who it is for." />
+              <About />
             </>
           )}
           {tab === 'reports' && page === 'glossary' && (

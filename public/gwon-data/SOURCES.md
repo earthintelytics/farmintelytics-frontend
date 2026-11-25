@@ -11,3 +11,5 @@ climate_projections.json: World Bank Climate Change Knowledge Portal, CMIP6 0.25
 socioeconomic.json: OCHA COD-PS Nigeria 2022; Global MPI (OPHI/UNDP), DHS 2024; IOM DTM rounds 43 (North-east) and 13 (North-central and North-west) (scripts/gwon_socioeconomic.py).
 Advisor, live: Open-Meteo forecast and ECMWF SEAS5 seasonal forecast, fetched by the reader's browser.
 admin/people_*.json: WorldPop 2020 population (1 km, UN-adjusted, CC BY 4.0) summed over each LGA and ward; IOM DTM displacement by LGA (OCHA code) and ward (scripts/gwon_people_drilldown.py).
+cropland_series.json: ESA CCI Land Cover cropland classes (10/11, 12, 20, 30, 40), per state, 2000-2020 (scripts/gwon_cropland_series.py).
+stac/: the STAC 1.0.0 catalogue of these files (scripts/gwon_stac.py). Soil layers: SoilGrids 2.0, ISRIC (CC BY 4.0), live WMS.

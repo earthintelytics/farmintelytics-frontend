@@ -176,7 +176,7 @@ const PortalHub = ({ onSelectModule, onSignOut, onOpenAdmin }) => {
       title: 'Management',
       description: 'Estate operations: what is harvested, block by block.',
       modules: filterModules([
-        { id: 'ffb-counter', title: 'FFB', crop: 'Fresh fruit bunches', icon: <Activity /> },
+        { id: 'ffb-counter', title: 'Plantation360', crop: 'Full plantation management and monitoring', icon: <Activity /> },
       ]),
     },
     {

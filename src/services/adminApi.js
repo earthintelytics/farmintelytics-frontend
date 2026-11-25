@@ -672,3 +672,11 @@ export async function updateSubscriptionPrice(code, data) {
 export async function fetchSubscriptionEstimate(orgId) {
   return adminFetch(`/organizations/${orgId}/subscription-estimate`);
 }
+
+// ── Service dates and billing per organisation (first and last day; subscription, trial, free or paused) ──
+export async function fetchServicePeriods(orgId) {
+  return adminFetch(`/organizations/${orgId}/service-periods`);
+}
+export async function updateServicePeriod(orgId, service, data) {
+  return adminFetch(`/organizations/${orgId}/service-periods/${encodeURIComponent(service)}`, { method: 'PUT', body: JSON.stringify(data) });
+}

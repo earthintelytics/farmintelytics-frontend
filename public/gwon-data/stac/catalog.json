@@ -1,0 +1,73 @@
+{
+ "type": "Catalog",
+ "stac_version": "1.0.0",
+ "id": "gwon",
+ "title": "GreenWall Observatory Nigeria",
+ "description": "The datasets behind GWON, the monitoring platform of the National Agency for the Great Green Wall. Powered by Earthintelytics.",
+ "links": [
+  {
+   "rel": "root",
+   "href": "./catalog.json",
+   "type": "application/json"
+  },
+  {
+   "rel": "self",
+   "href": "./catalog.json",
+   "type": "application/json"
+  },
+  {
+   "rel": "child",
+   "href": "./frontline-states.json",
+   "type": "application/json",
+   "title": "Frontline states"
+  },
+  {
+   "rel": "child",
+   "href": "./admin-boundaries.json",
+   "type": "application/json",
+   "title": "States, LGAs and wards"
+  },
+  {
+   "rel": "child",
+   "href": "./climate-series.json",
+   "type": "application/json",
+   "title": "Drought and water-stress series"
+  },
+  {
+   "rel": "child",
+   "href": "./drought-indices.json",
+   "type": "application/json",
+   "title": "Drought indices"
+  },
+  {
+   "rel": "child",
+   "href": "./climate-projections.json",
+   "type": "application/json",
+   "title": "Climate projections (CMIP6)"
+  },
+  {
+   "rel": "child",
+   "href": "./land-use.json",
+   "type": "application/json",
+   "title": "Land use change"
+  },
+  {
+   "rel": "child",
+   "href": "./cropland-kinds.json",
+   "type": "application/json",
+   "title": "Kinds of cropland"
+  },
+  {
+   "rel": "child",
+   "href": "./people.json",
+   "type": "application/json",
+   "title": "People and livelihoods"
+  },
+  {
+   "rel": "child",
+   "href": "./people-by-lga-ward.json",
+   "type": "application/json",
+   "title": "People by LGA and ward"
+  }
+ ]
+}

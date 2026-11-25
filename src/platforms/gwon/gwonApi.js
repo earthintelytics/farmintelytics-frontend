@@ -55,3 +55,6 @@ export async function gwonSignIn(email, password) {
 }
 
 export function gwonSignOut() { useTeam = false; clearTenantSession(); }
+
+/** The name to show for the signed-in person: their name, else the part of their email before the @. */
+export const shortName = (me) => (me?.name || (me?.email || '').split('@')[0] || 'Account');

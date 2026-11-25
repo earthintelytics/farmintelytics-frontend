@@ -47,7 +47,7 @@ export function resolveModule(rawId) {
   if (id === 'smallholder-hub') return { id, kind: 'smallholder', name: 'Smallholder', teamOnly: false };
   // The farm advisor is its own phone-first app (chat, advisories, reports), not a map dashboard.
   if (id === 'advisor') return { id, kind: 'advisor', name: 'Farm advisor', teamOnly: false };
-  if (id === 'ffb-counter') return { id, kind: 'management', name: 'FFB', teamOnly: false };
+  if (id === 'ffb-counter') return { id, kind: 'management', name: 'Plantation360', teamOnly: false };
   if (SERVICE_CATALOG[id]) return { id, kind: 'service', name: SERVICE_CATALOG[id].title, teamOnly: false };
   return null;
 }

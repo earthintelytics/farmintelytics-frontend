@@ -39,7 +39,7 @@ export const SERVICE_GROUPS = [
     { id: 'smallholder-eudr', label: 'EUDR passport', desc: 'Location and deforestation check per member' },
   ] },
   { id: 'management', label: 'Management', services: [
-    { id: 'ffb-counter', label: 'FFB', desc: 'Fresh fruit bunches counted per block at harvest with 9-layer anti-fraud verification' },
+    { id: 'ffb-counter', label: 'Plantation360', desc: 'Full plantation management and monitoring: fresh fruit bunches counted per block at harvest, with 9-layer anti-fraud verification' },
   ] },
   // The public API: switching it on makes the organisation an API client (wallet, keys) on the product's plan.
   { id: 'api', label: 'API', services: [

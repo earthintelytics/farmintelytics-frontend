@@ -13,10 +13,10 @@ import { appHref, useBuddyApp } from '../landing/components/useBuddyApp';
  * is a drawing with an example conversation, not a screenshot of anyone's farm.
  */
 const FEATURES = [
-  { icon: Mic, title: 'Ask by voice', text: 'Tap, speak your question about the farm, check the words, send. No typing needed.' },
-  { icon: Volume2, title: 'Hear the answer', text: 'Answers are read aloud, so you can listen while you walk the field.' },
-  { icon: Bell, title: 'Alerts you can listen to', text: 'When a block needs a visit, the alert comes to your phone and can be played aloud.' },
-  { icon: MapPin, title: 'Walk to the spot', text: 'Directions on your phone lead you to the weak patch the satellite found.' },
+  { icon: Mic, title: 'Ask by voice', text: 'Tap the microphone, ask your question, check the words and send. No typing needed.' },
+  { icon: Volume2, title: 'Hear the answer', text: 'Answers are read aloud, so you can listen as you walk the field.' },
+  { icon: Bell, title: 'Alerts you can hear', text: 'When a block needs a visit, an alert reaches your phone and can be read aloud.' },
+  { icon: MapPin, title: 'Go straight to the problem', text: 'Directions on your phone lead you to the weak patch the satellite found.' },
   { icon: LogIn, title: 'Same sign-in', text: 'Use the same details as the FarmIntelytics portal. Your organisation sets who can use it.' },
   { icon: Languages, title: 'Your language', text: 'English and Pidgin by voice. Where the phone has no Hausa, Yoruba or Igbo voice, the app says so and shows the text.' },
 ];
@@ -109,7 +109,7 @@ export default function AppPage() {
         {/* What it does */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <p className="text-sm font-semibold text-[var(--brand-primary)]">What it does</p>
-          <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">Made for walking the farm, not sitting at a desk</h2>
+          <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">Built for the field, not the office</h2>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {FEATURES.map(({ icon: Icon, title, text }) => (
               <div key={title} className="rounded-2xl border border-gray-200 p-6">

@@ -1,0 +1,75 @@
+{
+ "type": "Collection",
+ "stac_version": "1.0.0",
+ "id": "people-by-lga-ward",
+ "title": "People by LGA and ward",
+ "description": "Population (WorldPop 2020, 1 km) and people displaced (IOM DTM) for every LGA and ward of the frontline (files admin/people_<state>.json).",
+ "license": "CC-BY-4.0 / IOM terms",
+ "keywords": [
+  "population",
+  "lga",
+  "ward"
+ ],
+ "providers": [
+  {
+   "name": "WorldPop; IOM DTM",
+   "roles": [
+    "producer"
+   ]
+  },
+  {
+   "name": "Earthintelytics",
+   "roles": [
+    "processor",
+    "host"
+   ]
+  }
+ ],
+ "extent": {
+  "spatial": {
+   "bbox": [
+    [
+     2.6,
+     6.4,
+     15.0,
+     14.0
+    ]
+   ]
+  },
+  "temporal": {
+   "interval": [
+    [
+     "2020-01-01T00:00:00Z",
+     "2023-12-31T23:59:59Z"
+    ]
+   ]
+  }
+ },
+ "assets": {
+  "data": {
+   "href": "../../admin/index.json",
+   "type": "application/json",
+   "title": "People by LGA and ward",
+   "roles": [
+    "data"
+   ],
+   "updated": "2026-11-25T05:47:47+00:00",
+   "file:size": 3322
+  }
+ },
+ "links": [
+  {
+   "rel": "root",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "parent",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "self",
+   "href": "./people-by-lga-ward.json"
+  }
+ ],
+ "updated": "2026-11-25T06:49:00+00:00"
+}

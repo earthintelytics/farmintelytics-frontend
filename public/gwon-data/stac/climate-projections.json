@@ -1,0 +1,75 @@
+{
+ "type": "Collection",
+ "stac_version": "1.0.0",
+ "id": "climate-projections",
+ "title": "Climate projections (CMIP6)",
+ "description": "Nigeria under SSP1-2.6, 2-4.5, 3-7.0 and 5-8.5 to 2100 (10th, 50th, 90th percentile of the models), and state model runs to 2050.",
+ "license": "CC-BY-4.0",
+ "keywords": [
+  "climate",
+  "cmip6",
+  "projections"
+ ],
+ "providers": [
+  {
+   "name": "World Bank CCKP; Open-Meteo HighResMIP",
+   "roles": [
+    "producer"
+   ]
+  },
+  {
+   "name": "Earthintelytics",
+   "roles": [
+    "processor",
+    "host"
+   ]
+  }
+ ],
+ "extent": {
+  "spatial": {
+   "bbox": [
+    [
+     2.6,
+     6.4,
+     15.0,
+     14.0
+    ]
+   ]
+  },
+  "temporal": {
+   "interval": [
+    [
+     "1950-01-01T00:00:00Z",
+     "2100-12-31T23:59:59Z"
+    ]
+   ]
+  }
+ },
+ "assets": {
+  "data": {
+   "href": "../../climate_projections.json",
+   "type": "application/json",
+   "title": "Climate projections (CMIP6)",
+   "roles": [
+    "data"
+   ],
+   "updated": "2026-11-25T05:18:52+00:00",
+   "file:size": 116676
+  }
+ },
+ "links": [
+  {
+   "rel": "root",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "parent",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "self",
+   "href": "./climate-projections.json"
+  }
+ ],
+ "updated": "2026-11-25T06:49:00+00:00"
+}

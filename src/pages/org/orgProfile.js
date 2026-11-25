@@ -66,7 +66,7 @@ export const ORG_SERVICES = [
   svc('smallholder-hub', 'Smallholder', 'Members and parcels, farmer forms, farm monitoring, group carbon and EUDR.', 'advisory'),
   svc('advisor', 'Farm advisor', 'Advice for each field from your monitoring data and the weather.', 'advisory'),
   svc('rs-drone', 'Drone surveys', 'Drone surveys next to the latest satellite view.', 'engine'),
-  svc('ffb-counter', 'FFB Counter', 'Fresh fruit bunches counted per block at harvest.', 'management'),
+  svc('ffb-counter', 'Plantation360', 'Full plantation management and monitoring: fresh fruit bunches counted per block at harvest.', 'management'),
   // Managed platforms: built for one organisation, opened at their own address on the hub.
   { ...svc('platform-gwon', 'GreenWall Observatory Nigeria', 'The Great Green Wall platform: baseline atlas, project registry, monitoring, early warning, climate, reports and the Assistant.', 'platforms'),
     href: '/platforms/gwon', photo: '/crops/restoration.webp' },

@@ -1,0 +1,74 @@
+{
+ "type": "Collection",
+ "stac_version": "1.0.0",
+ "id": "cropland-kinds",
+ "title": "Kinds of cropland",
+ "description": "Hectares of rainfed, tree and shrub, irrigated and mosaic cropland per state, every year 2000-2020.",
+ "license": "CC-BY-4.0",
+ "keywords": [
+  "cropland",
+  "land cover"
+ ],
+ "providers": [
+  {
+   "name": "ESA CCI Land Cover via Microsoft Planetary Computer",
+   "roles": [
+    "producer"
+   ]
+  },
+  {
+   "name": "Earthintelytics",
+   "roles": [
+    "processor",
+    "host"
+   ]
+  }
+ ],
+ "extent": {
+  "spatial": {
+   "bbox": [
+    [
+     2.6,
+     6.4,
+     15.0,
+     14.0
+    ]
+   ]
+  },
+  "temporal": {
+   "interval": [
+    [
+     "2000-01-01T00:00:00Z",
+     "2020-12-31T23:59:59Z"
+    ]
+   ]
+  }
+ },
+ "assets": {
+  "data": {
+   "href": "../../cropland_series.json",
+   "type": "application/json",
+   "title": "Kinds of cropland",
+   "roles": [
+    "data"
+   ],
+   "updated": "2026-11-25T06:12:06+00:00",
+   "file:size": 44095
+  }
+ },
+ "links": [
+  {
+   "rel": "root",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "parent",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "self",
+   "href": "./cropland-kinds.json"
+  }
+ ],
+ "updated": "2026-11-25T06:49:00+00:00"
+}

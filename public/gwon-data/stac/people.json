@@ -1,0 +1,75 @@
+{
+ "type": "Collection",
+ "stac_version": "1.0.0",
+ "id": "people",
+ "title": "People and livelihoods",
+ "description": "Population by sex and age (2022), multidimensional poverty (DHS 2024) and people displaced, per state.",
+ "license": "CC-BY-IGO / CC0 / IOM terms",
+ "keywords": [
+  "population",
+  "poverty",
+  "displacement"
+ ],
+ "providers": [
+  {
+   "name": "OCHA COD-PS; OPHI/UNDP Global MPI; IOM DTM",
+   "roles": [
+    "producer"
+   ]
+  },
+  {
+   "name": "Earthintelytics",
+   "roles": [
+    "processor",
+    "host"
+   ]
+  }
+ ],
+ "extent": {
+  "spatial": {
+   "bbox": [
+    [
+     2.6,
+     6.4,
+     15.0,
+     14.0
+    ]
+   ]
+  },
+  "temporal": {
+   "interval": [
+    [
+     "2022-01-01T00:00:00Z",
+     "2024-12-31T23:59:59Z"
+    ]
+   ]
+  }
+ },
+ "assets": {
+  "data": {
+   "href": "../../socioeconomic.json",
+   "type": "application/json",
+   "title": "People and livelihoods",
+   "roles": [
+    "data"
+   ],
+   "updated": "2026-11-25T06:35:56+00:00",
+   "file:size": 13672
+  }
+ },
+ "links": [
+  {
+   "rel": "root",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "parent",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "self",
+   "href": "./people.json"
+  }
+ ],
+ "updated": "2026-11-25T06:49:00+00:00"
+}

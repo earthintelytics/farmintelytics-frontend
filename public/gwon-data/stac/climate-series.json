@@ -1,0 +1,74 @@
+{
+ "type": "Collection",
+ "stac_version": "1.0.0",
+ "id": "climate-series",
+ "title": "Drought and water-stress series",
+ "description": "Rain, reference evaporation, aridity, hot days, dry spells and soil moisture per state, 2015 to now, with the 2015-2024 baseline.",
+ "license": "CC-BY-4.0",
+ "keywords": [
+  "climate",
+  "drought"
+ ],
+ "providers": [
+  {
+   "name": "ERA5 (ECMWF) via Open-Meteo",
+   "roles": [
+    "producer"
+   ]
+  },
+  {
+   "name": "Earthintelytics",
+   "roles": [
+    "processor",
+    "host"
+   ]
+  }
+ ],
+ "extent": {
+  "spatial": {
+   "bbox": [
+    [
+     2.6,
+     6.4,
+     15.0,
+     14.0
+    ]
+   ]
+  },
+  "temporal": {
+   "interval": [
+    [
+     "2015-01-01T00:00:00Z",
+     null
+    ]
+   ]
+  }
+ },
+ "assets": {
+  "data": {
+   "href": "../../climate_series.json",
+   "type": "application/json",
+   "title": "Drought and water-stress series",
+   "roles": [
+    "data"
+   ],
+   "updated": "2026-11-25T04:02:48+00:00",
+   "file:size": 87849
+  }
+ },
+ "links": [
+  {
+   "rel": "root",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "parent",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "self",
+   "href": "./climate-series.json"
+  }
+ ],
+ "updated": "2026-11-25T06:49:00+00:00"
+}

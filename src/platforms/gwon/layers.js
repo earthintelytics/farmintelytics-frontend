@@ -35,10 +35,27 @@ export const LAYERS = {
     info: 'Share of the local economy at risk from drought, in deciles (NASA SEDAC, Natural Disaster Hotspots, 2000).' },
   nightlights: { name: 'Night lights 2016', group: 'People', id: 'VIIRS_Black_Marble', level: 8, ext: 'png', fixed: '2016-01-01',
     info: 'Lights at night in 2016 (NASA Black Marble, VIIRS): towns, villages and roads where people and markets are.' },
+  soc: { name: 'Soil organic carbon', group: 'Soil', kind: 'wms', url: 'https://maps.isric.org/mapserv?map=/map/soc.map', id: 'soc_0-5cm_mean', fixed: '', period: 'SoilGrids 2.0, topsoil 0-5 cm', coarse: true,
+    legendImg: 'https://maps.isric.org/mapserv?map=/map/soc.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&LAYER=soc_0-5cm_mean&FORMAT=image/png&SLD_VERSION=1.1.0',
+    info: 'Organic carbon in the topsoil (0-5 cm), SoilGrids 2.0 (ISRIC, 250 m), in decigrams per kilogram: divide by 10 for g/kg. Low carbon means soil that holds little water; restoration raises it.' },
+  ph: { name: 'Soil pH', group: 'Soil', kind: 'wms', url: 'https://maps.isric.org/mapserv?map=/map/phh2o.map', id: 'phh2o_0-5cm_mean', fixed: '', period: 'SoilGrids 2.0, topsoil 0-5 cm', coarse: true,
+    legendImg: 'https://maps.isric.org/mapserv?map=/map/phh2o.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&LAYER=phh2o_0-5cm_mean&FORMAT=image/png&SLD_VERSION=1.1.0',
+    info: 'Topsoil acidity (pH in water, 0-5 cm), SoilGrids 2.0 (ISRIC, 250 m), shown as pH x 10: 65 is pH 6.5.' },
+  clay: { name: 'Clay', group: 'Soil', kind: 'wms', url: 'https://maps.isric.org/mapserv?map=/map/clay.map', id: 'clay_0-5cm_mean', fixed: '', period: 'SoilGrids 2.0, topsoil 0-5 cm', coarse: true,
+    legendImg: 'https://maps.isric.org/mapserv?map=/map/clay.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&LAYER=clay_0-5cm_mean&FORMAT=image/png&SLD_VERSION=1.1.0',
+    info: 'Clay in the topsoil (0-5 cm), SoilGrids 2.0 (ISRIC, 250 m), in grams per kilogram. Clay soils hold water but crust and flood.' },
+  sand: { name: 'Sand', group: 'Soil', kind: 'wms', url: 'https://maps.isric.org/mapserv?map=/map/sand.map', id: 'sand_0-5cm_mean', fixed: '', period: 'SoilGrids 2.0, topsoil 0-5 cm', coarse: true,
+    legendImg: 'https://maps.isric.org/mapserv?map=/map/sand.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&LAYER=sand_0-5cm_mean&FORMAT=image/png&SLD_VERSION=1.1.0',
+    info: 'Sand in the topsoil (0-5 cm), SoilGrids 2.0 (ISRIC, 250 m), in grams per kilogram. Sandy soils drain and dry fast.' },
+  nitrogen: { name: 'Soil nitrogen', group: 'Soil', kind: 'wms', url: 'https://maps.isric.org/mapserv?map=/map/nitrogen.map', id: 'nitrogen_0-5cm_mean', fixed: '', period: 'SoilGrids 2.0, topsoil 0-5 cm', coarse: true,
+    legendImg: 'https://maps.isric.org/mapserv?map=/map/nitrogen.map&SERVICE=WMS&VERSION=1.3.0&REQUEST=GetLegendGraphic&LAYER=nitrogen_0-5cm_mean&FORMAT=image/png&SLD_VERSION=1.1.0',
+    info: 'Total nitrogen in the topsoil (0-5 cm), SoilGrids 2.0 (ISRIC, 250 m), in centigrams per kilogram.' },
+  firms: { name: 'Fire points (NASA FIRMS)', group: 'Hazards', kind: 'points', fixed: '', period: 'The last 2 days, VIIRS 375 m',
+    info: 'Each point is a fire or hot spot seen by the VIIRS satellites in the last 2 days (NASA FIRMS, within hours of the pass). Click a point for when it was seen and its fire power. Needs the FIRMS key in the admin.' },
 };
 // Drawn bottom to top.
-export const ORDER = ['truecolor', 'landcover', 'nightlights', 'population', 'droughtloss', 'droughthaz', 'ndvi', 'evi', 'photo', 'lst', 'soil', 'rain', 'flood', 'protected', 'forestloss', 'fires'];
-export const GROUPS = ['Vegetation and forest', 'Water and climate', 'Hazards', 'People', 'Base'];
+export const ORDER = ['truecolor', 'landcover', 'nightlights', 'population', 'droughtloss', 'droughthaz', 'ndvi', 'evi', 'photo', 'lst', 'soil', 'rain', 'flood', 'soc', 'ph', 'clay', 'sand', 'nitrogen', 'protected', 'forestloss', 'fires', 'firms'];
+export const GROUPS = ['Vegetation and forest', 'Water and climate', 'Soil', 'Hazards', 'People', 'Base'];
 
 export const iso = (d) => d.toISOString().slice(0, 10);
 export const daysAgo = (n) => { const d = new Date(); d.setUTCDate(d.getUTCDate() - n); return d; };

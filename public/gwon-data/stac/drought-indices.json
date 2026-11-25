@@ -1,0 +1,75 @@
+{
+ "type": "Collection",
+ "stac_version": "1.0.0",
+ "id": "drought-indices",
+ "title": "Drought indices",
+ "description": "SPI-1/3/6/12, SPEI-3/6/12, percent of normal and deciles, monthly since 1991, per state (baseline 1991-2020).",
+ "license": "CC-BY-4.0",
+ "keywords": [
+  "drought",
+  "spi",
+  "spei"
+ ],
+ "providers": [
+  {
+   "name": "ERA5 (ECMWF) via Open-Meteo; WMO-No. 1090",
+   "roles": [
+    "producer"
+   ]
+  },
+  {
+   "name": "Earthintelytics",
+   "roles": [
+    "processor",
+    "host"
+   ]
+  }
+ ],
+ "extent": {
+  "spatial": {
+   "bbox": [
+    [
+     2.6,
+     6.4,
+     15.0,
+     14.0
+    ]
+   ]
+  },
+  "temporal": {
+   "interval": [
+    [
+     "1991-01-01T00:00:00Z",
+     null
+    ]
+   ]
+  }
+ },
+ "assets": {
+  "data": {
+   "href": "../../drought_indices.json",
+   "type": "application/json",
+   "title": "Drought indices",
+   "roles": [
+    "data"
+   ],
+   "updated": "2026-11-25T05:06:19+00:00",
+   "file:size": 327006
+  }
+ },
+ "links": [
+  {
+   "rel": "root",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "parent",
+   "href": "../catalog.json"
+  },
+  {
+   "rel": "self",
+   "href": "./drought-indices.json"
+  }
+ ],
+ "updated": "2026-11-25T06:49:00+00:00"
+}
