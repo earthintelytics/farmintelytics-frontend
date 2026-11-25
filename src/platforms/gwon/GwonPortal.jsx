@@ -303,11 +303,14 @@ export default function GwonPortal() {
               className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">{dark ? <Sun size={16} /> : <Moon size={16} />}</button>
             {signedIn ? (
               <div className="flex items-center gap-2">
-                <span className="hidden lg:flex items-center gap-2 text-xs text-gray-700"><UserCircle2 size={18} className="text-[#007248]" /><span className="min-w-0"><span className="block font-semibold text-gray-900 truncate max-w-[180px]">{me.name || me.email}</span><span className="block text-gray-500 truncate max-w-[180px]">{me.organisation}</span></span></span>
+                <span className="hidden lg:flex items-center gap-2 text-xs text-gray-700"><UserCircle2 size={18} className="text-[#007248]" /><span className="min-w-0"><span className="block font-semibold text-gray-900 truncate max-w-[180px]">{me.name || me.email}</span><span className="block text-gray-500 truncate max-w-[180px]">{me.team ? `Team · ${me.organisation}` : me.organisation}</span></span></span>
                 <button type="button" onClick={signOut} className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50" aria-label="Sign out" title="Sign out"><LogOut size={16} /></button>
               </div>
             ) : (
-              <button type="button" onClick={() => setSignIn(true)} className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#007248] text-white text-sm font-semibold"><LogIn size={16} /> Sign in</button>
+              <div className="flex items-center gap-2">
+              {me?.error && <span className="hidden lg:block text-xs text-gray-600 max-w-[200px] truncate" title={me.error}>{me.email || 'This account'} has no GWON</span>}
+              <button type="button" onClick={() => setSignIn(true)} className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#007248] text-white text-sm font-semibold"><LogIn size={16} /> {me?.error ? 'Sign in to GWON' : 'Sign in'}</button>
+            </div>
             )}
           </div>
         </div>
@@ -419,10 +422,10 @@ export default function GwonPortal() {
                       <Indicator tone="rose" label="Longest dry spell, rainy season" value={cur?.dry_spell != null ? `${Math.round(cur.dry_spell)} days` : '\u2014'}
                         trend={yrs.map((r) => r.dry_spell)} trendLabel="each year" tip="The longest run of days under 1 mm of rain between May and September." />
                       <Indicator tone="green" label={`Tree cover, ${ly[ly.length - 1] || ''}`} value={treeNow == null ? '\u2014' : `${treeNow.toFixed(1)}%`}
-                        delta={treeNow == null ? null : { text: `${treeNow - treeFirst >= 0 ? '+' : ''}${(treeNow - treeFirst).toFixed(1)} points since ${ly[0]}`, good: treeNow >= treeFirst }}
+                        delta={treeNow == null ? null : { text: Math.abs(treeNow - treeFirst) < 0.05 ? `no change since ${ly[0]}` : `${treeNow - treeFirst > 0 ? '+' : ''}${(treeNow - treeFirst).toFixed(1)} points since ${ly[0]}`, good: treeNow >= treeFirst - 0.05 }}
                         trend={ly.map((y) => share(y, 'Tree cover'))} trendLabel="ESA land cover" tip="Share of the land under tree cover, ESA CCI land cover (300 m)." />
-                      <Indicator tone="white" label="Bare and sparse land" value={ly.length ? `${bare(ly[ly.length - 1]).toFixed(1)}%` : '\u2014'}
-                        delta={ly.length ? { text: `${bare(ly[ly.length - 1]) - bare(ly[0]) >= 0 ? '+' : ''}${(bare(ly[ly.length - 1]) - bare(ly[0])).toFixed(1)} points since ${ly[0]}`, good: bare(ly[ly.length - 1]) <= bare(ly[0]) } : null}
+                      <Indicator tone="white" label="Bare and sparse land" value={ly.length ? (bare(ly[ly.length - 1]) < 0.05 ? 'under 0.1%' : `${bare(ly[ly.length - 1]).toFixed(1)}%`) : '\u2014'}
+                        delta={ly.length ? { text: Math.abs(bare(ly[ly.length - 1]) - bare(ly[0])) < 0.05 ? `no change since ${ly[0]}` : `${bare(ly[ly.length - 1]) - bare(ly[0]) > 0 ? '+' : ''}${(bare(ly[ly.length - 1]) - bare(ly[0])).toFixed(1)} points since ${ly[0]}`, good: bare(ly[ly.length - 1]) <= bare(ly[0]) + 0.05 } : null}
                         trend={ly.map((y) => bare(y))} trendLabel="ESA land cover" tip="Share that is bare land or sparse vegetation: the land the Great Green Wall works to restore." />
                     </>
                   );
@@ -549,7 +552,7 @@ export default function GwonPortal() {
           {tab === 'monitor' && page === 'people' && (
             <>
               <Title title="People and livelihoods" tip="Population (OCHA COD-PS 2022), multidimensional poverty (Global MPI, DHS 2024) and people displaced (IOM DTM), for the frontline states." text={`Who lives on the land the Great Green Wall restores, ${aState}.`} />
-              <People scope={scope} aState={aState} frontline={states} dark={dark} onScope={(s) => { setScope(s); setLga(''); setWard(''); }} />
+              <People scope={scope} aState={aState} frontline={states} dark={dark} onScope={(s) => { setScope(s); setLga(''); setWard(''); }} drill={{ adminFile, lga, ward, lgaList, wardList, onLga: (n) => { setLga(n); setWard(''); }, onWard: setWard }} />
             </>
           )}
           {tab === 'monitor' && page === 'compare' && (
@@ -715,7 +718,8 @@ export default function GwonPortal() {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                       {[['Area', `${fmt(ha)} ha`], ['Registered sites', fmt(here.length)], ['Registered hectares', fmt(here.reduce((s, r) => s + r.ha, 0))],
-                        ['Rain so far', rr.length === 1 ? `${fmt(rr[0].now)} mm` : rr.length ? `${fmt(rr.reduce((s, r) => s + r.now, 0) / rr.length)} mm a state` : '—']].map(([k, v]) => (
+                        ['Rain so far', rr.length === 1 ? `${fmt(rr[0].now)} mm` : rr.length ? `${fmt(rr.reduce((s, r) => s + r.now, 0) / rr.length)} mm a state`
+                          : sa ? `${fmt(sa.cumulative.now[sa.cumulative.now.length - 1])} mm to ${sa.until}${all ? ' (state mean)' : ''}` : '—']].map(([k, v]) => (
                         <div key={k} className="rounded-xl border border-gray-200 px-3 py-2"><p className="text-xs text-gray-500">{k}</p><p className="font-semibold tabular-nums">{v}</p></div>
                       ))}
                     </div>
@@ -752,6 +756,12 @@ export default function GwonPortal() {
                         <tbody>{here.map((r) => <tr key={r.i} className="border-t border-gray-100"><td className="px-3 py-1.5">{r.name}</td><td className="px-3 py-1.5">{r.state || '—'}</td><td className="px-3 py-1.5">{r.programme || '—'}</td><td className="px-3 py-1.5 text-right tabular-nums">{fmt(r.ha)}</td></tr>)}</tbody>
                       </table>
                     ) : <p className="text-sm text-gray-600">No registered sites{all ? '' : ` in ${scope}`} yet. Load them in Monitor, Project registry.</p>)}
+                    {reportKind === 'summary' && !dailyOf && sa && (
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div><p className="text-sm font-semibold mb-2">The season so far</p><SeasonCurve cum={sa.cumulative} year={sa.year} /></div>
+                        <div><p className="text-sm font-semibold mb-2">Rain minus evaporation each month</p><MonthVsMean rows={sa.monthly} value="balance" unit="mm" year={sa.year} /></div>
+                      </div>
+                    )}
                     {reportKind === 'summary' && dailyOf && (
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div><p className="text-sm font-semibold mb-2">Rain each month</p><RainBars year={climateYear} thisYear={monthly(dailyOf, climateYear)} lastYear={monthly(dailyOf, climateYear - 1)} /></div>

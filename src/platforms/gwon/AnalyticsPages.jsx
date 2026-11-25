@@ -11,6 +11,7 @@ import { PALETTE } from './palette';
 import { CsvButton } from './csv';
 import { StateBars } from './Charts';
 import Choropleth from './Choropleth';
+import PeopleDrill from './PeopleDrill';
 
 const fmt = (n, d = 0) => (n == null || !Number.isFinite(n) ? '—' : Number(n).toLocaleString('en-GB', { maximumFractionDigits: d, minimumFractionDigits: d }));
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -336,7 +337,7 @@ export function ClimateFutures({ scope, aState }) {
 
 /* ───────────────────────────── People and livelihoods ───────────────────────────── */
 
-export function People({ scope, aState, frontline, dark, onScope }) {
+export function People({ scope, aState, frontline, dark, onScope, drill }) {
   const [data, err] = useJson('/gwon-data/socioeconomic.json');
   const [metric, setMetric] = useState('poor');
   if (!data) return <Loading err={err} what="the socio-economic figures" />;
@@ -379,6 +380,7 @@ export function People({ scope, aState, frontline, dark, onScope }) {
           </div>
         ))}
       </div>
+      {scope !== 'all' && drill && <PeopleDrill scope={scope} dark={dark} onScope={onScope} {...drill} />}
       {(() => {
         const vals = rows.map((r) => r.value).sort((a, b) => a - b);
         const q = (f) => vals[Math.min(vals.length - 1, Math.floor(f * vals.length))];

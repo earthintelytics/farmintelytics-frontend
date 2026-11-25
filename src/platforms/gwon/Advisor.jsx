@@ -238,7 +238,9 @@ export default function Advisor({ scope, placeName, focus, stateFeature, series,
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
         <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
           <p className="text-sm font-semibold flex items-center gap-1.5">The next 16 days, {place} <InfoTip text="Open-Meteo's best-match weather forecast at the point, daily rain and highest temperature." /></p>
-          {fc.short ? <SeriesChart series={[{ name: 'Rain', color: '#2563EB', points: fc.short.time.map((t, i) => [t, fc.short.precipitation_sum[i]]) }]} bars colorOf={() => '#2563EB'} unit="mm" digits={1} xFmt={(t) => t.slice(5)} csvName={`forecast-16-days-${place}`} xLabel="day" height={180} /> : <p className="text-sm text-gray-500">Loading the forecast…</p>}
+          {!fc.short ? <p className="text-sm text-gray-500">{fc.err ? 'The forecast could not be loaded.' : 'Loading the forecast…'}</p>
+            : rain16 < 0.5 ? <p className="text-sm text-gray-700 rounded-xl bg-gray-50 border border-gray-200 px-4 py-3">No rain in the forecast for the next 16 days ({fmt(rain16, 1)} mm in all).</p>
+            : <SeriesChart series={[{ name: 'Rain', color: '#2563EB', points: fc.short.time.map((t, i) => [t, fc.short.precipitation_sum[i]]) }]} bars colorOf={() => '#2563EB'} unit="mm" digits={1} xFmt={(t) => t.slice(5)} csvName={`forecast-16-days-${place}`} xLabel="day" height={180} />}
           {fc.short && <SeriesChart series={[{ name: 'Highest temperature', color: '#D97706', points: fc.short.time.map((t, i) => [t, fc.short.temperature_2m_max[i]]) }]} refs={[{ y: 40, label: '40 °C', color: '#B42318' }]} unit="°C" digits={1} xFmt={(t) => t.slice(5)} csvName={`forecast-16-days-tmax-${place}`} xLabel="day" height={160} />}
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">

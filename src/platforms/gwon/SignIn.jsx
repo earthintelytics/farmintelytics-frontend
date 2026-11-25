@@ -21,7 +21,7 @@ export function SignInDialog({ open, onClose, onSignedIn }) {
       if (me?.error) setErr(me.error);
       else if (me) { onSignedIn(me); onClose(); }
       else setErr('Could not sign in.');
-    } catch (ex) { setErr(ex.status === 401 ? 'Wrong email or access code.' : ex.message); }
+    } catch (ex) { setErr(ex.status === 401 ? 'Wrong email or password.' : ex.message); }
     setBusy(false);
   };
   const cls = 'w-full px-3 py-2.5 rounded-xl border border-gray-200 bg-white text-sm outline-none focus:border-[#007248]';
@@ -39,7 +39,7 @@ export function SignInDialog({ open, onClose, onSignedIn }) {
         </div>
         <label className="block space-y-1"><span className="text-xs font-semibold text-gray-700">Email</span>
           <input type="email" autoComplete="username" required value={email} onChange={(e) => setEmail(e.target.value)} className={cls} /></label>
-        <label className="block space-y-1"><span className="text-xs font-semibold text-gray-700">Access code</span>
+        <label className="block space-y-1"><span className="text-xs font-semibold text-gray-700">Password</span>
           <input type="password" autoComplete="current-password" required value={code} onChange={(e) => setCode(e.target.value)} className={cls} /></label>
         {err && <p className="text-sm text-red-700" role="alert">{err}</p>}
         <button type="submit" disabled={busy} className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#007248] text-white text-sm font-semibold disabled:opacity-60">

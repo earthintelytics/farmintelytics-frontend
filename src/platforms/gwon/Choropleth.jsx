@@ -14,8 +14,8 @@ function Fit({ data }) {
 }
 
 /** colorOf(state) -> colour, label(state) -> tooltip html, legend [{color, label}] */
-export default function Choropleth({ states, colorOf, label, legend, picked, onPick, height = 420, dark = false }) {
-  const key = useMemo(() => (states?.features || []).map((f) => `${f.properties.state}:${colorOf(f.properties.state)}`).join('|') + picked + dark, [states, colorOf, picked, dark]);
+export default function Choropleth({ states, colorOf, label, legend, picked, onPick, height = 420, dark = false, nameOf = (f) => f.properties.state }) {
+  const key = useMemo(() => (states?.features || []).map((f) => `${nameOf(f)}:${colorOf(nameOf(f))}`).join('|') + picked + dark, [states, colorOf, picked, dark, nameOf]);
   if (!states) return null;
   return (
     <div className="space-y-2">
@@ -23,10 +23,10 @@ export default function Choropleth({ states, colorOf, label, legend, picked, onP
         <MapContainer center={[11.8, 9]} zoom={6} style={{ height: '100%' }} zoomControl={false} scrollWheelZoom={false} attributionControl={false}>
           <TileLayer url={`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${dark ? 'Dark' : 'Light'}_Gray_Base/MapServer/tile/{z}/{y}/{x}`} />
           <GeoJSON key={key} data={states}
-            style={(f) => ({ color: f.properties.state === picked ? '#0E2D41' : dark ? '#0B1820' : '#FFFFFF', weight: f.properties.state === picked ? 3 : 1.5, fillColor: colorOf(f.properties.state) || '#E5E7EB', fillOpacity: 0.85 })}
+            style={(f) => ({ color: nameOf(f) === picked ? '#0E2D41' : dark ? '#0B1820' : '#FFFFFF', weight: nameOf(f) === picked ? 3 : 1, fillColor: colorOf(nameOf(f)) || '#E5E7EB', fillOpacity: 0.85 })}
             onEachFeature={(f, lyr) => {
-              lyr.bindTooltip(label(f.properties.state), { sticky: true });
-              lyr.on('click', () => onPick && onPick(f.properties.state));
+              lyr.bindTooltip(label(nameOf(f)), { sticky: true });
+              lyr.on('click', () => onPick && onPick(nameOf(f)));
             }} />
           <Fit data={states} />
         </MapContainer>
