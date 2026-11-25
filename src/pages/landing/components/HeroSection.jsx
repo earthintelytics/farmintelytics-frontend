@@ -6,10 +6,10 @@ import HeroBackdrop from './HeroBackdrop';
 
 // What the platform does, in three plain lines. No client data on a public page.
 const POINTS = [
-  { icon: Leaf, title: 'Crop health from satellite', text: 'See which blocks are growing well and which need a visit, updated with every new image.' },
-  { icon: Droplets, title: 'Water and weather advice', text: 'Know where fields are short of water or flooded, with what to do this week.' },
-  { icon: ShieldCheck, title: 'EUDR and land suitability', text: 'Check deforestation risk for every parcel and where each crop fits best.' },
-  { icon: Code2, title: 'An API for your own systems', text: 'Send plots from your own software: the EUDR check and crop suitability, plot by plot.' },
+  { icon: Leaf, title: 'How your crops are doing', text: 'Which blocks are thriving and which could use a visit. It updates every time a new satellite image comes in.' },
+  { icon: Droplets, title: 'Water and weather, made simple', text: 'Know when a field is thirsty or waterlogged, and what to do about it this week.' },
+  { icon: ShieldCheck, title: 'Proof and planning', text: 'Show buyers no forest was cleared for your crop, and find the land where each crop will do best.' },
+  { icon: Code2, title: 'Works with your software', text: 'Already have a system? Send your plots to our API and get the EUDR check and crop suitability back.' },
 ];
 
 const HeroSection = () => {
@@ -24,14 +24,14 @@ const HeroSection = () => {
         <div>
         <p className="text-sm font-medium text-[var(--brand-primary)]">Powered by Earthintelytics</p>
         <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl font-semibold tracking-tight text-gray-900 mt-3 max-w-xl">
-          <span className="block">Monitor every field.</span>
-          <span className="block">Stay informed.</span>
-          <span className="block text-[var(--brand-primary)]">Stay in control.</span>
+          <span className="block">Know your fields.</span>
+          <span className="block">Even the far ones.</span>
+          <span className="block text-[var(--brand-primary)]">Especially the far ones.</span>
         </h1>
         <p className="text-base sm:text-lg text-gray-600 mt-5 max-w-lg leading-relaxed">
-          FarmIntelytics turns satellite imagery into plain answers for farms, estates and co-operatives:
-          crop health and growth, water and irrigation advice, EUDR deforestation checks and land suitability,
-          in one easy platform.
+          You can't walk every field every week. Satellites can. FarmIntelytics looks at your land from above
+          and tells you, in plain words, how your crops are doing, where they need water, and what to check
+          next, whether you farm two hectares or run a whole estate.
         </p>
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
           <button type="button" id="hero-primary-sign-in" onClick={() => navigate(home || '/login')}
@@ -57,7 +57,7 @@ const HeroSection = () => {
             <p className="font-display text-base font-semibold text-gray-900">Field 12</p>
             <span className="text-xs font-medium px-2 py-0.5 rounded-md bg-green-50 text-green-800 border border-green-200">Growing well</span>
           </div>
-          <p className="text-sm text-gray-600 leading-relaxed">Crop vigour is steady against last month. No action needed this week.</p>
+          <p className="text-sm text-gray-600 leading-relaxed">Looking healthy, about the same as last month. Nothing to do here this week.</p>
           <p className="text-xs text-gray-500">Latest image 7 Oct · 92% of the field clear</p>
         </div>
         </div>

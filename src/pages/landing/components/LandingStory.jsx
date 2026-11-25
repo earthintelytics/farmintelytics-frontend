@@ -14,26 +14,26 @@ const PEOPLE = [
 ];
 
 const FLOW = [
-  { icon: Sprout, title: 'Your fields', text: 'Draw or upload each field once, from a phone or a file.' },
-  { icon: Satellite, title: 'Satellites pass', text: 'Every few days, new images of every field, rain or shine.' },
-  { icon: Leaf, title: 'We read them', text: 'Growth, water, weather and land change, field by field.' },
-  { icon: MessageSquareText, title: 'Plain advice', text: 'What to check this week, on your phone, in plain words.' },
+  { icon: Sprout, title: 'Add your fields', text: 'Draw them on the map or upload a file. You only do this once.' },
+  { icon: Satellite, title: 'Satellites keep watch', text: 'Every few days they take a fresh picture of each field, even when it is cloudy.' },
+  { icon: Leaf, title: 'We do the reading', text: 'We look at growth, water, weather and land change for you, field by field.' },
+  { icon: MessageSquareText, title: 'You get the news', text: 'A short note on your phone: what looks good, and what to check this week.' },
 ];
 
 const SERVICES = [
-  { img: '/crops/groundnut.webp', title: 'Crop health and growth', text: 'Which fields are growing well and which need a visit.' },
-  { img: '/crops/sorghum.webp', title: 'Water and weather', text: 'Where crops are short of water or flooded, and what to do.' },
-  { img: '/crops/eudr.webp', title: 'EUDR deforestation check', text: 'Proof, plot by plot, that no forest was cleared after 2020.' },
-  { img: '/crops/millet.webp', title: 'Land suitability', text: 'Where each crop grows best, before you plant.' },
-  { img: '/crops/field_logs.webp', title: 'Farmer groups', text: 'Members, their parcels and visits, for the whole co-operative.' },
-  { img: '/crops/finance.webp', title: 'Evidence for buyers and lenders', text: 'Reports and checks others can trust.' },
+  { img: '/crops/groundnut.webp', title: 'Crop health and growth', text: 'See at a glance which fields are doing well and which need you.' },
+  { img: '/crops/sorghum.webp', title: 'Water and weather', text: 'Know when crops are thirsty or flooded, and what to do next.' },
+  { img: '/crops/eudr.webp', title: 'EUDR deforestation check', text: 'Show European buyers, plot by plot, that no forest was cleared after 2020.' },
+  { img: '/crops/millet.webp', title: 'Land suitability', text: 'Find out where a crop will thrive before you put a seed in the ground.' },
+  { img: '/crops/field_logs.webp', title: 'Farmer groups', text: 'Keep every member, their plots and their visits together, for the whole co-operative.' },
+  { img: '/crops/finance.webp', title: 'Evidence for buyers and lenders', text: 'Clear reports you can hand to a buyer or a bank with confidence.' },
 ];
 
 const WHO = [
-  { icon: Wheat, title: 'Estates and plantations', text: 'Every block on one map, with alerts before problems spread.' },
-  { icon: Users, title: 'Co-operatives and groups', text: 'Thousands of small farms, one clear view, members on their phones.' },
-  { icon: Building2, title: 'Buyers and exporters', text: 'EUDR evidence for every supplier plot, ready for the EU system.' },
-  { icon: Trees, title: 'Carbon and restoration', text: 'Track planting and land change with satellite evidence.' },
+  { icon: Wheat, title: 'Estates and plantations', text: 'All your blocks on one map, and a heads-up before a small problem becomes a big one.' },
+  { icon: Users, title: 'Co-operatives and groups', text: 'Thousands of small farms in one clear picture, with every member on their own phone.' },
+  { icon: Building2, title: 'Buyers and exporters', text: 'EUDR evidence for every plot your suppliers farm, ready to send to the EU.' },
+  { icon: Trees, title: 'Carbon and restoration', text: 'Watch the trees you planted take hold, with satellite evidence to show for it.' },
 ];
 
 const LandingStory = () => {
@@ -44,13 +44,14 @@ const LandingStory = () => {
       <section className="bg-[#FBF8F1] border-y border-[#F0E9DA]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 grid gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] items-center">
           <div>
-            <p className="text-sm font-medium text-[var(--brand-primary)]">Made for the people who grow our food</p>
+            <p className="text-sm font-medium text-[var(--brand-primary)]">For the people who grow our food</p>
             <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-gray-900 mt-3">
-              More time in the field that needs you. Less walking the ones that don't.
+              Spend your time where your farm needs you.
             </h2>
             <p className="text-gray-600 mt-5 leading-relaxed max-w-lg">
-              Farmers, field teams and co-operatives use FarmIntelytics to see their land from above and act early:
-              a dry corner, a slow block, a parcel a buyer asks about. Simple enough for a phone, deep enough for an estate.
+              Every farmer knows the feeling: you find the problem a week too late. A corner drying out, a block that
+              stopped growing, a buyer asking for proof you don't have to hand. FarmIntelytics helps you see these
+              things early, from your phone, so you can go straight to the field that needs you.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <button type="button" onClick={() => navigate('/contact')}
@@ -78,7 +79,7 @@ const LandingStory = () => {
       <section className="bg-white">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <p className="text-sm font-medium text-[var(--brand-primary)] text-center">How it works</p>
-          <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-gray-900 mt-3 text-center">From space to your phone, every week</h2>
+          <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-gray-900 mt-3 text-center">From the sky to your pocket, every week</h2>
           <ol className="relative mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <span aria-hidden="true" className="fi-flow-line hidden lg:block absolute top-7 left-[12.5%] right-[12.5%] h-0.5" />
             {FLOW.map(({ icon: Icon, title, text }, i) => (
@@ -100,7 +101,7 @@ const LandingStory = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
           <div className="max-w-2xl">
             <p className="text-sm font-medium text-[var(--brand-primary)]">One platform</p>
-            <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-gray-900 mt-3">Everything your land is telling you</h2>
+            <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-gray-900 mt-3">Listen to what your land is telling you</h2>
           </div>
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {SERVICES.map((s) => (
@@ -121,8 +122,8 @@ const LandingStory = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
           <div>
             <p className="text-sm font-medium text-[var(--brand-primary)]">Who it is for</p>
-            <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-gray-900 mt-3">From one family farm to a whole supply chain</h2>
-            <p className="text-gray-600 mt-5 leading-relaxed">Each organisation gets the services it needs, set up for its own crops and land.</p>
+            <h2 className="font-display text-3xl sm:text-4xl font-semibold tracking-tight text-gray-900 mt-3">From smallholder to estate</h2>
+            <p className="text-gray-600 mt-5 leading-relaxed">Tell us what you grow and where. We set FarmIntelytics up for your crops and your land, with only the services you need.</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {WHO.map(({ icon: Icon, title, text }) => (
@@ -142,8 +143,8 @@ const LandingStory = () => {
           <div className="max-w-2xl flex gap-4">
             <span className="shrink-0 w-11 h-11 rounded-xl bg-white border border-[#F0E9DA] text-[var(--brand-primary)] flex items-center justify-center"><Code2 size={20} /></span>
             <div>
-              <h2 className="font-display text-2xl font-semibold text-gray-900">Build it into your own systems</h2>
-              <p className="text-gray-600 mt-2 leading-relaxed">The FarmIntelytics API: the EUDR deforestation check and crop suitability, plot by plot, priced per plot in naira.</p>
+              <h2 className="font-display text-2xl font-semibold text-gray-900">Already have your own system?</h2>
+              <p className="text-gray-600 mt-2 leading-relaxed">Plug FarmIntelytics into it. Our API runs the EUDR deforestation check and crop suitability for each plot you send, and you pay per plot, in naira.</p>
             </div>
           </div>
           <button type="button" onClick={() => navigate('/developers')}
