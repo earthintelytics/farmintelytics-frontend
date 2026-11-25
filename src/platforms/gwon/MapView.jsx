@@ -94,7 +94,7 @@ function Calendar({ dates, value, onPick, onClose }) {
  * props: initial (layer keys switched on), states, sites, stats ([{label, value, sub, tip}]), height, title, date
  * (a controlled timeline date, optional), onDate.
  */
-export default function MapView({ initial = ['ndvi'], states, sites, stats = [], height = 'calc(100vh - 290px)', title, date: dateIn, onDate, compact = false }) {
+export default function MapView({ focus = null, initial = ['ndvi'], states, sites, stats = [], height = 'calc(100vh - 290px)', title, date: dateIn, onDate, compact = false }) {
   const [layers, setLayers] = useState(() => Object.fromEntries(ORDER.map((k) => [k, { on: initial.includes(k), opacity: k === 'truecolor' ? 100 : 85 }])));
   const [panel, setPanel] = useState(!compact);
   const [year, setYear] = useState(() => new Date().getUTCFullYear());
@@ -138,11 +138,14 @@ export default function MapView({ initial = ['ndvi'], states, sites, stats = [],
           ))}
           <TileLayer url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}" attribution="Places: Esri" opacity={0.9} />
           {states && <GeoJSON key="st-w" data={states} style={{ color: '#FFFFFF', weight: 3, fill: false }} />}
+          {/* The state chosen in the header's filter stands out; the others are dimmed. */}
+          {states && focus && <GeoJSON key={`dim-${focus.properties.state}`} data={states} style={(f) => (f.properties.state === focus.properties.state
+            ? { color: '#0F5F57', weight: 3, fill: false } : { stroke: false, fillColor: '#FFFFFF', fillOpacity: 0.55 })} />}
           {states && <GeoJSON key="st" data={states} style={{ color: '#0F5F57', weight: 1.4, fillOpacity: 0 }}
             onEachFeature={(f, lyr) => lyr.bindTooltip(`<b>${f.properties.state}</b><br/>${fmt(f.properties.area_ha)} ha`, { sticky: true })} />}
           {sites?.features?.length > 0 && <GeoJSON key={`s-${sites.features.length}`} data={sites} style={{ color: '#B45309', weight: 2, fillColor: '#F59E0B', fillOpacity: 0.4 }}
             onEachFeature={(f, lyr) => lyr.bindTooltip(f.properties?.name || f.properties?.ref || 'Site', { sticky: true })} />}
-          <Fit data={states} />
+          <Fit data={focus || states} />
         </MapContainer>
 
         {/* Layers */}
