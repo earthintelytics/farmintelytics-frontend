@@ -296,22 +296,31 @@ export default function GwonPortal() {
       <style>{'@media print { .gwon-noprint { display: none !important; } .gwon-print-full { grid-column: 1 / -1 !important; } }'}</style>
       {/* Header: as every FarmIntelytics service, with the three header tabs */}
       <header className="gwon-noprint bg-white border-b border-gray-200 sticky top-0 z-[1200]">
+        <div className="bg-[#007248] text-white">
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 h-8 flex items-center justify-between gap-4 text-[12px]">
+            <span className="truncate">An official observatory prototype for the National Agency for the Great Green Wall, Nigeria</span>
+            <span className="hidden md:flex items-center gap-4 shrink-0">
+              {series && <span>Climate data to {Object.values(series.states)[0]?.until}</span>}
+              <span>Powered by Earthintelytics</span>
+            </span>
+          </div>
+        </div>
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 min-h-[68px] py-2 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <button type="button" onClick={() => setTab('home')} aria-label="GWON home" className="shrink-0"><img src="/gwon-data/naggw-seal.png" alt="National Agency for the Great Green Wall" className="w-11 h-11" /></button>
             <div className="min-w-0">
               <p className="font-display text-base font-semibold leading-tight truncate">GreenWall Observatory Nigeria</p>
-              <p className="hidden sm:block text-xs text-gray-500 truncate">National Agency for the Great Green Wall · Powered by <span className="font-semibold text-gray-700">Earthintelytics</span></p>
+              <p className="hidden sm:block text-xs text-gray-500 truncate">Monitoring the eleven frontline states</p>
             </div>
           </div>
-          <nav className="order-last md:order-none w-full md:w-auto flex items-center gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto" aria-label="GWON" data-tour="tabs">
+          {tab !== 'home' && <nav className="order-last md:order-none w-full md:w-auto flex items-center gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto" aria-label="GWON" data-tour="tabs">
             {TABS.map(({ id, label, icon: Icon }) => (
               <button key={id} type="button" onClick={() => open(id)}
                 className={`flex-1 md:flex-none justify-center inline-flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${tab === id ? 'bg-white text-[#0E2D41] border border-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
                 <Icon size={15} /> {label}
               </button>
             ))}
-          </nav>
+          </nav>}
           {/* Right: what data is shown, the tour, light or dark, then the account (standard top-right) */}
           <div className="flex items-center gap-2 ml-auto md:ml-0">
             <span className="hidden xl:flex text-xs text-gray-600 items-center gap-1.5 pr-1">{signedIn ? 'Public data and your organisation’s' : 'Public data only'} <InfoTip side="bottom" text="Only real public data: state boundaries, NASA satellite layers with NASA's legends, ERA5 climate and published programme figures with their source. The Agency's own sites appear once its files are loaded." /></span>

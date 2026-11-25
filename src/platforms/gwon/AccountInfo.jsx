@@ -86,6 +86,8 @@ export function AccountPanel({ open, me, onClose, onSignOut, adminIndex, stateNa
 const Sec = ({ title, children }) => <section className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2"><h2 className="font-display text-lg font-semibold text-gray-900">{title}</h2><div className="text-sm text-gray-700 space-y-2">{children}</div></section>;
 
 export function About() {
+  const [credits, setCredits] = useState(null);
+  useEffect(() => { fetch('/gwon-data/photos/credits.json').then((r) => r.json()).then(setCredits).catch(() => {}); }, []);
   return (
     <div className="space-y-4 max-w-4xl">
       <Sec title="What GWON is">
@@ -104,6 +106,11 @@ export function About() {
       <Sec title="Contact">
         <p>For the platform: Earthintelytics, through the FarmIntelytics contact page. For the Great Green Wall programme in Nigeria: the National Agency for the Great Green Wall (ggwnigeria.gov.ng).</p>
       </Sec>
+      {credits && (
+        <Sec title="Photographs">
+          <ul className="space-y-1 text-xs">{Object.values(credits).map((c) => <li key={c.title}><a href={c.source} target="_blank" rel="noreferrer" className="underline">{c.title}</a> · {c.author || 'Wikimedia Commons'} · {c.licence}</li>)}</ul>
+        </Sec>
+      )}
       <p className="flex items-center gap-1.5 text-xs text-gray-500"><Info size={13} /> GreenWall Observatory Nigeria · Powered by Earthintelytics</p>
     </div>
   );
