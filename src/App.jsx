@@ -135,6 +135,13 @@ const TeamHubPage = () => {
   const [teamSignedIn, setTeamSignedIn] = useState(hasValidTeamSession);
 
   const handleSelectModule = (id) => {
+    // A card that opens a page of its own: the API pages, a managed platform.
+    if (id.startsWith('link:')) {
+      const to = id.slice(5);
+      if (to.startsWith('/public-api/')) window.location.assign(to);   // served by the backend, not the portal
+      else navigate(to);
+      return;
+    }
     if (id.startsWith('org:')) {
       const org = id.slice(4);
       navigate(sessionTenant() === org ? paths.orgHub(org) : paths.orgLogin(org));

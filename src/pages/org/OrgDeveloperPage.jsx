@@ -5,7 +5,6 @@ import {
 import { useLoader } from '../../components/page/useLoader';
 import InfoTip from '../../components/page/InfoTip';
 import { Button, Field, Note } from '../../farmintelytics-admin/components/ui';
-import { PaymentReference } from '../../farmintelytics-admin/pages/ApiClients';
 import { API_FIELD_HELP as H } from '../../components/page/apiHelpText';
 import { createApiKey, fetchDeveloperOverview, fetchDeveloperStatement, revokeApiKey, rotateApiKey, saveWebhook } from '../../services/developerApi';
 import { naira } from '../../utils/money';
@@ -189,11 +188,6 @@ export default function OrgDeveloperPage({ profile }) {
                     <div><p className="text-xs text-gray-500 flex items-center gap-1">Plots per request <InfoTip text="The most plots one request may hold. Larger files are refused before anything is charged." /></p><p className="font-semibold">Up to {p.max_units_per_request}</p></div>
                   </div>
                 ))}
-              </section>
-              <section className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
-                <h2 className="font-display text-lg font-semibold flex items-center gap-2">Add money <InfoTip text="Pay by bank transfer quoting your payment reference. The balance updates when FarmIntelytics records the payment." /></h2>
-                <PaymentReference value={data.payment_reference} />
-                <p className="text-sm text-gray-600">A request costs the total area of its plots × the price per hectare. Plots refused by the EU rules, test keys and failed checks are never charged.</p>
               </section>
               <section className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
                 <div className="flex items-center justify-between gap-3">

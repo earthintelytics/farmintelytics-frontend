@@ -12,7 +12,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Activity, FileBarChart, MessageSquareText, Map as MapIcon, Layers, ClipboardList, Sprout, AlertTriangle, Compass, CloudRain,
-  UploadCloud, Trash2, Printer, ListChecks,
+  UploadCloud, Trash2, Printer, ListChecks, Sun, Droplets,
 } from 'lucide-react';
 import InfoTip from '../../components/page/InfoTip';
 import { useConfirm } from '../../components/ConfirmProvider';
@@ -20,6 +20,7 @@ import MapView from './MapView';
 import { ndviDate } from './layers';
 import { fetchClimate, monthly, rainToDate } from './climate';
 import { RainBars, MonthLines, StateBars } from './Charts';
+import { SeasonCurve, YearBars, MonthVsMean } from './AnalysisCharts';
 import Assistant from './Assistant';
 
 const TABS = [
@@ -29,13 +30,15 @@ const TABS = [
 ];
 const PAGES = {
   monitor: [
-    { id: 'overview', label: 'Overview', icon: MapIcon },
-    { id: 'atlas', label: 'Baseline atlas', icon: Layers },
-    { id: 'registry', label: 'Project registry', icon: ClipboardList },
-    { id: 'monitoring', label: 'Restoration monitoring', icon: Sprout },
-    { id: 'warning', label: 'Early warning', icon: AlertTriangle },
-    { id: 'planning', label: 'Planning', icon: Compass },
-    { id: 'climate', label: 'Climate and rain', icon: CloudRain },
+    { id: 'overview', label: 'Overview', icon: MapIcon, group: 'Maps' },
+    { id: 'atlas', label: 'Baseline atlas', icon: Layers, group: 'Maps' },
+    { id: 'registry', label: 'Project registry', icon: ClipboardList, group: 'Maps' },
+    { id: 'monitoring', label: 'Restoration monitoring', icon: Sprout, group: 'Maps' },
+    { id: 'warning', label: 'Early warning', icon: AlertTriangle, group: 'Maps' },
+    { id: 'planning', label: 'Planning', icon: Compass, group: 'Maps' },
+    { id: 'drought', label: 'Drought', icon: Sun, group: 'Analysis' },
+    { id: 'water', label: 'Water stress', icon: Droplets, group: 'Analysis' },
+    { id: 'climate', label: 'Climate and rain', icon: CloudRain, group: 'Analysis' },
   ],
   reports: [
     { id: 'report', label: 'Report', icon: Printer },
@@ -101,10 +104,13 @@ export default function GwonPortal() {
   const [period, setPeriod] = useState(() => ndviDate(new Date()));
   const [msg, setMsg] = useState('');
   const fileRef = useRef(null);
+  const [series, setSeries] = useState(null);       // drought and water-stress series (scripts/gwon_climate_series.py)
+  const [aState, setAState] = useState('Borno');
 
   useEffect(() => {
     document.title = 'GreenWall Observatory Nigeria (GWON)';
     fetch('/gwon-data/frontline_states.geojson').then((r) => r.json()).then(setStates).catch(() => setStates(null));
+    fetch('/gwon-data/climate_series.json').then((r) => r.json()).then(setSeries).catch(() => setSeries(null));
   }, []);
   useEffect(() => { if (states) fetchClimate(states).then(setClimate).catch((e) => setClimateErr(e.message)); }, [states]);
   useEffect(() => { window.history.replaceState(null, '', `#${tab}${tab === 'assistant' ? '' : `/${page}`}`); }, [tab, page]);
@@ -153,10 +159,30 @@ export default function GwonPortal() {
   const areaStat = { label: 'Frontline area', value: totalHa ? `${(totalHa / 1e6).toFixed(2)} m ha` : '—', sub: '11 states', tip: 'Worked out from the geoBoundaries state boundaries on an equal-area projection.' };
   const siteStat = { label: 'Registered sites', value: fmt(siteRows.length), sub: siteRows.length ? `${fmt(siteHa)} ha` : 'Load them in the registry', tip: 'Restoration sites in the Project registry, with their area from their boundaries.' };
   const rainStat = driest ? { label: 'Driest against last year', value: `${driest.state} ${Math.round(driest.change)}%`, sub: `Rain to ${driest.until}`, tip: 'Rain so far this year against the same days last year, ERA5 at one point inside each state.' } : null;
+  // Season so far against a normal season (the 2015-2024 mean to the same day), every state.
+  const vsNormal = useMemo(() => Object.entries(series?.states || {}).map(([state, s]) => {
+    const k = s.cumulative.now.length - 1;
+    const mean = s.cumulative.mean[Math.min(k, 364)];
+    return { state, now: s.cumulative.now[k], mean, pct: mean ? ((s.cumulative.now[k] - mean) / mean) * 100 : null };
+  }), [series]);
+  const sa = series?.states?.[aState];
+  const zColor = (r) => (r.z == null ? '#A3AEB8' : r.z <= -0.5 ? '#D97706' : r.z >= 0.5 ? '#0F766E' : '#94A3B8');
+  const stateSelect = (
+    <label className="text-sm">State <select value={aState} onChange={(e) => setAState(e.target.value)} className="ml-2 px-3 py-2 rounded-xl border border-gray-300 bg-white">
+      {Object.keys(series?.states || {}).map((s) => <option key={s}>{s}</option>)}
+    </select></label>
+  );
+  const card = (title, tip, body) => (
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-2">
+      <p className="text-sm font-semibold flex items-center gap-1.5">{title} <InfoTip text={tip} /></p>
+      {body}
+    </div>
+  );
+  const srcNote = series ? `${series.source}. Baseline ${series.baseline}; data to ${Object.values(series.states)[0].until}.` : '';
   const rainBars = (rows) => [...rows].filter((r) => r.change != null).sort((a, b) => a.change - b.change).map((r) => ({ label: r.state, value: r.change, color: r.change < 0 ? '#D97706' : '#0F766E' }));
 
   return (
-    <div className="min-h-screen bg-[#F7F9F8] text-gray-900">
+    <div className="min-h-screen bg-[#F7F9F8] text-gray-900 overflow-x-clip">
       <style>{'@media print { .gwon-noprint { display: none !important; } .gwon-print-full { grid-column: 1 / -1 !important; } }'}</style>
       {/* Header: as every FarmIntelytics service, with the three header tabs */}
       <header className="gwon-noprint bg-white border-b border-gray-200 sticky top-0 z-[1200]">
@@ -183,11 +209,14 @@ export default function GwonPortal() {
       <div className={`max-w-[1600px] mx-auto px-4 sm:px-6 py-5 grid gap-5 ${tab === 'assistant' ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-[224px_1fr]'}`}>
         {tab !== 'assistant' && (
           <nav className="gwon-noprint lg:sticky lg:top-[88px] self-start rounded-2xl border border-gray-200 bg-white p-2" aria-label="Pages">
-            {PAGES[tab].map(({ id, label, icon: Icon }) => (
-              <button key={id} type="button" onClick={() => setPage(id)}
+            {PAGES[tab].map(({ id, label, icon: Icon, group }, i) => (
+              <div key={id}>
+              {group && group !== PAGES[tab][i - 1]?.group && <p className={`px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400 ${i ? 'pt-3' : 'pt-1'}`}>{group}</p>}
+              <button type="button" onClick={() => setPage(id)}
                 className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-sm text-left ${page === id ? 'bg-[#0F766E] text-white font-semibold' : 'text-gray-700 hover:bg-gray-50'}`}>
                 <Icon size={16} /> {label}
               </button>
+              </div>
             ))}
           </nav>
         )}
@@ -203,6 +232,15 @@ export default function GwonPortal() {
                 <Kpi tone="sky" label="ACReSAL land under restoration" value="922,700 ha" sub="April 2026, about 97% of target" tip="Published by the Federal Ministry of Environment (ACReSAL update, April 2026); not measured by GWON." />
               </div>
               <MapView initial={['ndvi']} states={states} sites={sites} date={period} onDate={setPeriod} height="560px" title="Vegetation now" stats={[siteStat]} />
+              {sa && (
+                <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+                  {card('Every state: the season against normal', 'Rain so far this year against the 2015-2024 mean to the same day. Below zero: behind a normal season (Analysis, Drought).',
+                    <StateBars unit="%" rows={[...vsNormal].filter((r) => r.pct != null).sort((a, b) => a.pct - b.pct).map((r) => ({ label: r.state, value: r.pct, color: r.pct < 0 ? '#D97706' : '#0F766E' }))} />)}
+                  {card(`The season so far, ${aState}`, 'Rain adding up from 1 January against the 2015-2024 range. Choose the state in Analysis, Drought.', <SeasonCurve cum={sa.cumulative} year={sa.year} />)}
+                  {card(`Rain minus evaporation, ${aState}`, 'Below zero: the air takes more water than the rain gives (Analysis, Water stress).', <MonthVsMean rows={sa.monthly} value="balance" unit="mm" year={sa.year} />)}
+                  {card(`Hot days each year, ${aState}`, 'Days of 40 °C or more, 2015 to this year (Analysis, Water stress).', <YearBars rows={sa.annual} value="hot_days" unit="days" colorOf={() => '#D97706'} />)}
+                </div>
+              )}
               <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                 <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
                   <p className="text-sm font-semibold flex items-center gap-1.5">The states by size <InfoTip text="Each state's area, from its boundary." /></p>
@@ -278,6 +316,47 @@ export default function GwonPortal() {
               <Title title="Planning" tip="Where restoration helps most and will succeed: land cover shows what is there now, population shows who it serves. In the platform, species suitability and degradation layers come from the pipeline."
                 text="Land cover and where people live: switch between them, or lay one over the other with the opacity slider." />
               <MapView initial={['landcover']} states={states} sites={sites} stats={[areaStat]} title="Planning layers" />
+            </>
+          )}
+
+          {tab === 'monitor' && page === 'drought' && (
+            <>
+              <Title title="Drought" tip="How this season's rain compares with a normal season (the 2015-2024 mean), and how long the dry spells were. ERA5 at one point inside each state, so read it as that point's rain, not the whole state's." text="This year against ten years, for each frontline state.">{stateSelect}</Title>
+              {!sa ? <p className="text-sm text-gray-500">Loading the series…</p> : (
+                <>
+                  <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                    <Kpi tone="teal" label={`Rain so far in ${sa.year}`} value={`${fmt(sa.cumulative.now[sa.cumulative.now.length - 1])} mm`} sub={`to ${sa.until}`} tip="Rain from 1 January to the latest day of data." />
+                    <Kpi tone="amber" label="A normal season by now" value={`${fmt(sa.cumulative.mean[sa.cumulative.now.length - 1])} mm`} sub="2015–2024 mean, same day" tip="The mean of 2015-2024 to the same day of the year." />
+                    <Kpi tone="green" label="A normal year" value={`${fmt(sa.baseline_rain_mean)} mm`} sub="2015–2024 mean" tip="The mean rain of a whole year, 2015-2024." />
+                    <Kpi tone="sky" label="Longest dry spell this season" value={sa.annual[sa.annual.length - 1].dry_spell == null ? '—' : `${sa.annual[sa.annual.length - 1].dry_spell} days`} sub="May–September, under 1 mm a day" tip="The longest run of days with under 1 mm of rain between May and September." />
+                  </div>
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    {card(`The season so far, ${aState}`, 'Rain adding up from 1 January. The grey band is the driest to the wettest of 2015-2024; the dashed line their mean.', <SeasonCurve cum={sa.cumulative} year={sa.year} />)}
+                    {card(`Rain each year, ${aState}`, 'Amber: a dry year (at least half a standard deviation below the 2015-2024 mean). Teal: a wet year. The last bar is this year so far.', <YearBars rows={sa.annual} value="rain" unit="mm" mean={sa.baseline_rain_mean} colorOf={zColor} />)}
+                    {card('Every state: the season against normal', 'Rain so far this year against the 2015-2024 mean to the same day, in percent. Below zero: behind a normal season.', <StateBars unit="%" rows={[...vsNormal].filter((r) => r.pct != null).sort((a, b) => a.pct - b.pct).map((r) => ({ label: r.state, value: r.pct, color: r.pct < 0 ? '#D97706' : '#0F766E' }))} />)}
+                    {card(`Longest dry spell each rainy season, ${aState}`, 'The longest run of days under 1 mm between May and September, each year. Long spells after planting kill seedlings.', <YearBars rows={sa.annual} value="dry_spell" unit="days" colorOf={(r) => (r.dry_spell >= 21 ? '#D97706' : '#0F766E')} />)}
+                  </div>
+                  <p className="text-xs text-gray-500">{srcNote}</p>
+                </>
+              )}
+            </>
+          )}
+
+          {tab === 'monitor' && page === 'water' && (
+            <>
+              <Title title="Water stress" tip="Whether plants get the water the air takes from them: rain minus reference evaporation (FAO-56 ET0), the year's aridity (rain / ET0), hot days and topsoil moisture. ERA5 at one point inside each state." text="Where and when new plantings run short of water.">{stateSelect}</Title>
+              {!sa ? <p className="text-sm text-gray-500">Loading the series…</p> : (
+                <>
+                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    {card(`Rain minus evaporation each month, ${aState}`, 'Below zero: the air takes more water than the rain gives; plants live on what is in the soil. The dry months of the frontline are deeply negative.', <MonthVsMean rows={sa.monthly} value="balance" unit="mm" year={sa.year} />)}
+                    {card(`Topsoil moisture each month, ${aState}`, 'Water in the top 7 cm of soil (m³ of water per m³ of soil), the month’s mean, against 2015-2024.', <MonthVsMean rows={sa.monthly} value="soil" unit="m³/m³" year={sa.year} digits={2} />)}
+                    {card(`Aridity each year, ${aState}`, 'Rain divided by reference evaporation over the year. Under 0.2 is arid, 0.2 to 0.5 semi-arid (UNEP classes).', <YearBars rows={sa.annual} value="aridity" unit="" digits={2} colorOf={(r) => (r.aridity < 0.2 ? '#D97706' : '#0F766E')} />)}
+                    {card(`Hot days each year, ${aState}`, 'Days with a highest temperature of 40 °C or more. Heat raises the water new trees need. The last bar is this year so far.', <YearBars rows={sa.annual} value="hot_days" unit="days" colorOf={() => '#D97706'} />)}
+                  </div>
+                  {card(`Hot days in ${sa.year} so far, every state`, 'Days of 40 °C or more this year.', <StateBars unit="days" rows={Object.entries(series.states).map(([s, v]) => ({ label: s, value: v.annual[v.annual.length - 1].hot_days, color: '#D97706' })).sort((a, b) => b.value - a.value)} />)}
+                  <p className="text-xs text-gray-500">{srcNote}</p>
+                </>
+              )}
             </>
           )}
 

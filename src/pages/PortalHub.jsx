@@ -7,7 +7,11 @@ import {
   Leaf, 
   Satellite,
   Trees,
-  Target
+  Target,
+  Code2,
+  BookOpen,
+  KeyRound,
+  Map as MapIcon,
 } from 'lucide-react';
 import { 
   OilPalmIcon, 
@@ -175,6 +179,26 @@ const PortalHub = ({ onSelectModule, onSignOut, onOpenAdmin }) => {
       ]),
     },
     {
+      // The public API: what clients call from their own software, its reference and its accounts.
+      id: 'api',
+      title: 'API',
+      description: 'The public FarmIntelytics API: the EUDR check and crop suitability, priced per hectare, with its reference and client accounts.',
+      modules: filterModules([
+        { id: 'link:/developers', title: 'Developers', crop: 'The public API, for clients', icon: <Code2 /> },
+        { id: 'link:/public-api/v1/redoc', title: 'API reference', crop: 'Every endpoint, field and error', icon: <BookOpen /> },
+        { id: 'link:/admin/api-clients', title: 'API clients and plans', crop: 'Clients, keys, prices, statements', icon: <KeyRound /> },
+      ]),
+    },
+    {
+      // Platforms built for one organisation and hosted on the hub (their own name, menu and pages).
+      id: 'platforms',
+      title: 'Managed platforms',
+      description: 'Platforms built for one organisation and hosted on FarmIntelytics, with their own name, menu and pages.',
+      modules: filterModules([
+        { id: 'link:/platforms/gwon', title: 'GreenWall Observatory Nigeria', crop: 'For the National Agency for the Great Green Wall', icon: <MapIcon /> },
+      ]),
+    },
+    {
       id: 'custom',
       title: 'Organisations',
       description: "Each client organisation's own hub, with the services it was given at onboarding.",
@@ -189,6 +213,8 @@ const PortalHub = ({ onSelectModule, onSignOut, onOpenAdmin }) => {
     { id: 'field-advisory', label: 'Field advisory' },
     { id: 'engine', label: 'Engine' },
     { id: 'management', label: 'Management' },
+    { id: 'api', label: 'API' },
+    { id: 'platforms', label: 'Managed platforms' },
     { id: 'custom', label: 'Organisations' },
   ].filter(tab => (sections.find(s => s.id === tab.id)?.modules.length ?? 0) > 0);
   const currentTabId = visibleTabs.some(t => t.id === activeTab) ? activeTab : visibleTabs[0]?.id;

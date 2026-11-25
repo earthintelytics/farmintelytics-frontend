@@ -49,7 +49,7 @@ export default function Assistant({ facts, module, compact = false }) {
           <p className="text-xs text-gray-500">Answers from the figures on this platform only, with where each comes from.</p>
         </div>
       </div>
-      <div className="flex-1 p-5 space-y-4 overflow-y-auto max-h-[520px]">
+      <div className="flex-1 p-5 space-y-4">
         {log.length === 0 && (
           <div className="grid gap-2 sm:grid-cols-2">
             {STARTERS.map((s) => (
@@ -71,7 +71,7 @@ export default function Assistant({ facts, module, compact = false }) {
           </div>
         )}
       </div>
-      <form className="p-3 border-t border-gray-100 flex gap-2" onSubmit={(e) => { e.preventDefault(); ask(); }}>
+      <form className="sticky bottom-0 bg-white rounded-b-2xl p-3 border-t border-gray-100 flex gap-2" onSubmit={(e) => { e.preventDefault(); ask(); }}>
         <input value={q} onChange={(e) => setQ(e.target.value)} maxLength={600} placeholder="Ask about the frontline states, the climate or the registered sites"
           className="flex-1 px-3.5 py-2.5 rounded-xl border border-gray-300 text-sm outline-none focus:border-[#0F766E]" />
         <button type="submit" disabled={busy || !q.trim()} className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#0F766E] text-white text-sm font-semibold disabled:opacity-50"><Send size={15} /> Ask</button>
