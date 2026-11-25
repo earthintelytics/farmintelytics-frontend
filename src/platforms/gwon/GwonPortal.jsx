@@ -275,7 +275,6 @@ export default function GwonPortal() {
                   );
                 })()}
               </div>
-              <MapView focus={scopeFeature} initial={['ndvi']} states={states} sites={sites} date={period} onDate={setPeriod} height="560px" title="Vegetation now" stats={[siteStat]} />
               {sa && (
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
                   {card('Every state: the season against normal', 'Rain so far this year against the 2015-2024 mean to the same day. Below zero: behind a normal season (Analysis, Drought).',
