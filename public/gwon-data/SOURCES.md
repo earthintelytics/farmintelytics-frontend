@@ -1,1 +1,3 @@
 Frontline-state boundaries: geoBoundaries NGA ADM1 (gbOpen, CC BY 4.0), simplified for display. Areas computed on Africa Albers Equal Area (ESRI:102022) from the unsimplified boundaries. lat/lon: a point inside each state (shapely representative point), where the climate charts read ERA5 (Open-Meteo archive).
+climate_series.json: ERA5 via the Open-Meteo archive, 2015 to five days before it was made (scripts/gwon_climate_series.py).
+landuse_series.json: ESA CCI Land Cover, annual 300 m, 2000-2020, via Microsoft Planetary Computer, per state with true pixel areas (scripts/gwon_landcover_series.py).
