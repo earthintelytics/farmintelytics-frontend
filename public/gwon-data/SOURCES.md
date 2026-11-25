@@ -13,3 +13,4 @@ Advisor, live: Open-Meteo forecast and ECMWF SEAS5 seasonal forecast, fetched by
 admin/people_*.json: WorldPop 2020 population (1 km, UN-adjusted, CC BY 4.0) summed over each LGA and ward; IOM DTM displacement by LGA (OCHA code) and ward (scripts/gwon_people_drilldown.py).
 cropland_series.json: ESA CCI Land Cover cropland classes (10/11, 12, 20, 30, 40), per state, 2000-2020 (scripts/gwon_cropland_series.py).
 stac/: the STAC 1.0.0 catalogue of these files (scripts/gwon_stac.py). Soil layers: SoilGrids 2.0, ISRIC (CC BY 4.0), live WMS.
+photos/: nine photographs from the frontline states and the Sahel, from Wikimedia Commons (CC BY-SA 4.0, CC BY 4.0, CC BY 2.0); authors, licences and links in photos/credits.json and under "Photo credits" on the GWON home page.

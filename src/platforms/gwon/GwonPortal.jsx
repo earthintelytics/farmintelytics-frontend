@@ -882,7 +882,7 @@ export default function GwonPortal() {
           )}
 
           {tab === 'home' && (
-            <GwonHome go={(to) => { const [tb, pg] = to.split('/'); setTab(tb); if (pg) setPage(pg); }} states={states} series={series} adminIndex={adminIndex} signedIn={signedIn} onSignIn={() => setSignIn(true)} />
+            <GwonHome go={(to) => { const [tb, pg] = to.split("/"); setTab(tb); if (pg) setPage(pg); }} states={states} adminIndex={adminIndex} signedIn={signedIn} onSignIn={() => setSignIn(true)} />
           )}
           {tab === 'assistant' && (
             <div className="max-w-5xl mx-auto w-full space-y-4">
