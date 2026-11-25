@@ -32,3 +32,4 @@ Also from Wikimedia Commons (1280 px, WebP here; JPEG on report covers in the ba
 | cowpea.webp | [Field of Vigna unguiculata](https://commons.wikimedia.org/wiki/File:Field_of_Vigna_unguiculata.jpg) (Tamil Nadu, India) | Thamizhpparithi Maari | CC BY-SA 4.0 |
 | ginger.webp | [Ginger farm](https://commons.wikimedia.org/wiki/File:Ginger_farm.jpg) (Wayanad, India) | Aneesh Jose | CC BY 3.0 |
 | soybean.webp | [African Soya Bean after harvest](https://commons.wikimedia.org/wiki/File:African_Soya_Bean_after_harvest.jpg) | Nabimanya Norman | CC BY-SA 4.0 |
+| hero/gwon.webp | A snapshot of the GreenWall Observatory Nigeria map (NASA MODIS vegetation, Esri base map) | Earthintelytics | Our own screenshot; imagery NASA (public domain), base map Esri |

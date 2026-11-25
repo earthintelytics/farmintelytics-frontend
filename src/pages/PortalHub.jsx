@@ -31,6 +31,7 @@ import { HERO_PLACEHOLDERS } from '../constants/heroPlaceholders';
 // Photo per service (compressed WebP in /public/crops). Organisation cards use
 // the organisation photo unless the organisation has uploaded its own logo.
 const CARD_PHOTOS = {
+  'link:/platforms/gwon': '/crops/hero/gwon.webp',   // a snapshot of GWON's own vegetation map of the frontline
   'rs-ffb': '/crops/oil_palm.webp',
   'rs-maize': '/crops/maize.webp',
   'rs-rice': '/crops/rice.webp',
