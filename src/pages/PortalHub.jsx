@@ -259,7 +259,7 @@ const PortalHub = ({ onSelectModule, onSignOut, onOpenAdmin }) => {
           <p className="text-sm text-gray-500 mt-5">{serviceCount} services &middot; {orgCount} organisations</p>
         </section>
 
-        <nav className="mt-12 flex gap-8 border-b border-gray-200">
+        <nav className="mt-12 flex gap-7 border-b border-gray-200 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Service groups">
           {visibleTabs.map(tab => {
             const count = sections.find(s => s.id === tab.id)?.modules.length ?? 0;
             const on = currentTabId === tab.id;
@@ -267,12 +267,12 @@ const PortalHub = ({ onSelectModule, onSignOut, onOpenAdmin }) => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`-mb-px pb-3 border-b-2 text-sm font-medium transition-colors ${
+                className={`-mb-px pb-3 border-b-2 text-sm font-medium whitespace-nowrap shrink-0 inline-flex items-baseline gap-1.5 transition-colors ${
                   on ? 'border-[var(--brand-primary)] text-gray-900' : 'border-transparent text-gray-500 hover:text-gray-800'
                 }`}
               >
                 {tab.label}
-                <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${on ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-500'}`}>{count}</span>
+                <span className={`text-xs tabular-nums ${on ? 'text-[var(--brand-primary)] font-semibold' : 'text-gray-400'}`}>{count}</span>
               </button>
             );
           })}
