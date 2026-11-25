@@ -30,7 +30,7 @@ export default function Indicator({ label, value, sub, tip, tone = 'white', delt
   return (
     <div className={`rounded-2xl border p-4 flex flex-col gap-1.5 ${TONES[tone]}`}>
       <p className="text-xs font-semibold text-gray-600 flex items-center gap-1.5">{label} {tip && <InfoTip text={tip} side="bottom" />}</p>
-      <div className="flex items-end justify-between gap-3">
+      <div className="flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
         <p className="font-display text-2xl font-semibold text-gray-900 tabular-nums leading-tight">{value}</p>
         {trend && <Spark values={trend} color={LINE[tone]} />}
       </div>

@@ -3,6 +3,7 @@
  * each type in its own colour, a legend, a hover readout), from landuse_series.json (ESA CCI Land Cover, 300 m).
  */
 import { useState } from 'react';
+import { WithCsv } from './csv';
 
 export function LandStack({ years, byYear, types, colors }) {
   const [hover, setHover] = useState(null);
@@ -98,30 +99,32 @@ export function LandDonut({ years, byYear, types, colors }) {
   });
   const h = hover ? rows.find((x) => x.t === hover) : rows[0];
   return (
-    <div className="space-y-3">
-      <label className="flex items-center gap-2 text-xs font-semibold text-gray-600">Year
-        <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-800">
-          {years.map((y) => <option key={y} value={y}>{y}</option>)}
-        </select>
-      </label>
-      <div className="flex flex-col sm:flex-row items-center gap-5">
-        <svg viewBox="0 0 220 220" width="220" height="220" role="img" aria-label={`Land types in ${year}, percent`} onMouseLeave={() => setHover(null)} className="shrink-0">
-          {arcs.map((x) => <path key={x.t} d={x.d} fill={colors[x.t]} stroke="#FFFFFF" strokeWidth="2" opacity={hover && hover !== x.t ? 0.45 : 1} onMouseEnter={() => setHover(x.t)} />)}
-          {h && <>
-            <text x={C} y={C - 4} textAnchor="middle" fontSize="24" fontWeight="600" fill="#111827" fontFamily="Sora, Inter, sans-serif">{h.p.toFixed(1)}%</text>
-            <text x={C} y={C + 16} textAnchor="middle" fontSize="11" fill="#4B5563">{h.t}</text>
-          </>}
-        </svg>
-        <ul className="w-full space-y-1.5 text-sm">
-          {rows.map((x) => (
-            <li key={x.t} onMouseEnter={() => setHover(x.t)} onMouseLeave={() => setHover(null)} className="flex items-center justify-between gap-3">
-              <span className="inline-flex items-center gap-2 text-gray-700"><span className="w-3 h-3 rounded-sm border border-gray-200" style={{ background: colors[x.t] }} />{x.t}</span>
-              <span className="tabular-nums text-gray-900 font-semibold">{x.p.toFixed(1)}%<span className="text-gray-500 font-normal"> · {Math.round(x.v).toLocaleString('en-GB')} ha</span></span>
-            </li>
-          ))}
-        </ul>
+    <WithCsv name={`land-types-${year}`} rows={() => rows.map((x) => ({ year, land_type: x.t, hectares: Math.round(x.v), percent: Math.round(x.p * 10) / 10 }))}>
+      <div className="space-y-3">
+        <label className="flex items-center gap-2 text-xs font-semibold text-gray-600">Year
+          <select value={year} onChange={(e) => setYear(Number(e.target.value))} className="px-2 py-1.5 rounded-lg border border-gray-200 bg-white text-sm text-gray-800">
+            {years.map((y) => <option key={y} value={y}>{y}</option>)}
+          </select>
+        </label>
+        <div className="flex flex-col sm:flex-row items-center gap-5">
+          <svg viewBox="0 0 220 220" width="220" height="220" role="img" aria-label={`Land types in ${year}, percent`} onMouseLeave={() => setHover(null)} className="shrink-0">
+            {arcs.map((x) => <path key={x.t} d={x.d} fill={colors[x.t]} stroke="#FFFFFF" strokeWidth="2" opacity={hover && hover !== x.t ? 0.45 : 1} onMouseEnter={() => setHover(x.t)} />)}
+            {h && <>
+              <text x={C} y={C - 4} textAnchor="middle" fontSize="24" fontWeight="600" fill="#111827" fontFamily="Sora, Inter, sans-serif">{h.p.toFixed(1)}%</text>
+              <text x={C} y={C + 16} textAnchor="middle" fontSize="11" fill="#4B5563">{h.t}</text>
+            </>}
+          </svg>
+          <ul className="w-full space-y-1.5 text-sm">
+            {rows.map((x) => (
+              <li key={x.t} onMouseEnter={() => setHover(x.t)} onMouseLeave={() => setHover(null)} className="flex items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-2 text-gray-700"><span className="w-3 h-3 rounded-sm border border-gray-200" style={{ background: colors[x.t] }} />{x.t}</span>
+                <span className="tabular-nums text-gray-900 font-semibold">{x.p.toFixed(1)}%<span className="text-gray-500 font-normal"> · {Math.round(x.v).toLocaleString('en-GB')} ha</span></span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
-    </div>
+    </WithCsv>
   );
 }
 
@@ -134,29 +137,31 @@ export function LandBars({ from, to, a, b, types, colors }) {
   const xw = (v) => (v / max) * (W - pad.l - pad.r);
   const fmtHa = (v) => (Math.abs(v) >= 1e6 ? `${(v / 1e6).toFixed(2)} m` : `${Math.round(v / 1000).toLocaleString('en-GB')} k`);
   return (
-    <div className="space-y-2">
-      <div className="flex gap-4 text-xs text-gray-600">
-        <span className="inline-flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-gray-300" />{from}</span>
-        <span className="inline-flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-gray-700" />{to} (in the land type's colour)</span>
+    <WithCsv name={`land-types-${from}-${to}`} rows={() => rows.map((r) => ({ land_type: r.t, [`hectares_${from}`]: Math.round(r.x), [`hectares_${to}`]: Math.round(r.y), change_ha: Math.round(r.y - r.x), change_percent: r.x ? Math.round(((r.y - r.x) / r.x) * 1000) / 10 : null }))}>
+      <div className="space-y-2">
+        <div className="flex gap-4 text-xs text-gray-600">
+          <span className="inline-flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-gray-300" />{from}</span>
+          <span className="inline-flex items-center gap-1.5"><span className="w-3 h-3 rounded-sm bg-gray-700" />{to} (in the land type's colour)</span>
+        </div>
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`Land types, ${from} against ${to}`} onMouseLeave={() => setHover(null)}>
+          {rows.map((r, i) => {
+            const y0 = pad.t + i * rowH, d = r.y - r.x, pct = r.x ? (d / r.x) * 100 : null;
+            return (
+              <g key={r.t} onMouseEnter={() => setHover(r.t)} opacity={hover && hover !== r.t ? 0.5 : 1}>
+                <rect x={0} y={y0} width={W} height={rowH} fill="transparent" />
+                <text x={pad.l - 8} y={y0 + 19} textAnchor="end" fontSize="12" fill="#374151">{r.t}</text>
+                <rect x={pad.l} y={y0 + 5} width={Math.max(2, xw(r.x))} height={10} rx="3" fill="#D1D5DB" />
+                <rect x={pad.l} y={y0 + 17} width={Math.max(2, xw(r.y))} height={10} rx="3" fill={colors[r.t]} stroke="#9CA3AF" strokeWidth="0.5" />
+                <text x={W - pad.r + 8} y={y0 + 14} fontSize="11" fill="#6B7280">{fmtHa(r.y)} ha</text>
+                <text x={W - pad.r + 8} y={y0 + 27} fontSize="11" fontWeight="600" fill={d < 0 ? '#B45309' : '#007248'}>{pct == null ? 'new' : `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`}</text>
+              </g>
+            );
+          })}
+        </svg>
+        {hover && (() => { const r = rows.find((x) => x.t === hover); return (
+          <p className="text-xs text-gray-700"><span className="font-semibold text-gray-900">{r.t}:</span> {Math.round(r.x).toLocaleString('en-GB')} ha in {from}, {Math.round(r.y).toLocaleString('en-GB')} ha in {to} ({r.y - r.x >= 0 ? '+' : ''}{Math.round(r.y - r.x).toLocaleString('en-GB')} ha)</p>
+        ); })()}
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`Land types, ${from} against ${to}`} onMouseLeave={() => setHover(null)}>
-        {rows.map((r, i) => {
-          const y0 = pad.t + i * rowH, d = r.y - r.x, pct = r.x ? (d / r.x) * 100 : null;
-          return (
-            <g key={r.t} onMouseEnter={() => setHover(r.t)} opacity={hover && hover !== r.t ? 0.5 : 1}>
-              <rect x={0} y={y0} width={W} height={rowH} fill="transparent" />
-              <text x={pad.l - 8} y={y0 + 19} textAnchor="end" fontSize="12" fill="#374151">{r.t}</text>
-              <rect x={pad.l} y={y0 + 5} width={Math.max(2, xw(r.x))} height={10} rx="3" fill="#D1D5DB" />
-              <rect x={pad.l} y={y0 + 17} width={Math.max(2, xw(r.y))} height={10} rx="3" fill={colors[r.t]} stroke="#9CA3AF" strokeWidth="0.5" />
-              <text x={W - pad.r + 8} y={y0 + 14} fontSize="11" fill="#6B7280">{fmtHa(r.y)} ha</text>
-              <text x={W - pad.r + 8} y={y0 + 27} fontSize="11" fontWeight="600" fill={d < 0 ? '#B45309' : '#007248'}>{pct == null ? 'new' : `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`}</text>
-            </g>
-          );
-        })}
-      </svg>
-      {hover && (() => { const r = rows.find((x) => x.t === hover); return (
-        <p className="text-xs text-gray-700"><span className="font-semibold text-gray-900">{r.t}:</span> {Math.round(r.x).toLocaleString('en-GB')} ha in {from}, {Math.round(r.y).toLocaleString('en-GB')} ha in {to} ({r.y - r.x >= 0 ? '+' : ''}{Math.round(r.y - r.x).toLocaleString('en-GB')} ha)</p>
-      ); })()}
-    </div>
+    </WithCsv>
   );
 }

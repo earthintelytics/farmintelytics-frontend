@@ -6,3 +6,7 @@ nigeria_states.geojson and admin/lgas_*.geojson: OCHA common operational dataset
 admin/wards_*.geojson: GRID3 NGA Operational Wards (CC BY-SA 4.0), via HDX, simplified for display.
 naggw-seal.png, naggw-logo-*.png: the National Agency for the Great Green Wall's own logo, from ggwnigeria.gov.ng, used on the platform built for the Agency.
 Map layers: NASA GIBS (MODIS, VIIRS, SMAP, IMERG, GPW, SEDAC Natural Disaster Hotspots; public domain); Global Forest Change v1.12 (Hansen/UMD/Google/USGS/NASA, CC BY 4.0); World Database on Protected Areas (UNEP-WCMC and IUCN, non-commercial terms of use).
+drought_indices.json: ERA5 via the Open-Meteo archive, monthly 1991 to now, SPI and SPEI per WMO-No. 1090 and Vicente-Serrano et al. 2010 (scripts/gwon_drought_indices.py).
+climate_projections.json: World Bank Climate Change Knowledge Portal, CMIP6 0.25 degree ensemble (scripts/gwon_projections.py).
+socioeconomic.json: OCHA COD-PS Nigeria 2022; Global MPI (OPHI/UNDP), DHS 2024; IOM DTM rounds 43 (North-east) and 13 (North-central and North-west) (scripts/gwon_socioeconomic.py).
+Advisor, live: Open-Meteo forecast and ECMWF SEAS5 seasonal forecast, fetched by the reader's browser.

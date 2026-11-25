@@ -1,12 +1,12 @@
 /**
  * The GWON Assistant: ask about what the platform shows. The question goes with the page's own figures (states,
- * areas, climate, registry) to POST /public/platforms/gwon/ask, which answers from those figures only.
+ * areas, climate, registry) to POST /platforms/gwon/ask (signed in), which answers from those figures only.
  */
 import { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { MessageSquareText, Send } from 'lucide-react';
-import { API_BASE } from '../../services/apiBase';
+import { gwonFetch } from './gwonApi';
 
 const STARTERS = [
   'Which frontline state had the least rain this year compared with last year?',
@@ -26,12 +26,7 @@ export default function Assistant({ facts, module, compact = false }) {
     setBusy(true); setQ('');
     setLog((l) => [...l, { role: 'you', text }]);
     try {
-      const res = await fetch(`${API_BASE}/public/platforms/gwon/ask`, {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: text, module, facts }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.detail || data.message || 'The Assistant could not answer just now.');
+      const data = await gwonFetch('/platforms/gwon/ask', { method: 'POST', body: JSON.stringify({ question: text, module, facts }) });
       setLog((l) => [...l, { role: 'assistant', text: data.answer, follow: data.follow_ups || [] }]);
     } catch (e) {
       setLog((l) => [...l, { role: 'assistant', text: e.message, error: true }]);

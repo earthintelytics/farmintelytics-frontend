@@ -13,7 +13,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   SlidersHorizontal,
   Activity, FileBarChart, MessageSquareText, Map as MapIcon, Layers, ClipboardList, Sprout, AlertTriangle, Compass, CloudRain,
-  UploadCloud, Trash2, Printer, ListChecks, Sun, Moon, Droplets, Trees, FileText, MapPin,
+  UploadCloud, Trash2, Printer, LogIn, LogOut, UserCircle2, ListChecks, Sun, Moon, Droplets, Trees, FileText, MapPin, Gauge, TrendingUp, Users, GitCompare, FlaskConical, HelpCircle, BookOpen, BookOpenText, Lightbulb,
 } from 'lucide-react';
 import InfoTip from '../../components/page/InfoTip';
 import { useConfirm } from '../../components/ConfirmProvider';
@@ -26,6 +26,13 @@ import { LandDonut, LandBars } from './LandCharts';
 import Indicator from './Indicators';
 import { averageSeries, averageDaily, sumLand } from './scope';
 import Assistant from './Assistant';
+import Welcome, { TOUR_KEY } from './Welcome';
+import Glossary from './Glossary';
+import StoryMaps from './StoryMaps';
+import Advisor from './Advisor';
+import { SignInDialog, Locked } from './SignIn';
+import { gwonFetch, gwonMe, gwonSignOut } from './gwonApi';
+import { DroughtIndices, ClimateFutures, People, Compare, Scenarios } from './AnalyticsPages';
 import './gwon-theme.css';
 
 const TABS = [
@@ -36,6 +43,7 @@ const TABS = [
 const PAGES = {
   monitor: [
     { id: 'overview', label: 'Overview', icon: Activity, group: 'Dashboard' },
+    { id: 'advisor', label: 'Advisor', icon: Lightbulb, group: 'Dashboard' },
     { id: 'map', label: 'Map', icon: MapIcon, group: 'Maps' },
     { id: 'atlas', label: 'Baseline atlas', icon: Layers, group: 'Maps' },
     { id: 'registry', label: 'Project registry', icon: ClipboardList, group: 'Maps' },
@@ -43,13 +51,20 @@ const PAGES = {
     { id: 'warning', label: 'Early warning', icon: AlertTriangle, group: 'Maps' },
     { id: 'planning', label: 'Planning', icon: Compass, group: 'Maps' },
     { id: 'drought', label: 'Drought', icon: Sun, group: 'Analysis' },
+    { id: 'indices', label: 'Drought indices', icon: Gauge, group: 'Analysis' },
     { id: 'water', label: 'Water stress', icon: Droplets, group: 'Analysis' },
     { id: 'landuse', label: 'Land use change', icon: Trees, group: 'Analysis' },
     { id: 'climate', label: 'Climate and rain', icon: CloudRain, group: 'Analysis' },
+    { id: 'futures', label: 'Climate futures', icon: TrendingUp, group: 'Analysis' },
+    { id: 'people', label: 'People and livelihoods', icon: Users, group: 'Analysis' },
+    { id: 'scenarios', label: 'Scenario planner', icon: FlaskConical, group: 'Planning' },
+    { id: 'compare', label: 'Compare', icon: GitCompare, group: 'Planning' },
   ],
   reports: [
     { id: 'report', label: 'Report', icon: Printer },
     { id: 'results', label: 'Results Framework', icon: ListChecks },
+    { id: 'stories', label: 'Story maps', icon: BookOpenText },
+    { id: 'glossary', label: 'Glossary', icon: BookOpen },
   ],
 };
 
@@ -79,8 +94,6 @@ const REPORT_KINDS = [
   { id: 'sites', label: 'Restoration sites', icon: MapPin, desc: 'Every registered site with its state and hectares.' },
 ];
 
-const SITES_KEY = 'gwon_prototype_sites';
-const readSites = () => { try { return JSON.parse(localStorage.getItem(SITES_KEY) || 'null') || { type: 'FeatureCollection', features: [] }; } catch { return { type: 'FeatureCollection', features: [] }; } };
 
 function Title({ title, tip, text, children }) {
   return (
@@ -107,21 +120,30 @@ function Kpi({ label, value, sub, tip, tone }) {
 
 export default function GwonPortal() {
   const confirm = useConfirm();
-  const initial = (window.location.hash.slice(1) || 'monitor/overview').split('/');
+  const initial = (window.location.hash.slice(1).split('?')[0] || 'monitor/overview').split('/');
   const [tab, setTab] = useState(TABS.some((t) => t.id === initial[0]) ? initial[0] : 'monitor');
   const [page, setPage] = useState(initial[1] || (initial[0] === 'reports' ? 'report' : 'overview'));
   const [states, setStates] = useState(null);
-  const [sites, setSites] = useState(readSites);
+  const EMPTY_SITES = { type: 'FeatureCollection', features: [] };
+  const [sites, setSites] = useState(EMPTY_SITES);
+  // Signed in: who (me), or null for a public visitor; me.error when the organisation has no GWON.
+  const [me, setMe] = useState(null);
+  const [signIn, setSignIn] = useState(false);
+  const signedIn = !!(me && !me.error);
+  const canEdit = signedIn && me.can_edit;
   const [climate, setClimate] = useState(null);
   const [climateErr, setClimateErr] = useState('');
   // One state filter for every page: 'all' (the eleven frontline states) or one state.
   const [scope, setScope] = useState(() => { try { return localStorage.getItem('gwon_scope') || 'all'; } catch { return 'all'; } });
   const all = scope === 'all';
+  const [welcome, setWelcome] = useState(() => { try { return !localStorage.getItem(TOUR_KEY); } catch { return false; } });
+  const [tourNow, setTourNow] = useState(false);
   // Light or dark, kept between visits.
   const [dark, setDark] = useState(() => { try { return localStorage.getItem('gwon_theme') === 'dark'; } catch { return false; } });
   useEffect(() => { try { localStorage.setItem('gwon_theme', dark ? 'dark' : 'light'); } catch { /* storage unavailable */ } }, [dark]);
   // Years shown on the yearly charts (dashboard filter). null = from the first / to the last year there is.
   const [reportKind, setReportKind] = useState('summary');
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [yFrom, setYFrom] = useState(null);
   const [yTo, setYTo] = useState(null);
   const inYears = (y) => (yFrom == null || y >= yFrom) && (yTo == null || y <= yTo);
@@ -152,8 +174,12 @@ export default function GwonPortal() {
     return () => { if (icon && before) icon.setAttribute('href', before); };
   }, []);
   useEffect(() => { if (states) fetchClimate(states).then(setClimate).catch((e) => setClimateErr(e.message)); }, [states]);
-  useEffect(() => { window.history.replaceState(null, '', `#${tab}${tab === 'assistant' ? '' : `/${page}`}`); }, [tab, page]);
-  useEffect(() => { try { localStorage.setItem(SITES_KEY, JSON.stringify(sites)); } catch { /* storage unavailable */ } }, [sites]);
+  useEffect(() => { const q = page === 'stories' ? (window.location.hash.match(/\?.*$/) || [''])[0] : ''; window.history.replaceState(null, '', `#${tab}${tab === 'assistant' ? '' : `/${page}`}${q}`); }, [tab, page]);
+  useEffect(() => { gwonMe().then(setMe).catch(() => setMe(null)); }, []);
+  const loadSites = () => gwonFetch('/platforms/gwon/sites').then(setSites).catch(() => setSites(EMPTY_SITES));
+  useEffect(() => { if (signedIn) loadSites(); }, [signedIn]); // eslint-disable-line react-hooks/exhaustive-deps
+  const shownSites = signedIn ? sites : EMPTY_SITES;
+  const signOut = () => { gwonSignOut(); setMe(null); setSites(EMPTY_SITES); };
   useEffect(() => { try { localStorage.setItem('gwon_scope', scope); } catch { /* storage unavailable */ } }, [scope]);
   const adminFile = scope !== 'all' ? adminIndex?.[scope]?.file : null;
   useEffect(() => {
@@ -192,8 +218,9 @@ export default function GwonPortal() {
         const g = JSON.parse(reader.result);
         const feats = (g.type === 'FeatureCollection' ? g.features : g.type === 'Feature' ? [g] : []).filter((f) => ['Polygon', 'MultiPolygon'].includes(f?.geometry?.type));
         if (!feats.length) { setMsg('No site boundaries (polygons) found in that file.'); return; }
-        setSites((s) => ({ type: 'FeatureCollection', features: [...s.features, ...feats] }));
-        setMsg(`${feats.length} site${feats.length > 1 ? 's' : ''} added from ${file.name}.`);
+        gwonFetch('/platforms/gwon/sites', { method: 'POST', body: JSON.stringify({ type: 'FeatureCollection', features: feats }) })
+          .then((r) => { setMsg(`${r.added} site${r.added > 1 ? 's' : ''} added from ${file.name}; ${r.total} in the registry.`); loadSites(); })
+          .catch((ex) => setMsg(ex.message));
       } catch { setMsg('That file is not GeoJSON.'); }
       if (fileRef.current) fileRef.current.value = '';
     };
@@ -201,7 +228,8 @@ export default function GwonPortal() {
   };
   const removeSite = async (i) => {
     if (!(await confirm(`Remove ${siteRows[i].name} from the registry?`, { action: 'Remove' }))) return;
-    setSites((s) => ({ ...s, features: s.features.filter((_, k) => k !== i) }));
+    const id = sites.features[i]?.properties?.id;
+    gwonFetch(`/platforms/gwon/sites/${id}`, { method: 'DELETE' }).then(loadSites).catch((ex) => setMsg(ex.message));
   };
 
   const areaStat = { label: 'Frontline area', value: totalHa ? `${(totalHa / 1e6).toFixed(2)} m ha` : '—', sub: '11 states', tip: 'Worked out from the geoBoundaries state boundaries on an equal-area projection.' };
@@ -245,6 +273,8 @@ export default function GwonPortal() {
 
   return (
     <div className={`min-h-screen bg-[#F7F9F8] text-gray-900 overflow-x-clip ${dark ? 'gwon-dark' : ''}`}>
+      <SignInDialog open={signIn} onClose={() => setSignIn(false)} onSignedIn={setMe} />
+      <Welcome key={tourNow ? 'tour' : 'welcome'} open={welcome} startTour={tourNow} onClose={() => { setWelcome(false); setTourNow(false); }} />
       <style>{'@media print { .gwon-noprint { display: none !important; } .gwon-print-full { grid-column: 1 / -1 !important; } }'}</style>
       {/* Header: as every FarmIntelytics service, with the three header tabs */}
       <header className="gwon-noprint bg-white border-b border-gray-200 sticky top-0 z-[1200]">
@@ -253,43 +283,56 @@ export default function GwonPortal() {
             <img src="/gwon-data/naggw-seal.png" alt="National Agency for the Great Green Wall" className="w-11 h-11 shrink-0" />
             <div className="min-w-0">
               <p className="font-display text-base font-semibold leading-tight truncate">GreenWall Observatory Nigeria</p>
-              <p className="text-xs text-gray-500 truncate">National Agency for the Great Green Wall · Powered by <span className="font-semibold text-gray-700">Earthintelytics</span></p>
+              <p className="hidden sm:block text-xs text-gray-500 truncate">National Agency for the Great Green Wall · Powered by <span className="font-semibold text-gray-700">Earthintelytics</span></p>
             </div>
           </div>
-          <nav className="flex items-center gap-1 bg-gray-100 p-1 rounded-xl" aria-label="GWON">
+          <nav className="order-last md:order-none w-full md:w-auto flex items-center gap-1 bg-gray-100 p-1 rounded-xl overflow-x-auto" aria-label="GWON" data-tour="tabs">
             {TABS.map(({ id, label, icon: Icon }) => (
               <button key={id} type="button" onClick={() => open(id)}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold ${tab === id ? 'bg-white text-[#0E2D41] border border-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
+                className={`flex-1 md:flex-none justify-center inline-flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${tab === id ? 'bg-white text-[#0E2D41] border border-gray-200' : 'text-gray-600 hover:text-gray-900'}`}>
                 <Icon size={15} /> {label}
               </button>
             ))}
           </nav>
-          <button type="button" onClick={() => setDark((d) => !d)} aria-pressed={dark} aria-label={dark ? 'Light mode' : 'Dark mode'} title={dark ? 'Light mode' : 'Dark mode'}
+          {signedIn ? (
+            <div className="flex items-center gap-2">
+              <span className="hidden lg:flex items-center gap-2 text-xs text-gray-700"><UserCircle2 size={18} className="text-[#007248]" /><span className="min-w-0"><span className="block font-semibold text-gray-900 truncate max-w-[180px]">{me.name || me.email}</span><span className="block text-gray-500 truncate max-w-[180px]">{me.organisation}</span></span></span>
+              <button type="button" onClick={signOut} className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50" aria-label="Sign out" title="Sign out"><LogOut size={16} /></button>
+            </div>
+          ) : (
+            <button type="button" onClick={() => setSignIn(true)} className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#007248] text-white text-sm font-semibold"><LogIn size={16} /> Sign in</button>
+          )}
+          <button type="button" onClick={() => { setTourNow(true); setWelcome(true); }} className="hidden md:inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50"><HelpCircle size={16} /> Tour</button>
+          <button type="button" data-tour="theme" onClick={() => setDark((d) => !d)} aria-pressed={dark} aria-label={dark ? 'Light mode' : 'Dark mode'} title={dark ? 'Light mode' : 'Dark mode'}
             className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">{dark ? <Sun size={16} /> : <Moon size={16} />}</button>
-          <span className="text-xs text-gray-600 flex items-center gap-1.5">Public data only <InfoTip side="bottom" text="Only real public data: state boundaries, NASA satellite layers with NASA's legends, ERA5 climate and published programme figures with their source. The Agency's own sites appear once its files are loaded." /></span>
+          <span className="hidden xl:flex text-xs text-gray-600 items-center gap-1.5">{signedIn ? 'Public data and your organisation’s' : 'Public data only'} <InfoTip side="bottom" text="Only real public data: state boundaries, NASA satellite layers with NASA's legends, ERA5 climate and published programme figures with their source. The Agency's own sites appear once its files are loaded." /></span>
         </div>
         {/* Dashboard filters: one row, every page follows them */}
         {tab !== 'assistant' && (
-          <div className="border-t border-gray-100 bg-white">
-            <div className="max-w-[1600px] mx-auto px-4 sm:px-6 py-2.5 flex flex-wrap items-end gap-3">
-              <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider pb-2.5"><SlidersHorizontal size={14} /> Filters</span>
+          <div className="border-t border-gray-100 bg-white" data-tour="filters">
+            <button type="button" onClick={() => setFiltersOpen((o) => !o)} aria-expanded={filtersOpen} className="md:hidden w-full flex items-center justify-between px-4 py-2.5 text-sm font-semibold text-gray-800">
+              <span className="inline-flex items-center gap-2"><SlidersHorizontal size={15} /> Filters</span>
+              <span className="text-xs font-normal text-gray-600 truncate ml-3">{placeName || (all ? 'All frontline states' : `${scope} State`)}</span>
+            </button>
+            <div className={`${filtersOpen ? 'grid' : 'hidden'} md:flex grid-cols-2 max-w-[1600px] mx-auto px-4 sm:px-6 py-2.5 md:flex-wrap items-end gap-3`}>
+              <span className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider pb-2.5"><SlidersHorizontal size={14} /> Filters</span>
               <label className="flex flex-col gap-1">
                 <span className="text-[11px] font-semibold text-gray-600">State</span>
-                <select value={scope} onChange={(e) => { setScope(e.target.value); setLga(''); setWard(''); }} className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 outline-none hover:border-gray-300 focus:border-[#007248] min-w-[200px]">
+                <select value={scope} onChange={(e) => { setScope(e.target.value); setLga(''); setWard(''); }} className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 outline-none hover:border-gray-300 focus:border-[#007248] md:min-w-[200px] w-full">
                   <option value="all">All frontline states (11)</option>
                   {(states?.features || []).map((f) => f.properties.state).sort().map((s) => <option key={s} value={s}>{s}</option>)}
                 </select>
               </label>
               <label className="flex flex-col gap-1">
                 <span className="text-[11px] font-semibold text-gray-600 flex items-center gap-1">LGA <InfoTip side="bottom" text="Local government areas of the chosen state (OCHA common boundaries). Maps zoom to the LGA and show its wards; the climate and land charts stay the state's, measured for the state." /></span>
-                <select value={lga} disabled={all || !lgaList} onChange={(e) => { setLga(e.target.value); setWard(''); }} className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 outline-none hover:border-gray-300 focus:border-[#007248] min-w-[170px] disabled:opacity-50">
+                <select value={lga} disabled={all || !lgaList} onChange={(e) => { setLga(e.target.value); setWard(''); }} className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 outline-none hover:border-gray-300 focus:border-[#007248] md:min-w-[170px] w-full disabled:opacity-50">
                   <option value="">{all ? 'Choose a state first' : 'All LGAs'}</option>
                   {(lgaList?.features || []).map((f) => f.properties.name).sort().map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
               </label>
               <label className="flex flex-col gap-1">
                 <span className="text-[11px] font-semibold text-gray-600 flex items-center gap-1">Ward <InfoTip side="bottom" text="Wards of the chosen LGA (GRID3 Nigeria operational wards). Maps zoom to the ward." /></span>
-                <select value={ward} disabled={!lga || !wardsOfLga?.features.length} onChange={(e) => setWard(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 outline-none hover:border-gray-300 focus:border-[#007248] min-w-[160px] disabled:opacity-50">
+                <select value={ward} disabled={!lga || !wardsOfLga?.features.length} onChange={(e) => setWard(e.target.value)} className="px-3 py-2 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-800 outline-none hover:border-gray-300 focus:border-[#007248] md:min-w-[160px] w-full disabled:opacity-50">
                   <option value="">{!lga ? 'Choose an LGA first' : wardsOfLga?.features.length ? 'All wards' : 'No ward boundaries yet'}</option>
                   {(wardsOfLga?.features || []).map((f) => f.properties.name).sort().map((n) => <option key={n} value={n}>{n}</option>)}
                 </select>
@@ -313,7 +356,7 @@ export default function GwonPortal() {
                 </select>
               </label>
               <button type="button" onClick={resetFilters} disabled={!filtered} className="px-3 py-2 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:hover:bg-white">Reset</button>
-              <p className="text-xs text-gray-600 pb-2.5 ml-auto">Showing <span className="font-semibold text-gray-900">{placeName || (all ? 'all eleven frontline states' : `${scope} State`)}</span>, <span className="font-semibold text-gray-900">{yFrom ?? 'first year'} to {yTo ?? 'latest'}</span></p>
+              <p className="hidden md:block text-xs text-gray-600 pb-2.5 ml-auto">Showing <span className="font-semibold text-gray-900">{placeName || (all ? 'all eleven frontline states' : `${scope} State`)}</span>, <span className="font-semibold text-gray-900">{yFrom ?? 'first year'} to {yTo ?? 'latest'}</span></p>
             </div>
           </div>
         )}
@@ -321,7 +364,17 @@ export default function GwonPortal() {
 
       <div className={`max-w-[1600px] mx-auto px-4 sm:px-6 py-5 grid gap-5 ${tab === 'assistant' ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-[224px_1fr]'}`}>
         {tab !== 'assistant' && (
-          <nav className="gwon-noprint lg:sticky lg:top-[88px] self-start rounded-2xl border border-gray-200 bg-white p-2" aria-label="Pages">
+          <label className="gwon-noprint lg:hidden flex items-center gap-2 rounded-2xl border border-gray-200 bg-white px-3 py-2">
+            <span className="text-xs font-semibold text-gray-600 shrink-0">Page</span>
+            <select value={page} onChange={(e) => setPage(e.target.value)} aria-label="Page" className="flex-1 min-w-0 py-1.5 bg-transparent text-sm font-semibold text-gray-900 outline-none">
+              {[...new Set(PAGES[tab].map((x) => x.group || ''))].map((g) => (
+                <optgroup key={g || 'pages'} label={g || 'Pages'}>{PAGES[tab].filter((x) => (x.group || '') === g).map((x) => <option key={x.id} value={x.id}>{x.label}</option>)}</optgroup>
+              ))}
+            </select>
+          </label>
+        )}
+        {tab !== 'assistant' && (
+          <nav className="gwon-noprint hidden lg:block lg:sticky lg:top-[164px] self-start lg:max-h-[calc(100vh-180px)] overflow-y-auto overscroll-contain rounded-2xl border border-gray-200 bg-white p-2" aria-label="Pages" data-tour="menu">
             {PAGES[tab].map(({ id, label, icon: Icon, group }, i) => (
               <div key={id}>
               {group && group !== PAGES[tab][i - 1]?.group && <p className={`px-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400 ${i ? 'pt-3' : 'pt-1'}`}>{group}</p>}
@@ -334,11 +387,11 @@ export default function GwonPortal() {
           </nav>
         )}
 
-        <main className="space-y-5 min-w-0 gwon-print-full">
+        <main className="space-y-5 min-w-0 gwon-print-full" data-tour="main">
           {tab === 'monitor' && page === 'overview' && (
             <>
               <Title title={all ? "The Great Green Wall in Nigeria" : `${scope} State`} text={all ? "The eleven frontline states: the land, how green it is now, the rain this season, and every site the Agency registers." : `One of the eleven frontline states: its land, its vegetation now, this season\u2019s rain and its registered sites.`} />
-              <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-4">
                 {(() => {
                   const k = sa ? sa.cumulative.now.length - 1 : 0;
                   const pct = sa ? ((sa.cumulative.now[k] - sa.cumulative.mean[k]) / (sa.cumulative.mean[k] || 1)) * 100 : null;
@@ -356,8 +409,8 @@ export default function GwonPortal() {
                       <Indicator tone="sky" label={`Rain so far in ${sa?.year || ''}`} value={sa ? `${fmt(sa.cumulative.now[k])} mm` : '\u2014'}
                         delta={pct == null ? null : { text: `${pct > 0 ? '+' : ''}${Math.round(pct)}% against a normal season by now`, good: pct >= 0 }}
                         trend={yrs.map((r) => r.rain)} trendLabel="rain each year since 2015" tip={`ERA5 at one point inside ${all ? 'each state (frontline average)' : 'the state'}; normal: the 2015-2024 mean to the same day.`} />
-                      <Indicator tone="amber" label="Hot days this year" value={cur ? `${cur.hot_days} days` : '\u2014'}
-                        delta={cur ? { text: `${Math.round(meanHot)} in a normal year`, good: cur.hot_days <= meanHot } : null}
+                      <Indicator tone="amber" label="Hot days this year" value={cur ? `${Math.round(cur.hot_days)} days` : '\u2014'}
+                        delta={cur ? { text: `${Math.round(meanHot)} in a normal year`, good: Math.round(cur.hot_days) <= Math.round(meanHot) } : null}
                         trend={yrs.map((r) => r.hot_days)} trendLabel="each year" tip="Days with a highest temperature of 40 °C or more." />
                       <Indicator tone="rose" label="Longest dry spell, rainy season" value={cur?.dry_spell != null ? `${Math.round(cur.dry_spell)} days` : '\u2014'}
                         trend={yrs.map((r) => r.dry_spell)} trendLabel="each year" tip="The longest run of days under 1 mm of rain between May and September." />
@@ -396,28 +449,34 @@ export default function GwonPortal() {
           {tab === 'monitor' && page === 'map' && (
             <>
               <Title title={all ? 'Map of the frontline' : `Map of ${scope}`} tip="The vegetation now over the frontline states, with every registered site. Switch other layers on in the Layers panel; step through the year on the strip under the map." text="How green the land is now, and where the registered sites are." />
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={sites} date={period} onDate={setPeriod} title="Vegetation now" stats={[siteStat]} />
+              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={period} onDate={setPeriod} title="Vegetation now" stats={[siteStat]} />
             </>
           )}
 
           {tab === 'monitor' && page === 'atlas' && (
             <>
               <Title title="Baseline atlas" tip="The same layers for every state, so progress is measured against a fixed baseline. In the platform, 10 m Sentinel-2 and 30 m Landsat layers come from the pipeline." text="Switch layers on in the Layers panel; step through the year on the strip under the map." />
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={sites} date={period} onDate={setPeriod} stats={[areaStat, siteStat]} />
+              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={period} onDate={setPeriod} stats={[areaStat, siteStat]} />
             </>
           )}
 
-          {tab === 'monitor' && page === 'registry' && (
+          {tab === 'monitor' && page === 'registry' && !signedIn && (
+            <>
+              <Title title="Project registry" text="Every restoration site of the Agency, with its boundary, programme and state." />
+              <Locked what="see and manage the project registry" onSignIn={() => setSignIn(true)} note={me?.error || undefined} />
+            </>
+          )}
+          {tab === 'monitor' && page === 'registry' && signedIn && (
             <>
               <Title title="Project registry" tip="Every site in one place: shelterbelts, woodlots, orchards, water points. Load a GeoJSON of site boundaries; name, programme, partner and state are shown when present."
                 text={siteRows.length ? `${fmt(siteRows.length)} sites, ${fmt(siteHa)} ha in all.` : 'No sites yet: load the Agency’s site boundaries.'}>
                 <div>
                   <input ref={fileRef} type="file" accept=".geojson,.json,application/geo+json,application/json" className="hidden" onChange={onFile} />
-                  <button type="button" onClick={() => fileRef.current?.click()} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#007248] text-white text-sm font-semibold hover:bg-[#0B5F58]"><UploadCloud size={16} /> Load site boundaries</button>
+                  <button type="button" disabled={!canEdit} title={canEdit ? '' : 'Your account can read only'} onClick={() => fileRef.current?.click()} className="disabled:opacity-50 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#007248] text-white text-sm font-semibold hover:bg-[#0B5F58]"><UploadCloud size={16} /> Load site boundaries</button>
                 </div>
               </Title>
               {msg && <p className="text-sm rounded-xl border border-[#A9D9BF] bg-[#E8F5EE] text-[#0E2D41] px-4 py-3">{msg}</p>}
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['truecolor']} states={states} sites={sites} height="520px" title="Sites on the map" stats={[siteStat]} />
+              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['truecolor']} states={states} sites={shownSites} height="520px" title="Sites on the map" stats={[siteStat]} />
               {siteRows.length > 0 && (
                 <div className="rounded-2xl border border-gray-200 bg-white overflow-x-auto">
                   <table className="w-full text-sm">
@@ -427,14 +486,14 @@ export default function GwonPortal() {
                         <tr key={r.i} className="border-t border-gray-100">
                           <td className="px-4 py-2 font-medium">{r.name}</td><td className="px-4 py-2">{r.programme || '—'}</td><td className="px-4 py-2">{r.state || '—'}</td>
                           <td className="px-4 py-2 text-right tabular-nums">{r.ha.toLocaleString('en-GB', { maximumFractionDigits: 1 })}</td>
-                          <td className="px-4 py-2 text-right"><button type="button" onClick={() => removeSite(r.i)} className="text-red-700 hover:underline inline-flex items-center gap-1"><Trash2 size={14} /> Remove</button></td>
+                          <td className="px-4 py-2 text-right"><button type="button" onClick={() => removeSite(r.i)} disabled={!canEdit} className="disabled:opacity-40 text-red-700 hover:underline inline-flex items-center gap-1"><Trash2 size={14} /> Remove</button></td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               )}
-              <p className="text-xs text-gray-500">In the prototype the sites stay in this browser. In the platform they are stored for the Agency, shared with its state offices and checked by the pipeline every season.</p>
+              <p className="text-xs text-gray-500">The sites are kept on the server for {me?.organisation}, seen by its signed-in staff. Previously: In the platform they are stored for the Agency, shared with its state offices and checked by the pipeline every season.</p>
             </>
           )}
 
@@ -443,8 +502,8 @@ export default function GwonPortal() {
               <Title title="Restoration monitoring" tip="Each registered site compared with itself: the same 16-day picture this year and a year before. In the platform each site gets a seasonal reading (growing, holding or lost) and a flag when it needs a visit."
                 text="The same picture a year apart. Move the timeline under the right-hand map; the left follows a year earlier." />
               <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
-                <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={sites} date={lastYear(period)} onDate={() => {}} height="480px" title={`A year before: ${lastYear(period)}`} compact />
-                <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={sites} date={period} onDate={setPeriod} height="480px" title={`Now: ${period}`} compact />
+                <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={lastYear(period)} onDate={() => {}} height="480px" title={`A year before: ${lastYear(period)}`} compact />
+                <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={period} onDate={setPeriod} height="480px" title={`Now: ${period}`} compact />
               </div>
             </>
           )}
@@ -453,7 +512,7 @@ export default function GwonPortal() {
             <>
               <Title title="Early warning" tip="Signs that planted sites are at risk: dry soil where roots reach and rain that has not come. In the platform an alert goes to the state office when a site's vegetation falls well below the same season last year."
                 text="Soil moisture and rainfall over the frontline, day by day." />
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['soil']} states={states} sites={sites} stats={rainStat ? [rainStat] : []} title="Soil and rain" />
+              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['soil']} states={states} sites={shownSites} stats={rainStat ? [rainStat] : []} title="Soil and rain" />
             </>
           )}
 
@@ -461,7 +520,44 @@ export default function GwonPortal() {
             <>
               <Title title="Planning" tip="Where restoration helps most and will succeed: land cover shows what is there now, population shows who it serves. In the platform, species suitability and degradation layers come from the pipeline."
                 text="Land cover and where people live: switch between them, or lay one over the other with the opacity slider." />
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['landcover']} states={states} sites={sites} stats={[areaStat]} title="Planning layers" />
+              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['landcover']} states={states} sites={shownSites} stats={[areaStat]} title="Planning layers" />
+            </>
+          )}
+
+          {tab === 'monitor' && page === 'advisor' && (
+            <>
+              <Title title="Advisor" tip="What to do now, this season and for the future, for the state, LGA or ward in the filters: from the drought record, the season so far, the 16-day and seasonal forecasts, land cover, people and climate futures. Each piece of advice says why." text={`Actions for ${placeName || (all ? 'the frontline' : `${scope} State`)}, from all of GWON's data.`} />
+              <Advisor scope={scope} placeName={placeName} focus={wardFeature || lgaFeature} stateFeature={stateFeature} series={series} land={land} signedIn={signedIn} onSignIn={() => setSignIn(true)} />
+            </>
+          )}
+          {tab === 'monitor' && page === 'indices' && (
+            <>
+              <Title title="Drought indices" tip="The standard drought indices, month by month since 1991, for each frontline state: SPI (rain only) and SPEI (rain minus evaporation) at 1 to 12 months, percent of normal and deciles. WMO classes." text={`How dry or wet each month has been against 1991-2020, ${aState}.`} />
+              <DroughtIndices scope={scope} inYears={inYears} aState={aState} frontline={states} dark={dark} onScope={(s) => { setScope(s); setLga(''); setWard(''); }} />
+            </>
+          )}
+          {tab === 'monitor' && page === 'futures' && (
+            <>
+              <Title title="Climate futures" tip="CMIP6 climate projections: Nigeria under four emissions scenarios to 2100 (World Bank Climate Change Knowledge Portal), and each state model by model to 2050 (Open-Meteo, HighResMIP)." text="What the climate models project for heat, rain and dry spells, and how far they agree." />
+              <ClimateFutures scope={scope} aState={aState} />
+            </>
+          )}
+          {tab === 'monitor' && page === 'people' && (
+            <>
+              <Title title="People and livelihoods" tip="Population (OCHA COD-PS 2022), multidimensional poverty (Global MPI, DHS 2024) and people displaced (IOM DTM), for the frontline states." text={`Who lives on the land the Great Green Wall restores, ${aState}.`} />
+              <People scope={scope} aState={aState} frontline={states} dark={dark} onScope={(s) => { setScope(s); setLga(''); setWard(''); }} />
+            </>
+          )}
+          {tab === 'monitor' && page === 'compare' && (
+            <>
+              <Title title="Compare" tip="Put any yearly series side by side for the states you tick, or put years against each other for one state. One axis per chart; download the figures as CSV." text="Series across states, and years against each other." />
+              <Compare series={series} land={land} inYears={inYears} states={states} />
+            </>
+          )}
+          {tab === 'monitor' && page === 'scenarios' && (
+            <>
+              <Title title="Scenario planner" tip="Plan a restoration, enter your own assumptions, and see how many trees could live through the droughts the record shows, with carbon, cost and people. Up to four scenarios side by side." text={`Plan, test and compare restoration scenarios, ${aState}.`} />
+              <Scenarios scope={scope} aState={aState} frontline={states} />
             </>
           )}
 
@@ -470,7 +566,7 @@ export default function GwonPortal() {
               <Title title="Drought" tip="How this season's rain compares with a normal season (the 2015-2024 mean), and how long the dry spells were. ERA5 at one point inside each state, so read it as that point's rain, not the whole state's." text="This year against ten years, for each frontline state.">{stateSelect}</Title>
               {!sa ? <p className="text-sm text-gray-500">Loading the series…</p> : (
                 <>
-                  <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                     <Kpi tone="teal" label={`Rain so far in ${sa.year}`} value={`${fmt(sa.cumulative.now[sa.cumulative.now.length - 1])} mm`} sub={`to ${sa.until}`} tip="Rain from 1 January to the latest day of data." />
                     <Kpi tone="amber" label="A normal season by now" value={`${fmt(sa.cumulative.mean[sa.cumulative.now.length - 1])} mm`} sub="2015–2024 mean, same day" tip="The mean of 2015-2024 to the same day of the year." />
                     <Kpi tone="green" label="A normal year" value={`${fmt(sa.baseline_rain_mean)} mm`} sub="2015–2024 mean" tip="The mean rain of a whole year, 2015-2024." />
@@ -522,7 +618,7 @@ export default function GwonPortal() {
                 }).sort((p, q) => q.value - p.value);
                 return (
                   <>
-                    <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                       <Kpi tone="amber" label={`Cropland, ${last}`} value={`${share(a1, 'Cropland').toFixed(1)}%`} sub={`${share(a0, 'Cropland').toFixed(1)}% in ${first}`} tip="Share of the state that is cropland (rainfed or irrigated)." />
                       <Kpi tone="green" label={`Tree cover, ${last}`} value={`${share(a1, 'Tree cover').toFixed(1)}%`} sub={`${share(a0, 'Tree cover').toFixed(1)}% in ${first}`} tip="Share of the state under tree cover (any forest or woodland class)." />
                       <Kpi tone="sky" label={`Shrub and grass, ${last}`} value={`${(share(a1, 'Shrubland') + share(a1, 'Grassland')).toFixed(1)}%`} sub={`${(share(a0, 'Shrubland') + share(a0, 'Grassland')).toFixed(1)}% in ${first}`} tip="Share under shrubland and grassland together." />
@@ -581,7 +677,7 @@ export default function GwonPortal() {
             <>
               <Title title="Report" tip="Choose the kind of report, then the state and years in the filters above. Every figure comes from GWON's own data, with its source. Print it, or save it as PDF from the print window." text="Choose what the report is about; it follows the filters above.">
                 <div className="flex flex-wrap gap-2 gwon-noprint">
-                  <button type="button" onClick={() => window.print()} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#007248] text-white text-sm font-semibold"><Printer size={15} /> Print or save as PDF</button>
+                  <button type="button" onClick={() => (signedIn ? window.print() : setSignIn(true))} title={signedIn ? '' : 'Sign in to print or save the report'} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#007248] text-white text-sm font-semibold"><Printer size={15} /> Print or save as PDF</button>
                 </div>
               </Title>
               <div className="gwon-noprint rounded-2xl border border-gray-200 bg-white p-4 space-y-2">
@@ -671,6 +767,18 @@ export default function GwonPortal() {
             </>
           )}
 
+          {tab === 'reports' && page === 'stories' && (
+            <>
+              <Title title="Story maps" tip="Chapters of words, maps and charts that change as the reader scrolls; share them with a link." text="Tell the Great Green Wall's story with maps, and share it." />
+              <StoryMaps states={states} dark={dark} series={series} />
+            </>
+          )}
+          {tab === 'reports' && page === 'glossary' && (
+            <>
+              <Title title="Glossary" text="Every term, index and source on GWON, in plain words." />
+              <Glossary />
+            </>
+          )}
           {tab === 'reports' && page === 'results' && (
             <>
               <Title title="Results Framework" tip="The Great Green Wall Accelerator Harmonized Results Framework has five core indicators reported each year to the UNCCD. GWON calculates the satellite-based ones the same way every year." text="What GWON measures for the yearly report." />
@@ -694,7 +802,7 @@ export default function GwonPortal() {
           {tab === 'assistant' && (
             <div className="max-w-5xl mx-auto w-full space-y-4">
               <Title title="Assistant" tip="Ask in plain words. The Assistant reads the figures GWON shows now (states, areas, climate, registered sites) and answers from them only, saying where each figure comes from." text="Questions and advice about the frontline states, from GWON's own figures." />
-              <Assistant facts={facts} module="assistant" />
+              {signedIn ? <Assistant facts={facts} module="assistant" /> : <Locked what="ask the Assistant" onSignIn={() => setSignIn(true)} note={me?.error || 'The Assistant answers from the figures on GWON, for signed-in staff and partners.'} />}
             </div>
           )}
 

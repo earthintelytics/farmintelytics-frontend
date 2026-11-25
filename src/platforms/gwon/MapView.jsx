@@ -168,9 +168,9 @@ function TimeSlider({ dates, value, onChange }) {
  * ([{label, value, sub, tip}]), height, title, date (a controlled timeline date, optional), onDate, focus (the chosen
  * state, LGA or ward feature), outlines (inner boundaries to draw, e.g. the LGAs of the chosen state), dark.
  */
-export default function MapView({ focus = null, initial = ['ndvi'], states, allStates, outlines, sites, stats = [], height = 'calc(100vh - 330px)', title, date: dateIn, onDate, compact = false, dark = false }) {
+export default function MapView({ focus = null, initial = ['ndvi'], states, allStates, outlines, sites, stats = [], height = (typeof window !== 'undefined' && window.innerWidth < 768) ? '62vh' : 'calc(100vh - 330px)', title, date: dateIn, onDate, compact = false, dark = false }) {
   const [layers, setLayers] = useState(() => Object.fromEntries(ORDER.map((k) => [k, { on: initial.includes(k), opacity: k === 'truecolor' ? 100 : 85 }])));
-  const [panel, setPanel] = useState(!compact);
+  const [panel, setPanel] = useState(() => !compact && (typeof window === 'undefined' || window.innerWidth >= 768));
   const [openGroups, setOpenGroups] = useState(() => Object.fromEntries(GROUPS.map((g) => [g, GROUPS.slice(0, 2).includes(g) || ORDER.some((k) => LAYERS[k].group === g && initial.includes(k))])));
   const [year, setYear] = useState(() => new Date().getUTCFullYear());
   const periodMode = layers.ndvi.on || layers.evi.on;

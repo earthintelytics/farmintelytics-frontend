@@ -3,6 +3,7 @@
  * 2015-2024 baseline drawn as a dashed line or a grey band. Values come straight from climate_series.json.
  */
 import { useState } from 'react';
+import { WithCsv } from './csv';
 
 const TEAL = '#007248', GREY = '#A3AEB8', INK = '#334155', BAND = '#DDE6EA';
 const MON = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
@@ -39,26 +40,28 @@ export function SeasonCurve({ cum, year, unit = 'mm' }) {
   const k = hover ?? cum.now.length - 1;
   const day = new Date(Date.UTC(year, 0, 1 + k)).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' });
   return (
-    <div className="space-y-2">
-      <Legend items={[[`${year}`, TEAL], ['2015–2024 mean', INK, true], ['2015–2024 driest to wettest', BAND]]} />
-      <div className="relative">
-        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Rain so far this year against 2015 to 2024" onMouseLeave={() => setHover(null)}
-          onMouseMove={(e) => { const r = e.currentTarget.getBoundingClientRect(); const kk = Math.round((((e.clientX - r.left) / r.width) * W - pad.l) / (W - pad.l - pad.r) * 364); setHover(Math.max(0, Math.min(364, kk))); }}>
-          {[0, max / 2, max].map((t) => <g key={t}><line x1={pad.l} x2={W - pad.r} y1={y(t)} y2={y(t)} stroke="#EEF1F3" /><text x={pad.l - 6} y={y(t) + 4} textAnchor="end" fontSize="11" fill="#6B7280">{Math.round(t)}</text></g>)}
-          <path d={band} fill={BAND} />
-          <path d={line(cum.mean)} fill="none" stroke={INK} strokeWidth="1.5" strokeDasharray="4 3" />
-          <path d={line(cum.now)} fill="none" stroke={TEAL} strokeWidth="2.5" />
-          {hover != null && <line x1={x(hover)} x2={x(hover)} y1={pad.t} y2={H - pad.b} stroke="#CBD5E1" />}
-          {MON.map((m, i) => <text key={i} x={x(MONTH_STARTS[i] + 15)} y={H - 8} textAnchor="middle" fontSize="11" fill="#6B7280">{m}</text>)}
-          <text x={4} y={12} fontSize="11" fill="#6B7280">{unit}</text>
-        </svg>
-        <Readout>
-          <p className="font-semibold text-gray-900">{day}</p>
-          <p>{year}: {cum.now[k] != null ? `${cum.now[k]} ${unit}` : 'not yet'}</p>
-          <p>Mean {cum.mean[k]} {unit} · range {cum.low[k]}–{cum.high[k]}</p>
-        </Readout>
+    <WithCsv name={`rain-adding-up-${year}`} rows={() => cum.mean.map((m, k) => ({ day_of_year: k + 1, [`rain_${year}_mm`]: cum.now[k], mean_2015_2024_mm: m, lowest_mm: cum.low[k], highest_mm: cum.high[k] }))}>
+      <div className="space-y-2">
+        <Legend items={[[`${year}`, TEAL], ['2015–2024 mean', INK, true], ['2015–2024 driest to wettest', BAND]]} />
+        <div className="relative">
+          <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Rain so far this year against 2015 to 2024" onMouseLeave={() => setHover(null)}
+            onMouseMove={(e) => { const r = e.currentTarget.getBoundingClientRect(); const kk = Math.round((((e.clientX - r.left) / r.width) * W - pad.l) / (W - pad.l - pad.r) * 364); setHover(Math.max(0, Math.min(364, kk))); }}>
+            {[0, max / 2, max].map((t) => <g key={t}><line x1={pad.l} x2={W - pad.r} y1={y(t)} y2={y(t)} stroke="#EEF1F3" /><text x={pad.l - 6} y={y(t) + 4} textAnchor="end" fontSize="11" fill="#6B7280">{Math.round(t)}</text></g>)}
+            <path d={band} fill={BAND} />
+            <path d={line(cum.mean)} fill="none" stroke={INK} strokeWidth="1.5" strokeDasharray="4 3" />
+            <path d={line(cum.now)} fill="none" stroke={TEAL} strokeWidth="2.5" />
+            {hover != null && <line x1={x(hover)} x2={x(hover)} y1={pad.t} y2={H - pad.b} stroke="#CBD5E1" />}
+            {MON.map((m, i) => <text key={i} x={x(MONTH_STARTS[i] + 15)} y={H - 8} textAnchor="middle" fontSize="11" fill="#6B7280">{m}</text>)}
+            <text x={4} y={12} fontSize="11" fill="#6B7280">{unit}</text>
+          </svg>
+          <Readout>
+            <p className="font-semibold text-gray-900">{day}</p>
+            <p>{year}: {cum.now[k] != null ? `${cum.now[k]} ${unit}` : 'not yet'}</p>
+            <p>Mean {cum.mean[k]} {unit} · range {cum.low[k]}–{cum.high[k]}</p>
+          </Readout>
+        </div>
       </div>
-    </div>
+    </WithCsv>
   );
 }
 
@@ -73,23 +76,25 @@ export function YearBars({ rows, value, unit, mean, colorOf, digits = 0 }) {
   const y = (v) => H - pad.b - ((v - lo) / (hi - lo)) * (H - pad.t - pad.b);
   const h = hover != null ? rows[hover] : null;
   return (
-    <div className="relative">
-      <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`${value} by year`} onMouseLeave={() => setHover(null)}>
-        {[lo, (lo + hi) / 2, hi].map((t) => <g key={t}><line x1={pad.l} x2={W - pad.r} y1={y(t)} y2={y(t)} stroke="#EEF1F3" /><text x={pad.l - 6} y={y(t) + 4} textAnchor="end" fontSize="11" fill="#6B7280">{t.toFixed(digits)}</text></g>)}
-        {lo < 0 && <line x1={pad.l} x2={W - pad.r} y1={y(0)} y2={y(0)} stroke="#CBD5E1" />}
-        {rows.map((r, i) => (
-          <g key={r.year} onMouseEnter={() => setHover(i)}>
-            <rect x={pad.l + i * bw} y={pad.t} width={bw} height={H - pad.t - pad.b} fill="transparent" />
-            {r[value] != null && <rect x={pad.l + i * bw + 4} y={Math.min(y(r[value]), y(0))} width={Math.max(2, bw - 8)} height={Math.abs(y(r[value]) - y(0))} rx="2"
-              fill={colorOf ? colorOf(r) : TEAL} opacity={r.full === false ? 0.45 : 1} />}
-            <text x={pad.l + i * bw + bw / 2} y={H - 8} textAnchor="middle" fontSize="10.5" fill="#6B7280">{`'${String(r.year).slice(2)}`}</text>
-          </g>
-        ))}
-        {mean != null && <><line x1={pad.l} x2={W - pad.r} y1={y(mean)} y2={y(mean)} stroke={INK} strokeDasharray="4 3" /><text x={W - pad.r} y={y(mean) - 4} textAnchor="end" fontSize="10.5" fill={INK}>2015–2024 mean</text></>}
-        <text x={4} y={12} fontSize="11" fill="#6B7280">{unit}</text>
-      </svg>
-      {h && <Readout><p className="font-semibold text-gray-900">{h.year}{h.full === false ? ' (so far)' : ''}</p><p>{h[value] == null ? 'not yet' : `${Number(h[value]).toFixed(digits)} ${unit}`}</p></Readout>}
-    </div>
+    <WithCsv name={`${value}-by-year`} rows={() => rows.map((r) => ({ year: r.year, [`${value}${unit ? `_${unit}` : ''}`]: r[value], whole_year: r.full !== false }))}>
+      <div className="relative">
+        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`${value} by year`} onMouseLeave={() => setHover(null)}>
+          {[lo, (lo + hi) / 2, hi].map((t) => <g key={t}><line x1={pad.l} x2={W - pad.r} y1={y(t)} y2={y(t)} stroke="#EEF1F3" /><text x={pad.l - 6} y={y(t) + 4} textAnchor="end" fontSize="11" fill="#6B7280">{t.toFixed(digits)}</text></g>)}
+          {lo < 0 && <line x1={pad.l} x2={W - pad.r} y1={y(0)} y2={y(0)} stroke="#CBD5E1" />}
+          {rows.map((r, i) => (
+            <g key={r.year} onMouseEnter={() => setHover(i)}>
+              <rect x={pad.l + i * bw} y={pad.t} width={bw} height={H - pad.t - pad.b} fill="transparent" />
+              {r[value] != null && <rect x={pad.l + i * bw + 4} y={Math.min(y(r[value]), y(0))} width={Math.max(2, bw - 8)} height={Math.abs(y(r[value]) - y(0))} rx="2"
+                fill={colorOf ? colorOf(r) : TEAL} opacity={r.full === false ? 0.45 : 1} />}
+              <text x={pad.l + i * bw + bw / 2} y={H - 8} textAnchor="middle" fontSize="10.5" fill="#6B7280">{`'${String(r.year).slice(2)}`}</text>
+            </g>
+          ))}
+          {mean != null && <><line x1={pad.l} x2={W - pad.r} y1={y(mean)} y2={y(mean)} stroke={INK} strokeDasharray="4 3" /><text x={W - pad.r} y={y(mean) - 4} textAnchor="end" fontSize="10.5" fill={INK}>2015–2024 mean</text></>}
+          <text x={4} y={12} fontSize="11" fill="#6B7280">{unit}</text>
+        </svg>
+        {h && <Readout><p className="font-semibold text-gray-900">{h.year}{h.full === false ? ' (so far)' : ''}</p><p>{h[value] == null ? 'not yet' : `${Number(h[value]).toFixed(digits)} ${unit}`}</p></Readout>}
+      </div>
+    </WithCsv>
   );
 }
 
@@ -105,29 +110,31 @@ export function MonthVsMean({ rows, value, unit, year, digits = 0 }) {
   const bar = (v, x0, color) => (v == null ? null : <rect x={x0} y={Math.min(y(v), y(0))} width={w} height={Math.max(1, Math.abs(y(v) - y(0)))} rx="2" fill={color} />);
   const h = hover != null ? rows[hover] : null;
   return (
-    <div className="space-y-2">
-      <Legend items={[['2015–2024 mean', GREY], [`${year}`, TEAL]]} />
-      <div className="relative">
-        <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`${value} each month against the mean`} onMouseLeave={() => setHover(null)}>
-          {[lo, 0, hi].map((t) => <g key={t}><line x1={pad.l} x2={W - pad.r} y1={y(t)} y2={y(t)} stroke={t === 0 ? '#CBD5E1' : '#EEF1F3'} /><text x={pad.l - 6} y={y(t) + 4} textAnchor="end" fontSize="11" fill="#6B7280">{t.toFixed(digits)}</text></g>)}
-          {rows.map((r, i) => (
-            <g key={i} onMouseEnter={() => setHover(i)}>
-              <rect x={pad.l + i * bw} y={pad.t} width={bw} height={H - pad.t - pad.b} fill="transparent" />
-              {bar(r.mean?.[value], pad.l + i * bw + 4, GREY)}
-              {bar(r.now?.[value], pad.l + i * bw + 6 + w, TEAL)}
-              <text x={pad.l + i * bw + bw / 2} y={H - 8} textAnchor="middle" fontSize="11" fill="#6B7280">{MON[i]}</text>
-            </g>
-          ))}
-          <text x={4} y={12} fontSize="11" fill="#6B7280">{unit}</text>
-        </svg>
-        {h && (
-          <Readout>
-            <p className="font-semibold text-gray-900">{MONTH_NAMES[hover]}</p>
-            <p>Mean: {h.mean?.[value] == null ? '—' : `${Number(h.mean[value]).toFixed(digits)} ${unit}`}</p>
-            <p>{year}: {h.now?.[value] == null ? 'not yet' : `${Number(h.now[value]).toFixed(digits)} ${unit}`}</p>
-          </Readout>
-        )}
+    <WithCsv name={`${value}-by-month-${year}`} rows={() => rows.map((r, i) => ({ month: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][i], [`${value}_${year}`]: r.now?.[value], [`${value}_mean_2015_2024`]: r.mean?.[value], unit }))}>
+      <div className="space-y-2">
+        <Legend items={[['2015–2024 mean', GREY], [`${year}`, TEAL]]} />
+        <div className="relative">
+          <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={`${value} each month against the mean`} onMouseLeave={() => setHover(null)}>
+            {[lo, 0, hi].map((t) => <g key={t}><line x1={pad.l} x2={W - pad.r} y1={y(t)} y2={y(t)} stroke={t === 0 ? '#CBD5E1' : '#EEF1F3'} /><text x={pad.l - 6} y={y(t) + 4} textAnchor="end" fontSize="11" fill="#6B7280">{t.toFixed(digits)}</text></g>)}
+            {rows.map((r, i) => (
+              <g key={i} onMouseEnter={() => setHover(i)}>
+                <rect x={pad.l + i * bw} y={pad.t} width={bw} height={H - pad.t - pad.b} fill="transparent" />
+                {bar(r.mean?.[value], pad.l + i * bw + 4, GREY)}
+                {bar(r.now?.[value], pad.l + i * bw + 6 + w, TEAL)}
+                <text x={pad.l + i * bw + bw / 2} y={H - 8} textAnchor="middle" fontSize="11" fill="#6B7280">{MON[i]}</text>
+              </g>
+            ))}
+            <text x={4} y={12} fontSize="11" fill="#6B7280">{unit}</text>
+          </svg>
+          {h && (
+            <Readout>
+              <p className="font-semibold text-gray-900">{MONTH_NAMES[hover]}</p>
+              <p>Mean: {h.mean?.[value] == null ? '—' : `${Number(h.mean[value]).toFixed(digits)} ${unit}`}</p>
+              <p>{year}: {h.now?.[value] == null ? 'not yet' : `${Number(h.now[value]).toFixed(digits)} ${unit}`}</p>
+            </Readout>
+          )}
+        </div>
       </div>
-    </div>
+    </WithCsv>
   );
 }
