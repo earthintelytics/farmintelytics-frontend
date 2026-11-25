@@ -181,7 +181,7 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, site
   return (
     <div className="rounded-2xl border border-gray-200 bg-white overflow-hidden">
       {/* Smooth maps (owner's rule): coarse layers (9 to 10 km cells) are softened, never shown as blocks. */}
-      <style>{'.gwon-soft img { filter: blur(2.5px); }'}</style>
+      <style>{'.gwon-soft img { filter: blur(2.5px); } .leaflet-container path.leaflet-interactive:focus, .leaflet-container .leaflet-interactive:focus { outline: none; }'}</style>
       <div className="relative" style={{ height }}>
         {split ? (
           <div className="grid grid-cols-2 h-full gap-0.5 bg-gray-200">
