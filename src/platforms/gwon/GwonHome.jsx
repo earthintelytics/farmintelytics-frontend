@@ -42,9 +42,7 @@ export default function GwonHome({ go, states, adminIndex, signedIn, onSignIn })
   const wards = adminIndex ? Object.values(adminIndex).reduce((a, s) => a + s.wards, 0) : null;
   const pop = socio ? Object.values(socio.states).reduce((a, s) => a + (s.population?.total || 0), 0) : null;
   const latest = (s, k) => { const i = s.month.length - 1 - [...s[k]].reverse().findIndex((v) => v != null); return [s.month[i], s[k][i]]; };
-  const driest = idx ? Object.entries(idx.states).map(([n, s]) => [n, ...latest(s, 'spi3')]).sort((a, b) => a[2] - b[2])[0] : null;
   const dry = idx ? Object.values(idx.states).filter((s) => latest(s, 'spi3')[1] <= -1).length : null;
-  const monthName = (m) => new Date(`${m}-01T00:00:00Z`).toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
 
   return (
     <div className="-mx-4 sm:-mx-6 -mt-5">
@@ -52,24 +50,16 @@ export default function GwonHome({ go, states, adminIndex, signedIn, onSignIn })
       <section className="relative min-h-[560px] flex items-end">
         <img src={P('hero')} alt="Trees planted around Ajiwa Dam, Katsina State" className="absolute inset-0 w-full h-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0E2D41]/95 via-[#0E2D41]/70 to-[#0E2D41]/10" />
-        <div className="relative w-full max-w-[1400px] mx-auto px-6 sm:px-10 py-14 grid lg:grid-cols-[1fr_340px] gap-10 items-end">
+        <div className="relative w-full max-w-[1400px] mx-auto px-6 sm:px-10 py-14 grid gap-10 items-end">
           <div className="text-white max-w-2xl">
             <div className="flex items-center gap-3"><img src="/gwon-data/naggw-seal.png" alt="" className="w-14 h-14 rounded-full bg-white p-0.5" /><p className="text-sm font-semibold tracking-wider">NATIONAL AGENCY FOR THE GREAT GREEN WALL</p></div>
-            <h1 className="font-display text-4xl sm:text-6xl font-semibold leading-[1.05] mt-6">Watch the land.<br /><span className="text-[#7FD3A6]">Grow the Great Green Wall.</span></h1>
+            <h1 className="font-display text-4xl sm:text-6xl font-semibold leading-[1.05] mt-6">Track the land.<br /><span className="text-[#7FD3A6]">Restore the Great Green Wall.</span></h1>
             <p className="text-lg text-white/90 mt-5 leading-relaxed">GreenWall Observatory Nigeria follows the land, the rain and the people of the eleven frontline states, so that every tree the Agency plants has the best chance to grow.</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button type="button" onClick={() => go('monitor/overview')} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-white text-[#0E2D41] text-sm font-semibold">Open the dashboard <ArrowRight size={16} /></button>
               {!signedIn && <button type="button" onClick={onSignIn} className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-white/60 text-white text-sm font-semibold hover:bg-white/10"><LogIn size={16} /> Staff sign-in</button>}
             </div>
           </div>
-          {driest && (
-            <div className="rounded-2xl bg-white p-5 text-gray-900">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-gray-500">Frontline watch</p>
-              <div className="flex items-center justify-between mt-1"><p className="font-display text-lg font-semibold">{driest[0]} State</p><span className={`text-xs font-semibold ${driest[2] <= -1 ? 'text-amber-700' : 'text-[#007248]'}`}>{driest[2] <= -1 ? 'Drier than normal' : 'Near normal'}</span></div>
-              <p className="text-sm text-gray-700 mt-2">The driest of the eleven states over the last three months (SPI-3 {fmt(driest[2], 2)}, {monthName(driest[1])}).</p>
-              <button type="button" onClick={() => go('monitor/advisor')} className="mt-3 text-sm font-semibold text-[#007248]">See the advice →</button>
-            </div>
-          )}
         </div>
       </section>
 
