@@ -16,13 +16,14 @@ const SMALLHOLDER_CARDS = [
   { id: 'smallholder-eudr', title: 'EUDR passport', text: 'The deforestation check for each member farm, managed for the whole group in one place.', photo: '/crops/eudr.webp' },
 ];
 
-const isTeam = () => Boolean(localStorage.getItem('fi_admin_token')) && !localStorage.getItem('fi_token');
 
-const SmallholderHub = ({ onBack, onSignOut }) => {
+// team: the portal's own team check (a valid team session), passed in, so a client sign-in left in this browser
+// (another organisation, or GWON) never hides the pages from the team.
+const SmallholderHub = ({ team = false, onBack, onSignOut }) => {
   const navigate = useNavigate();
   let allowed = [];
   try { allowed = JSON.parse(localStorage.getItem('fi_allowed_modules') || '[]') || []; } catch { allowed = []; }
-  const cards = SMALLHOLDER_CARDS.filter((c) => SMALLHOLDER_SERVICES.includes(c.id) && (isTeam() || allowed.includes(c.id)));
+  const cards = SMALLHOLDER_CARDS.filter((c) => SMALLHOLDER_SERVICES.includes(c.id) && (team || allowed.includes(c.id)));
   const orgName = localStorage.getItem('fi_display_name') || '';
 
   const open = (id) => {

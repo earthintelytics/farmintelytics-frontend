@@ -329,7 +329,7 @@ const PortalPage = () => {
   } else if (mod.kind === 'suitability') {
     content = <SuitabilityPortal {...props} />;
   } else if (mod.kind === 'smallholder') {
-    content = <SmallholderHub {...props} />;
+    content = <SmallholderHub team={team} {...props} />;
   } else if (mod.kind === 'advisor') {
     content = <AdvisorApp {...props} />;
   } else if (mod.kind === 'management') {
