@@ -174,6 +174,7 @@ export default function GwonPortal() {
     return () => { if (icon && before) icon.setAttribute('href', before); };
   }, []);
   useEffect(() => { if (states) fetchClimate(states).then(setClimate).catch((e) => setClimateErr(e.message)); }, [states]);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'auto' }); }, [tab, page]);
   useEffect(() => { const q = page === 'stories' ? (window.location.hash.match(/\?.*$/) || [''])[0] : ''; window.history.replaceState(null, '', `#${tab}${tab === 'assistant' ? '' : `/${page}`}${q}`); }, [tab, page]);
   useEffect(() => { gwonMe().then(setMe).catch(() => setMe(null)); }, []);
   const loadSites = () => gwonFetch('/platforms/gwon/sites').then(setSites).catch(() => setSites(EMPTY_SITES));
@@ -294,18 +295,21 @@ export default function GwonPortal() {
               </button>
             ))}
           </nav>
-          {signedIn ? (
-            <div className="flex items-center gap-2">
-              <span className="hidden lg:flex items-center gap-2 text-xs text-gray-700"><UserCircle2 size={18} className="text-[#007248]" /><span className="min-w-0"><span className="block font-semibold text-gray-900 truncate max-w-[180px]">{me.name || me.email}</span><span className="block text-gray-500 truncate max-w-[180px]">{me.organisation}</span></span></span>
-              <button type="button" onClick={signOut} className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50" aria-label="Sign out" title="Sign out"><LogOut size={16} /></button>
-            </div>
-          ) : (
-            <button type="button" onClick={() => setSignIn(true)} className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#007248] text-white text-sm font-semibold"><LogIn size={16} /> Sign in</button>
-          )}
-          <button type="button" onClick={() => { setTourNow(true); setWelcome(true); }} className="hidden md:inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50"><HelpCircle size={16} /> Tour</button>
-          <button type="button" data-tour="theme" onClick={() => setDark((d) => !d)} aria-pressed={dark} aria-label={dark ? 'Light mode' : 'Dark mode'} title={dark ? 'Light mode' : 'Dark mode'}
-            className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">{dark ? <Sun size={16} /> : <Moon size={16} />}</button>
-          <span className="hidden xl:flex text-xs text-gray-600 items-center gap-1.5">{signedIn ? 'Public data and your organisation’s' : 'Public data only'} <InfoTip side="bottom" text="Only real public data: state boundaries, NASA satellite layers with NASA's legends, ERA5 climate and published programme figures with their source. The Agency's own sites appear once its files are loaded." /></span>
+          {/* Right: what data is shown, the tour, light or dark, then the account (standard top-right) */}
+          <div className="flex items-center gap-2 ml-auto md:ml-0">
+            <span className="hidden xl:flex text-xs text-gray-600 items-center gap-1.5 pr-1">{signedIn ? 'Public data and your organisation’s' : 'Public data only'} <InfoTip side="bottom" text="Only real public data: state boundaries, NASA satellite layers with NASA's legends, ERA5 climate and published programme figures with their source. The Agency's own sites appear once its files are loaded." /></span>
+            <button type="button" onClick={() => { setTourNow(true); setWelcome(true); }} className="hidden md:inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-gray-200 text-sm font-semibold text-gray-700 hover:bg-gray-50"><HelpCircle size={16} /> Tour</button>
+            <button type="button" data-tour="theme" onClick={() => setDark((d) => !d)} aria-pressed={dark} aria-label={dark ? 'Light mode' : 'Dark mode'} title={dark ? 'Light mode' : 'Dark mode'}
+              className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50">{dark ? <Sun size={16} /> : <Moon size={16} />}</button>
+            {signedIn ? (
+              <div className="flex items-center gap-2">
+                <span className="hidden lg:flex items-center gap-2 text-xs text-gray-700"><UserCircle2 size={18} className="text-[#007248]" /><span className="min-w-0"><span className="block font-semibold text-gray-900 truncate max-w-[180px]">{me.name || me.email}</span><span className="block text-gray-500 truncate max-w-[180px]">{me.organisation}</span></span></span>
+                <button type="button" onClick={signOut} className="p-2.5 rounded-xl border border-gray-200 text-gray-700 hover:bg-gray-50" aria-label="Sign out" title="Sign out"><LogOut size={16} /></button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => setSignIn(true)} className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-[#007248] text-white text-sm font-semibold"><LogIn size={16} /> Sign in</button>
+            )}
+          </div>
         </div>
         {/* Dashboard filters: one row, every page follows them */}
         {tab !== 'assistant' && (
@@ -449,14 +453,14 @@ export default function GwonPortal() {
           {tab === 'monitor' && page === 'map' && (
             <>
               <Title title={all ? 'Map of the frontline' : `Map of ${scope}`} tip="The vegetation now over the frontline states, with every registered site. Switch other layers on in the Layers panel; step through the year on the strip under the map." text="How green the land is now, and where the registered sites are." />
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={period} onDate={setPeriod} title="Vegetation now" stats={[siteStat]} />
+              <MapView dark={dark} detail={!!(lgaFeature || wardFeature)} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={period} onDate={setPeriod} title="Vegetation now" stats={[siteStat]} />
             </>
           )}
 
           {tab === 'monitor' && page === 'atlas' && (
             <>
               <Title title="Baseline atlas" tip="The same layers for every state, so progress is measured against a fixed baseline. In the platform, 10 m Sentinel-2 and 30 m Landsat layers come from the pipeline." text="Switch layers on in the Layers panel; step through the year on the strip under the map." />
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={period} onDate={setPeriod} stats={[areaStat, siteStat]} />
+              <MapView dark={dark} detail={!!(lgaFeature || wardFeature)} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={period} onDate={setPeriod} stats={[areaStat, siteStat]} />
             </>
           )}
 
@@ -476,7 +480,7 @@ export default function GwonPortal() {
                 </div>
               </Title>
               {msg && <p className="text-sm rounded-xl border border-[#A9D9BF] bg-[#E8F5EE] text-[#0E2D41] px-4 py-3">{msg}</p>}
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['truecolor']} states={states} sites={shownSites} height="520px" title="Sites on the map" stats={[siteStat]} />
+              <MapView dark={dark} detail={!!(lgaFeature || wardFeature)} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['truecolor']} states={states} sites={shownSites} height="520px" title="Sites on the map" stats={[siteStat]} />
               {siteRows.length > 0 && (
                 <div className="rounded-2xl border border-gray-200 bg-white overflow-x-auto">
                   <table className="w-full text-sm">
@@ -502,8 +506,8 @@ export default function GwonPortal() {
               <Title title="Restoration monitoring" tip="Each registered site compared with itself: the same 16-day picture this year and a year before. In the platform each site gets a seasonal reading (growing, holding or lost) and a flag when it needs a visit."
                 text="The same picture a year apart. Move the timeline under the right-hand map; the left follows a year earlier." />
               <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4">
-                <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={lastYear(period)} onDate={() => {}} height="480px" title={`A year before: ${lastYear(period)}`} compact />
-                <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={period} onDate={setPeriod} height="480px" title={`Now: ${period}`} compact />
+                <MapView dark={dark} detail={!!(lgaFeature || wardFeature)} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={lastYear(period)} onDate={() => {}} height="480px" title={`A year before: ${lastYear(period)}`} compact />
+                <MapView dark={dark} detail={!!(lgaFeature || wardFeature)} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['ndvi']} states={states} sites={shownSites} date={period} onDate={setPeriod} height="480px" title={`Now: ${period}`} compact />
               </div>
             </>
           )}
@@ -512,7 +516,7 @@ export default function GwonPortal() {
             <>
               <Title title="Early warning" tip="Signs that planted sites are at risk: dry soil where roots reach and rain that has not come. In the platform an alert goes to the state office when a site's vegetation falls well below the same season last year."
                 text="Soil moisture and rainfall over the frontline, day by day." />
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['soil']} states={states} sites={shownSites} stats={rainStat ? [rainStat] : []} title="Soil and rain" />
+              <MapView dark={dark} detail={!!(lgaFeature || wardFeature)} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['soil']} states={states} sites={shownSites} stats={rainStat ? [rainStat] : []} title="Soil and rain" />
             </>
           )}
 
@@ -520,7 +524,7 @@ export default function GwonPortal() {
             <>
               <Title title="Planning" tip="Where restoration helps most and will succeed: land cover shows what is there now, population shows who it serves. In the platform, species suitability and degradation layers come from the pipeline."
                 text="Land cover and where people live: switch between them, or lay one over the other with the opacity slider." />
-              <MapView dark={dark} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['landcover']} states={states} sites={shownSites} stats={[areaStat]} title="Planning layers" />
+              <MapView dark={dark} detail={!!(lgaFeature || wardFeature)} focus={scopeFeature} allStates={allStates} outlines={mapOutlines} initial={['landcover']} states={states} sites={shownSites} stats={[areaStat]} title="Planning layers" />
             </>
           )}
 

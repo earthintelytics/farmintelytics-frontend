@@ -7,11 +7,14 @@ import LandingFooter from '../landing/components/LandingFooter';
 import { creditFor } from '../landing/components/photoCredits';
 
 /**
- * /pricing: what the EUDR check costs and exactly how it is charged (api_platform/pricing.py): per hectare, on the
- * total area of a request's plots, from a prepaid wallet; only the area really checked is charged. Only the EUDR check
- * is sold now (owner, 24 Nov 2026). The price is set in Admin, API clients: the EUDR plan marked "Show on the
- * pricing page", read from GET /public-api/v1/pricing. Without one, the page says the price is on request.
+ * /pricing: what FarmIntelytics costs, every price from the admin (nothing priced in the code):
+ *  - crop monitoring: a monthly subscription by size (mapped hectares x the price per hectare a month), from
+ *    Admin, Subscriptions, read from GET /public/subscription-prices;
+ *  - the API: the EUDR check and crop suitability (with its PDF report), per hectare from a prepaid wallet
+ *    (api_platform/pricing.py), from the plans marked "Show on the pricing page" in Admin, API clients, read from
+ *    GET /public-api/v1/pricing. A product without a published plan shows "on request".
  */
+import { API_BASE } from '../../services/apiBase';
 
 const naira = (n) => `₦${Math.round(n).toLocaleString('en-NG')}`;
 const ha = (n) => `${Number(n.toFixed(4)).toLocaleString('en-NG')} ha`;
@@ -35,11 +38,36 @@ const EXAMPLES = [
 ];
 
 const FAQ = [
+  ['How is crop monitoring billed?', 'Every month, on the hectares of the fields you have mapped, at the price per hectare shown above. Add or remove fields and the next month follows.'],
+  ['Do I need the API to use FarmIntelytics?', 'No. Monitoring works in the web portal and the phone app. The API is for teams that want to send plots from their own software.'],
   ['What if I split my land into many small plots?', 'The price does not change: it is the total area that is charged, never the number of plots.'],
   ['What do I get for each plot?', 'Pass, review or fail against the 31 December 2020 cut-off, with forest in 2020, tree cover lost since and its year, protected-area overlap, and a GeoJSON file ready for the EU information system.'],
   ['How do I top up?', 'Pay by bank transfer and quote your payment reference (shown in your Developer page). Your balance updates when the payment is recorded.'],
   ['What happens if my balance is too low?', 'The request is refused with a clear message (402) and nothing runs or is charged. Top up and send it again.'],
 ];
+
+function MonitoringEstimator({ perHa, minimum }) {
+  const [area, setArea] = useState('50');
+  const a = Math.max(0, parseFloat(area) || 0);
+  const month = Math.max(a * perHa, minimum || 0);
+  return (
+    <div className="rounded-3xl border border-[#E3EFDF] bg-white p-6 sm:p-8">
+      <div className="flex items-center gap-3">
+        <span className="w-10 h-10 rounded-xl bg-[#EEF6EC] text-[var(--brand-primary)] flex items-center justify-center"><Calculator size={20} /></span>
+        <h3 className="font-display text-xl font-semibold text-gray-900">What would monitoring cost you?</h3>
+      </div>
+      <label className="block mt-5"><span className="text-sm font-semibold text-gray-800">How many hectares do you farm?</span>
+        <input className="mt-1.5 w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-base font-mono focus:border-[var(--brand-primary)] outline-none" inputMode="decimal" value={area} onChange={(e) => setArea(e.target.value)} /></label>
+      <div className="mt-6 rounded-2xl bg-[#F5FAF3] border border-[#E3EFDF] p-5 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm text-gray-600">{ha(a)} × {naira(perHa)} a hectare a month{minimum && a * perHa < minimum ? ` (the monthly minimum is ${naira(minimum)})` : ''}</p>
+          <p className="mt-1 font-display text-4xl font-semibold text-gray-900">{naira(month)}<span className="text-base font-normal text-gray-600"> a month</span></p>
+        </div>
+        <p className="text-xs text-gray-500 max-w-[15rem]">Counted on the fields you map, measured from their boundaries. Add or remove fields and next month follows.</p>
+      </div>
+    </div>
+  );
+}
 
 function Estimator({ PRICE_PER_HA }) {
   const [mode, setMode] = useState('area');
@@ -52,7 +80,7 @@ function Estimator({ PRICE_PER_HA }) {
     <div className="rounded-3xl border border-[#E3EFDF] bg-white p-6 sm:p-8">
       <div className="flex items-center gap-3">
         <span className="w-10 h-10 rounded-xl bg-[#EEF6EC] text-[var(--brand-primary)] flex items-center justify-center"><Calculator size={20} /></span>
-        <h3 className="font-display text-xl font-semibold text-gray-900">Estimate your cost</h3>
+        <h3 className="font-display text-xl font-semibold text-gray-900">What would an API check cost?</h3>
       </div>
       <div role="tablist" aria-label="Estimate by" className="mt-5 inline-flex p-1 rounded-xl bg-[#EEF6EC] border border-[#D8EBD3]">
         {[['area', 'Total hectares'], ['plots', 'Plots × average size']].map(([id, label]) => (
@@ -90,22 +118,40 @@ export default function PricingPage() {
   const load = useCallback(() => fetch('/public-api/v1/pricing', { cache: 'no-store' }).then((r) => (r.ok ? r.json() : { data: [] })), []);
   const prices = useLoader(load);
   const eudr = (prices.data?.data || []).find((p) => p.code === 'eudr-check');
+  const suit = (prices.data?.data || []).find((p) => p.code === 'suitability-check');
   const PRICE_PER_HA = eudr ? eudr.price_per_ha_minor / 100 : null;
+  const SUIT_PER_HA = suit ? suit.price_per_ha_minor / 100 : null;
   const RULES = rulesFor(PRICE_PER_HA);
+  // Crop monitoring: the monthly price per hectare, from the admin.
+  const loadSubs = useCallback(() => fetch(`${API_BASE}/public/subscription-prices`, { cache: 'no-store' }).then((r) => (r.ok ? r.json() : { data: [] })), []);
+  const subs = useLoader(loadSubs);
+  const mon = (subs.data?.data || []).find((p) => p.code === 'crop-monitoring');
+  const MON_PER_HA = mon ? mon.price_per_ha_month_minor / 100 : null;
+  const MON_MIN = mon?.minimum_month_minor ? mon.minimum_month_minor / 100 : 0;
+  const loading = prices.state === 'loading' || subs.state === 'loading';
+  const PLANS = [
+    { key: 'mon', img: '/crops/groundnut.webp', title: 'Crop monitoring', price: MON_PER_HA, unit: 'a hectare a month', who: 'For farms, estates and co-operatives',
+      points: ['Every field watched from space, every few days', 'Crop health, water and weather advice in plain words', 'Alerts when a field needs a visit', 'Reports for your team, buyers and lenders', 'The phone app for your field teams'] },
+    { key: 'eudr', img: '/crops/hero/eudr.webp', title: 'EUDR deforestation check', price: PRICE_PER_HA, unit: 'a hectare checked', who: 'API, for exporters and buyers',
+      points: ['Pass, review or fail for every plot', 'Forest in 2020, loss since and its year', 'Protected-area overlap', 'A GeoJSON file for the EU information system'] },
+    { key: 'suit', img: '/crops/millet.webp', title: 'Crop suitability', price: SUIT_PER_HA, unit: 'a hectare checked', who: 'API, before you plant',
+      points: ['How well each plot suits the crop', 'What limits it: rain, soil, slope, heat', 'A full PDF report for every check', 'Charged on the area you check'] },
+  ];
   return (
     <div className="min-h-screen flex flex-col bg-white text-gray-900 font-sans">
       <LandingNav />
 
       {/* Hero: the price, plainly */}
       <section className="bg-[#F5FAF3] border-b border-[#E3EFDF]">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20 grid gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-center">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-16">
           <div>
             <p className="text-sm font-semibold text-[var(--brand-primary-dark)]">Pricing</p>
-            <h1 className="mt-2 font-display text-4xl sm:text-5xl font-semibold tracking-tight leading-[1.08]">
-              One price per hectare. <span className="text-[var(--brand-primary)]">Nothing else.</span>
+            <h1 className="mt-2 font-display text-4xl sm:text-5xl font-semibold tracking-tight leading-[1.08] max-w-3xl">
+              Simple prices, <span className="text-[var(--brand-primary)]">by the hectare.</span>
             </h1>
             <p className="mt-5 text-lg text-gray-600 leading-relaxed max-w-xl">
-              The EUDR deforestation check, plot by plot, charged on the land you check, from a prepaid wallet.
+              You pay for the land we look after, never for the number of files or fields. Monitoring is a monthly
+              subscription by size; the EUDR and suitability checks are paid per hectare from a prepaid wallet.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <button type="button" onClick={() => navigate('/contact')}
@@ -119,35 +165,59 @@ export default function PricingPage() {
             </div>
           </div>
 
-          {/* The price card */}
-          <div className="rounded-3xl border border-[#D8EBD3] bg-white overflow-hidden">
-            <div className="relative h-36">
-              <img src="/crops/hero/eudr.webp" alt="" data-credit={creditFor('/crops/hero/eudr.webp')} className="absolute inset-0 w-full h-full object-cover" />
-              <span className="absolute left-4 bottom-4 rounded-lg bg-white/95 px-3 py-1 text-sm font-semibold text-gray-900">EUDR deforestation check</span>
-            </div>
-            <div className="p-7">
-              <p className="flex items-end gap-2">
-                {PRICE_PER_HA ? (
-                  <><span className="font-display text-6xl font-semibold tracking-tight text-gray-900">{naira(PRICE_PER_HA)}</span>
-                    <span className="pb-2 text-gray-600">per hectare</span></>
-                ) : <span className="font-display text-3xl font-semibold text-gray-900">{prices.state === 'loading' ? '…' : 'Price per hectare on request'}</span>}
-              </p>
-              <ul className="mt-6 space-y-2.5 text-sm text-gray-700">
-                {['Pass, review or fail for every plot', 'Forest in 2020, loss since and its year', 'Protected-area overlap', 'A GeoJSON file for the EU information system', 'API, callbacks and test keys included'].map((x) => (
-                  <li key={x} className="flex gap-2.5"><Check size={16} className="mt-0.5 shrink-0 text-[var(--brand-primary)]" />{x}</li>
-                ))}
-              </ul>
-              <p className="mt-6 text-xs text-gray-500">Prices in naira. Contact us for very large volumes.</p>
-            </div>
-          </div>
         </div>
       </section>
 
       <main className="flex-1">
+        {/* The three ways to pay */}
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-16">
+          <div className="grid gap-5 lg:grid-cols-3">
+            {PLANS.map((pl) => (
+              <article key={pl.key} className="rounded-3xl border border-[#D8EBD3] bg-white overflow-hidden flex flex-col">
+                <div className="relative h-32">
+                  <img src={pl.img} alt="" data-credit={creditFor(pl.img)} className="absolute inset-0 w-full h-full object-cover" />
+                  <span className="absolute left-4 bottom-4 rounded-lg bg-white/95 px-3 py-1 text-sm font-semibold text-gray-900">{pl.title}</span>
+                </div>
+                <div className="p-6 flex-1 flex flex-col">
+                  <p className="text-xs font-semibold text-[#9A6A00]">{pl.who}</p>
+                  <p className="mt-2 flex items-end gap-2">
+                    {pl.price ? (<><span className="font-display text-5xl font-semibold tracking-tight text-gray-900">{naira(pl.price)}</span><span className="pb-1.5 text-gray-600">{pl.unit}</span></>)
+                      : <span className="font-display text-2xl font-semibold text-gray-900">{loading ? '…' : 'Price on request'}</span>}
+                  </p>
+                  {pl.key === 'mon' && MON_MIN > 0 && <p className="text-xs text-gray-500 mt-1">Minimum {naira(MON_MIN)} a month</p>}
+                  <ul className="mt-5 space-y-2.5 text-sm text-gray-700 flex-1">
+                    {pl.points.map((x) => <li key={x} className="flex gap-2.5"><Check size={16} className="mt-0.5 shrink-0 text-[var(--brand-primary)]" />{x}</li>)}
+                  </ul>
+                  <button type="button" onClick={() => navigate(pl.key === 'mon' ? '/contact' : '/developers')}
+                    className="mt-6 inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold text-white bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)]">
+                    {pl.key === 'mon' ? 'Talk to us' : 'Get a test key'}<ArrowRight size={15} />
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-gray-500">All prices in naira, set by our team and shown here as they are. Contact us for very large areas.</p>
+        </section>
+
+        {/* Monitoring estimator */}
+        {MON_PER_HA && (
+          <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-14">
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start">
+              <MonitoringEstimator perHa={MON_PER_HA} minimum={MON_MIN} />
+              <div>
+                <p className="text-sm font-semibold text-[var(--brand-primary)]">Crop monitoring</p>
+                <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight">A monthly price that grows with your farm</h2>
+                <p className="mt-4 text-gray-600 leading-relaxed">We count the hectares of the fields you map, measured from their boundaries, and multiply by {naira(MON_PER_HA)} a hectare a month. A 2 ha family farm pays {naira(Math.max(2 * MON_PER_HA, MON_MIN))} a month; a 500 ha estate pays {naira(Math.max(500 * MON_PER_HA, MON_MIN))}. Map a new field and it is counted from the next month; take one off and it stops.</p>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* How it is charged */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-          <p className="text-sm font-semibold text-[var(--brand-primary)]">How it is charged</p>
-          <h2 className="mt-2 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Fair by design: you pay for land, not for files</h2>
+          <p className="text-sm font-semibold text-[var(--brand-primary)]">How the API checks are charged</p>
+          <h2 className="mt-2 font-display text-3xl sm:text-4xl font-semibold tracking-tight">Fair: you pay for land, not for files</h2>
+          {SUIT_PER_HA && <p className="mt-3 text-gray-600 max-w-3xl">The same rules apply to crop suitability, at {naira(SUIT_PER_HA)} a hectare, with its PDF report included. The examples below are for the EUDR check.</p>}
           <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {RULES.map(({ icon: Icon, title, text }) => (
               <article key={title} className="rounded-2xl border border-gray-200 p-6">

@@ -168,7 +168,7 @@ function TimeSlider({ dates, value, onChange }) {
  * ([{label, value, sub, tip}]), height, title, date (a controlled timeline date, optional), onDate, focus (the chosen
  * state, LGA or ward feature), outlines (inner boundaries to draw, e.g. the LGAs of the chosen state), dark.
  */
-export default function MapView({ focus = null, initial = ['ndvi'], states, allStates, outlines, sites, stats = [], height = (typeof window !== 'undefined' && window.innerWidth < 768) ? '62vh' : 'calc(100vh - 330px)', title, date: dateIn, onDate, compact = false, dark = false }) {
+export default function MapView({ detail = false, focus = null, initial = ['ndvi'], states, allStates, outlines, sites, stats = [], height = (typeof window !== 'undefined' && window.innerWidth < 768) ? '62vh' : 'calc(100vh - 330px)', title, date: dateIn, onDate, compact = false, dark = false }) {
   const [layers, setLayers] = useState(() => Object.fromEntries(ORDER.map((k) => [k, { on: initial.includes(k), opacity: k === 'truecolor' ? 100 : 85 }])));
   const [panel, setPanel] = useState(() => !compact && (typeof window === 'undefined' || window.innerWidth >= 768));
   const [openGroups, setOpenGroups] = useState(() => Object.fromEntries(GROUPS.map((g) => [g, GROUPS.slice(0, 2).includes(g) || ORDER.some((k) => LAYERS[k].group === g && initial.includes(k))])));
@@ -187,7 +187,7 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, allS
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState('normal');
   const [cal, setCal] = useState(false);
-  const anyTime = ORDER.some((k) => layers[k].on && LAYERS[k].time);
+  const anyTime = ORDER.some((k) => isOn(k) && LAYERS[k].time);
   const years = Array.from({ length: new Date().getUTCFullYear() - 2014 }, (_, i) => new Date().getUTCFullYear() - i);
   // Split screen: a second map with its own date (by default the same picture a year earlier, or 30 days earlier).
   const [split, setSplit] = useState(null);         // null, 'side' or 'swipe'
@@ -217,7 +217,11 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, allS
     return () => clearInterval(t);
   }, [playing, speed, act.tl, act.d]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const set = (k, patch) => setLayers((s) => ({ ...s, [k]: { ...s[k], ...patch } }));
+  // Zoomed to an LGA or ward: sharp satellite imagery underneath, and the coarse layers off until the reader turns
+  // one on (owner, 25 Nov 2026). A layer switched on by hand stays on.
+  const [touched, setTouched] = useState({});
+  const isOn = (k) => layers[k].on && (!detail || touched[k] || !['ndvi', 'evi', 'truecolor', 'landcover', 'soil', 'rain', 'lst', 'photo', 'population', 'droughthaz', 'droughtloss', 'nightlights'].includes(k));
+  const set = (k, patch) => { if ('on' in patch) setTouched((s) => ({ ...s, [k]: true })); setLayers((s) => ({ ...s, [k]: { ...s[k], ...patch } })); };
   // The day each layer shows: the timeline's day, the nearest 16-day picture, or the layer's fixed date.
   const dayFor = (k, d = date) => {
     const l = LAYERS[k];
@@ -238,8 +242,9 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, allS
   const drawMap = (d, id) => (
     <MapContainer center={[11.5, 8.5]} zoom={6} style={{ height: '100%' }} zoomControl={false} scrollWheelZoom>
       <Sync group={sync} id={id} />
-      <TileLayer key={`base-${theme}`} url={BASE[theme]} attribution="Base map: Esri" maxNativeZoom={16} />
-      {ORDER.filter((k) => layers[k].on).map((k) => {
+      {detail ? <TileLayer key="base-imagery" url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}" attribution="Imagery: Esri, Maxar, Earthstar Geographics" maxNativeZoom={18} maxZoom={19} />
+        : <TileLayer key={`base-${theme}`} url={BASE[theme]} attribution="Base map: Esri" maxNativeZoom={16} />}
+      {ORDER.filter((k) => isOn(k)).map((k) => {
         const l = LAYERS[k];
         const cls = l.coarse ? 'gwon-soft' : '';
         if (l.kind === 'wms') {
@@ -249,7 +254,7 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, allS
         return <TileLayer key={`${k}-${dayFor(k, d)}`} url={tileUrl(k, l.kind === 'xyz' ? null : dayFor(k, d))} maxNativeZoom={l.level} maxZoom={14}
           opacity={layers[k].opacity / 100} attribution={l.kind === 'xyz' ? (k === 'protected' ? 'WDPA, UNEP-WCMC and IUCN' : 'Hansen/UMD/Google/USGS/NASA') : 'NASA GIBS (public domain)'} className={cls} />;
       })}
-      <TileLayer key={`lab-${theme}`} url={LABELS[theme]} attribution="Places: Esri" opacity={0.9} />
+      <TileLayer key={`lab-${detail ? 'img' : theme}`} url={detail ? LABELS.light : LABELS[theme]} attribution="Places: Esri" opacity={0.9} />
       {allStates && <GeoJSON key={`all-${theme}`} data={allStates} style={{ color: dark ? '#5E7A8A' : '#94A3B8', weight: 0.8, fill: false }}
         onEachFeature={(f, lyr) => lyr.bindTooltip(`<b>${f.properties.name || f.properties.state}</b>`, { sticky: true })} />}
       {states && <GeoJSON key={`st-w-${theme}`} data={states} style={{ color: dark ? '#0B1820' : '#FFFFFF', weight: 3, fill: false }} />}
@@ -258,8 +263,8 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, allS
       {outlines?.features?.length > 0 && <GeoJSON key={`ol-${outlines.features.length}-${outlines.features[0]?.properties?.name}`} data={outlines} style={{ color: dark ? '#9FB3BF' : '#0E2D41', weight: 0.7, opacity: 0.7, fill: false, dashArray: '3 3' }}
         onEachFeature={(f, lyr) => lyr.bindTooltip(`<b>${f.properties.name}</b>`, { sticky: true })} />}
       {/* The chosen state, LGA or ward stands out; the rest is dimmed. */}
-      {mask && <GeoJSON key={`mask-${focusKey}-${theme}`} data={mask} interactive={false} style={{ stroke: false, fillColor: dark ? '#0B1820' : '#FFFFFF', fillOpacity: 0.6 }} />}
-      {focus && <GeoJSON key={`focus-${focusKey}`} data={focus} interactive={false} style={{ color: dark ? '#7FD3A6' : '#0E2D41', weight: 3, fill: false }} />}
+      {mask && <GeoJSON key={`mask-${focusKey}-${theme}`} data={mask} interactive={false} style={{ stroke: false, fillColor: dark ? '#0B1820' : '#FFFFFF', fillOpacity: detail ? 0.45 : 0.6 }} />}
+      {focus && <GeoJSON key={`focus-${focusKey}`} data={focus} interactive={false} style={{ color: detail ? '#FACC15' : dark ? '#7FD3A6' : '#0E2D41', weight: 3, fill: false }} />}
       {sites?.features?.length > 0 && <GeoJSON key={`s-${sites.features.length}`} data={sites} style={{ color: '#B45309', weight: 2, fillColor: '#F59E0B', fillOpacity: 0.4 }}
         onEachFeature={(f, lyr) => lyr.bindTooltip(f.properties?.name || f.properties?.ref || 'Site', { sticky: true })} />}
       <Fit data={focus || states} />
@@ -324,7 +329,7 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, allS
         <div className="absolute top-3 left-3 z-[1002] w-[310px] max-w-[calc(100%-24px)] max-h-[calc(100%-24px)] flex">
           {!panel ? (
             <button type="button" onClick={() => setPanel(true)} className="self-start inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-white border border-gray-200 text-sm font-semibold text-gray-800">
-              <Layers size={16} className="text-[#007248]" /> Layers <span className="text-gray-500 font-normal">{ORDER.filter((k) => layers[k].on).length} on</span>
+              <Layers size={16} className="text-[#007248]" /> Layers <span className="text-gray-500 font-normal">{ORDER.filter((k) => isOn(k)).length} on</span>
             </button>
           ) : (
             <div className="rounded-2xl bg-white border border-gray-200 overflow-y-auto w-full">
@@ -338,7 +343,7 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, allS
               <div className="p-2 space-y-1">
                 {GROUPS.map((g) => {
                   const ks = [...ORDER].reverse().filter((k) => LAYERS[k].group === g);
-                  const on = ks.filter((k) => layers[k].on).length;
+                  const on = ks.filter((k) => isOn(k)).length;
                   return (
                     <div key={g}>
                       <button type="button" onClick={() => setOpenGroups((s) => ({ ...s, [g]: !s[g] }))} aria-expanded={!!openGroups[g]}
@@ -349,12 +354,12 @@ export default function MapView({ focus = null, initial = ['ndvi'], states, allS
                       {openGroups[g] && (
                         <div className="space-y-1.5 pb-1.5">
                           {ks.map((k) => (
-                            <div key={k} className={`rounded-xl border p-3 ${layers[k].on ? 'border-[#A9D9BF] bg-[#F1F9F4]' : 'border-gray-200'}`}>
+                            <div key={k} className={`rounded-xl border p-3 ${isOn(k) ? 'border-[#A9D9BF] bg-[#F1F9F4]' : 'border-gray-200'}`}>
                               <div className="flex items-center justify-between gap-2">
                                 <p className="text-sm font-semibold text-gray-900 flex items-center gap-1.5">{LAYERS[k].name} <InfoTip text={LAYERS[k].info} side="bottom" /></p>
-                                <Switch on={layers[k].on} onChange={(v) => set(k, { on: v })} label={LAYERS[k].name} />
+                                <Switch on={isOn(k)} onChange={(v) => set(k, { on: v })} label={LAYERS[k].name} />
                               </div>
-                              {layers[k].on && (
+                              {isOn(k) && (
                                 <div className="mt-2.5 space-y-2">
                                   <Legend k={k} />
                                   <label className="block">
