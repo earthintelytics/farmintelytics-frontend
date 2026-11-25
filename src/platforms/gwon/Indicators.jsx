@@ -5,10 +5,10 @@
 import InfoTip from '../../components/page/InfoTip';
 
 const TONES = {
-  teal: 'bg-[#ECFDF8] border-[#A7E3D4]', amber: 'bg-[#FFF8EB] border-[#F6D9A0]', green: 'bg-[#F1F8EC] border-[#CFE6BF]',
+  teal: 'bg-[#E8F5EE] border-[#A9D9BF]', amber: 'bg-[#FFF8EB] border-[#F6D9A0]', green: 'bg-[#F1F8EC] border-[#CFE6BF]',
   sky: 'bg-[#EEF6FD] border-[#BFDDF6]', rose: 'bg-[#FDF2F2] border-[#F5C8C8]', white: 'bg-white border-gray-200',
 };
-const LINE = { teal: '#0F766E', amber: '#D97706', green: '#3F8432', sky: '#2563EB', rose: '#B42318', white: '#0F766E' };
+const LINE = { teal: '#007248', amber: '#D97706', green: '#3F8432', sky: '#2563EB', rose: '#B42318', white: '#007248' };
 
 function Spark({ values, color }) {
   const v = values.filter((x) => x != null);
@@ -34,7 +34,7 @@ export default function Indicator({ label, value, sub, tip, tone = 'white', delt
         <p className="font-display text-2xl font-semibold text-gray-900 tabular-nums leading-tight">{value}</p>
         {trend && <Spark values={trend} color={LINE[tone]} />}
       </div>
-      {delta && <p className={`text-xs font-semibold ${delta.good == null ? 'text-gray-600' : delta.good ? 'text-[#0F766E]' : 'text-amber-700'}`}>{delta.text}</p>}
+      {delta && <p className={`text-xs font-semibold ${delta.good == null ? 'text-gray-600' : delta.good ? 'text-[#007248]' : 'text-amber-700'}`}>{delta.text}</p>}
       {(sub || trendLabel) && <p className="text-[11px] text-gray-500">{sub}{sub && trendLabel ? ' · ' : ''}{trendLabel}</p>}
     </div>
   );

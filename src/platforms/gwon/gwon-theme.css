@@ -1,0 +1,33 @@
+/*
+ * GWON colours: the National Agency for the Great Green Wall's own green (#007248) and navy (#0E2D41), from its seal.
+ * Dark mode: the whole platform under .gwon-dark, the same layout on deep navy surfaces. Flat colour, no glow.
+ */
+.gwon-dark { color-scheme: dark; background: #0B1820 !important; color: #E6EEF2; }
+.gwon-dark .bg-white, .gwon-dark .bg-white\/95 { background-color: #12232E !important; }
+.gwon-dark .bg-gray-50, .gwon-dark .hover\:bg-gray-50:hover { background-color: #172C39 !important; }
+.gwon-dark .bg-gray-100 { background-color: #0F1F29 !important; }
+.gwon-dark .bg-gray-200 { background-color: #20384A !important; }
+.gwon-dark .bg-gray-300 { background-color: #3A5466 !important; }
+.gwon-dark [class*="border-gray-"], .gwon-dark .divide-gray-100 > * + * { border-color: #24404F !important; }
+.gwon-dark .text-gray-900, .gwon-dark .text-gray-800 { color: #F1F6F8 !important; }
+.gwon-dark .text-gray-700 { color: #D3DEE4 !important; }
+.gwon-dark .text-gray-600 { color: #AFC0C9 !important; }
+.gwon-dark .text-gray-500, .gwon-dark .text-gray-400 { color: #8CA2AE !important; }
+.gwon-dark .text-gray-300 { color: #4D6573 !important; }
+/* tinted cards and chosen items keep their tint, darker */
+.gwon-dark .bg-\[\#E8F5EE\], .gwon-dark .bg-\[\#F1F9F4\], .gwon-dark .hover\:bg-\[\#D2EDDD\]:hover { background-color: #0F3324 !important; }
+.gwon-dark .bg-\[\#FFF8EB\] { background-color: #33270F !important; }
+.gwon-dark .bg-\[\#F1F8EC\] { background-color: #1A2F14 !important; }
+.gwon-dark .bg-\[\#EEF6FD\] { background-color: #10263A !important; }
+.gwon-dark .bg-\[\#FDF2F2\] { background-color: #341616 !important; }
+.gwon-dark .text-\[\#0E2D41\] { color: #7FD3A6 !important; }
+.gwon-dark .text-\[\#007248\] { color: #4CC38A !important; }
+.gwon-dark .text-amber-700 { color: #F2B45A !important; }
+.gwon-dark input, .gwon-dark select, .gwon-dark textarea { background-color: #12232E; color: #F1F6F8; }
+/* charts: grid lines and axis text readable on dark */
+.gwon-dark svg line[stroke="#EEF1F3"], .gwon-dark svg line[stroke="#DDE6EA"] { stroke: #24404F; }
+.gwon-dark svg text[fill="#6B7280"], .gwon-dark svg text[fill="#4B5563"], .gwon-dark svg text[fill="#374151"] { fill: #AFC0C9; }
+.gwon-dark svg text[fill="#111827"] { fill: #F1F6F8; }
+.gwon-dark svg rect[fill="#D1D5DB"] { fill: #4D6573; }
+.gwon-dark .leaflet-container { background: #0B1820; }
+.gwon-dark .leaflet-tooltip { background: #12232E; color: #F1F6F8; border-color: #24404F; }

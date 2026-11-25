@@ -61,7 +61,7 @@ export function LandChange({ from, to, a, b, types, colors }) {
   return (
     <div className="overflow-x-auto rounded-xl border border-gray-200">
       <table className="w-full text-sm">
-        <thead className="bg-[#0F766E] text-white text-left"><tr>
+        <thead className="bg-[#007248] text-white text-left"><tr>
           <th className="px-3 py-2">Land type</th><th className="px-3 py-2 text-right">{from} (ha)</th><th className="px-3 py-2 text-right">{to} (ha)</th>
           <th className="px-3 py-2 text-right">Change (ha)</th><th className="px-3 py-2 text-right">Change</th>
         </tr></thead>
@@ -71,8 +71,8 @@ export function LandChange({ from, to, a, b, types, colors }) {
               <td className="px-3 py-1.5"><span className="inline-flex items-center gap-2"><span className="w-3 h-3 rounded-sm border border-gray-200" style={{ background: colors[r.t] }} />{r.t}</span></td>
               <td className="px-3 py-1.5 text-right tabular-nums">{Math.round(r.x).toLocaleString('en-GB')}</td>
               <td className="px-3 py-1.5 text-right tabular-nums">{Math.round(r.y).toLocaleString('en-GB')}</td>
-              <td className={`px-3 py-1.5 text-right tabular-nums ${r.d < 0 ? 'text-amber-700' : 'text-[#0F766E]'}`}>{r.d > 0 ? '+' : ''}{Math.round(r.d).toLocaleString('en-GB')}</td>
-              <td className={`px-3 py-1.5 text-right tabular-nums ${r.d < 0 ? 'text-amber-700' : 'text-[#0F766E]'}`}>{r.pct == null ? 'new' : `${r.pct > 0 ? '+' : ''}${r.pct.toFixed(1)}%`}</td>
+              <td className={`px-3 py-1.5 text-right tabular-nums ${r.d < 0 ? 'text-amber-700' : 'text-[#007248]'}`}>{r.d > 0 ? '+' : ''}{Math.round(r.d).toLocaleString('en-GB')}</td>
+              <td className={`px-3 py-1.5 text-right tabular-nums ${r.d < 0 ? 'text-amber-700' : 'text-[#007248]'}`}>{r.pct == null ? 'new' : `${r.pct > 0 ? '+' : ''}${r.pct.toFixed(1)}%`}</td>
             </tr>
           ))}
         </tbody>
@@ -149,7 +149,7 @@ export function LandBars({ from, to, a, b, types, colors }) {
               <rect x={pad.l} y={y0 + 5} width={Math.max(2, xw(r.x))} height={10} rx="3" fill="#D1D5DB" />
               <rect x={pad.l} y={y0 + 17} width={Math.max(2, xw(r.y))} height={10} rx="3" fill={colors[r.t]} stroke="#9CA3AF" strokeWidth="0.5" />
               <text x={W - pad.r + 8} y={y0 + 14} fontSize="11" fill="#6B7280">{fmtHa(r.y)} ha</text>
-              <text x={W - pad.r + 8} y={y0 + 27} fontSize="11" fontWeight="600" fill={d < 0 ? '#B45309' : '#0F766E'}>{pct == null ? 'new' : `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`}</text>
+              <text x={W - pad.r + 8} y={y0 + 27} fontSize="11" fontWeight="600" fill={d < 0 ? '#B45309' : '#007248'}>{pct == null ? 'new' : `${pct > 0 ? '+' : ''}${pct.toFixed(1)}%`}</text>
             </g>
           );
         })}

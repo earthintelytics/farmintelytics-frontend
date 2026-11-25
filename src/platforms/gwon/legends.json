@@ -192,5 +192,207 @@
     "label": "0.70"
    }
   ]
+ },
+ "lst": {
+  "kind": "ramp",
+  "unit": "°C",
+  "stops": [
+   {
+    "color": "#0100FF",
+    "label": "-44"
+   },
+   {
+    "color": "#04FFF7",
+    "label": "-14"
+   },
+   {
+    "color": "#C5FF00",
+    "label": "17"
+   },
+   {
+    "color": "#FF9700",
+    "label": "47"
+   },
+   {
+    "color": "#FF0100",
+    "label": "77"
+   }
+  ]
+ },
+ "evi": {
+  "kind": "ramp",
+  "unit": "",
+  "stops": [
+   {
+    "color": "#F1ECEC",
+    "label": "0.0001"
+   },
+   {
+    "color": "#C0B096",
+    "label": "0.0976"
+   },
+   {
+    "color": "#9A6E59",
+    "label": "0.1951"
+   },
+   {
+    "color": "#5C9F01",
+    "label": "0.3876"
+   },
+   {
+    "color": "#0A6901",
+    "label": "0.5826"
+   },
+   {
+    "color": "#000001",
+    "label": "0.9751"
+   }
+  ]
+ },
+ "flood": {
+  "kind": "classes",
+  "unit": "",
+  "stops": [
+   {
+    "color": "#000001",
+    "label": "No Water"
+   },
+   {
+    "color": "#32D2F5",
+    "label": "Surface Water"
+   },
+   {
+    "color": "#FFFF00",
+    "label": "Recurring Flood"
+   },
+   {
+    "color": "#FA1E24",
+    "label": "Flood"
+   },
+   {
+    "color": "#AFAFAF",
+    "label": "Insufficient Data"
+   }
+  ]
+ },
+ "droughthaz": {
+  "kind": "ramp",
+  "unit": "droughts, 1980-2000",
+  "stops": [
+   {
+    "color": "#FEFEFE",
+    "label": "0"
+   },
+   {
+    "color": "#FDD88D",
+    "label": "4"
+   },
+   {
+    "color": "#F38921",
+    "label": "8"
+   },
+   {
+    "color": "#D0590B",
+    "label": "12"
+   },
+   {
+    "color": "#B44607",
+    "label": "16"
+   },
+   {
+    "color": "#983303",
+    "label": "20"
+   }
+  ]
+ },
+ "droughtloss": {
+  "kind": "ramp",
+  "unit": "decile of loss",
+  "stops": [
+   {
+    "color": "#F7FBFF",
+    "label": "1"
+   },
+   {
+    "color": "#ECE7F2",
+    "label": "3"
+   },
+   {
+    "color": "#A6BDDB",
+    "label": "5"
+   },
+   {
+    "color": "#74A9CF",
+    "label": "6"
+   },
+   {
+    "color": "#0570B0",
+    "label": "8"
+   },
+   {
+    "color": "#023858",
+    "label": "10"
+   }
+  ]
+ },
+ "photo": {
+  "kind": "ramp",
+  "unit": "kg C/m² in 8 days",
+  "stops": [
+   {
+    "color": "#640000",
+    "label": "0"
+   },
+   {
+    "color": "#FFCE00",
+    "label": "0.024"
+   },
+   {
+    "color": "#01FF00",
+    "label": "0.048"
+   },
+   {
+    "color": "#00FEFF",
+    "label": "0.0715"
+   },
+   {
+    "color": "#0100FF",
+    "label": "0.0955"
+   },
+   {
+    "color": "#FA31FF",
+    "label": "0.1195"
+   }
+  ]
+ },
+ "fires": {
+  "kind": "classes",
+  "unit": "",
+  "stops": [
+   {
+    "color": "#E8462A",
+    "label": "Fire or hot spot seen that day (MODIS)"
+   }
+  ]
+ },
+ "forestloss": {
+  "kind": "classes",
+  "unit": "",
+  "stops": [
+   {
+    "color": "#FF0000",
+    "label": "Tree cover lost, 2001 to 2024"
+   }
+  ]
+ },
+ "protected": {
+  "kind": "classes",
+  "unit": "",
+  "stops": [
+   {
+    "color": "#6FA35A",
+    "label": "Protected area (WDPA)"
+   }
+  ]
  }
 }

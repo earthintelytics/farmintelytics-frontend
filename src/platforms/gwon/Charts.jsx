@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 
-const TEAL = '#0F766E', GREY = '#A3AEB8', AMBER = '#D97706';
+const TEAL = '#007248', GREY = '#A3AEB8', AMBER = '#D97706';
 
 function Legend({ items }) {
   return (

@@ -4,7 +4,7 @@
  */
 import { useState } from 'react';
 
-const TEAL = '#0F766E', GREY = '#A3AEB8', INK = '#334155', BAND = '#DDE6EA';
+const TEAL = '#007248', GREY = '#A3AEB8', INK = '#334155', BAND = '#DDE6EA';
 const MON = ['J', 'F', 'M', 'A', 'M', 'J', 'J', 'A', 'S', 'O', 'N', 'D'];
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const MONTH_STARTS = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
