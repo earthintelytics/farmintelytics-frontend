@@ -11,7 +11,6 @@ import { login, fetchCropMonitoringConfig } from '../services/organizationMonito
 import ForgotPasswordModal from '../components/ForgotPasswordModal';
 import { HERO_PLACEHOLDERS } from '../constants/heroPlaceholders';
 import { clearTenantAccount } from '../services/session';
-import { demoAccounts } from '../constants/demoAccounts';
 import { signInDesignFor } from './login/signInDesigns';
 
 // ─── Main Login Component (Clean White Background Theme) ─────────────────────
@@ -29,7 +28,6 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
   const currentDesign = tenant && design.name === 'Your organisation'
     ? { ...design, name: tenant.charAt(0).toUpperCase() + tenant.slice(1).replace(/[-_]/g, ' ') }
     : design;
-  const demos = demoAccounts('tenant');
 
   const [prevDefaults, setPrevDefaults] = useState({ defaultEmail, defaultCode });
   if (defaultEmail !== prevDefaults.defaultEmail || defaultCode !== prevDefaults.defaultCode) {
@@ -229,18 +227,6 @@ const Login = ({ onLogin, moduleId, tenant = null, onBack, defaultEmail = '', de
                 )}
               </button>
             </form>
-
-            {demos.length > 0 && (
-              <div className="mt-6 flex flex-wrap items-center gap-2 text-sm text-[var(--text-muted)]">
-                <span>Demo account:</span>
-                {demos.map((d) => (
-                  <button key={d.email} type="button" onClick={() => { setEmail(d.email); setAccessCode(d.code); setError(''); }}
-                    className="px-3 py-1.5 rounded-lg border border-[var(--border-light)] bg-white hover:bg-[var(--bg-subtle)] text-[var(--text-main)] font-medium">
-                    {d.label || d.email}
-                  </button>
-                ))}
-              </div>
-            )}
 
           </div>
         </div>
